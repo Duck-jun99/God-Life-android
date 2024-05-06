@@ -1,12 +1,7 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -20,4 +15,12 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "God-Life"
-include(":app")
+include(
+    ":app",
+
+    ":core:data",
+    ":core:domain",
+    "core:designsystem",
+
+    ":feature:main"
+)
