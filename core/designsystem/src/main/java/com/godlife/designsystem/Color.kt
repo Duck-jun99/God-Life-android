@@ -1,4 +1,4 @@
-package com.godlife.god_life.ui.theme
+package com.godlife.designsystem
 
 import androidx.compose.ui.graphics.Color
 
