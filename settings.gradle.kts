@@ -26,5 +26,8 @@ include(
     ":core:sharedpreference",
 
     ":feature:main",
-    ":feature:login"
+    ":feature:login",
+    ":feature:main-page",
+    ":feature:community-page",
+    ":feature:setting-page",
 )
