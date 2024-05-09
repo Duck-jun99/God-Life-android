@@ -1,6 +1,7 @@
 package com.godlife.main
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -36,6 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MainUiTheme()
         }
@@ -45,7 +48,9 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainUiTheme(){
+
     CleanArchitectureTheme {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -56,6 +61,9 @@ fun MainUiTheme(){
 
             Text("hello")
 
+            Spacer(modifier = Modifier.height(30.dp))
+
+
         }
     }
 }
@@ -63,5 +71,20 @@ fun MainUiTheme(){
 @Preview(showBackground = true)
 @Composable
 fun MainPreview(){
-    MainUiTheme()
+    CleanArchitectureTheme {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text("hello")
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+        }
+    }
 }

@@ -1,9 +1,30 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
 plugins {
     id("god_life.android.feature")
 }
 
 android {
     namespace = "com.godlife.main"
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField(
+            "String",
+            "KAKAO_NATIVE_APP_KEY",
+            properties.getProperty("KAKAO_NATIVE_APP_KEY")
+        )
+
+
+        manifestPlaceholders["NATIVE_APP_KEY"] =
+            properties.getProperty("KAKAO_NATIVE_APP_KEY_NO_QUOTES")
+    }
 }
 
 dependencies {

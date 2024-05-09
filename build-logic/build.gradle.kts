@@ -26,5 +26,13 @@ gradlePlugin {
             id = "god_life.android.glide"
             implementationClass = "com.godlife.god_life.AndroidGlidePlugin"
         }
+        register("kakaoSdkUser"){
+            id = "god_life.kakao.user"
+            implementationClass = "com.godlife.god_life.KakaoSdkPlugin"
+        }
+        register("androidSecurityCrypto"){
+            id = "god_life.android.security-crypto"
+            implementationClass = "com.godlife.god_life.SecurityCryptoPlugin"
+        }
     }
 }
