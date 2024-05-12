@@ -30,6 +30,7 @@
             <option value="$PROJECT_DIR$/core/sharedpreference" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/community-page" />
+            <option value="$PROJECT_DIR$/feature/createtodolist" />
             <option value="$PROJECT_DIR$/feature/login" />
             <option value="$PROJECT_DIR$/feature/main" />
             <option value="$PROJECT_DIR$/feature/main-page" />

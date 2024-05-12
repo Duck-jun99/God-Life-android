@@ -30,4 +30,5 @@ include(
     ":feature:main-page",
     ":feature:community-page",
     ":feature:setting-page",
+    ":feature:createtodolist"
 )

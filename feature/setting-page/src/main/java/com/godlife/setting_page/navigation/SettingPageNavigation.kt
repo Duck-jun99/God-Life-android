@@ -3,10 +3,10 @@ package com.godlife.setting_page.navigation
 import androidx.navigation.NavController
 
 fun NavController.navigateSettingPage() {
-    navigate(MainSettingRoute.route)
+    navigate(SettingPageRoute.route)
 }
 
 
-object MainSettingRoute {
+object SettingPageRoute {
     const val route = "Setting-Page"
 }

@@ -3,12 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.godlife.setting_page"
+    namespace = "com.godlife.createtodolist"
 
     buildFeatures {
         buildConfig = true
     }
-
 
 }
 

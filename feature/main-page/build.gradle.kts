@@ -14,17 +14,7 @@ android {
 
 dependencies {
 
-    implementation(projects.feature.main)
-
-    implementation(projects.core.data)
-    implementation(projects.core.designsystem)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.runtimeCompose)
-    implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.kotlinx.immutable)
+    implementation(projects.feature.createtodolist)
 
     implementation(libs.androidx.junit.ktx)
 }
