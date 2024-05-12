@@ -11,16 +11,24 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://devrepo.kakao.com/nexus/content/groups/public/")
     }
 }
 
-rootProject.name = "God-Life"
+rootProject.name = "GodLife"
 include(
     ":app",
 
     ":core:data",
     ":core:domain",
     "core:designsystem",
+    ":core:network",
+    ":core:sharedpreference",
 
-    ":feature:main"
+    ":feature:main",
+    ":feature:login",
+    ":feature:main-page",
+    ":feature:community-page",
+    ":feature:setting-page",
+    ":feature:createtodolist"
 )

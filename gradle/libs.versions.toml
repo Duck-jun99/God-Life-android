@@ -58,6 +58,10 @@ navigationCommonKtx = "2.7.7"
 glide = "4.12.0"
 foundationLayoutAndroid = "1.6.7"
 
+kakaoUserSDK = "2.17.0"
+
+androidXSecurity = "1.0.0"
+
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -147,6 +151,9 @@ androidx-tracing-ktx = { group = "androidx.tracing", name = "tracing-ktx", versi
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroid" }
+
+kakao-sdk-v2-user = {module  = "com.kakao.sdk:v2-user", version.ref = "kakaoUserSDK"}
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "androidXSecurity"}
 
 [bundles]
 
