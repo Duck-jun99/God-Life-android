@@ -2,8 +2,8 @@ package com.godlife.createtodolist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godlife.createtodolist.model.EndTimeData
-import com.godlife.createtodolist.model.NotificationTimeData
+import com.godlife.model.todo.EndTimeData
+import com.godlife.model.todo.NotificationTimeData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

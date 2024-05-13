@@ -38,11 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.godlife.createtodolist.model.EndTimeData
-import com.godlife.createtodolist.model.NotificationTimeData
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GreyWhite
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.model.todo.EndTimeData
+import com.godlife.model.todo.NotificationTimeData
 import java.time.LocalDateTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

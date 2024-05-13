@@ -1,4 +1,4 @@
-package com.godlife.createtodolist.model
+package com.godlife.model.todo
 
 data class EndTimeData(
     val y:Int,
