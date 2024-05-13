@@ -1,25 +1,31 @@
 package com.godlife.createtodolist
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerLayoutType
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,10 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.godlife.designsystem.GodLifeTheme
-import com.godlife.designsystem.GreyWhite
-import com.godlife.designsystem.PurpleMain
+import com.godlife.createtodolist.model.EndTimeData
+import com.godlife.createtodolist.model.NotificationTimeData
+import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GreyWhite
+import com.godlife.designsystem.theme.PurpleMain
+import java.time.LocalDateTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -77,15 +87,10 @@ fun CreateTodoListScreen2(
                 )
             }
 
-            Text(text = "PM 10:00",
-                style = TextStyle(
-                    color = GreyWhite,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp
-                ),
-                modifier = Modifier.fillMaxWidth()
-                , textAlign = TextAlign.Center
-            )
+            Box(modifier = Modifier.fillMaxWidth()){
+                EndTimeInput(modifier = Modifier.padding(10.dp)
+                    .align(Alignment.Center))
+            }
 
             Spacer(modifier = Modifier.height(100.dp))
 
@@ -107,15 +112,10 @@ fun CreateTodoListScreen2(
                 )
             }
 
-            Text(text = "PM 09:00",
-                style = TextStyle(
-                    color = GreyWhite,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp
-                ),
-                modifier = Modifier.fillMaxWidth()
-                , textAlign = TextAlign.Center
-            )
+            Box(modifier = Modifier.fillMaxWidth()){
+                NotificationTimeInput(modifier = Modifier.padding(10.dp)
+                    .align(Alignment.Center))
+            }
 
             Spacer(modifier = Modifier.height(100.dp))
 
@@ -163,6 +163,13 @@ fun CreateTodoListScreen2Preview(){
                 )
             }
 
+            Box(modifier = Modifier.fillMaxWidth()){
+                EndTimeInput(modifier = Modifier.padding(10.dp)
+                    .align(Alignment.Center))
+            }
+
+
+/*
             Text(text = "PM 10:00",
                 style = TextStyle(
                     color = GreyWhite,
@@ -172,6 +179,8 @@ fun CreateTodoListScreen2Preview(){
                 modifier = Modifier.fillMaxWidth()
                 , textAlign = TextAlign.Center
             )
+
+ */
 
             Spacer(modifier = Modifier.height(100.dp))
 
@@ -193,6 +202,12 @@ fun CreateTodoListScreen2Preview(){
                 )
             }
 
+            Box(modifier = Modifier.fillMaxWidth()){
+                NotificationTimeInput(modifier = Modifier.padding(10.dp)
+                    .align(Alignment.Center))
+            }
+
+            /*
             Text(text = "PM 09:00",
                 style = TextStyle(
                     color = GreyWhite,
@@ -203,10 +218,87 @@ fun CreateTodoListScreen2Preview(){
                 , textAlign = TextAlign.Center
             )
 
+             */
+
             Spacer(modifier = Modifier.height(100.dp))
 
 
         }
 
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EndTimeInput(
+    modifier: Modifier,
+    createViewModel: CreateViewModel = hiltViewModel()
+){
+    val timePickerState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 0,
+        is24Hour = false
+    )
+
+    TimeInput(
+        state = timePickerState,
+        modifier = modifier,
+        colors = TimePickerDefaults.colors(Color.Black),
+    )
+
+    val now = LocalDateTime.now()
+    val year = now.year
+    val month = now.monthValue
+    val day = now.dayOfMonth
+    val hour = timePickerState.hour
+    val minute = timePickerState.minute
+
+    createViewModel.updateEndTime(EndTimeData(year, month, day, hour, minute))
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotificationTimeInput(
+    modifier: Modifier,
+    createViewModel: CreateViewModel = hiltViewModel()
+){
+    val timePickerState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 0,
+        is24Hour = false
+    )
+
+    TimeInput(
+        state = timePickerState,
+        modifier = modifier,
+        colors = TimePickerDefaults.colors(Color.Black),
+    )
+
+    val now = LocalDateTime.now()
+    val year = now.year
+    val month = now.monthValue
+    val day = now.dayOfMonth
+    val hour = timePickerState.hour
+    val minute = timePickerState.minute
+
+    createViewModel.updateNotificationTime(NotificationTimeData(year, month, day, hour, minute))
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun TimeInputPreview(){
+    val timePickerState = rememberTimePickerState(
+        initialHour = 17,
+        initialMinute = 30,
+        is24Hour = false
+    )
+
+    TimeInput(
+        state = timePickerState,
+        modifier = Modifier.padding(top = 10.dp),
+        colors = TimePickerDefaults.colors(Color.Black)
+    )
 }

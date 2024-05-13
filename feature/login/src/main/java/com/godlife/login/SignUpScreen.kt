@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.godlife.designsystem.GodLifeTheme
+import com.godlife.designsystem.theme.GodLifeTheme
 
 @Preview(showBackground = true)
 @Composable
