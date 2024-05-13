@@ -46,7 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.godlife.createtodolist.model.TodoList
-import com.godlife.designsystem.CleanArchitectureTheme
+import com.godlife.designsystem.GodLifeTheme
 import com.godlife.designsystem.GreyWhite
 import com.godlife.designsystem.PurpleMain
 
@@ -65,7 +65,7 @@ fun CreateTodoListScreen1(
 
     val navController = rememberNavController()
 
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         Column(
             modifier = Modifier
@@ -158,7 +158,7 @@ fun CreateTodoListScreen1(
 @Preview(showBackground = true)
 @Composable
 fun CreateTodoListScreen1Preview(){
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         Column(
             modifier = Modifier
@@ -202,7 +202,8 @@ fun CreateTodoListScreen1Preview(){
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Blue),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxHeight(0.7f)
                     .align(Alignment.CenterHorizontally)
             )
@@ -220,7 +221,8 @@ fun CreateTodoListScreen1Preview(){
                     fontWeight = FontWeight.Bold,
                     color = Color.Blue
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxHeight(0.2f)
                     .align(Alignment.CenterHorizontally)
             )

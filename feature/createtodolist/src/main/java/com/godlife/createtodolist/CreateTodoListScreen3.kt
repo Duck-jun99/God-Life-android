@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.godlife.designsystem.CleanArchitectureTheme
+import com.godlife.designsystem.GodLifeTheme
 import com.godlife.designsystem.GreyWhite
 import com.godlife.designsystem.PurpleMain
 
@@ -40,7 +40,7 @@ import com.godlife.designsystem.PurpleMain
 fun CreateTodoListScreen3(
     createViewModel: CreateViewModel = hiltViewModel()
 ){
-    CleanArchitectureTheme{
+    GodLifeTheme{
 
         Column(
             modifier = Modifier
@@ -63,7 +63,7 @@ fun CreateTodoListScreen3(
 @Preview(showBackground = true)
 @Composable
 fun CreateTodoListScreen3Preview(){
-    CleanArchitectureTheme{
+    GodLifeTheme{
 
         Column(
             modifier = Modifier

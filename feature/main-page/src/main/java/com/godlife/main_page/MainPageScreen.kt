@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.godlife.createtodolist.CreateActivity
-import com.godlife.designsystem.CleanArchitectureTheme
+import com.godlife.designsystem.GodLifeTheme
 import com.godlife.designsystem.NullColor
 import com.godlife.designsystem.Purple40
 import com.godlife.designsystem.PurpleMain
@@ -55,7 +55,7 @@ fun MainPageScreen(
 
     val context = LocalContext.current
 
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         Column(
             modifier = Modifier
@@ -129,7 +129,7 @@ fun GradientSquareWithText(
 @Preview(showBackground = true)
 @Composable
 fun MainPreview(){
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         Column(
             modifier = Modifier

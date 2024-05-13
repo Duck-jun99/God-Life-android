@@ -65,7 +65,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.navigation.CommunityPageRoute
-import com.godlife.designsystem.CleanArchitectureTheme
+import com.godlife.designsystem.GodLifeTheme
 import com.godlife.designsystem.NullColor
 import com.godlife.designsystem.Purple40
 import com.godlife.designsystem.PurpleMain
@@ -158,7 +158,7 @@ fun TabBarBadgeView(count: Int? = null) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainUiTheme(){
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         val mainTab = TabBarItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
         val communityTab = TabBarItem(title = "God Life", selectedIcon = Icons.Filled.List, unselectedIcon = Icons.Outlined.List, route = CommunityPageRoute.route)
