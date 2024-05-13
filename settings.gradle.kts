@@ -24,6 +24,8 @@ include(
     "core:designsystem",
     ":core:network",
     ":core:sharedpreference",
+    ":core:database",
+    ":core:model",
 
     ":feature:main",
     ":feature:login",

@@ -20,15 +20,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,12 +38,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.godlife.createtodolist.model.TodoList
-import com.godlife.designsystem.CleanArchitectureTheme
-import com.godlife.designsystem.GreyWhite
-import com.godlife.designsystem.PurpleMain
+import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GodLifeTypography
+import com.godlife.designsystem.theme.GreyWhite
+import com.godlife.designsystem.theme.PurpleMain
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -65,7 +61,7 @@ fun CreateTodoListScreen1(
 
     val navController = rememberNavController()
 
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         Column(
             modifier = Modifier
@@ -73,35 +69,10 @@ fun CreateTodoListScreen1(
         ) {
 
 
-            Row(modifier = Modifier
-                .fillMaxWidth()
-            ){
-                Text(
-                    text = "오늘 달성할 목표를 선택해주세요.",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = GreyWhite
-                    ),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-
-                Button(onClick = {
-
-                },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = PurpleMain
-                    )
-                ) {
-                    Text(text = "이전 목표 불러오기",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-            }
+            Text(
+                text = "오늘 달성할 목표를 선택해주세요.",
+                style = GodLifeTypography.titleLarge
+            )
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
@@ -113,12 +84,24 @@ fun CreateTodoListScreen1(
                 }
             }
 
-            Text(text = "선택한 목표",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreyWhite)
-            )
+            Row(modifier = Modifier
+                .fillMaxWidth()
+            ){
+
+                Text(text = "선택한 목표",
+                    style = GodLifeTypography.titleLarge
+                )
+
+                GodLifeButton(onClick = { /*TODO*/ }) {
+                    Text(text = "이전 목표 불러오기",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
 
 
             LazyRow(
@@ -158,7 +141,7 @@ fun CreateTodoListScreen1(
 @Preview(showBackground = true)
 @Composable
 fun CreateTodoListScreen1Preview(){
-    CleanArchitectureTheme {
+    GodLifeTheme {
 
         Column(
             modifier = Modifier
@@ -166,34 +149,10 @@ fun CreateTodoListScreen1Preview(){
                 .padding(10.dp),
             //horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-            ){
-                Text(
-                    text = "오늘 달성할 목표를 선택해주세요.",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = GreyWhite
-                    ),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-
-                Button(onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = PurpleMain
-                    )
-                ) {
-                    Text(text = "이전 목표 불러오기",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-            }
+            Text(
+                text = "오늘 달성할 목표를 선택해주세요.",
+                style = GodLifeTypography.titleLarge
+            )
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -202,17 +161,32 @@ fun CreateTodoListScreen1Preview(){
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Blue),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxHeight(0.7f)
                     .align(Alignment.CenterHorizontally)
             )
 
-            Text(text = "선택한 목표",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreyWhite)
-            )
+            Row(modifier = Modifier
+                .fillMaxWidth()
+            ){
+
+                Text(text = "선택한 목표",
+                    style = GodLifeTypography.titleLarge
+                )
+
+                GodLifeButton(onClick = { /*TODO*/ }) {
+                    Text(text = "이전 목표 불러오기",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+
+
 
             Text(text = "리스트 부분",
                 style = TextStyle(
@@ -220,7 +194,8 @@ fun CreateTodoListScreen1Preview(){
                     fontWeight = FontWeight.Bold,
                     color = Color.Blue
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .fillMaxHeight(0.2f)
                     .align(Alignment.CenterHorizontally)
             )
