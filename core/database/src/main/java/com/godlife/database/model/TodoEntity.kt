@@ -3,6 +3,8 @@ package com.godlife.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.godlife.model.todo.EndTimeData
+import com.godlife.model.todo.NotificationTimeData
 
 @Entity(tableName = "todos")
 data class TodoEntity(
@@ -12,8 +14,8 @@ data class TodoEntity(
     val todoList: List<String>,
 
     @ColumnInfo(name = "endTime")
-    val endTime: List<String>,
+    val endTime: EndTimeData,
 
     @ColumnInfo(name = "notificationTime")
-    val notificationTime: List<String>
+    val notificationTime: NotificationTimeData
 )

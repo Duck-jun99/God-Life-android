@@ -4,7 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.godlife.database.model.TodoEntity
+import com.godlife.database.util.EndTimeDataConverter
 import com.godlife.database.util.ListConverter
+import com.godlife.database.util.NotificationTimeDataConverter
 
 @Database(
     entities = [TodoEntity::class],
@@ -12,6 +14,8 @@ import com.godlife.database.util.ListConverter
 )
 @TypeConverters(
     ListConverter::class,
+    EndTimeDataConverter::class,
+    NotificationTimeDataConverter::class
 )
 abstract class LocalDatabase : RoomDatabase() {
 

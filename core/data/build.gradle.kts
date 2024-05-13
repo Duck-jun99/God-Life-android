@@ -11,7 +11,7 @@ dependencies {
 
     api(projects.core.network)
     api(projects.core.sharedpreference)
-    //api(projects.core.database)
+    api(projects.core.database)
 
     implementation(libs.androidx.junit.ktx)
 
