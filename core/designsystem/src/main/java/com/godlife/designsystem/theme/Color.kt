@@ -18,3 +18,6 @@ val PurpleSecond = Color(0xFF9FA8DA)
 val GreyWhite = Color(0xFF7E7575)
 
 val NullColor = Color(0x00FFFFFF)
+
+//불투명 색상
+val CheckColor = Color(0x80495C9F)

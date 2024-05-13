@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GreyWhite
 import com.godlife.designsystem.theme.PurpleMain
@@ -88,7 +89,8 @@ fun CreateTodoListScreen2(
             }
 
             Box(modifier = Modifier.fillMaxWidth()){
-                EndTimeInput(modifier = Modifier.padding(10.dp)
+                EndTimeInput(modifier = Modifier
+                    .padding(10.dp)
                     .align(Alignment.Center))
             }
 
@@ -113,7 +115,8 @@ fun CreateTodoListScreen2(
             }
 
             Box(modifier = Modifier.fillMaxWidth()){
-                NotificationTimeInput(modifier = Modifier.padding(10.dp)
+                NotificationTimeInput(modifier = Modifier
+                    .padding(10.dp)
                     .align(Alignment.Center))
             }
 
@@ -164,7 +167,8 @@ fun CreateTodoListScreen2Preview(){
             }
 
             Box(modifier = Modifier.fillMaxWidth()){
-                EndTimeInput(modifier = Modifier.padding(10.dp)
+                EndTimeInput(modifier = Modifier
+                    .padding(10.dp)
                     .align(Alignment.Center))
             }
 
@@ -203,7 +207,8 @@ fun CreateTodoListScreen2Preview(){
             }
 
             Box(modifier = Modifier.fillMaxWidth()){
-                NotificationTimeInput(modifier = Modifier.padding(10.dp)
+                NotificationTimeInput(modifier = Modifier
+                    .padding(10.dp)
                     .align(Alignment.Center))
             }
 
@@ -246,14 +251,19 @@ fun EndTimeInput(
         colors = TimePickerDefaults.colors(Color.Black),
     )
 
-    val now = LocalDateTime.now()
-    val year = now.year
-    val month = now.monthValue
-    val day = now.dayOfMonth
-    val hour = timePickerState.hour
-    val minute = timePickerState.minute
 
-    createViewModel.updateEndTime(EndTimeData(year, month, day, hour, minute))
+    createViewModel.updateEndTime(
+        EndTimeData(LocalDateTime.now().year,
+            LocalDateTime.now().monthValue,
+            LocalDateTime.now().dayOfMonth,
+            timePickerState.hour,
+            timePickerState.minute))
+
+    Log.e("EndTimeInput", EndTimeData(LocalDateTime.now().year,
+        LocalDateTime.now().monthValue,
+        LocalDateTime.now().dayOfMonth,
+        timePickerState.hour,
+        timePickerState.minute).toString())
 
 }
 
@@ -275,15 +285,19 @@ fun NotificationTimeInput(
         colors = TimePickerDefaults.colors(Color.Black),
     )
 
-    val now = LocalDateTime.now()
-    val year = now.year
-    val month = now.monthValue
-    val day = now.dayOfMonth
-    val hour = timePickerState.hour
-    val minute = timePickerState.minute
 
-    createViewModel.updateNotificationTime(NotificationTimeData(year, month, day, hour, minute))
+    Log.e("NotificationTimeInput", NotificationTimeData(LocalDateTime.now().year,
+        LocalDateTime.now().monthValue,
+        LocalDateTime.now().dayOfMonth,
+        timePickerState.hour,
+        timePickerState.minute).toString())
 
+    createViewModel.updateNotificationTime(
+        NotificationTimeData(LocalDateTime.now().year,
+            LocalDateTime.now().monthValue,
+            LocalDateTime.now().dayOfMonth,
+            timePickerState.hour,
+            timePickerState.minute))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

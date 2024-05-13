@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,6 +29,9 @@ import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.PurpleMain
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CreateActivity :ComponentActivity() {
@@ -42,7 +46,9 @@ class CreateActivity :ComponentActivity() {
 }
 
 @Composable
-fun CreateTodoList() {
+fun CreateTodoList(
+    createViewModel: CreateViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -82,9 +88,14 @@ fun CreateTodoList() {
 
             GodLifeButton(
                 onClick = {
+                    //첫번째 화면
                     if(currentRoute == CreateTodoListScreen1Route.route) {navController.navigate(CreateTodoListScreen2Route.route)
                     }
-                    else if (currentRoute == CreateTodoListScreen2Route.route) {navController.navigate(CreateTodoListScreen3Route.route)}
+                    //두번째 화면
+                    else if (currentRoute == CreateTodoListScreen2Route.route) {
+
+                        navController.navigate(CreateTodoListScreen3Route.route)
+                    }
                 },
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -123,7 +134,8 @@ fun CreateUiPreview(){
                 .weight(0.1f)){
 
                 GodLifeButton(onClick = { /*TODO*/ },
-                    modifier = Modifier.fillMaxWidth(0.5f)
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
                         .align(Alignment.Center),
                     text = {Text(text = "다음",
                         style = TextStyle(color = Color.White)

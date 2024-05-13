@@ -14,5 +14,6 @@ android {
 dependencies {
 
     implementation(libs.androidx.junit.ktx)
+    implementation(projects.core.database)
     implementation(projects.core.model)
 }

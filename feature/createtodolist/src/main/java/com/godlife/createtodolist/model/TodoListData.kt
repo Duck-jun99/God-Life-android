@@ -5,6 +5,7 @@ import com.godlife.createtodolist.R
 data class TodoListForm(
     val name: String,
     val imgId: Int,
+    var isSelected:Boolean = false,
     val description: String = ""
 )
 
