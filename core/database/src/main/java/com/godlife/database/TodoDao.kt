@@ -3,12 +3,13 @@ package com.godlife.database
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.godlife.database.model.TodoEntity
 
 @Dao
 interface TodoDao {
     @Insert
-    suspend fun insertUser(todo:Todo)
+    fun insertTodo(todo: TodoEntity)
 
-    @Query("SELECT * FROM users WHERE email = :email")
-    suspend fun getUserByEmail(email: String): User?
+    @Query("SELECT * FROM todos")
+    fun getAllTodoList() : List<TodoEntity>
 }
