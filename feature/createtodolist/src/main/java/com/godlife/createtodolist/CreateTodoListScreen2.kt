@@ -29,6 +29,8 @@ import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +56,12 @@ import java.time.LocalDateTime
 fun CreateTodoListScreen2(
     createViewModel: CreateViewModel = hiltViewModel()
 ){
+
+    Log.e("CreateViewModel2", createViewModel.toString())
+
+    val selectedList by createViewModel.selectedList.collectAsState()
+    Log.e("selectedList",selectedList.toString())
+
     GodLifeTheme{
 
         Column(

@@ -17,6 +17,6 @@ dependencies {
     implementation(projects.core.database)
     implementation(projects.core.model)
 
-    //api(projects.feature.main)
+    implementation(projects.feature.navigator)
 
 }

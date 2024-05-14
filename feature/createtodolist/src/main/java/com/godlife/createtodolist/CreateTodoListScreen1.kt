@@ -70,11 +70,13 @@ fun CreateTodoListScreen1(
 
     //val todoList = TodoList().getTodoList()
 
+    Log.e("CreateViewModel1", createViewModel.toString())
+
     val todoList by createViewModel.todoList.collectAsState()
     Log.e("todoList", todoList.toString())
 
     val selectedList by createViewModel.selectedList.collectAsState()
-    Log.e("kjldaslkd",selectedList.toString())
+    Log.e("selectedList",selectedList.toString())
 
     val navController = rememberNavController()
 
@@ -182,7 +184,7 @@ fun CardTodoList(
         modifier = Modifier
             .padding(5.dp)
             .clickable {
-                //viewModel.addToSelectedList(title)
+                viewModel.addToSelectedList(todoItem.name)
                 viewModel.toggleSelect(todoItem)
             },
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -221,10 +223,12 @@ fun SelectedCardTodoList(
 ){
 
     Column(
-        modifier = Modifier.padding(5.dp).clickable {
-            //viewModel.addToSelectedList(title)
-            viewModel.toggleSelect(todoItem)
-        },
+        modifier = Modifier
+            .padding(5.dp)
+            .clickable {
+                viewModel.deleteToSelectedList(todoItem.name)
+                viewModel.toggleSelect(todoItem)
+            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 

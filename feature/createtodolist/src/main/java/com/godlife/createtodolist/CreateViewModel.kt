@@ -23,6 +23,7 @@ class CreateViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase
 ) :ViewModel(){
 
+
     private val _todoList = MutableStateFlow(TodoList().getTodoList())
     val todoList: StateFlow<List<TodoListForm>> = _todoList
 
@@ -44,14 +45,20 @@ class CreateViewModel @Inject constructor(
 
     }
 
-    /*
+
     fun addToSelectedList(todo: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _selectedList.value += todo
         }
     }
 
-     */
+    fun deleteToSelectedList(todo: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _selectedList.value = _selectedList.value.toMutableList().apply { remove(todo) }
+        }
+    }
+
+
 
     fun updateEndTime(time: EndTimeData) {
         viewModelScope.launch(Dispatchers.IO) {

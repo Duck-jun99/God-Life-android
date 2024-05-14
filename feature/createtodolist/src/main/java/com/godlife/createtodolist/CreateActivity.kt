@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,20 +34,24 @@ import androidx.navigation.navOptions
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateActivity :ComponentActivity() {
+
+    @Inject
+    lateinit var mainNavigator: MainNavigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val context: Context = this
-
         setContent{
-            CreateTodoList(context)
+            CreateTodoList(mainNavigator, this)
         }
 
     }
@@ -53,8 +59,10 @@ class CreateActivity :ComponentActivity() {
 
 @Composable
 fun CreateTodoList(
-    context: Context,
+    mainNavigator: MainNavigator,
+    createActivity: CreateActivity,
     createViewModel: CreateViewModel = hiltViewModel()
+
 ) {
     val navController = rememberNavController()
 
@@ -72,18 +80,32 @@ fun CreateTodoList(
                 .fillMaxWidth()
                 .weight(0.9f)) {
 
+
             composable(CreateTodoListScreen1Route.route){
                 CreateTodoListScreen1()
 
             }
 
-            composable(CreateTodoListScreen2Route.route){
-                CreateTodoListScreen2()
-
+            composable(
+                route = CreateTodoListScreen2Route.route
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(CreateTodoListScreen1Route.route)
+                }
+                CreateTodoListScreen2(
+                    createViewModel = hiltViewModel(parentEntry)
+                )
             }
 
-            composable(CreateTodoListScreen3Route.route){
-                CreateTodoListScreen3()
+            composable(
+                route = CreateTodoListScreen3Route.route
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(CreateTodoListScreen2Route.route)
+                }
+                CreateTodoListScreen3(
+                    createViewModel = hiltViewModel(parentEntry)
+                )
             }
 
         }
@@ -105,7 +127,7 @@ fun CreateTodoList(
                     }
                     //세번째 화면
                     else{
-                        MoveMainActivity(context)
+                        MoveMainActivity(mainNavigator = mainNavigator, createActivity = createActivity)
                     }
                 },
                 modifier = Modifier
@@ -137,7 +159,7 @@ fun CreateUiPreview(){
                 .fillMaxWidth()
                 .weight(0.9f)){
 
-                CreateTodoListScreen1()
+                //CreateTodoListScreen1()
             }
 
             Box(modifier = Modifier
@@ -173,10 +195,12 @@ object CreateTodoListScreen3Route {
 }
 
 
-private fun MoveMainActivity(
-    context:Context
-){
+private fun MoveMainActivity(mainNavigator: MainNavigator, createActivity: CreateActivity){
     //val intent = Intent(context, MainActivity::class.java)
     //ContextCompat.startActivity(context, intent, null)
+    mainNavigator.navigateFrom(
+        activity = createActivity,
+        withFinish = true
+    )
 }
 
