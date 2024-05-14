@@ -1,5 +1,7 @@
 package com.godlife.createtodolist
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,10 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,8 +42,10 @@ class CreateActivity :ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val context: Context = this
+
         setContent{
-            CreateTodoList()
+            CreateTodoList(context)
         }
 
     }
@@ -47,6 +53,7 @@ class CreateActivity :ComponentActivity() {
 
 @Composable
 fun CreateTodoList(
+    context: Context,
     createViewModel: CreateViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
@@ -95,6 +102,10 @@ fun CreateTodoList(
                     else if (currentRoute == CreateTodoListScreen2Route.route) {
 
                         navController.navigate(CreateTodoListScreen3Route.route)
+                    }
+                    //세번째 화면
+                    else{
+                        MoveMainActivity(context)
                     }
                 },
                 modifier = Modifier
@@ -160,3 +171,12 @@ object CreateTodoListScreen2Route {
 object CreateTodoListScreen3Route {
     const val route = "CreateTodoListScreen3"
 }
+
+
+private fun MoveMainActivity(
+    context:Context
+){
+    //val intent = Intent(context, MainActivity::class.java)
+    //ContextCompat.startActivity(context, intent, null)
+}
+

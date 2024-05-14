@@ -100,7 +100,7 @@ fun CreateTodoListScreen1(
 
             Text(
                 text = "오늘 달성할 목표를 선택해주세요.",
-                style = GodLifeTypography.titleLarge
+                style = GodLifeTypography.titleMedium
             )
 
             LazyVerticalGrid(
@@ -121,7 +121,7 @@ fun CreateTodoListScreen1(
             ){
 
                 Text(text = "선택한 목표",
-                    style = GodLifeTypography.titleLarge
+                    style = GodLifeTypography.titleMedium
                 )
 
                 GodLifeButton(onClick = getOnClick) {
@@ -314,7 +314,7 @@ fun CreateTodoListScreen1Preview(){
         ) {
             Text(
                 text = "오늘 달성할 목표를 선택해주세요.",
-                style = GodLifeTypography.titleLarge
+                style = GodLifeTypography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -335,7 +335,7 @@ fun CreateTodoListScreen1Preview(){
             ){
 
                 Text(text = "선택한 목표",
-                    style = GodLifeTypography.titleLarge
+                    style = GodLifeTypography.titleMedium
                 )
 
                 GodLifeButton(onClick = { /*TODO*/ }) {

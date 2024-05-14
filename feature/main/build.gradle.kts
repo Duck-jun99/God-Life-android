@@ -29,13 +29,17 @@ android {
 
 dependencies {
 
-    implementation(projects.core.data)
-    implementation(projects.core.designsystem)
+    //implementation(projects.core.data)
+    //implementation(projects.core.designsystem)
+
 
     implementation(projects.feature.mainPage)
     implementation(projects.feature.communityPage)
     implementation(projects.feature.settingPage)
-    implementation(projects.feature.createtodolist)
+    
+    //implementation(projects.feature.createtodolist)
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

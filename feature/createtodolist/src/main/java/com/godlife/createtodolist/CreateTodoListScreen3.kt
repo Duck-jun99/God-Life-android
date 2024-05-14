@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -29,11 +30,7 @@ fun CreateTodoListScreen3(
 
             Text(
                 text = "오늘의 목표 설정이 완료되었어요.\n보람찬 하루를 시작해봐요!",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreyWhite
-                )
+                style = GodLifeTypography.titleMedium
             )
         }
 
@@ -52,11 +49,7 @@ fun CreateTodoListScreen3Preview(){
 
             Text(
                 text = "오늘의 목표 설정이 완료되었어요.\n보람찬 하루를 시작해봐요!",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreyWhite
-                )
+                style = GodLifeTypography.titleMedium
             )
         }
 

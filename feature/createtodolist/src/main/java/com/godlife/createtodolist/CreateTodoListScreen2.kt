@@ -2,6 +2,7 @@ package com.godlife.createtodolist
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.annotation.ColorRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerLayoutType
+import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,6 +42,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.todo.EndTimeData
@@ -60,11 +63,7 @@ fun CreateTodoListScreen2(
 
             Text(
                 text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreyWhite
-                )
+                style = GodLifeTypography.titleMedium
             )
 
 
@@ -245,11 +244,7 @@ fun EndTimeInput(
         is24Hour = false
     )
 
-    TimeInput(
-        state = timePickerState,
-        modifier = modifier,
-        colors = TimePickerDefaults.colors(Color.Black),
-    )
+    CustomTimeInput(timePickerState = timePickerState)
 
 
     createViewModel.updateEndTime(
@@ -279,12 +274,7 @@ fun NotificationTimeInput(
         is24Hour = false
     )
 
-    TimeInput(
-        state = timePickerState,
-        modifier = modifier,
-        colors = TimePickerDefaults.colors(Color.Black),
-    )
-
+    CustomTimeInput(timePickerState = timePickerState)
 
     Log.e("NotificationTimeInput", NotificationTimeData(LocalDateTime.now().year,
         LocalDateTime.now().monthValue,
@@ -298,6 +288,74 @@ fun NotificationTimeInput(
             LocalDateTime.now().dayOfMonth,
             timePickerState.hour,
             timePickerState.minute))
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTimeInput(
+    timePickerState: TimePickerState
+){
+    TimeInput(
+        state = timePickerState,
+        modifier = Modifier.padding(top = 10.dp),
+        colors = TimePickerDefaults.colors(
+            timeSelectorSelectedContainerColor = Color.White,
+            timeSelectorSelectedContentColor = PurpleMain,
+            timeSelectorUnselectedContainerColor = Color.White,
+            timeSelectorUnselectedContentColor = GreyWhite,
+
+            periodSelectorBorderColor = PurpleMain,
+            periodSelectorSelectedContainerColor = PurpleMain,
+            periodSelectorSelectedContentColor = Color.White,
+            periodSelectorUnselectedContainerColor = Color.White,
+            periodSelectorUnselectedContentColor = GreyWhite,
+
+            containerColor = PurpleMain,
+            selectorColor = PurpleMain,
+            clockDialColor = PurpleMain,
+            clockDialSelectedContentColor = PurpleMain,
+            clockDialUnselectedContentColor = Color.White,
+
+        )
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun CustomTimeInputPreview(){
+    val timePickerState = rememberTimePickerState(
+        initialHour = 17,
+        initialMinute = 30,
+        is24Hour = false
+    )
+
+    TimeInput(
+        state = timePickerState,
+        modifier = Modifier.padding(top = 10.dp),
+        colors = TimePickerDefaults.colors(
+            timeSelectorSelectedContainerColor = Color.White,
+            timeSelectorSelectedContentColor = PurpleMain,
+            timeSelectorUnselectedContainerColor = Color.White,
+            timeSelectorUnselectedContentColor = GreyWhite,
+
+            periodSelectorBorderColor = PurpleMain,
+            periodSelectorSelectedContainerColor = PurpleMain,
+            periodSelectorSelectedContentColor = Color.White,
+            periodSelectorUnselectedContainerColor = Color.White,
+            periodSelectorUnselectedContentColor = GreyWhite,
+
+            containerColor = PurpleMain,
+            selectorColor = PurpleMain,
+            clockDialColor = PurpleMain,
+            clockDialSelectedContentColor = PurpleMain,
+            clockDialUnselectedContentColor = Color.White,
+
+
+        )
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
