@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.createtodolist.model.TodoList
 import com.godlife.createtodolist.model.TodoListForm
-import com.godlife.database.TodoDao
 import com.godlife.database.model.TodoEntity
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.model.todo.EndTimeData

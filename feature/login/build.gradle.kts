@@ -34,6 +34,8 @@ dependencies {
 
     implementation(projects.feature.main)
 
+    implementation(projects.feature.navigator)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
