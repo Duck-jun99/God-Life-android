@@ -11,13 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,16 +32,69 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.godlife.createtodolist.util.AnimatedPreLoader
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.MainNavigator
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CreateTodoListScreen3(
+    navController: NavController,
+    createActivity: CreateActivity,
+    mainNavigator: MainNavigator,
+    createViewModel: CreateViewModel
+){
+
+    val showDoneUI = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(5000) // 5초 지연
+        showDoneUI.value = true
+    }
+
+    if (showDoneUI.value) {
+        DoneLodingUI(
+            navController = navController,
+            createActivity = createActivity,
+            mainNavigator = mainNavigator,
+            createViewModel = createViewModel
+        )
+    } else {
+        LoadingUI()
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoadingUI(){
+    GodLifeTheme {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                AnimatedPreLoader(modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+
+                Text(text = "투두 리스트를 만들고 있어요.", style = GodLifeTypography.bodyLarge)
+            }
+
+        }
+    }
+}
+
+@Composable
+fun DoneLodingUI(
     navController: NavController,
     createActivity: CreateActivity,
     mainNavigator: MainNavigator,
@@ -94,20 +151,6 @@ fun CreateTodoListScreen3(
                     )
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoadingUI(){
-    GodLifeTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PurpleMain)
-        ) {
-
         }
     }
 }

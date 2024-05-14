@@ -1,5 +1,6 @@
 import com.godlife.god_life.configureHiltAndroid
 import com.godlife.god_life.configureKakaoSdk
+import com.godlife.god_life.configureLottie
 import com.godlife.god_life.libs
 
 plugins {
@@ -15,6 +16,7 @@ android {
 
 configureHiltAndroid()
 configureKakaoSdk()
+configureLottie()
 
 dependencies {
     implementation(project(":core:model"))

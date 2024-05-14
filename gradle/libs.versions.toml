@@ -156,6 +156,7 @@ kakao-sdk-v2-user = {module  = "com.kakao.sdk:v2-user", version.ref = "kakaoUser
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "androidXSecurity"}
 
 gson = { module = "com.google.code.gson:gson", version = "2.10.1" }
+lottie = {module = "com.airbnb.android:lottie-compose", version = "6.0.1"}
 
 [bundles]
 
