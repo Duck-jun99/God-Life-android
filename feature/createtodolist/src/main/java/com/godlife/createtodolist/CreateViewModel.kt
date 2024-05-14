@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.createtodolist.model.TodoList
 import com.godlife.createtodolist.model.TodoListForm
-import com.godlife.database.TodoDao
 import com.godlife.database.model.TodoEntity
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.model.todo.EndTimeData
@@ -23,6 +22,7 @@ import javax.inject.Inject
 class CreateViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase
 ) :ViewModel(){
+
 
     private val _todoList = MutableStateFlow(TodoList().getTodoList())
     val todoList: StateFlow<List<TodoListForm>> = _todoList
@@ -45,14 +45,26 @@ class CreateViewModel @Inject constructor(
 
     }
 
-    /*
+
     fun addToSelectedList(todo: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _selectedList.value += todo
         }
     }
 
-     */
+    fun deleteToSelectedList(todo: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _selectedList.value = _selectedList.value.toMutableList().apply { remove(todo) }
+        }
+    }
+
+    fun updateSelectedList(selectedList: List<String>){
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.e("updateSelectedList", _selectedList.value.toString())
+            _selectedList.value = selectedList
+        }
+    }
+
 
     fun updateEndTime(time: EndTimeData) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -96,25 +108,12 @@ class CreateViewModel @Inject constructor(
             Log.e("CreateViewModel", notificationTime.value.toString())
             Log.e("CreateViewModel", data.toString())
 
-            Log.e("CreateViewModel", _selectedList.value.toString())
-            Log.e("CreateViewModel", _endTime.value.toString())
-            Log.e("CreateViewModel", _notificationTime.value.toString())
-            Log.e("CreateViewModel", data.toString())
-
             if (data != null) {
                 localDatabaseUseCase.insertTodo(data)
                 Log.e("CreateViewModel", localDatabaseUseCase.getAllTodoList().toString())
             }
         }
 
-
-
     }
-
-
-
-
-
-
 
 }

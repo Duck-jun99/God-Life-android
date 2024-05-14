@@ -1,24 +1,32 @@
 package com.godlife.createtodolist
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,18 +36,24 @@ import androidx.navigation.navOptions
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateActivity :ComponentActivity() {
+
+    @Inject
+    lateinit var mainNavigator: MainNavigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent{
-            CreateTodoList()
+            CreateTodoList(mainNavigator, this)
         }
 
     }
@@ -47,14 +61,16 @@ class CreateActivity :ComponentActivity() {
 
 @Composable
 fun CreateTodoList(
+    mainNavigator: MainNavigator,
+    createActivity: CreateActivity,
     createViewModel: CreateViewModel = hiltViewModel()
+
 ) {
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -62,26 +78,64 @@ fun CreateTodoList(
 
         NavHost(navController = navController, startDestination = CreateTodoListScreen1Route.route,
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.9f)) {
+                .fillMaxSize()) {
+
 
             composable(CreateTodoListScreen1Route.route){
-                CreateTodoListScreen1()
-
+                CreateTodoListScreen1(
+                    navController,
+                    createViewModel = createViewModel
+                )
             }
 
             composable(CreateTodoListScreen2Route.route){
-                CreateTodoListScreen2()
-
+                CreateTodoListScreen2(
+                    navController,
+                    createViewModel = createViewModel
+                )
             }
 
             composable(CreateTodoListScreen3Route.route){
-                CreateTodoListScreen3()
+                CreateTodoListScreen3(
+                    navController,
+                    createActivity,
+                    mainNavigator,
+                    createViewModel = createViewModel
+                )
             }
+
+            /*
+            composable(
+                route = CreateTodoListScreen2Route.route
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(CreateTodoListScreen1Route.route)
+                }
+                CreateTodoListScreen2(
+                    navController,
+                    createViewModel = hiltViewModel(parentEntry)
+                )
+            }
+
+            composable(
+                route = CreateTodoListScreen3Route.route
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(CreateTodoListScreen2Route.route)
+                }
+
+                CreateTodoListScreen3(
+                    navController,
+                    createViewModel = hiltViewModel(parentEntry)
+                )
+            }
+
+             */
 
         }
         
 
+        /*
         Box(modifier = Modifier
             .fillMaxWidth()
             .weight(0.1f)){
@@ -89,12 +143,18 @@ fun CreateTodoList(
             GodLifeButton(
                 onClick = {
                     //첫번째 화면
-                    if(currentRoute == CreateTodoListScreen1Route.route) {navController.navigate(CreateTodoListScreen2Route.route)
+                    if(currentRoute == CreateTodoListScreen1Route.route) {
+
+                        navController.navigate(CreateTodoListScreen2Route.route)
                     }
                     //두번째 화면
                     else if (currentRoute == CreateTodoListScreen2Route.route) {
 
                         navController.navigate(CreateTodoListScreen3Route.route)
+                    }
+                    //세번째 화면
+                    else{
+                        MoveMainActivity(mainNavigator = mainNavigator, createActivity = createActivity)
                     }
                 },
                 modifier = Modifier
@@ -108,6 +168,8 @@ fun CreateTodoList(
                 }) {
             }
         }
+
+         */
 
 
 
@@ -126,7 +188,7 @@ fun CreateUiPreview(){
                 .fillMaxWidth()
                 .weight(0.9f)){
 
-                CreateTodoListScreen1()
+                //CreateTodoListScreen1()
             }
 
             Box(modifier = Modifier

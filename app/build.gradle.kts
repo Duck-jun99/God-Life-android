@@ -56,9 +56,12 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.network)
     implementation(projects.core.database)
+    implementation(projects.core.common)
 
     implementation(projects.feature.main)
     implementation(projects.feature.login)
+    implementation(projects.feature.createtodolist)
+    implementation(projects.feature.navigator)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp.logging)

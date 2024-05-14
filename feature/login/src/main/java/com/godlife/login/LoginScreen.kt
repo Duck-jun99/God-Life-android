@@ -30,12 +30,6 @@ import com.godlife.main.MainActivity
 fun LoginScreen(context: Context,
                 loginViewModel: LoginViewModel = hiltViewModel()){
 
-    checkAutoLoginState(loginViewModel)
-
-    val content: View = LocalView.current
-
-    autoLogin(content, context)
-
     val kakaoLoginManager: KakaoLoginManager = KakaoLoginManager(LocalContext.current, loginViewModel)
 
     GodLifeTheme {
@@ -95,53 +89,4 @@ fun LoginScreenPreview(){
 
         }
     }
-}
-
-private lateinit var autoLoginState:AutoLoginConstant
-private fun autoLogin(content: View, context: Context) {
-
-    content.viewTreeObserver.addOnPreDrawListener(
-        object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                return if (::autoLoginState.isInitialized) {
-                    if (autoLoginState == AutoLoginConstant.AUTO_LOGIN_SUCCESS) {
-
-                        Log.e("LoginActivity", "AUTO_LOGIN_SUCCESS")
-                        moveMainActivity(context)
-                    }
-                    content.viewTreeObserver.removeOnPreDrawListener(this)
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-    )
-}
-
-
-
-private fun checkAutoLoginState(loginViewModel: LoginViewModel) {
-
-    if (loginViewModel.getAccessToken() != "") {
-        autoLoginState = AutoLoginConstant.AUTO_LOGIN_SUCCESS
-        Log.e("checkAutoLoginState", "AUTO_LOGIN_SUCCESS")
-    } else {
-        autoLoginState = AutoLoginConstant.AUTO_LOGIN_FAILURE
-        Log.e("checkAutoLoginState", "AUTO_LOGIN_FAILURE")
-    }
-
-
-}
-
-private fun moveMainActivity(context: Context){
-    val intent = Intent(context, MainActivity::class.java)
-    ContextCompat.startActivity(context, intent, null)
-
-}
-
-private fun moveSignUpActivity(context: Context){
-    val intent = Intent(context, MainActivity::class.java)
-    ContextCompat.startActivity(context, intent, null)
-
 }

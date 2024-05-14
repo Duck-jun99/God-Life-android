@@ -29,10 +29,12 @@ android {
 
 dependencies {
 
-    implementation(projects.core.data)
-    implementation(projects.core.designsystem)
+    //implementation(projects.core.data)
+    //implementation(projects.core.designsystem)
 
     implementation(projects.feature.main)
+
+    implementation(projects.feature.navigator)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

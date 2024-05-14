@@ -26,11 +26,14 @@ include(
     ":core:sharedpreference",
     ":core:database",
     ":core:model",
+    ":core:common",
 
     ":feature:main",
     ":feature:login",
     ":feature:main-page",
     ":feature:community-page",
     ":feature:setting-page",
-    ":feature:createtodolist"
+    ":feature:createtodolist",
+
+    ":feature:navigator"
 )

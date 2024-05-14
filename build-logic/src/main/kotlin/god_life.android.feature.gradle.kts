@@ -1,5 +1,6 @@
 import com.godlife.god_life.configureHiltAndroid
 import com.godlife.god_life.configureKakaoSdk
+import com.godlife.god_life.configureLottie
 import com.godlife.god_life.libs
 
 plugins {
@@ -15,11 +16,13 @@ android {
 
 configureHiltAndroid()
 configureKakaoSdk()
+configureLottie()
 
 dependencies {
-    //implementation(project(":core:model"))
+    implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:domain"))
+
 
     val libs = project.extensions.libs
     implementation(libs.findLibrary("hilt.navigation.compose").get())
