@@ -3,12 +3,14 @@ package com.godlife.createtodolist
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -69,7 +71,6 @@ fun CreateTodoList(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -77,15 +78,33 @@ fun CreateTodoList(
 
         NavHost(navController = navController, startDestination = CreateTodoListScreen1Route.route,
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.9f)) {
+                .fillMaxSize()) {
 
 
             composable(CreateTodoListScreen1Route.route){
-                CreateTodoListScreen1()
-
+                CreateTodoListScreen1(
+                    navController,
+                    createViewModel = createViewModel
+                )
             }
 
+            composable(CreateTodoListScreen2Route.route){
+                CreateTodoListScreen2(
+                    navController,
+                    createViewModel = createViewModel
+                )
+            }
+
+            composable(CreateTodoListScreen3Route.route){
+                CreateTodoListScreen3(
+                    navController,
+                    createActivity,
+                    mainNavigator,
+                    createViewModel = createViewModel
+                )
+            }
+
+            /*
             composable(
                 route = CreateTodoListScreen2Route.route
             ) { backStackEntry ->
@@ -93,6 +112,7 @@ fun CreateTodoList(
                     navController.getBackStackEntry(CreateTodoListScreen1Route.route)
                 }
                 CreateTodoListScreen2(
+                    navController,
                     createViewModel = hiltViewModel(parentEntry)
                 )
             }
@@ -103,14 +123,19 @@ fun CreateTodoList(
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(CreateTodoListScreen2Route.route)
                 }
+
                 CreateTodoListScreen3(
+                    navController,
                     createViewModel = hiltViewModel(parentEntry)
                 )
             }
 
+             */
+
         }
         
 
+        /*
         Box(modifier = Modifier
             .fillMaxWidth()
             .weight(0.1f)){
@@ -118,7 +143,9 @@ fun CreateTodoList(
             GodLifeButton(
                 onClick = {
                     //첫번째 화면
-                    if(currentRoute == CreateTodoListScreen1Route.route) {navController.navigate(CreateTodoListScreen2Route.route)
+                    if(currentRoute == CreateTodoListScreen1Route.route) {
+
+                        navController.navigate(CreateTodoListScreen2Route.route)
                     }
                     //두번째 화면
                     else if (currentRoute == CreateTodoListScreen2Route.route) {
@@ -141,6 +168,8 @@ fun CreateTodoList(
                 }) {
             }
         }
+
+         */
 
 
 
@@ -193,14 +222,3 @@ object CreateTodoListScreen2Route {
 object CreateTodoListScreen3Route {
     const val route = "CreateTodoListScreen3"
 }
-
-
-private fun MoveMainActivity(mainNavigator: MainNavigator, createActivity: CreateActivity){
-    //val intent = Intent(context, MainActivity::class.java)
-    //ContextCompat.startActivity(context, intent, null)
-    mainNavigator.navigateFrom(
-        activity = createActivity,
-        withFinish = true
-    )
-}
-

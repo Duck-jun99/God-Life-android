@@ -58,6 +58,12 @@ class CreateViewModel @Inject constructor(
         }
     }
 
+    fun updateSelectedList(selectedList: List<String>){
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.e("updateSelectedList", _selectedList.value.toString())
+            _selectedList.value = selectedList
+        }
+    }
 
 
     fun updateEndTime(time: EndTimeData) {
@@ -100,11 +106,6 @@ class CreateViewModel @Inject constructor(
             Log.e("CreateViewModel", selectedList.value.toString())
             Log.e("CreateViewModel", endTime.value.toString())
             Log.e("CreateViewModel", notificationTime.value.toString())
-            Log.e("CreateViewModel", data.toString())
-
-            Log.e("CreateViewModel", _selectedList.value.toString())
-            Log.e("CreateViewModel", _endTime.value.toString())
-            Log.e("CreateViewModel", _notificationTime.value.toString())
             Log.e("CreateViewModel", data.toString())
 
             if (data != null) {

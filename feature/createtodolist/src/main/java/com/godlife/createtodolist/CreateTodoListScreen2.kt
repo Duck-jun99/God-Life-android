@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
@@ -42,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
@@ -54,189 +60,116 @@ import java.time.LocalDateTime
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CreateTodoListScreen2(
-    createViewModel: CreateViewModel = hiltViewModel()
+    navController: NavController,
+    createViewModel: CreateViewModel
 ){
 
     Log.e("CreateViewModel2", createViewModel.toString())
 
     val selectedList by createViewModel.selectedList.collectAsState()
+
+    //createViewModel.updateSelectedList(selectedList)
+
     Log.e("selectedList",selectedList.toString())
 
-    GodLifeTheme{
+    GodLifeTheme {
+
 
         Column(
             modifier = Modifier
-                .padding(20.dp),
+                .padding(5.dp)
+                .fillMaxSize()
         ) {
+            Column(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .weight(0.8f)
+            ) {
 
-            Text(
-                text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
-                style = GodLifeTypography.titleMedium
-            )
-
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Row(modifier = Modifier.padding(5.dp)){
-
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                Text(
+                    text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
+                    style = GodLifeTypography.titleMedium
                 )
 
-                Text(text = "목표 종료 시간",
-                    style = TextStyle(
-                        color = PurpleMain,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
+
+                Spacer(modifier = Modifier.height(100.dp))
+
+                Row(modifier = Modifier.padding(5.dp)){
+
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+
+                    Text(text = "목표 종료 시간",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        ),
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+
+                Box(modifier = Modifier.fillMaxWidth()){
+                    EndTimeInput(modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.Center),
+                        createViewModel)
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+
+                Row(modifier = Modifier.padding(5.dp)){
+
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+
+                    Text(text = "알림 시간",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        ),
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+
+                Box(modifier = Modifier.fillMaxWidth()){
+                    NotificationTimeInput(modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.Center),
+                        createViewModel)
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+
             }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f)){
 
-            Box(modifier = Modifier.fillMaxWidth()){
-                EndTimeInput(modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.Center))
+                GodLifeButton(onClick = {
+                    navController.navigate(CreateTodoListScreen3Route.route)
+                },
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(0.5f)
+                ) {
+                    Text(text = "완료",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Row(modifier = Modifier.padding(5.dp)){
-
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-
-                Text(text = "알림 시간",
-                    style = TextStyle(
-                        color = PurpleMain,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-
-            Box(modifier = Modifier.fillMaxWidth()){
-                NotificationTimeInput(modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.Center))
-            }
-
-            Spacer(modifier = Modifier.height(100.dp))
-
         }
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CreateTodoListScreen2Preview(){
-    GodLifeTheme{
-
-        Column(
-            modifier = Modifier
-                .padding(20.dp),
-        ) {
-
-            Text(
-                text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreyWhite
-                )
-            )
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Row(modifier = Modifier.padding(5.dp)){
-
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-
-                Text(text = "목표 종료 시간",
-                    style = TextStyle(
-                        color = PurpleMain,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-
-            Box(modifier = Modifier.fillMaxWidth()){
-                EndTimeInput(modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.Center))
-            }
-
-
-/*
-            Text(text = "PM 10:00",
-                style = TextStyle(
-                    color = GreyWhite,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp
-                ),
-                modifier = Modifier.fillMaxWidth()
-                , textAlign = TextAlign.Center
-            )
-
- */
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Row(modifier = Modifier.padding(5.dp)){
-
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-
-                Text(text = "알림 시간",
-                    style = TextStyle(
-                        color = PurpleMain,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-
-            Box(modifier = Modifier.fillMaxWidth()){
-                NotificationTimeInput(modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.Center))
-            }
-
-            /*
-            Text(text = "PM 09:00",
-                style = TextStyle(
-                    color = GreyWhite,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp
-                ),
-                modifier = Modifier.fillMaxWidth()
-                , textAlign = TextAlign.Center
-            )
-
-             */
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-
-        }
-
     }
 }
 
@@ -244,7 +177,7 @@ fun CreateTodoListScreen2Preview(){
 @Composable
 fun EndTimeInput(
     modifier: Modifier,
-    createViewModel: CreateViewModel = hiltViewModel()
+    createViewModel: CreateViewModel
 ){
     val timePickerState = rememberTimePickerState(
         initialHour = 0,
@@ -274,7 +207,7 @@ fun EndTimeInput(
 @Composable
 fun NotificationTimeInput(
     modifier: Modifier,
-    createViewModel: CreateViewModel = hiltViewModel()
+    createViewModel: CreateViewModel
 ){
     val timePickerState = rememberTimePickerState(
         initialHour = 0,
@@ -381,4 +314,101 @@ fun TimeInputPreview(){
         modifier = Modifier.padding(top = 10.dp),
         colors = TimePickerDefaults.colors(Color.Black)
     )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun CreateTodoListScreen2Preview(){
+    GodLifeTheme {
+
+
+        Column(
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .weight(0.8f)
+            ) {
+
+                Text(
+                    text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
+                    style = GodLifeTypography.titleMedium
+                )
+
+
+                Spacer(modifier = Modifier.height(100.dp))
+
+                Row(modifier = Modifier.padding(5.dp)){
+
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+
+                    Text(text = "목표 종료 시간",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        ),
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+
+                Box(modifier = Modifier.fillMaxWidth()){
+
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+
+                Row(modifier = Modifier.padding(5.dp)){
+
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+
+                    Text(text = "알림 시간",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        ),
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+
+                Box(modifier = Modifier.fillMaxWidth()){
+
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+
+            }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f)){
+
+                GodLifeButton(onClick = {},
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(0.5f)
+                ) {
+                    Text(text = "완료",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+    }
 }

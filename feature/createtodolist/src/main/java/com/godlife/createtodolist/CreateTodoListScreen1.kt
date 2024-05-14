@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.godlife.createtodolist.model.TodoList
 import com.godlife.createtodolist.model.TodoListForm
@@ -64,7 +65,9 @@ import kotlin.coroutines.CoroutineContext
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CreateTodoListScreen1(
-    createViewModel: CreateViewModel = hiltViewModel(),
+    navController: NavController,
+    createViewModel: CreateViewModel
+
     //onNextClick: () -> Unit
 ){
 
@@ -73,13 +76,9 @@ fun CreateTodoListScreen1(
     Log.e("CreateViewModel1", createViewModel.toString())
 
     val todoList by createViewModel.todoList.collectAsState()
-    Log.e("todoList", todoList.toString())
 
     val selectedList by createViewModel.selectedList.collectAsState()
     Log.e("selectedList",selectedList.toString())
-
-    val navController = rememberNavController()
-
 
 
     GodLifeTheme {
@@ -97,77 +96,88 @@ fun CreateTodoListScreen1(
 
         Column(
             modifier = Modifier
-                .padding(20.dp),
+                .padding(5.dp)
+                .fillMaxSize()
         ) {
-
-            Text(
-                text = "오늘 달성할 목표를 선택해주세요.",
-                style = GodLifeTypography.titleMedium
-            )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
+            Column(
                 modifier = Modifier
                     .padding(5.dp)
-                    .fillMaxHeight(0.7f)
+                    .weight(0.8f)
             ) {
-                itemsIndexed(todoList){ index, item ->
-                    if(!item.isSelected) CardTodoList(item)
-                    else SelectedCardTodoList(item)
 
-                }
-            }
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-            ){
-
-                Text(text = "선택한 목표",
+                Text(
+                    text = "오늘 달성할 목표를 선택해주세요.",
                     style = GodLifeTypography.titleMedium
                 )
 
-                GodLifeButton(onClick = getOnClick) {
-                    Text(text = "이전 목표 불러오기",
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .fillMaxHeight(0.7f)
+                ) {
+                    itemsIndexed(todoList){ index, item ->
+                        if(!item.isSelected) CardTodoList(item, createViewModel)
+                        else SelectedCardTodoList(item, createViewModel)
+
+                    }
+                }
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                ){
+
+                    Text(text = "선택한 목표",
+                        style = GodLifeTypography.titleMedium
+                    )
+
+                    GodLifeButton(onClick = getOnClick) {
+                        Text(text = "이전 목표 불러오기",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+
+
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.2f)
+                ) {
+                    itemsIndexed(selectedList) { index, item ->
+                        SelectedTodoList(item)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+
+            }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f)){
+
+                GodLifeButton(onClick = {
+                    navController.navigate(CreateTodoListScreen2Route.route)
+                },
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(0.5f)) {
+
+                    Text(text = "다음",
                         color = Color.White,
                         style = TextStyle(
-                            fontSize = 10.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                     )
+
                 }
             }
-
-
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.2f)
-            ) {
-                itemsIndexed(selectedList) { index, item ->
-                    SelectedTodoList(item)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            /*
-            Button(onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PurpleMain
-                )
-                , modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .fillMaxWidth(0.5f)){
-                Text(text = "다음",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-
-             */
-
         }
     }
 }
@@ -177,7 +187,7 @@ fun CreateTodoListScreen1(
 @Composable
 fun CardTodoList(
     todoItem: TodoListForm,
-    viewModel: CreateViewModel = hiltViewModel()
+    viewModel: CreateViewModel
 ){
 
     Column(
@@ -219,7 +229,7 @@ fun CardTodoList(
 @Composable
 fun SelectedCardTodoList(
     todoItem: TodoListForm,
-    viewModel: CreateViewModel = hiltViewModel()
+    viewModel: CreateViewModel
 ){
 
     Column(
@@ -303,76 +313,6 @@ fun SelectedTodoList(name: String){
     }
 
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CreateTodoListScreen1Preview(){
-    GodLifeTheme {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            //horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "오늘 달성할 목표를 선택해주세요.",
-                style = GodLifeTypography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Text(text = "리스트 부분",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Blue),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.7f)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-            ){
-
-                Text(text = "선택한 목표",
-                    style = GodLifeTypography.titleMedium
-                )
-
-                GodLifeButton(onClick = { /*TODO*/ }) {
-                    Text(text = "이전 목표 불러오기",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-            }
-
-
-
-            Text(text = "리스트 부분",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Blue
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.2f)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-
-
-        }
-    }
 }
 
 @Preview(showBackground = true)
@@ -489,11 +429,91 @@ fun SelectedTodoListPreview(){
             )
         }
 
-
-
     }
 
 }
 
+@Preview(showBackground = true)
+@Composable
+fun MainUIPreview(){
+    GodLifeTheme {
 
 
+        Column(
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .weight(0.8f)
+            ) {
+
+                Text(
+                    text = "오늘 달성할 목표를 선택해주세요.",
+                    style = GodLifeTypography.titleMedium
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .fillMaxHeight(0.7f)
+                ) {
+
+                }
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                ){
+
+                    Text(text = "선택한 목표",
+                        style = GodLifeTypography.titleMedium
+                    )
+
+                    GodLifeButton(onClick = {}) {
+                        Text(text = "이전 목표 불러오기",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+
+
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.2f)
+                ) {
+
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+
+            }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f)){
+
+                GodLifeButton(onClick = {},
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(0.5f)
+                ) {
+                    Text(text = "다음",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
