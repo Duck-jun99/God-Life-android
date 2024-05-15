@@ -65,17 +65,27 @@ fun CreateTodoListScreen3(
             createViewModel = createViewModel
         )
     } else {
-        LoadingUI()
+        LoadingUI(createViewModel)
     }
 
 }
 
-@Preview(showBackground = true)
 @Composable
-fun LoadingUI(){
+fun LoadingUI(
+    createViewModel: CreateViewModel
+){
     GodLifeTheme {
+
+        val selectedList by createViewModel.selectedList.collectAsState()
+        val endTime by createViewModel.endTime.collectAsState()
+        val notificationTime by createViewModel.notificationTime.collectAsState()
+
+        createViewModel.addDatabase()
+
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier.align(Alignment.Center)
@@ -102,24 +112,15 @@ fun DoneLodingUI(
 ){
     GodLifeTheme {
 
-        val selectedList by createViewModel.selectedList.collectAsState()
-        val endTime by createViewModel.endTime.collectAsState()
-        val notificationTime by createViewModel.notificationTime.collectAsState()
-
-        Log.e("CreateTodoListScreen3", createViewModel.toString())
-        Log.e("CreateTodoListScreen3", selectedList.toString())
-        Log.e("CreateTodoListScreen3", endTime.toString())
-        Log.e("CreateTodoListScreen3", notificationTime.toString())
-
-
         Column(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 
@@ -157,6 +158,32 @@ fun DoneLodingUI(
 
 @Preview(showBackground = true)
 @Composable
+fun LoadingUIPreview(
+){
+    GodLifeTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                AnimatedPreLoader(modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+
+                Text(text = "투두 리스트를 만들고 있어요.", style = GodLifeTypography.bodyLarge)
+            }
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun CreateTodoListScreen3Preview(){
     GodLifeTheme {
 
@@ -164,10 +191,11 @@ fun CreateTodoListScreen3Preview(){
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 

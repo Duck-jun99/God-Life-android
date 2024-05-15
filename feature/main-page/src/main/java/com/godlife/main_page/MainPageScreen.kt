@@ -1,8 +1,10 @@
 package com.godlife.main_page
 
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,17 +42,21 @@ import com.godlife.designsystem.theme.NullColor
 import com.godlife.designsystem.theme.Purple40
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.theme.PurpleSecond
+import com.godlife.navigator.CreatetodolistNavigator
 
-@Preview(showBackground = true)
+
 @Composable
 fun MainPageScreen(
+    mainActivity: Activity,
+    createNavigator: CreatetodolistNavigator,
     viewModel: MainPageViewModel = hiltViewModel()
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
     LaunchedEffect(key1 = true) {
-
+        
+        Log.e("MainPageScreen", viewModel.todoList.value.toString())
     }
 
     val context = LocalContext.current
@@ -64,20 +70,22 @@ fun MainPageScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            GradientSquareWithText(context)
+            NoTodoListBox(context, mainActivity, createNavigator)
 
         }
     }
-
 
 }
 
 
 
 @Composable
-fun GradientSquareWithText(
-    context: Context
+fun NoTodoListBox(
+    context: Context,
+    mainActivity: Activity,
+    createNavigator: CreatetodolistNavigator
 ) {
+
     Column(
         Modifier
             .background(
@@ -107,7 +115,57 @@ fun GradientSquareWithText(
 
         Button(
             onClick = {
-                moveCreateActivity(context = context)
+                moveCreateActivity(createNavigator, mainActivity)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = NullColor
+            ),
+        ) {
+            Text(text = "> 투두 리스트 만들기 가기",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
+        }
+
+    }
+}
+
+@Preview
+@Composable
+fun NoTodoListBoxPreview() {
+    Column(
+        Modifier
+            .background(
+                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                shape = RoundedCornerShape(30.dp),
+                alpha = 0.8f
+            )
+            .size(300.dp)
+            .padding(30.dp),
+    ) {
+
+        Text(
+            text = "오늘의 투두 리스트를\n만들어주세요!",
+            color = Color.White,
+
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Divider(
+            color = Color.White,
+            thickness = 2.dp,
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
+
+        Button(
+            onClick = {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -140,7 +198,7 @@ fun MainPreview(){
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            //GradientSquareWithText(context)
+            NoTodoListBoxPreview()
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -149,40 +207,12 @@ fun MainPreview(){
     }
 }
 
-@Preview
-@Composable
-fun TodoListCard() {
-    Box(
-        modifier = Modifier
-            .background(color = Purple40)
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "오늘의 투두 리스트를 만들어 주세요!",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "> 투두 리스트 만들기 가기")
-            }
-        }
-    }
-}
 
-private fun moveCreateActivity(context:Context){
-
-    val intent = Intent(context, CreateActivity::class.java)
-    ContextCompat.startActivity(context, intent, null)
+private fun moveCreateActivity(createNavigator: CreatetodolistNavigator, mainActivity: Activity){
+    createNavigator.navigateFrom(
+        activity = mainActivity,
+        withFinish = false
+    )
 
 }
 

@@ -98,10 +98,11 @@ fun CreateTodoListScreen1(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 
@@ -438,15 +439,15 @@ fun SelectedTodoListPreview(){
 fun MainUIPreview(){
     GodLifeTheme {
 
-
         Column(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 

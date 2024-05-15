@@ -79,10 +79,11 @@ fun CreateTodoListScreen2(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 
@@ -327,10 +328,11 @@ fun CreateTodoListScreen2Preview(){
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 
