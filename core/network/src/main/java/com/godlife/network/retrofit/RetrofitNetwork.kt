@@ -1,8 +1,11 @@
 package com.godlife.network.retrofit
 
 import androidx.tracing.trace
+import com.godlife.network.BuildConfig
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.NetworkUserQuery
+import com.godlife.network.model.SignUpCheckEmailQuery
+import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.Call
@@ -12,6 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,6 +33,16 @@ interface RetrofitNetworkApi {
         @Path("id") id: String?,
     ): NetworkUserQuery
 
+    @GET("check/nickname")
+    suspend fun checkNickname(
+        @Query("nickname") nickname :String?
+    ): SignUpCheckNicknameQuery
+
+    @GET("check/email")
+    suspend fun checkEmail(
+        @Query("email") email :String?
+    ): SignUpCheckEmailQuery
+
 
 }
 
@@ -41,7 +55,7 @@ internal class RetrofitNetwork @Inject constructor(
 
     private val networkApi = trace("RetrofitNetwork") {
         Retrofit.Builder()
-            .baseUrl("BASE_URL_HERE")
+            .baseUrl(BuildConfig.SERVER_DOMAIN)
             .callFactory { okhttpCallFactory.get().newCall(it) }
             .addConverterFactory(
                 networkJson.asConverterFactory("application/json".toMediaType()),
@@ -56,5 +70,12 @@ internal class RetrofitNetwork @Inject constructor(
     ): NetworkUserQuery? =
         networkApi.getUserInfo(id = id)
 
+    override suspend fun checkNickname(
+        nickname: String
+    ): SignUpCheckNicknameQuery? =
+        networkApi.checkNickname(nickname = nickname)
+
+    override suspend fun checkEmail(email: String): SignUpCheckEmailQuery?
+    = networkApi.checkEmail(email = email)
 
 }

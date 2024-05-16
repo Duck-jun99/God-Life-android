@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,16 +22,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.login.social_login_manager.KakaoLoginManager
 import com.godlife.main.MainActivity
 
 
 @Composable
-fun LoginScreen(context: Context,
-                loginViewModel: LoginViewModel = hiltViewModel()){
+fun LoginScreen(
+    context: Context,
+    navController: NavController,
+    loginViewModel: LoginViewModel = hiltViewModel()){
 
     val kakaoLoginManager: KakaoLoginManager = KakaoLoginManager(LocalContext.current, loginViewModel)
+
 
     GodLifeTheme {
 
@@ -51,6 +58,12 @@ fun LoginScreen(context: Context,
 
             }) {
                 Text("KaKao Login")
+            }
+
+            Button(onClick = {
+                navController.navigate(SignUpScreenRoute.route)
+            }){
+                Text("회원가입 테스트")
             }
 
         }
@@ -82,7 +95,6 @@ fun LoginScreenPreview(){
 
 
             Button(onClick = {
-
             }){
                 Text("회원가입 테스트")
             }

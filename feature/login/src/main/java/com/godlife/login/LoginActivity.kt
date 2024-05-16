@@ -68,7 +68,7 @@ fun LoginUi(context: Context){
             modifier = Modifier.fillMaxHeight()) {
 
             composable(LoginScreenRoute.route){
-                LoginScreen(context)
+                LoginScreen(context, navController)
             }
 
             composable(SignUpScreenRoute.route){

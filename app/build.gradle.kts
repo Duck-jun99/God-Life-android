@@ -43,6 +43,12 @@ android {
             properties.getProperty("KAKAO_NATIVE_APP_KEY")
         )
 
+        buildConfigField(
+            "String",
+            "SERVER_DOMAIN",
+            properties.getProperty("SERVER_DOMAIN")
+        )
+
 
         manifestPlaceholders["NATIVE_APP_KEY"] =
             properties.getProperty("KAKAO_NATIVE_APP_KEY_NO_QUOTES")

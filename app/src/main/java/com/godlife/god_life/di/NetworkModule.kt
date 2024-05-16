@@ -1,5 +1,6 @@
 package com.godlife.god_life.di
 
+import com.godlife.network.BuildConfig
 import com.godlife.network.retrofit.RetrofitNetworkApi
 import dagger.Module
 import dagger.Provides
@@ -40,7 +41,7 @@ internal object NetworkModule {
         gsonConverterFactory: GsonConverterFactory
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("BASE_URL_HERE")
+            .baseUrl(BuildConfig.SERVER_DOMAIN)
             .client(okHttpClient)
             .addConverterFactory(gsonConverterFactory)
             .build()
