@@ -10,11 +10,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,7 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.godlife.createtodolist.CardTodoList
 import com.godlife.createtodolist.CreateActivity
+import com.godlife.createtodolist.SelectedCardTodoList
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
@@ -49,6 +55,7 @@ import com.godlife.designsystem.theme.NullColor
 import com.godlife.designsystem.theme.Purple40
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.theme.PurpleSecond
+import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatetodolistNavigator
 
 
@@ -79,13 +86,27 @@ fun MainPageScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            UserInfo()
+            
             //NoTodoListBox(context, mainActivity, createNavigator)
 
+            val todayTodoList by viewModel.todoList.collectAsState()
             val todayBoolean by viewModel.todayBoolean.collectAsState()
             if (todayBoolean) {
                 TodoListBox()
             } else {
                 NoTodoListBox(context, mainActivity, createNavigator)
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxHeight(0.7f)
+            ) {
+                itemsIndexed(todayTodoList.todoList){index, item ->
+                    if(item.iscompleted) CompletedTodayList(item, viewModel) else NoCompletedTodayList(item, viewModel)
+                }
             }
 
         }
@@ -171,8 +192,8 @@ fun NoTodoListBox(
 
 @Composable
 fun TodoListBox(
-
 ) {
+
     Column(
         modifier = Modifier
             .background(
@@ -233,6 +254,72 @@ fun TodoListBox(
     }
 }
 
+@Composable
+fun NoCompletedTodayList(
+    todo: TodoList,
+    viewModel: MainPageViewModel
+){
+    GodLifeTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(150.dp)
+                .padding(10.dp)
+        ) {
+            Text(text = todo.name,
+                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
+            )
+
+            Divider(
+                color = PurpleMain,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+            )
+
+            GodLifeButton(
+                onClick = { /*Todo*/ },
+                modifier = Modifier.align(Alignment.End)) {
+                Text(text = "달성하기", style = TextStyle(color = Color.White))
+            }
+
+        }
+    }
+}
+
+@Composable
+fun CompletedTodayList(
+    todo: TodoList,
+    viewModel: MainPageViewModel
+){
+    GodLifeTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(150.dp)
+                .padding(10.dp)
+        ) {
+            Text(text = todo.name,
+                style = TextStyle(fontSize = 20.sp, color = GreyWhite)
+            )
+
+            Divider(
+                color = GreyWhite,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+            )
+
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.End),
+                colors = ButtonDefaults.buttonColors(GreyWhite)) {
+                Text(text = "달성하기", style = TextStyle(color = Color.White))
+            }
+
+        }
+    }
+}
 
 //Preview
 
@@ -451,6 +538,41 @@ fun MainPreview(){
             Spacer(modifier = Modifier.height(30.dp))
 
 
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserInfo(){
+    GodLifeTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(50.dp)
+        ) {
+            Text(text = "Guset님 환영해요!", style = GodLifeTypography.titleMedium)
+            Spacer(modifier = Modifier.size(5.dp))
+            Divider(modifier = Modifier.fillMaxWidth().size(5.dp), color = PurpleMain)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TodayTodoListPreview(){
+    GodLifeTheme {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxHeight(0.7f)
+            ) {
+                item {  }
+            }
         }
     }
 }

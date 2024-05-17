@@ -27,6 +27,10 @@ class MainPageViewModel @Inject constructor(
     private val _todayBoolean = MutableStateFlow<Boolean>(false)
     val todayBoolean: StateFlow<Boolean> = _todayBoolean
 
+    //오늘 투두리스트 진행 상황
+    private val _completedCount = MutableStateFlow<Int>(0)
+    val completedCount: StateFlow<Int> = _completedCount
+
     init{
         viewModelScope.launch(Dispatchers.IO) {
 

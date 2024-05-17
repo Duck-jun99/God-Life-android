@@ -1,8 +1,7 @@
-package com.godlife.login.social_login_manager
+package com.godlife.login.login_manager
 
 import android.content.Context
 import android.util.Log
-import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.login.LoginViewModel
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
@@ -47,7 +46,7 @@ class KakaoLoginManager @Inject constructor(
 
                 loginViewModel.saveAccessToken(token.accessToken)
 
-                getUserInfo(context)
+                getUserInfo(context, loginViewModel)
 
 
             }
@@ -78,7 +77,8 @@ enum class KaKaoLoginState {
 }
 
 private fun getUserInfo(
-    context:Context
+    context:Context,
+    loginViewModel: LoginViewModel
 ){
     val TAG = "KakaoLoginManager"
     UserApiClient.instance.me { user, error ->
@@ -88,6 +88,16 @@ private fun getUserInfo(
         }
         else if (user != null) {
             var scopes = mutableListOf<String>()
+
+            Log.e(TAG, "User ID: ${user.id.toString()}")
+
+            //User 고유의 ID가 이미 저장되어 있는지 확인 후 없으면 새로 저장
+            if(loginViewModel.getUserId() == ""){
+                loginViewModel.saveUserId(user.id.toString())
+            }
+
+            //서버에 이미 등록되어 있는 회원정보인지 확인, 등록되어 있지 않다면 회원가입으로 진행
+
 
             if (user.kakaoAccount?.emailNeedsAgreement == true) { scopes.add("account_email") }
             if (user.kakaoAccount?.birthdayNeedsAgreement == true) { scopes.add("birthday") }

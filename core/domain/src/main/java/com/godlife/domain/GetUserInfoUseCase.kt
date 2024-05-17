@@ -7,6 +7,6 @@ class GetUserInfoUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     //suspend fun execute(remoteErrorEmitter: RemoteErrorEmitter, id : String) = notionRepository.getPortfolio(remoteErrorEmitter, id)
-    suspend fun executeGetUserInfo(id : String) = networkRepository.getUserInfo(id)
+    suspend fun executeGetUserInfo(userId : String) = networkRepository.getUserInfo(userId)
 
 }

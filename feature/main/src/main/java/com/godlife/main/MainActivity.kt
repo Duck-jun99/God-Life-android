@@ -40,6 +40,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.navigation.MainPageRoute
 import com.godlife.navigator.CreatetodolistNavigator
+import com.godlife.navigator.LoginNavigator
 import com.godlife.setting_page.SettingPageScreen
 import com.godlife.setting_page.navigation.SettingPageRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,11 +50,14 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var createNavigator: CreatetodolistNavigator
+
+    @Inject
+    lateinit var loginNavigator: LoginNavigator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MainUiTheme(this, createNavigator)
+            MainUiTheme(this, createNavigator, loginNavigator)
         }
     }
 }
@@ -130,7 +134,8 @@ fun TabBarBadgeView(count: Int? = null) {
 @Composable
 fun MainUiTheme(
     mainActivity: MainActivity,
-    createNavigator: CreatetodolistNavigator
+    createNavigator: CreatetodolistNavigator,
+    loginNavigator: LoginNavigator
 ){
     GodLifeTheme {
 
@@ -164,7 +169,7 @@ fun MainUiTheme(
                     }
 
                     composable(settingTab.route) {
-                        SettingPageScreen()
+                        SettingPageScreen(mainActivity, loginNavigator)
                     }
 
 

@@ -1,10 +1,7 @@
 package com.godlife.login
 
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
-import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.SignUpUseCase
-import com.godlife.login.social_login_manager.KakaoLoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

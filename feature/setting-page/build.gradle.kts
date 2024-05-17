@@ -14,5 +14,7 @@ android {
 
 dependencies {
 
+    implementation(projects.feature.navigator)
+
     implementation(libs.androidx.junit.ktx)
 }

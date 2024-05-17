@@ -10,15 +10,19 @@ class LocalPreferenceUserUseCase @Inject constructor(
 
     fun saveAccessToken(accessToken: String) = localPreferenceUserRepository.saveAccessToken(accessToken)
 
-    fun getUserNickname(): String = localPreferenceUserRepository.getUserNickname()
-
-    fun getUserId(): Int = localPreferenceUserRepository.getUserId()
-
-    fun saveUserId(userId: Int) = localPreferenceUserRepository.saveUserId(userId)
-
-    fun saveUserNickname(userNickname: String) = localPreferenceUserRepository.saveUserNickname(userNickname)
-
     fun removeAccessToken() = localPreferenceUserRepository.removeAccessToken()
 
-    fun removeUserNickname() = localPreferenceUserRepository.removeUserNickname()
+    fun getRefreshToken(): String = localPreferenceUserRepository.getRefreshToken()
+
+    fun saveRefreshToken(refreshToken: String) = localPreferenceUserRepository.saveRefreshToken(refreshToken)
+
+    fun removeRefreshToken() = localPreferenceUserRepository.removeRefreshToken()
+
+    fun getUserId(): String = localPreferenceUserRepository.getUserId()
+
+    fun saveUserId(userId: String) = localPreferenceUserRepository.saveUserId(userId)
+
+    fun removeUserId() = localPreferenceUserRepository.removeUserId()
+
+
 }

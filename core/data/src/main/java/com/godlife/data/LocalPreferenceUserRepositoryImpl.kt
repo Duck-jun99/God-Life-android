@@ -15,28 +15,33 @@ class LocalPreferenceUserRepositoryImpl @Inject constructor(
         return localPreferenceUserDataSource.saveAccessToken(accessToken)
     }
 
-    override fun getUserNickname(): String {
-        return localPreferenceUserDataSource.getUserNickname()
-    }
-
-    override fun getUserId(): Int {
-        return localPreferenceUserDataSource.getUserId()
-    }
-
-    override fun saveUserId(userId: Int) {
-        return localPreferenceUserDataSource.saveUserId(userId)
-    }
-
-    override fun saveUserNickname(userNickname: String) {
-        return localPreferenceUserDataSource.saveUserNickname(userNickname)
-    }
-
     override fun removeAccessToken() {
         return localPreferenceUserDataSource.removeAccessToken()
     }
 
-    override fun removeUserNickname() {
-        return localPreferenceUserDataSource.removeUserNickname()
+    override fun getRefreshToken(): String {
+        return localPreferenceUserDataSource.getRefreshToken()
     }
+
+    override fun saveRefreshToken(refreshToken: String) {
+        return localPreferenceUserDataSource.saveRefreshToken(refreshToken)
+    }
+
+    override fun removeRefreshToken() {
+        return localPreferenceUserDataSource.removeRefreshToken()
+    }
+
+    override fun getUserId(): String {
+        return localPreferenceUserDataSource.getUserId()
+    }
+
+    override fun saveUserId(userId: String) {
+        return localPreferenceUserDataSource.saveUserId(userId)
+    }
+
+    override fun removeUserId() {
+        return localPreferenceUserDataSource.removeUserId()
+    }
+
 
 }

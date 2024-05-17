@@ -6,15 +6,17 @@ interface LocalPreferenceUserRepository {
 
     fun saveAccessToken(accessToken: String)
 
-    fun getUserNickname(): String
-
-    fun getUserId(): Int
-
-    fun saveUserId(userId: Int)
-
-    fun saveUserNickname(userNickname: String)
-
     fun removeAccessToken()
 
-    fun removeUserNickname()
+    fun getRefreshToken(): String
+
+    fun saveRefreshToken(refreshToken: String)
+
+    fun removeRefreshToken()
+
+    fun getUserId(): String
+
+    fun saveUserId(userId: String)
+
+    fun removeUserId()
 }

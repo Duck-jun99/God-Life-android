@@ -3,7 +3,7 @@ package com.godlife.network.model
 import com.google.gson.annotations.SerializedName
 
 data class NetworkUserQuery(
-    val nickName: String
+    val userId: String
 )
 
 data class SignUpCheckNicknameQuery(
