@@ -10,6 +10,7 @@ import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main.MainActivity
 import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,6 +65,7 @@ fun LoginUi(context: Context){
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .background(PurpleMain)
     ) {
         NavHost(navController = navController, startDestination = LoginScreenRoute.route,
             modifier = Modifier.fillMaxHeight()) {

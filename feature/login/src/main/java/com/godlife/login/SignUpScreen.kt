@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.PurpleMain
 import kotlinx.coroutines.CoroutineScope
@@ -124,9 +125,9 @@ fun SignUpScreen1(
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(
-                    value = nickname,
-                    onValueChange = {nickname = it},
+                GodLifeTextField(
+                    text = nickname,
+                    onTextChanged = {nickname = it},
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                     ),
@@ -166,9 +167,9 @@ fun SignUpScreen1(
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(
-                    value = email,
-                    onValueChange = {email = it},
+                GodLifeTextField(
+                    text = email,
+                    onTextChanged = {email = it},
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                     ),
@@ -312,9 +313,9 @@ fun SignUpScreen1Preview(){
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(
-                    value = nickname,
-                    onValueChange = {nickname = it},
+                GodLifeTextField(
+                    text = nickname,
+                    onTextChanged = {nickname = it},
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                     ),
@@ -340,9 +341,9 @@ fun SignUpScreen1Preview(){
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(
-                    value = email,
-                    onValueChange = {email = it},
+                GodLifeTextField(
+                    text = email,
+                    onTextChanged = {email = it},
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                     ),

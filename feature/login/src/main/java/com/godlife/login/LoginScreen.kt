@@ -7,16 +7,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.login.login_manager.KakaoLoginManager
 
 
@@ -43,17 +47,16 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            Button(onClick = {
-                kakaoLoginManager.startKakaoLogin { context }
-
-            }) {
-                Text("KaKao Login")
+            Button(onClick = { kakaoLoginManager.startKakaoLogin { context } },
+                colors = ButtonDefaults.buttonColors(PurpleMain)
+            ) {
+                Text("KaKao Login", style = TextStyle(color = Color.White))
             }
 
-            Button(onClick = {
-                navController.navigate(SignUpScreenRoute.route)
-            }){
-                Text("회원가입 테스트")
+            Button(onClick = { navController.navigate(SignUpScreenRoute.route) },
+                colors = ButtonDefaults.buttonColors(PurpleMain)
+            ){
+                Text("회원가입 테스트", style = TextStyle(color = Color.White))
             }
 
         }
@@ -79,14 +82,15 @@ fun LoginScreenPreview(){
 
             Button(onClick = {
 
-            }) {
-                Text("KaKao Login")
+            }, colors = ButtonDefaults.buttonColors(PurpleMain)) {
+                Text("KaKao Login", style = TextStyle(color = Color.White))
             }
 
 
             Button(onClick = {
-            }){
-                Text("회원가입 테스트")
+
+            }, colors = ButtonDefaults.buttonColors(PurpleMain)){
+                Text("회원가입 테스트", style = TextStyle(color = Color.White))
             }
 
         }
