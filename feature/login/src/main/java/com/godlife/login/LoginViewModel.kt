@@ -1,13 +1,26 @@
 package com.godlife.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
+import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase): ViewModel() {
+    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
+    private val getUserInfoUseCase: GetUserInfoUseCase
+) : ViewModel() {
+
+    private val _userExistenceResult = MutableStateFlow<Boolean?>(null)
+    val userExistenceResult: StateFlow<Boolean?> = _userExistenceResult
 
     fun saveAccessToken(accessToken: String){
         localPreferenceUserUseCase.saveAccessToken(accessToken)
@@ -32,9 +45,19 @@ class LoginViewModel @Inject constructor(
         return localPreferenceUserUseCase.getUserId()
     }
 
+    /*
+    fun checkUserExistence(userId :String) {
 
-
-    init {
-
+        viewModelScope.launch(Dispatchers.IO) {
+            _userExistenceResult.value = getUserInfoUseCase.executeGetUserInfo(userId)?.check
+        }
     }
+
+     */
+
+    suspend fun checkUserExistence(userId :String):Boolean {
+
+        return getUserInfoUseCase.executeGetUserInfo(userId)!!.check
+    }
+
 }

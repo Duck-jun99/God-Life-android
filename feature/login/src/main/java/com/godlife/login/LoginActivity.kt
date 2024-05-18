@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
@@ -42,13 +43,14 @@ class LoginActivity: ComponentActivity() {
 
         val context: Context = this
         val content: View = this.findViewById(android.R.id.content)
+        val loginActivity = this
 
         checkAutoLoginState(loginViewModel)
 
         autoLogin(content, context, mainNavigator, this)
 
         setContent {
-            LoginUi(context)
+            LoginUi(context, mainNavigator, loginActivity, loginViewModel)
         }
     }
 }
@@ -56,12 +58,17 @@ class LoginActivity: ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginUi(context: Context){
+fun LoginUi(context: Context,
+            mainNavigator: MainNavigator,
+            loginActivity:LoginActivity,
+            loginViewModel:LoginViewModel){
 
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -71,7 +78,7 @@ fun LoginUi(context: Context){
             modifier = Modifier.fillMaxHeight()) {
 
             composable(LoginScreenRoute.route){
-                LoginScreen(context, navController)
+                LoginScreen(context, navController, mainNavigator, loginActivity)
             }
 
             composable(SignUpScreenRoute.route){
@@ -128,17 +135,10 @@ private fun checkAutoLoginState(loginViewModel: LoginViewModel) {
 }
 
 private fun moveMainActivity(mainNavigator: MainNavigator, loginActivity: LoginActivity){
-    //val intent = Intent(context, MainActivity::class.java)
-    //ContextCompat.startActivity(context, intent, null)
+
     mainNavigator.navigateFrom(
         activity = loginActivity,
         withFinish = true
     )
-
-}
-
-private fun moveSignUpActivity(context: Context){
-    //val intent = Intent(context, MainActivity::class.java)
-    //ContextCompat.startActivity(context, intent, null)
 
 }

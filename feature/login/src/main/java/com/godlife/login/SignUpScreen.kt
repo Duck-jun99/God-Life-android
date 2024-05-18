@@ -45,7 +45,10 @@ fun SignUpScreen(
 ){
 
     var showText by remember { mutableStateOf(false) }
-    var showSignUpScreen1 by remember { mutableStateOf(false) }
+    var showEditScreen1 by remember { mutableStateOf(false) }
+
+    val showEditAge by signUpViewModel.showEditAge.collectAsState()
+    val showEditSex by signUpViewModel.showEditSex.collectAsState()
 
     LaunchedEffect(Unit) {
         // "회원가입을 도와드릴게요." 텍스트가 0.5초 후에 나타나도록 설정
@@ -53,10 +56,10 @@ fun SignUpScreen(
         showText = true
     }
 
-    LaunchedEffect(showSignUpScreen1) {
-        // 2초 후에 SignUpScreen1이 그려지도록 설정
+    LaunchedEffect(showEditScreen1) {
+        // 2초 후에 EditNicknameScreen이 그려지도록 설정
         delay(2000)
-        showSignUpScreen1 = true
+        showEditScreen1 = true
     }
 
     GodLifeTheme {
@@ -81,14 +84,14 @@ fun SignUpScreen(
 
                 Spacer(modifier = Modifier.size(50.dp))
 
-                AnimatedVisibility(visible = showSignUpScreen1,
+                AnimatedVisibility(visible = showEditScreen1,
                     enter = fadeIn(
-                        // Overwrites the initial value of alpha to 0.4f for fade in, 0 by default
                         initialAlpha = 0.4f
                     )
                 ) {
-                    SignUpScreen1(signUpViewModel)
+                    EditScreen1(signUpViewModel)
                 }
+
 
             }
         }
@@ -96,167 +99,150 @@ fun SignUpScreen(
 }
 
 @Composable
-fun SignUpScreen1(
+fun EditScreen1(
     signUpViewModel:SignUpViewModel
 ){
-    GodLifeTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PurpleMain)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PurpleMain)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
 
-                var nickname by remember { mutableStateOf("") }
-                var email by remember { mutableStateOf("") }
+            var nickname by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("") }
 
-                //var checkedNickname by remember { mutableStateOf(false) }
-                //var checkedEmail by remember { mutableStateOf(false) }
+            val checkedNickname by signUpViewModel.checkedNickname.collectAsState()
 
-                val checkedNickname by signUpViewModel.checkedNickname.collectAsState()
-                val checkedEmail by signUpViewModel.checkedEmail.collectAsState()
+            val checkedNicknameMessage by signUpViewModel.checkedNicknameMessage.collectAsState()
 
-                Text(text = "닉네임을 입력해주세요.", style = TextStyle(
-                    color = Color.White,
-                    fontSize = 20.sp
-                ))
+            val checkedServerNickname by signUpViewModel.checkedServerNickname.collectAsState()
 
-                Spacer(modifier = Modifier.size(10.dp))
+            val checkedEmail by signUpViewModel.checkedEmail.collectAsState()
 
-                GodLifeTextField(
-                    text = nickname,
-                    onTextChanged = {nickname = it},
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
+            val checkedEmailMessage by signUpViewModel.checkedEmailMessage.collectAsState()
 
-                        // 키보드 입력 종료 시 통신 수행
-                        checkNickname(nickname, signUpViewModel)
-                        Log.e("Silkjsakjld", "키보드 입력 종료")
-                    })
-                )
+            val checkedServerEmail by signUpViewModel.checkedServerEmail.collectAsState()
 
-                if(checkedNickname){
+            Text(text = "닉네임을 입력해주세요.", style = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp
+            ))
 
-                    Spacer(modifier = Modifier.size(5.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-                    Text(text = "사용 가능한 닉네임이에요.",
-                        style = TextStyle(color = Color.White),
-                        modifier = Modifier.align(Alignment.End),
-                        textAlign = TextAlign.End)
+            GodLifeTextField(
+                text = nickname,
+                onTextChanged = {nickname = it},
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+
+                    // 키보드 입력 종료 시 통신 수행
+                    signUpViewModel.checkNicknameLogic(nickname)
+                    Log.e("Silkjsakjld", "키보드 입력 종료")
+                })
+            )
+
+            Spacer(modifier = Modifier.size(5.dp))
+
+            Text(text = checkedNicknameMessage,
+                style = TextStyle(color = Color.White),
+                modifier = Modifier.align(Alignment.End),
+                textAlign = TextAlign.End)
+
+            Spacer(modifier = Modifier.size(50.dp))
+
+            Text(text = "이메일을 입력해주세요.", style = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp
+            ))
+
+            Spacer(modifier = Modifier.size(10.dp))
+
+            GodLifeTextField(
+                text = email,
+                onTextChanged = {email = it},
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    // 키보드 입력 종료 시 통신 수행
+                    //performCommunication(nickname, email)
+                    signUpViewModel.checkEmailLogic(email)
+                    Log.e("Silkjsakjld", "키보드 입력 종료")
+                })
+            )
+
+            Spacer(modifier = Modifier.size(5.dp))
+
+            Text(text = checkedEmailMessage,
+                style = TextStyle(color = Color.White),
+                modifier = Modifier.align(Alignment.End),
+                textAlign = TextAlign.End)
+
+            Spacer(modifier = Modifier.size(100.dp))
+
+            if(checkedNickname && checkedServerNickname && checkedEmail && checkedServerEmail){
+
+                AnimatedVisibility(visible = true,
+                    enter = fadeIn(
+                        initialAlpha = 0.4f
+                    )
+                ) {
+
+                    EditScreen2(signUpViewModel)
                 }
-
-                else{
-                    Spacer(modifier = Modifier.size(5.dp))
-
-                    Text(text = "다른 닉네임을 사용해주세요.",
-                        style = TextStyle(color = Color.White),
-                        modifier = Modifier.align(Alignment.End),
-                        textAlign = TextAlign.End)
-                }
-
-                Spacer(modifier = Modifier.size(100.dp))
-
-                Text(text = "이메일을 입력해주세요.", style = TextStyle(
-                    color = Color.White,
-                    fontSize = 20.sp
-                ))
-
-                Spacer(modifier = Modifier.size(10.dp))
-
-                GodLifeTextField(
-                    text = email,
-                    onTextChanged = {email = it},
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        // 키보드 입력 종료 시 통신 수행
-                        //performCommunication(nickname, email)
-                        checkEmail(email, signUpViewModel)
-                        Log.e("Silkjsakjld", "키보드 입력 종료")
-                    })
-                )
-
-                if(checkedEmail){
-                    Spacer(modifier = Modifier.size(5.dp))
-
-                    Text(text = "사용 가능한 이메일이에요.",
-                        style = TextStyle(color = Color.White),
-                        modifier = Modifier.align(Alignment.End),
-                        textAlign = TextAlign.End)
-                }
-
-                else{
-                    Spacer(modifier = Modifier.size(5.dp))
-
-                    Text(text = "다른 이메일을 사용해주세요.",
-                        style = TextStyle(color = Color.White),
-                        modifier = Modifier.align(Alignment.End),
-                        textAlign = TextAlign.End)
-                }
-
             }
         }
     }
 }
-
 
 @Composable
-fun SignUpScreen2(){
-    GodLifeTheme {
-        Box(
-            modifier = Modifier
-                .background(PurpleMain)
+fun EditScreen2(
+    signUpViewModel:SignUpViewModel
+){
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PurpleMain)
+    ) {
+        Column(
+
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
 
-                var age by remember { mutableStateOf("") }
-                var sex by remember { mutableStateOf("") }
+            var age by remember { mutableStateOf("") }
+            var sex by remember { mutableStateOf("") }
 
 
-                Text(text = "나이를 입력해주세요.", style = TextStyle(
-                    color = Color.White,
-                    fontSize = 20.sp
-                ))
+            Text(text = "나이를 입력해주세요.", style = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp
+            ))
 
-                Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(value = age, onValueChange = {age = it})
+            GodLifeTextField(text = age, onTextChanged = {age = it})
 
-                Spacer(modifier = Modifier.size(100.dp))
+            Spacer(modifier = Modifier.size(100.dp))
 
-                Text(text = "성별을 입력해주세요.", style = TextStyle(
-                    color = Color.White,
-                    fontSize = 20.sp
-                ))
+            Text(text = "성별을 입력해주세요.", style = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp
+            ))
 
-                Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(value = sex, onValueChange = {sex = it})
+            GodLifeTextField(text = sex, onTextChanged = {sex = it})
 
 
-            }
         }
     }
 }
 
-private fun checkNickname(nickname :String, signUpViewModel: SignUpViewModel){
-    CoroutineScope(Dispatchers.IO).launch {
-        signUpViewModel.checkNickname(nickname)
-    }
-}
-
-private fun checkEmail(email :String, signUpViewModel: SignUpViewModel){
-    CoroutineScope(Dispatchers.IO).launch {
-        signUpViewModel.checkEmail(email)
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -393,7 +379,7 @@ fun SignUpScreen2Preview(){
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(value = age, onValueChange = {age = it})
+                GodLifeTextField(text = age, onTextChanged = {age = it})
 
                 Spacer(modifier = Modifier.size(100.dp))
 
@@ -404,7 +390,7 @@ fun SignUpScreen2Preview(){
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                TextField(value = sex, onValueChange = {sex = it})
+                GodLifeTextField(text = sex, onTextChanged = {sex = it})
 
 
             }

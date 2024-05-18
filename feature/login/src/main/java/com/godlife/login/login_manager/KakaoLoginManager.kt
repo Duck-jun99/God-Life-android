@@ -2,17 +2,32 @@ package com.godlife.login.login_manager
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.login.LoginActivity
 import com.godlife.login.LoginViewModel
+import com.godlife.login.SignUpScreenRoute
+import com.godlife.navigator.MainNavigator
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class KakaoLoginManager @Inject constructor(
     @ActivityContext private val context: Context,
-    private val loginViewModel: LoginViewModel
+    private val loginViewModel: LoginViewModel,
+    private val navController: NavController,
+    private val mainNavigator: MainNavigator,
+    private val loginActivity: LoginActivity
 ) {
     private lateinit var kakaoLoginState: KaKaoLoginState
     private lateinit var kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit
@@ -46,7 +61,7 @@ class KakaoLoginManager @Inject constructor(
 
                 loginViewModel.saveAccessToken(token.accessToken)
 
-                getUserInfo(context, loginViewModel)
+                getUserInfo(context, loginViewModel, navController, mainNavigator, loginActivity)
 
 
             }
@@ -78,7 +93,10 @@ enum class KaKaoLoginState {
 
 private fun getUserInfo(
     context:Context,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    navController: NavController,
+    mainNavigator: MainNavigator,
+    loginActivity: LoginActivity
 ){
     val TAG = "KakaoLoginManager"
     UserApiClient.instance.me { user, error ->
@@ -94,9 +112,31 @@ private fun getUserInfo(
             //User 고유의 ID가 이미 저장되어 있는지 확인 후 없으면 새로 저장
             if(loginViewModel.getUserId() == ""){
                 loginViewModel.saveUserId(user.id.toString())
+                Log.e(TAG, "SAVE USER ID: ${user.id.toString()}")
             }
 
-            //서버에 이미 등록되어 있는 회원정보인지 확인, 등록되어 있지 않다면 회원가입으로 진행
+            // KaKao 로그인 후 서버에 회원가입 되어있는지 여부에 따라 checkLoginOrSignUp == false이면 회원가입 진행, true면 MainActivity로 이동
+
+            var checkLoginOrSignUp:Boolean? = null
+            CoroutineScope(Dispatchers.Main).launch {
+
+                launch {
+                    checkLoginOrSignUp = loginViewModel.checkUserExistence(user.id.toString())
+                }.join()
+
+                launch {
+
+                    Log.e(TAG, checkLoginOrSignUp.toString())
+
+                    if (!checkLoginOrSignUp!!) {
+                        navController.navigate(SignUpScreenRoute.route)
+                    } else {
+                        moveMainActivity(mainNavigator, loginActivity)
+                    }
+
+                }
+
+            }
 
 
             if (user.kakaoAccount?.emailNeedsAgreement == true) { scopes.add("account_email") }
@@ -139,4 +179,13 @@ private fun getUserInfo(
             }
         }
     }
+}
+
+private fun moveMainActivity(mainNavigator: MainNavigator, loginActivity: LoginActivity){
+
+    mainNavigator.navigateFrom(
+        activity = loginActivity,
+        withFinish = true
+    )
+
 }

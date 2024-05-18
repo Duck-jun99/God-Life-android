@@ -3,7 +3,7 @@ package com.godlife.network.retrofit
 import androidx.tracing.trace
 import com.godlife.network.BuildConfig
 import com.godlife.network.NetworkDataSource
-import com.godlife.network.model.NetworkUserQuery
+import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -28,10 +28,10 @@ interface RetrofitNetworkApi {
      *
      */
 
-    @POST("databases/{id}/query")
+    @GET("check/id")
     suspend fun getUserInfo(
-        @Path("id") id: String?,
-    ): NetworkUserQuery
+        @Query("id") id: String?,
+    ): UserExistenceCheckResult
 
     @GET("check/nickname")
     suspend fun checkNickname(
@@ -67,7 +67,7 @@ internal class RetrofitNetwork @Inject constructor(
     override suspend fun getUserInfo(
         //remoteErrorEmitter: RemoteErrorEmitter,
         id: String
-    ): NetworkUserQuery? =
+    ): UserExistenceCheckResult? =
         networkApi.getUserInfo(id = id)
 
     override suspend fun checkNickname(

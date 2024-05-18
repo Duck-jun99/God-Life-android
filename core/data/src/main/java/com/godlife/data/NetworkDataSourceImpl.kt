@@ -1,7 +1,7 @@
 package com.godlife.data
 
 import com.godlife.network.NetworkDataSource
-import com.godlife.network.model.NetworkUserQuery
+import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.retrofit.RetrofitNetworkApi
@@ -11,7 +11,7 @@ class NetworkDataSourceImpl @Inject constructor(
     private val networkApi: RetrofitNetworkApi
 ) : NetworkDataSource {
 
-    override suspend fun getUserInfo( id : String): NetworkUserQuery? {
+    override suspend fun getUserInfo( id : String): UserExistenceCheckResult? {
         return networkApi.getUserInfo(id = id)
 
     }
