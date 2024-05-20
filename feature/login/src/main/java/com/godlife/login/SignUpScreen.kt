@@ -3,10 +3,12 @@ package com.godlife.login
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,11 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.PurpleMain
@@ -44,11 +51,55 @@ fun SignUpScreen(
     signUpViewModel: SignUpViewModel = hiltViewModel()
 ){
 
+    val checkedNickname by signUpViewModel.checkedNickname.collectAsState()
+    val checkedEmail by signUpViewModel.checkedEmail.collectAsState()
+    val checkedAge by signUpViewModel.checkedAge.collectAsState()
+    val checkedSex by signUpViewModel.checkedSex.collectAsState()
+
+
+    val navController = rememberNavController()
+
+    //val navBackStackEntry by navController.currentBackStackEntryAsState()
+    //val currentRoute = navBackStackEntry?.destination?.route
+
+    if(checkedNickname && checkedEmail && checkedAge && checkedSex){
+        navController.navigate("SignUpConfirmScreen")
+    }
+
+    NavHost(navController = navController, startDestination = "SignUpScreen1",
+        modifier = Modifier.fillMaxHeight()) {
+
+        composable("SignUpScreen1"){
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(initialAlpha = 0.4f),
+                exit = fadeOut()
+            ) {
+                SignUpScreen1(signUpViewModel)
+            }
+
+        }
+
+        composable("SignUpConfirmScreen"){
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(initialAlpha = 0.4f)
+            ) {
+                SignUpConfirmScreen(signUpViewModel)
+            }
+
+        }
+    }
+
+}
+
+@Composable
+fun SignUpScreen1(
+    signUpViewModel: SignUpViewModel
+){
     var showText by remember { mutableStateOf(false) }
     var showEditScreen1 by remember { mutableStateOf(false) }
 
-    val showEditAge by signUpViewModel.showEditAge.collectAsState()
-    val showEditSex by signUpViewModel.showEditSex.collectAsState()
 
     LaunchedEffect(Unit) {
         // "회원가입을 도와드릴게요." 텍스트가 0.5초 후에 나타나도록 설정
@@ -111,8 +162,8 @@ fun EditScreen1(
             modifier = Modifier.padding(20.dp)
         ) {
 
-            var nickname by remember { mutableStateOf("") }
-            var email by remember { mutableStateOf("") }
+            var nickname by remember { signUpViewModel.nickname }
+            var email by remember { signUpViewModel.email }
 
             val checkedNickname by signUpViewModel.checkedNickname.collectAsState()
 
@@ -184,9 +235,9 @@ fun EditScreen1(
                 modifier = Modifier.align(Alignment.End),
                 textAlign = TextAlign.End)
 
-            Spacer(modifier = Modifier.size(100.dp))
+            Spacer(modifier = Modifier.size(50.dp))
 
-            if(checkedNickname && checkedServerNickname && checkedEmail && checkedServerEmail){
+            if(checkedNickname && checkedEmail) {
 
                 AnimatedVisibility(visible = true,
                     enter = fadeIn(
@@ -214,8 +265,14 @@ fun EditScreen2(
 
         ) {
 
-            var age by remember { mutableStateOf("") }
-            var sex by remember { mutableStateOf("") }
+            var age by remember { signUpViewModel.age}
+            var sex by remember { signUpViewModel.sex }
+
+            val checkedAge by signUpViewModel.checkedAge.collectAsState()
+            val checkedAgeMessage by signUpViewModel.checkedAgeMessage.collectAsState()
+
+            val checkedSex by signUpViewModel.checkedSex.collectAsState()
+            val checkedSexMessage by signUpViewModel.checkedSexMessage.collectAsState()
 
 
             Text(text = "나이를 입력해주세요.", style = TextStyle(
@@ -225,9 +282,24 @@ fun EditScreen2(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            GodLifeTextField(text = age, onTextChanged = {age = it})
+            GodLifeTextField(text = age, onTextChanged = {age = it},
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number).copy(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
+                    // 키보드 입력 종료 시 통신 수행
+                    //performCommunication(nickname, email)
+                    signUpViewModel.checkAgeLogic(age)
+                    Log.e("Silkjsakjld", "키보드 입력 종료")
+                })
+            )
 
-            Spacer(modifier = Modifier.size(100.dp))
+            Spacer(modifier = Modifier.size(5.dp))
+
+            Text(text = checkedAgeMessage,
+                style = TextStyle(color = Color.White),
+                modifier = Modifier.align(Alignment.End),
+                textAlign = TextAlign.End)
+
+            Spacer(modifier = Modifier.size(50.dp))
 
             Text(text = "성별을 입력해주세요.", style = TextStyle(
                 color = Color.White,
@@ -236,8 +308,24 @@ fun EditScreen2(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            GodLifeTextField(text = sex, onTextChanged = {sex = it})
+            GodLifeTextField(text = sex, onTextChanged = {sex = it},
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    // 키보드 입력 종료 시 통신 수행
+                    //performCommunication(nickname, email)
+                    signUpViewModel.checkSexLogic(sex)
+                    Log.e("Silkjsakjld", "키보드 입력 종료")
+                })
+            )
 
+            Spacer(modifier = Modifier.size(5.dp))
+
+            Text(text = checkedSexMessage,
+                style = TextStyle(color = Color.White),
+                modifier = Modifier.align(Alignment.End),
+                textAlign = TextAlign.End)
 
         }
     }
@@ -379,7 +467,9 @@ fun SignUpScreen2Preview(){
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                GodLifeTextField(text = age, onTextChanged = {age = it})
+                GodLifeTextField(text = age, onTextChanged = {age = it},
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
 
                 Spacer(modifier = Modifier.size(100.dp))
 

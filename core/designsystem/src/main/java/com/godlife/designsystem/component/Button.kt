@@ -1,6 +1,7 @@
 package com.godlife.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -68,6 +69,54 @@ fun GodLifeButton(
 }
 
 @Composable
+fun GodLifeButtonWhite(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = PurpleMain
+        ),
+        contentPadding = contentPadding,
+        content = content,
+        elevation = ButtonDefaults.buttonElevation(3.dp)
+    )
+}
+
+@Composable
+fun GodLifeButtonWhite(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    text: @Composable () -> Unit,
+    leadingIcon: @Composable (() -> Unit)? = null,
+) {
+    GodLifeButtonWhite(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        contentPadding = if (leadingIcon != null) {
+            ButtonDefaults.ButtonWithIconContentPadding
+        } else {
+            ButtonDefaults.ContentPadding
+        },
+
+        ) {
+        GodLifeButtonContent(
+            text = text,
+            leadingIcon = leadingIcon,
+        )
+    }
+}
+
+@Composable
 private fun GodLifeButtonContent(
     text: @Composable () -> Unit,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -95,10 +144,20 @@ private fun GodLifeButtonContent(
 @Composable
 fun GodLifeButtonPreview(){
     GodLifeTheme {
-        GodLifeButton(onClick = {},
-            text = { Text("Test button") }
-        ) {
+        Column {
+
+            GodLifeButton(onClick = {},
+                text = { Text("Test Button") }
+            ) {
+
+            }
+
+            GodLifeButtonWhite(onClick = { /*TODO*/ },
+                text = { Text(text = "Test Button")}) {
+
+            }
 
         }
+
     }
 }
