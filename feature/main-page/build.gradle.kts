@@ -15,6 +15,9 @@ android {
 dependencies {
 
     implementation(projects.feature.createtodolist)
+    implementation(projects.core.database)
+
+    implementation(projects.feature.navigator)
 
     implementation(libs.androidx.junit.ktx)
 }

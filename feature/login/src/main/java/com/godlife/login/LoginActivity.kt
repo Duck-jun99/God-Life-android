@@ -10,10 +10,12 @@ import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
@@ -21,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main.MainActivity
 import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,13 +43,14 @@ class LoginActivity: ComponentActivity() {
 
         val context: Context = this
         val content: View = this.findViewById(android.R.id.content)
+        val loginActivity = this
 
         checkAutoLoginState(loginViewModel)
 
         autoLogin(content, context, mainNavigator, this)
 
         setContent {
-            LoginUi(context)
+            LoginUi(context, mainNavigator, loginActivity, loginViewModel)
         }
     }
 }
@@ -54,21 +58,27 @@ class LoginActivity: ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginUi(context: Context){
+fun LoginUi(context: Context,
+            mainNavigator: MainNavigator,
+            loginActivity:LoginActivity,
+            loginViewModel:LoginViewModel){
 
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+
+
     Column(
         modifier = Modifier.fillMaxSize()
+            .background(PurpleMain)
     ) {
         NavHost(navController = navController, startDestination = LoginScreenRoute.route,
             modifier = Modifier.fillMaxHeight()) {
 
             composable(LoginScreenRoute.route){
-                LoginScreen(context)
+                LoginScreen(context, navController, mainNavigator, loginActivity)
             }
 
             composable(SignUpScreenRoute.route){
@@ -125,17 +135,10 @@ private fun checkAutoLoginState(loginViewModel: LoginViewModel) {
 }
 
 private fun moveMainActivity(mainNavigator: MainNavigator, loginActivity: LoginActivity){
-    //val intent = Intent(context, MainActivity::class.java)
-    //ContextCompat.startActivity(context, intent, null)
+
     mainNavigator.navigateFrom(
         activity = loginActivity,
         withFinish = true
     )
-
-}
-
-private fun moveSignUpActivity(context: Context){
-    //val intent = Intent(context, MainActivity::class.java)
-    //ContextCompat.startActivity(context, intent, null)
 
 }

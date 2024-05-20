@@ -49,6 +49,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeTimeInput
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite
@@ -79,10 +80,11 @@ fun CreateTodoListScreen2(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 
@@ -185,7 +187,7 @@ fun EndTimeInput(
         is24Hour = false
     )
 
-    CustomTimeInput(timePickerState = timePickerState)
+    GodLifeTimeInput(timePickerState = timePickerState)
 
 
     createViewModel.updateEndTime(
@@ -215,7 +217,7 @@ fun NotificationTimeInput(
         is24Hour = false
     )
 
-    CustomTimeInput(timePickerState = timePickerState)
+    GodLifeTimeInput(timePickerState = timePickerState)
 
     Log.e("NotificationTimeInput", NotificationTimeData(LocalDateTime.now().year,
         LocalDateTime.now().monthValue,
@@ -232,90 +234,6 @@ fun NotificationTimeInput(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomTimeInput(
-    timePickerState: TimePickerState
-){
-    TimeInput(
-        state = timePickerState,
-        modifier = Modifier.padding(top = 10.dp),
-        colors = TimePickerDefaults.colors(
-            timeSelectorSelectedContainerColor = Color.White,
-            timeSelectorSelectedContentColor = PurpleMain,
-            timeSelectorUnselectedContainerColor = Color.White,
-            timeSelectorUnselectedContentColor = GreyWhite,
-
-            periodSelectorBorderColor = PurpleMain,
-            periodSelectorSelectedContainerColor = PurpleMain,
-            periodSelectorSelectedContentColor = Color.White,
-            periodSelectorUnselectedContainerColor = Color.White,
-            periodSelectorUnselectedContentColor = GreyWhite,
-
-            containerColor = PurpleMain,
-            selectorColor = PurpleMain,
-            clockDialColor = PurpleMain,
-            clockDialSelectedContentColor = PurpleMain,
-            clockDialUnselectedContentColor = Color.White,
-
-        )
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-fun CustomTimeInputPreview(){
-    val timePickerState = rememberTimePickerState(
-        initialHour = 17,
-        initialMinute = 30,
-        is24Hour = false
-    )
-
-    TimeInput(
-        state = timePickerState,
-        modifier = Modifier.padding(top = 10.dp),
-        colors = TimePickerDefaults.colors(
-            timeSelectorSelectedContainerColor = Color.White,
-            timeSelectorSelectedContentColor = PurpleMain,
-            timeSelectorUnselectedContainerColor = Color.White,
-            timeSelectorUnselectedContentColor = GreyWhite,
-
-            periodSelectorBorderColor = PurpleMain,
-            periodSelectorSelectedContainerColor = PurpleMain,
-            periodSelectorSelectedContentColor = Color.White,
-            periodSelectorUnselectedContainerColor = Color.White,
-            periodSelectorUnselectedContentColor = GreyWhite,
-
-            containerColor = PurpleMain,
-            selectorColor = PurpleMain,
-            clockDialColor = PurpleMain,
-            clockDialSelectedContentColor = PurpleMain,
-            clockDialUnselectedContentColor = Color.White,
-
-
-        )
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-fun TimeInputPreview(){
-    val timePickerState = rememberTimePickerState(
-        initialHour = 17,
-        initialMinute = 30,
-        is24Hour = false
-    )
-
-    TimeInput(
-        state = timePickerState,
-        modifier = Modifier.padding(top = 10.dp),
-        colors = TimePickerDefaults.colors(Color.Black)
-    )
-}
-
 
 @Preview(showBackground = true)
 @Composable
@@ -327,10 +245,11 @@ fun CreateTodoListScreen2Preview(){
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(20.dp)
                     .weight(0.8f)
             ) {
 

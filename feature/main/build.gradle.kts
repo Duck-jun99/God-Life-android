@@ -36,6 +36,8 @@ dependencies {
     implementation(projects.feature.mainPage)
     implementation(projects.feature.communityPage)
     implementation(projects.feature.settingPage)
+
+    implementation(projects.feature.navigator)
     
     //implementation(projects.feature.createtodolist)
 

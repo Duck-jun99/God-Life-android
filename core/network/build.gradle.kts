@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
 plugins {
     id("god_life.android.library")
     id("god_life.android.hilt")
@@ -9,6 +14,17 @@ android {
 
     buildFeatures {
         buildConfig = true
+    }
+
+    defaultConfig {
+
+
+        buildConfigField(
+            "String",
+            "SERVER_DOMAIN",
+            properties.getProperty("SERVER_DOMAIN")
+        )
+
     }
 }
 
