@@ -28,3 +28,8 @@ data class SignUpCheckEmailQuery(
 
     val message: String
 )
+
+data class SignUpQuery(
+    val accessToken: String,
+    val refershToken: String,
+)

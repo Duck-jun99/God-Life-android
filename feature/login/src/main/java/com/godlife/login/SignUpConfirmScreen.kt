@@ -126,7 +126,9 @@ fun SignUpConfirmScreen(
                     .align(Alignment.CenterHorizontally)
                     .weight(0.2f)
             ){
-                GodLifeButtonWhite(onClick = {},
+                GodLifeButtonWhite(onClick = {
+                    signUpViewModel.signUp()
+                                             },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .fillMaxWidth(0.5f)

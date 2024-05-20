@@ -6,11 +6,16 @@ import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
+import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.SignUpRequest
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -20,13 +25,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface RetrofitNetworkApi {
-
-    /**
-     * ## getUserInfo()
-     * 서버에 저장된 User 정보를 받아오기 위함
-     *
-     *
-     */
 
     @GET("check/id")
     suspend fun getUserInfo(
@@ -43,6 +41,11 @@ interface RetrofitNetworkApi {
         @Query("email") email :String?
     ): SignUpCheckEmailQuery
 
+
+    @POST("/signup")
+    suspend fun signUp(
+        @Body request: SignUpRequest
+    ): SignUpQuery
 
 }
 
@@ -77,5 +80,15 @@ internal class RetrofitNetwork @Inject constructor(
 
     override suspend fun checkEmail(email: String): SignUpCheckEmailQuery?
     = networkApi.checkEmail(email = email)
+
+    override suspend fun signUp(
+        nickname: String,
+        email: String,
+        age: Int,
+        sex: String,
+        providerId: String,
+        providerName: String
+    ): SignUpQuery
+    = networkApi.signUp(SignUpRequest(nickname, email, age, sex, providerId, providerName))
 
 }

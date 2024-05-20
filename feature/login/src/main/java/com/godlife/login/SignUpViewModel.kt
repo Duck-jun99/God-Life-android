@@ -4,7 +4,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.SignUpUseCase
+import com.godlife.network.model.SignUpQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val signUpUseCase: SignUpUseCase
+    private val signUpUseCase: SignUpUseCase,
+    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase
 ) : ViewModel() {
 
     //입력된 닉네임, 이메일, 나이, 성별
@@ -22,6 +25,8 @@ class SignUpViewModel @Inject constructor(
     val email = mutableStateOf("")
     val age = mutableStateOf("")
     val sex = mutableStateOf("")
+
+    lateinit var id: String
 
 
     // 닉네임, 이메일, 나이, 성별 로직을 통과하는지에 대한 여부
@@ -149,6 +154,31 @@ class SignUpViewModel @Inject constructor(
         else{
             _checkedSexMessage.value = "남 또는 여 를 올바르게 입력해주세요."
         }
+    }
+
+    fun signUp(){
+        viewModelScope.launch {
+
+            id = localPreferenceUserUseCase.getUserId()
+            if(::id.isInitialized){
+                var signUpQuery: SignUpQuery =
+                signUpUseCase.executeSignUp(nickname = nickname.value,
+                    email = email.value,
+                    age = age.value.toInt(),
+                    sex = sex.value,
+                    providerId = id,
+                    providerName = "KaKao")
+
+                localPreferenceUserUseCase.saveAccessToken(signUpQuery.accessToken)
+                localPreferenceUserUseCase.saveAccessToken(signUpQuery.refershToken)
+
+            }
+
+
+
+        }
+
+
     }
 
 }

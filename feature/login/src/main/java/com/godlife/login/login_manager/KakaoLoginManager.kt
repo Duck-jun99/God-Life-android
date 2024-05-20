@@ -59,7 +59,7 @@ class KakaoLoginManager @Inject constructor(
                 Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.idToken}")
                 Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.refreshToken}")
 
-                loginViewModel.saveAccessToken(token.accessToken)
+                //loginViewModel.saveAccessToken(token.accessToken)
 
                 getUserInfo(context, loginViewModel, navController, mainNavigator, loginActivity)
 
