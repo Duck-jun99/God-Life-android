@@ -77,7 +77,12 @@ fun MainPageScreen(
 
     val context = LocalContext.current
 
+
+    val todayTodoList by viewModel.todoList.collectAsState()
+    val todayBoolean by viewModel.todayBoolean.collectAsState()
+
     GodLifeTheme {
+
 
         Column(
             modifier = Modifier
@@ -90,10 +95,10 @@ fun MainPageScreen(
             
             //NoTodoListBox(context, mainActivity, createNavigator)
 
-            val todayTodoList by viewModel.todoList.collectAsState()
-            val todayBoolean by viewModel.todayBoolean.collectAsState()
+
+
             if (todayBoolean) {
-                TodoListBox()
+                TodoListBox(viewModel)
             } else {
                 NoTodoListBox(context, mainActivity, createNavigator)
             }
@@ -192,6 +197,7 @@ fun NoTodoListBox(
 
 @Composable
 fun TodoListBox(
+    viewModel: MainPageViewModel
 ) {
 
     Column(
@@ -239,8 +245,10 @@ fun TodoListBox(
             .fillMaxWidth()
             .weight(0.4f)){
 
+            var todoListCount = viewModel.getTodoListCount()
+
             Text(
-                text = "2/5",
+                text = "${todoListCount[1]} / ${todoListCount[0]}",
                 style = TextStyle(
                     color = Color.White,
                     fontSize = 18.sp,
@@ -278,7 +286,9 @@ fun NoCompletedTodayList(
             )
 
             GodLifeButton(
-                onClick = { /*Todo*/ },
+                onClick = {
+                    viewModel.completeTodo(todo)
+                },
                 modifier = Modifier.align(Alignment.End)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))
             }
@@ -553,7 +563,9 @@ fun UserInfo(){
         ) {
             Text(text = "Guset님 환영해요!", style = GodLifeTypography.titleMedium)
             Spacer(modifier = Modifier.size(5.dp))
-            Divider(modifier = Modifier.fillMaxWidth().size(5.dp), color = PurpleMain)
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .size(5.dp), color = PurpleMain)
         }
     }
 }

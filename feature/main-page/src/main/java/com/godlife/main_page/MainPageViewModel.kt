@@ -7,6 +7,7 @@ import com.godlife.database.model.TodoEntity
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.model.todo.EndTimeData
 import com.godlife.model.todo.NotificationTimeData
+import com.godlife.model.todo.TodoList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,6 +48,30 @@ class MainPageViewModel @Inject constructor(
 
             }
 
+        }
+    }
+
+    fun getTodoListCount():List<Int>{
+        var completedCount = 0
+        todoList.value.todoList.forEach {
+            if(it.iscompleted){
+                completedCount+=1
+            }
+        }
+        return listOf(todoList.value.todoList.size, completedCount)
+    }
+
+    fun completeTodo(todo: TodoList){
+        viewModelScope.launch(Dispatchers.IO) {
+            val newList = _todoList.value
+            newList.todoList = newList.todoList.map { if(it == todo) it.copy(iscompleted = true) else it }
+            _todoList.value = newList
+
+            /*
+            val newList = _todoList.value.map { if (it == todo) it.copy(isSelected = !it.isSelected) else it }
+            _todoList.value = newList
+
+             */
         }
     }
 }

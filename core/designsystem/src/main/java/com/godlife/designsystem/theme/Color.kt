@@ -13,6 +13,8 @@ val Pink40 = Color(0xFF7D5260)
 val PurpleMain = Color(0xFF495C9F)
 val PurpleSecond = Color(0xFF9FA8DA)
 
+val GreyWhite2 = Color(0xFFDBDBDB)
+
 
 //Text Color
 val GreyWhite = Color(0xFF7E7575)
