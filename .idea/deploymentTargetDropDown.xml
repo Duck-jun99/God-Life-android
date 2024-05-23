@@ -5,6 +5,9 @@
       <entry key="CommunityPagePreview">
         <State />
       </entry>
+      <entry key="CreatePostActivityPreview">
+        <State />
+      </entry>
       <entry key="LoadingUI">
         <State />
       </entry>

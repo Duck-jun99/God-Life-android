@@ -1,20 +1,15 @@
 package com.godlife.createtodolist
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,14 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.createtodolist.util.AnimatedPreLoader
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.MainNavigator
 import kotlinx.coroutines.delay
 
@@ -47,7 +39,7 @@ fun CreateTodoListScreen3(
     navController: NavController,
     createActivity: CreateActivity,
     mainNavigator: MainNavigator,
-    createViewModel: CreateViewModel
+    createViewModel: CreateTodoListViewModel
 ){
 
     val showDoneUI = remember { mutableStateOf(false) }
@@ -72,7 +64,7 @@ fun CreateTodoListScreen3(
 
 @Composable
 fun LoadingUI(
-    createViewModel: CreateViewModel
+    createViewModel: CreateTodoListViewModel
 ){
     GodLifeTheme {
 
@@ -108,7 +100,7 @@ fun DoneLodingUI(
     navController: NavController,
     createActivity: CreateActivity,
     mainNavigator: MainNavigator,
-    createViewModel: CreateViewModel
+    createViewModel: CreateTodoListViewModel
 ){
     GodLifeTheme {
 

@@ -69,7 +69,7 @@ fun GodLifeButton(
 }
 
 @Composable
-fun GodLifeButtonWhite(
+fun GodLifeButtonWhiteWrap(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -98,7 +98,7 @@ fun GodLifeButtonWhite(
     text: @Composable () -> Unit,
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
-    GodLifeButtonWhite(
+    GodLifeButtonWhiteWrap(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,

@@ -8,5 +8,5 @@ android {
     namespace = "com.godlife.common"
 }
 dependencies {
-
+    implementation(libs.androidx.junit.ktx)
 }

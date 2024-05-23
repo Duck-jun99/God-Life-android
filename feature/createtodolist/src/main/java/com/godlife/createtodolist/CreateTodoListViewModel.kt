@@ -14,12 +14,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateViewModel @Inject constructor(
+class CreateTodoListViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase
 ) :ViewModel(){
 

@@ -57,6 +57,7 @@ import com.godlife.designsystem.theme.Purple40
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.theme.PurpleSecond
 import com.godlife.model.todo.TodoList
+import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 
 
@@ -64,6 +65,7 @@ import com.godlife.navigator.CreatetodolistNavigator
 fun MainPageScreen(
     mainActivity: Activity,
     createNavigator: CreatetodolistNavigator,
+    createPostNavigator: CreatePostNavigator,
     viewModel: MainPageViewModel = hiltViewModel()
 ) {
 
@@ -96,6 +98,11 @@ fun MainPageScreen(
             
             //NoTodoListBox(context, mainActivity, createNavigator)
 
+
+            //CreatePost 테스트용 임시
+            Button(onClick = { moveCreatePostActivity(createPostNavigator, mainActivity) }) {
+                Text(text = "CreatePost")
+            }
 
 
             if (todayBoolean) {
@@ -264,9 +271,7 @@ fun TodoListBox(
 }
 
 @Composable
-fun CompletedTodoListBox(
-    viewModel: MainPageViewModel
-) {
+fun CompletedTodoListBox() {
     Column(
         modifier = Modifier
             .background(
@@ -312,9 +317,11 @@ fun CompletedTodoListBox(
             .fillMaxWidth()
             .weight(0.4f)){
 
-            GodLifeButtonWhite(onClick = { /*TODO*/ },modifier = Modifier.align(Alignment.Center)) {
-                Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold))
-            }
+            GodLifeButtonWhite(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.Center),
+                text = { Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold)) }
+            )
 
         }
 
@@ -574,9 +581,11 @@ fun CompletedTodoListBoxPreview() {
             .fillMaxWidth()
             .weight(0.4f)){
 
-            GodLifeButtonWhite(onClick = { /*TODO*/ },modifier = Modifier.align(Alignment.Center)) {
-                Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold))
-            }
+            GodLifeButtonWhite(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.Center),
+                text = { Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold)) }
+            )
 
         }
 
@@ -715,3 +724,10 @@ private fun moveCreateActivity(createNavigator: CreatetodolistNavigator, mainAct
 
 }
 
+private fun moveCreatePostActivity(createPostNavigator: CreatePostNavigator, mainActivity: Activity){
+    createPostNavigator.navigateFrom(
+        activity = mainActivity,
+        withFinish = false
+    )
+
+}
