@@ -190,7 +190,8 @@ fun CommunityLatestPostListPreview(modifier: Modifier = Modifier){
                     modifier
                         .background(PurpleMain)
                         .weight(0.4f)
-                        .fillMaxSize()){
+                        .height(350.dp)
+                        .fillMaxWidth()){
 
                     Text(text = "Image")
                 }

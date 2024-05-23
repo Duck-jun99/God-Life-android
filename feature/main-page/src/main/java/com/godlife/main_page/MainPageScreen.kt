@@ -48,6 +48,7 @@ import com.godlife.createtodolist.CardTodoList
 import com.godlife.createtodolist.CreateActivity
 import com.godlife.createtodolist.SelectedCardTodoList
 import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite
@@ -263,6 +264,64 @@ fun TodoListBox(
 }
 
 @Composable
+fun CompletedTodoListBox(
+    viewModel: MainPageViewModel
+) {
+    Column(
+        modifier = Modifier
+            .background(
+                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                shape = RoundedCornerShape(30.dp),
+                alpha = 0.8f
+            )
+            .size(300.dp)
+            .padding(20.dp),
+    ) {
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            Text(
+                text = "오늘의 투두를 모두 완료했어요!\n인증 게시물을 올려보세요!",
+                style = TextStyle(
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold),
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
+
+
+        }
+
+        Box(modifier = Modifier
+            .padding(vertical = 10.dp)
+            .weight(0.2f))
+        {
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            GodLifeButtonWhite(onClick = { /*TODO*/ },modifier = Modifier.align(Alignment.Center)) {
+                Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold))
+            }
+
+        }
+
+    }
+}
+
+@Composable
 fun NoCompletedTodayList(
     todo: TodoList,
     viewModel: MainPageViewModel
@@ -330,6 +389,8 @@ fun CompletedTodayList(
         }
     }
 }
+
+
 
 //Preview
 
@@ -459,6 +520,63 @@ fun TodoListBoxPreview() {
                 modifier = Modifier.align(Alignment.TopEnd)
             )
 
+
+        }
+
+    }
+}
+
+@Preview
+@Composable
+fun CompletedTodoListBoxPreview() {
+    Column(
+        modifier = Modifier
+            .background(
+                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                shape = RoundedCornerShape(30.dp),
+                alpha = 0.8f
+            )
+            .size(300.dp)
+            .padding(20.dp),
+    ) {
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            Text(
+                text = "오늘의 투두를 모두 완료했어요!\n인증 게시물을 올려보세요!",
+                style = TextStyle(
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold),
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
+
+
+        }
+
+        Box(modifier = Modifier
+            .padding(vertical = 10.dp)
+            .weight(0.2f))
+        {
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            GodLifeButtonWhite(onClick = { /*TODO*/ },modifier = Modifier.align(Alignment.Center)) {
+                Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold))
+            }
 
         }
 
