@@ -4,5 +4,9 @@
         <activity android:name="com.godlife.createtodolist.CreateActivity">
 
         </activity>
+
+        <activity android:name="com.godlife.create_post.CreatePostActivity">
+
+        </activity>
     </application>
 </manifest>

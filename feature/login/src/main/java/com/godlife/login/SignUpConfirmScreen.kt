@@ -131,16 +131,16 @@ fun SignUpConfirmScreen(
                                              },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth(0.5f)
-                ) {
-                    Text(text = "갓생 시작",
+                        .fillMaxWidth(0.5f),
+
+                    text = { Text(text = "갓생 시작",
                         color = PurpleMain,
                         style = TextStyle(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
-                    )
-                }
+                    ) }
+                )
             }
         }
     }
@@ -248,16 +248,15 @@ fun SignUpConfirmScreenPreview(){
                 GodLifeButtonWhite(onClick = {},
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth(0.5f)
-                ) {
-                    Text(text = "갓생 시작",
+                        .fillMaxWidth(0.5f),
+                    text = {Text(text = "갓생 시작",
                         color = PurpleMain,
                         style = TextStyle(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
-                    )
-                }
+                    ) }
+                )
             }
         }
     }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,7 @@ import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.navigation.MainPageRoute
+import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
 import com.godlife.setting_page.SettingPageScreen
@@ -53,11 +55,14 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var loginNavigator: LoginNavigator
+
+    @Inject
+    lateinit var createPostNavigator: CreatePostNavigator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MainUiTheme(this, createNavigator, loginNavigator)
+            MainUiTheme(this, createNavigator, loginNavigator, createPostNavigator)
         }
     }
 }
@@ -135,7 +140,8 @@ fun TabBarBadgeView(count: Int? = null) {
 fun MainUiTheme(
     mainActivity: MainActivity,
     createNavigator: CreatetodolistNavigator,
-    loginNavigator: LoginNavigator
+    loginNavigator: LoginNavigator,
+    createPostNavigator: CreatePostNavigator
 ){
     GodLifeTheme {
 
@@ -154,6 +160,7 @@ fun MainUiTheme(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
+
             Scaffold(
                 bottomBar = { TabView(tabBarItems, navController) }
             ) {
@@ -161,7 +168,7 @@ fun MainUiTheme(
 
 
                     composable(mainTab.route) {
-                        MainPageScreen(mainActivity, createNavigator)
+                        MainPageScreen(mainActivity, createNavigator, createPostNavigator)
                     }
 
                     composable(communityTab.route) {

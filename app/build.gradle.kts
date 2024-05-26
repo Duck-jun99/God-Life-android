@@ -67,6 +67,7 @@ dependencies {
     implementation(projects.feature.main)
     implementation(projects.feature.login)
     implementation(projects.feature.createtodolist)
+    implementation(projects.feature.createPost)
     implementation(projects.feature.navigator)
 
     implementation(libs.kotlinx.serialization.json)

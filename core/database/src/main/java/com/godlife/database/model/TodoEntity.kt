@@ -12,7 +12,7 @@ data class TodoEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
 
     @ColumnInfo(name = "todoList")
-    val todoList: List<TodoList>,
+    var todoList: List<TodoList>,
 
     @ColumnInfo(name = "endTime")
     val endTime: EndTimeData,

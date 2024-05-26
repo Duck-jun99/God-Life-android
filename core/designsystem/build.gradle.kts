@@ -11,4 +11,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
 
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.constraintlayout)
+    implementation(project(":core:model"))
 }

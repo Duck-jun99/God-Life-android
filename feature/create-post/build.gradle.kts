@@ -3,18 +3,20 @@ plugins {
 }
 
 android {
-    namespace = "com.godlife.community_page"
+    namespace = "com.godlife.createpost"
 
     buildFeatures {
         buildConfig = true
     }
 
-
 }
 
 dependencies {
 
-    implementation(projects.core.model)
-    implementation(projects.core.designsystem)
     implementation(libs.androidx.junit.ktx)
+    implementation(projects.core.database)
+    implementation(projects.core.model)
+
+    implementation(projects.feature.navigator)
+
 }

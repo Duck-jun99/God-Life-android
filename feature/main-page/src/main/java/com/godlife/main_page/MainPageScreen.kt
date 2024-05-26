@@ -48,6 +48,7 @@ import com.godlife.createtodolist.CardTodoList
 import com.godlife.createtodolist.CreateActivity
 import com.godlife.createtodolist.SelectedCardTodoList
 import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite
@@ -56,6 +57,7 @@ import com.godlife.designsystem.theme.Purple40
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.theme.PurpleSecond
 import com.godlife.model.todo.TodoList
+import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 
 
@@ -63,6 +65,7 @@ import com.godlife.navigator.CreatetodolistNavigator
 fun MainPageScreen(
     mainActivity: Activity,
     createNavigator: CreatetodolistNavigator,
+    createPostNavigator: CreatePostNavigator,
     viewModel: MainPageViewModel = hiltViewModel()
 ) {
 
@@ -77,7 +80,12 @@ fun MainPageScreen(
 
     val context = LocalContext.current
 
+
+    val todayTodoList by viewModel.todoList.collectAsState()
+    val todayBoolean by viewModel.todayBoolean.collectAsState()
+
     GodLifeTheme {
+
 
         Column(
             modifier = Modifier
@@ -90,10 +98,15 @@ fun MainPageScreen(
             
             //NoTodoListBox(context, mainActivity, createNavigator)
 
-            val todayTodoList by viewModel.todoList.collectAsState()
-            val todayBoolean by viewModel.todayBoolean.collectAsState()
+
+            //CreatePost 테스트용 임시
+            Button(onClick = { moveCreatePostActivity(createPostNavigator, mainActivity) }) {
+                Text(text = "CreatePost")
+            }
+
+
             if (todayBoolean) {
-                TodoListBox()
+                TodoListBox(viewModel)
             } else {
                 NoTodoListBox(context, mainActivity, createNavigator)
             }
@@ -192,6 +205,7 @@ fun NoTodoListBox(
 
 @Composable
 fun TodoListBox(
+    viewModel: MainPageViewModel
 ) {
 
     Column(
@@ -239,8 +253,10 @@ fun TodoListBox(
             .fillMaxWidth()
             .weight(0.4f)){
 
+            var todoListCount = viewModel.getTodoListCount()
+
             Text(
-                text = "2/5",
+                text = "${todoListCount[1]} / ${todoListCount[0]}",
                 style = TextStyle(
                     color = Color.White,
                     fontSize = 18.sp,
@@ -248,6 +264,64 @@ fun TodoListBox(
                 modifier = Modifier.align(Alignment.TopEnd)
             )
 
+
+        }
+
+    }
+}
+
+@Composable
+fun CompletedTodoListBox() {
+    Column(
+        modifier = Modifier
+            .background(
+                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                shape = RoundedCornerShape(30.dp),
+                alpha = 0.8f
+            )
+            .size(300.dp)
+            .padding(20.dp),
+    ) {
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            Text(
+                text = "오늘의 투두를 모두 완료했어요!\n인증 게시물을 올려보세요!",
+                style = TextStyle(
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold),
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
+
+
+        }
+
+        Box(modifier = Modifier
+            .padding(vertical = 10.dp)
+            .weight(0.2f))
+        {
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            GodLifeButtonWhite(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.Center),
+                text = { Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold)) }
+            )
 
         }
 
@@ -278,7 +352,9 @@ fun NoCompletedTodayList(
             )
 
             GodLifeButton(
-                onClick = { /*Todo*/ },
+                onClick = {
+                    viewModel.completeTodo(todo)
+                },
                 modifier = Modifier.align(Alignment.End)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))
             }
@@ -320,6 +396,8 @@ fun CompletedTodayList(
         }
     }
 }
+
+
 
 //Preview
 
@@ -455,6 +533,65 @@ fun TodoListBoxPreview() {
     }
 }
 
+@Preview
+@Composable
+fun CompletedTodoListBoxPreview() {
+    Column(
+        modifier = Modifier
+            .background(
+                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                shape = RoundedCornerShape(30.dp),
+                alpha = 0.8f
+            )
+            .size(300.dp)
+            .padding(20.dp),
+    ) {
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            Text(
+                text = "오늘의 투두를 모두 완료했어요!\n인증 게시물을 올려보세요!",
+                style = TextStyle(
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold),
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
+
+
+        }
+
+        Box(modifier = Modifier
+            .padding(vertical = 10.dp)
+            .weight(0.2f))
+        {
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.4f)){
+
+            GodLifeButtonWhite(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.Center),
+                text = { Text(text = "게시물 작성", style = TextStyle(fontWeight = FontWeight.Bold)) }
+            )
+
+        }
+
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun NoCompletedTodayListPreview(){
@@ -553,7 +690,9 @@ fun UserInfo(){
         ) {
             Text(text = "Guset님 환영해요!", style = GodLifeTypography.titleMedium)
             Spacer(modifier = Modifier.size(5.dp))
-            Divider(modifier = Modifier.fillMaxWidth().size(5.dp), color = PurpleMain)
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .size(5.dp), color = PurpleMain)
         }
     }
 }
@@ -585,3 +724,10 @@ private fun moveCreateActivity(createNavigator: CreatetodolistNavigator, mainAct
 
 }
 
+private fun moveCreatePostActivity(createPostNavigator: CreatePostNavigator, mainActivity: Activity){
+    createPostNavigator.navigateFrom(
+        activity = mainActivity,
+        withFinish = false
+    )
+
+}

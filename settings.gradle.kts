@@ -34,6 +34,7 @@ include(
     ":feature:community-page",
     ":feature:setting-page",
     ":feature:createtodolist",
+    ":feature:create-post",
 
     ":feature:navigator"
 )

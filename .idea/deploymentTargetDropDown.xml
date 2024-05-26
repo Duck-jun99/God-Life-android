@@ -2,7 +2,13 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="LoadingUI">
+      <entry key="CommunityPagePreview">
+        <State />
+      </entry>
+      <entry key="CreatePostActivityPreview">
+        <State />
+      </entry>
+      <entry key="CreatePostPreviewScreenPreview">
         <State />
       </entry>
       <entry key="SignUpConfirmScreenPreview">

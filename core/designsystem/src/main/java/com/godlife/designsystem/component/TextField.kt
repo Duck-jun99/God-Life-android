@@ -33,6 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GreyWhite
+import com.godlife.designsystem.theme.GreyWhite2
 import com.godlife.designsystem.theme.PurpleMain
 
 @Composable
@@ -57,6 +59,34 @@ fun GodLifeTextField(
                 )
                 )
                 Divider(modifier = Modifier.fillMaxWidth(), color = Color.White)
+            }
+
+        }
+    )
+}
+
+@Composable
+fun GodLifeTextFieldGray(
+    text: String,
+    onTextChanged: (String) -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+) {
+    BasicTextField(
+        value = text,
+        onValueChange = onTextChanged,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        decorationBox = {
+
+            Column(modifier = Modifier.fillMaxWidth()
+                .padding(5.dp)) {
+                Text(text = text, style = TextStyle(
+                    color = GreyWhite,
+                    fontSize = 15.sp
+                )
+                )
+                //Divider(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), color = GreyWhite2)
             }
 
         }
