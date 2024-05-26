@@ -63,6 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -80,6 +81,7 @@ import com.godlife.model.community.TagItem
 fun CreatePostScreen(
     createPostViewModel: CreatePostViewModel,
     createPostActivity: CreatePostActivity,
+    navController: NavController,
     modifier: Modifier = Modifier
 ){
 
@@ -232,7 +234,8 @@ fun CreatePostScreen(
                         Card(
                             modifier = Modifier
                                 .padding(12.dp)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .clickable { navController.navigate("CreatePostPreviewScreen") },
                             shape = RoundedCornerShape(8.dp),
                             elevation = CardDefaults.cardElevation(7.dp),
                             colors = CardDefaults.cardColors(Color.White)

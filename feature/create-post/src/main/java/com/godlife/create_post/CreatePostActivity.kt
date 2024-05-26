@@ -8,11 +8,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import com.godlife.create_post.CreatePostScreen
 
@@ -46,11 +55,33 @@ class CreatePostActivity: ComponentActivity() {
 
         setContent {
 
-            CreatePostScreen(createPostViewModel, this)
+            CreatePostUI(createPostViewModel, this)
         }
 
     }
 
+}
+
+@Composable
+fun CreatePostUI(createPostViewModel:CreatePostViewModel, createPostActivity: CreatePostActivity){
+    val navController = rememberNavController()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        NavHost(navController = navController, startDestination = "CreatePostScreen", modifier = Modifier.fillMaxSize()){
+            composable("CreatePostScreen"){
+                CreatePostScreen(createPostViewModel = createPostViewModel, createPostActivity = createPostActivity, navController)
+            }
+            composable("CreatePostPreviewScreen"){
+                CreatePostPreviewScreen(createPostViewModel = createPostViewModel, navController)
+            }
+        }
+    }
 }
 
 
