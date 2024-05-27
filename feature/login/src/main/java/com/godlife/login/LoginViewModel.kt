@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.navigator.MainNavigator
+import com.godlife.network.model.BodyQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,9 +56,9 @@ class LoginViewModel @Inject constructor(
 
      */
 
-    suspend fun checkUserExistence(userId :String):Boolean {
+    suspend fun checkUserExistence(userId :String): BodyQuery {
 
-        return getUserInfoUseCase.executeGetUserInfo(userId)!!.check
+        return getUserInfoUseCase.executeGetUserInfo(userId)!!.body
     }
 
 }

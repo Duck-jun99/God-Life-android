@@ -1,5 +1,8 @@
 package com.godlife.data.repository
 
+import android.graphics.Bitmap
+import android.net.Uri
+import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
@@ -19,6 +22,14 @@ interface NetworkRepository {
                        providerId: String,
                        providerName: String
                        ): SignUpQuery
+
+    suspend fun createPost(
+        authorization: String,
+        title: String,
+        content: String,
+        tags: List<String>,
+        imagePath: List<Uri>?
+    ): PostQuery
 
 
 }

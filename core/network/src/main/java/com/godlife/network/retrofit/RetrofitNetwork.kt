@@ -3,6 +3,7 @@ package com.godlife.network.retrofit
 import androidx.tracing.trace
 import com.godlife.network.BuildConfig
 import com.godlife.network.NetworkDataSource
+import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
@@ -12,13 +13,16 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import javax.inject.Inject
@@ -28,7 +32,7 @@ interface RetrofitNetworkApi {
 
     @GET("check/id")
     suspend fun getUserInfo(
-        @Query("id") id: String?,
+        @Query("memberId") id: String?,
     ): UserExistenceCheckResult
 
     @GET("check/nickname")
@@ -47,9 +51,19 @@ interface RetrofitNetworkApi {
         @Body request: SignUpRequest
     ): SignUpQuery
 
+    @Multipart
+    @POST("/board")
+    suspend fun createPost(
+        @Header("Authorization") authorization: String,
+        @Part("title") title: String,
+        @Part("content") content: String,
+        @Part("tags") tags: List<String>,
+        @Part images: List<MultipartBody.Part>?,
+    ): PostQuery
+
 }
 
-
+/*
 @Singleton
 internal class RetrofitNetwork @Inject constructor(
     networkJson: Json,
@@ -91,4 +105,14 @@ internal class RetrofitNetwork @Inject constructor(
     ): SignUpQuery
     = networkApi.signUp(SignUpRequest(nickname, email, age, sex, providerId, providerName))
 
+    override suspend fun createPost(
+        title: String,
+        content: String,
+        tags: List<String>,
+        imagePath: List<String>
+    ) = networkApi.createPost(title, content, tags, imagePath)
+
 }
+
+ */
+
