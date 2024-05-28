@@ -42,6 +42,7 @@ import com.godlife.designsystem.component.CommunityLatestPostList
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite2
+import com.godlife.designsystem.theme.GreyWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.FamousPostItem
 import com.godlife.model.community.LatestPostItem
@@ -73,7 +74,7 @@ fun CommunityPagePreview(modifier: Modifier = Modifier){
         LazyColumn(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite2)
+                .background(GreyWhite3)
         ) {
             item {
                 Surface(shadowElevation = 7.dp) {

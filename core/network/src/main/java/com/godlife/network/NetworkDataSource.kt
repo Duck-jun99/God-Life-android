@@ -2,6 +2,7 @@ package com.godlife.network
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
@@ -30,5 +31,12 @@ interface NetworkDataSource {
         tags: List<String>,
         imagePath: List<Uri>?
     ): PostQuery
+
+    suspend fun getLatestPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String,
+    ): LatestPostQuery
 
 }

@@ -3,6 +3,7 @@ package com.godlife.network.retrofit
 import androidx.tracing.trace
 import com.godlife.network.BuildConfig
 import com.godlife.network.NetworkDataSource
+import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
@@ -60,6 +61,14 @@ interface RetrofitNetworkApi {
         @Part("tags") tags: List<String>,
         @Part images: List<MultipartBody.Part>?,
     ): PostQuery
+
+    @GET("/boards")
+    suspend fun getLatestPost(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("keyword") keyword: String,
+        @Query("Tag") tag: String,
+    ): LatestPostQuery
 
 }
 

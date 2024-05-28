@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GreyWhite
 import com.godlife.designsystem.theme.GreyWhite2
+import com.godlife.designsystem.theme.GreyWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.LatestPostItem
 
@@ -36,7 +37,7 @@ fun CommunityLatestPostList(modifier: Modifier = Modifier,
     GodLifeTheme(
         modifier
             .height(375.dp)
-            .background(GreyWhite2)
+            .background(GreyWhite3)
     ) {
         Box(
             modifier
@@ -132,7 +133,7 @@ fun CommunityLatestPostList(modifier: Modifier = Modifier,
 fun CommunityLatestPostListPreview(modifier: Modifier = Modifier){
     GodLifeTheme(
         modifier.height(375.dp)
-            .background(GreyWhite2)
+            .background(GreyWhite3)
     ) {
         Surface(
             shadowElevation = 7.dp

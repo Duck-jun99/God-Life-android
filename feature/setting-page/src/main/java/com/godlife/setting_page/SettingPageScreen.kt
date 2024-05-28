@@ -53,6 +53,7 @@ import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GreyWhite2
+import com.godlife.designsystem.theme.GreyWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.LoginNavigator
 
@@ -80,7 +81,7 @@ fun SettingPageScreen(
         LazyColumn(
             modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(GreyWhite3)
         ) {
 
             item {
@@ -225,7 +226,7 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
         LazyColumn(
             modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(GreyWhite3)
         ) {
 
             item {
