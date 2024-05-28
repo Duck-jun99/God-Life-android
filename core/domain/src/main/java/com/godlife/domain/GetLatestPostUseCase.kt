@@ -1,16 +1,11 @@
 package com.godlife.domain
 
+import com.godlife.data.repository.LatestPostRepository
 import com.godlife.data.repository.NetworkRepository
-import com.godlife.network.model.LatestPostQuery
 import javax.inject.Inject
 
 class GetLatestPostUseCase @Inject constructor(
-    private val networkRepository: NetworkRepository
+    private val latestPostRepository: LatestPostRepository
 ) {
-    suspend fun executeGetLatestPost(
-        authorization: String,
-        page: Int,
-        keyword: String,
-        tag: String,
-    ) = networkRepository.getLatestPost(authorization, page, keyword, tag)
+    fun executeGetLatestPost() = latestPostRepository.getLatestPost()
 }

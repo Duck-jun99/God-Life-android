@@ -36,6 +36,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.godlife.community_page.CommunityPageScreen
+import com.godlife.community_page.LatestPostScreen
+import com.godlife.community_page.LatestPostScreenRoute
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.main_page.MainPageScreen
@@ -167,16 +169,22 @@ fun MainUiTheme(
                 NavHost(navController = navController, startDestination = mainTab.route) {
 
 
+                    //bottomBar
                     composable(mainTab.route) {
                         MainPageScreen(mainActivity, createNavigator, createPostNavigator)
                     }
 
                     composable(communityTab.route) {
-                        CommunityPageScreen()
+                        CommunityPageScreen(navController)
                     }
 
                     composable(settingTab.route) {
                         SettingPageScreen(mainActivity, loginNavigator)
+                    }
+
+                    //Community 세부 기능
+                    composable(LatestPostScreenRoute.route) {
+                        LatestPostScreen()
                     }
 
 

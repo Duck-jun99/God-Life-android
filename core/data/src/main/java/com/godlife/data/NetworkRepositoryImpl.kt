@@ -10,6 +10,7 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(

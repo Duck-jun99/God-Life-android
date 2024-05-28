@@ -1,5 +1,6 @@
 package com.godlife.god_life.di
 
+import com.godlife.data.repository.LatestPostRepository
 import com.godlife.data.repository.NetworkRepository
 import com.godlife.domain.CreatePostUseCase
 import com.godlife.domain.GetLatestPostUseCase
@@ -29,5 +30,5 @@ class UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetLatestPostUseCase(repository: NetworkRepository) = GetLatestPostUseCase(repository)
+    fun provideGetLatestPostUseCase(repository: LatestPostRepository) = GetLatestPostUseCase(repository)
 }

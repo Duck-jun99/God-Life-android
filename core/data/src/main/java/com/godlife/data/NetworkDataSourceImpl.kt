@@ -2,6 +2,9 @@ package com.godlife.data
 
 import android.net.Uri
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.PostQuery
@@ -15,6 +18,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.util.concurrent.Flow
 import javax.inject.Inject
 
 class NetworkDataSourceImpl @Inject constructor(
@@ -66,6 +70,8 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.createPost(authorization, title, content, tags, imageParts)
     }
 
+
+
     override suspend fun getLatestPost(
         authorization: String,
         page: Int,
@@ -75,5 +81,8 @@ class NetworkDataSourceImpl @Inject constructor(
 
         return networkApi.getLatestPost(authorization, page, keyword, tag)
     }
+
+
+
 
 }

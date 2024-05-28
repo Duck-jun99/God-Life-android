@@ -37,6 +37,7 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.godlife.designsystem.component.CommunityFamousPostList
 import com.godlife.designsystem.component.CommunityLatestPostList
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -50,7 +51,9 @@ import com.godlife.model.community.TagItem
 
 @Composable
 fun CommunityPageScreen(
+    navController: NavController,
     viewModel: CommunityPageViewModel = hiltViewModel()
+
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -59,10 +62,163 @@ fun CommunityPageScreen(
 
     }
 
-    CommunityPagePreview()
+    CommunityPageView(navController)
 
 }
 
+@Composable
+fun CommunityPageView(navController: NavController, modifier: Modifier = Modifier){
+
+    GodLifeTheme {
+
+
+        LazyColumn(
+            modifier
+                .fillMaxSize()
+                .background(GreyWhite3)
+        ) {
+            item {
+                Surface(shadowElevation = 7.dp) {
+                    Box(
+                        modifier
+                            .background(Color.White)
+                            .fillMaxWidth()
+                            .height(70.dp)
+                            .padding(10.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(text = "Guset님! 다른 갓생러들은 어떻게 살고 있을까요?", style = GodLifeTypography.titleSmall)
+                    }
+                }
+            }
+
+            item { Spacer(modifier.size(8.dp)) }
+
+            item { CategoryView(navController) }
+
+            item { Spacer(modifier.size(8.dp)) }
+
+            item { FamousPostPreview() }
+
+            item { Spacer(modifier.size(8.dp)) }
+
+            //item { LatestPostPreview() }
+
+
+
+            item{
+
+                Box(
+                    modifier
+                        .background(Color.White)
+                        .fillMaxWidth()
+                        .padding(
+                            top = 10.dp,
+                            bottom = 10.dp
+                        ),
+                    contentAlignment = Alignment.CenterStart
+                ){
+                    Column {
+
+                        Box(modifier.padding(start = 10.dp)){
+                            Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
+                        }
+
+                        Spacer(modifier.size(10.dp))
+
+                    }
+                }
+            }
+
+            val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
+                TagItem("TAG1"), TagItem("TAG2")
+            )),
+                LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
+
+            itemsIndexed(latestPostItem) { index, item ->
+                CommunityLatestPostList(latestPostItem = item)
+            }
+        }
+
+
+    }
+}
+
+
+@Composable
+fun CategoryView(navController: NavController, modifier: Modifier = Modifier){
+    Column(
+        modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(
+                start = 10.dp,
+                end = 10.dp,
+                top = 30.dp,
+                bottom = 30.dp
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Row(
+            modifier.fillMaxWidth()
+        ){
+            Button(onClick = { /*TODO*/ },
+                modifier
+                    .size(150.dp, 50.dp)
+                    .weight(0.5f)
+                    .padding(start = 10.dp, end = 10.dp),
+                colors = ButtonDefaults.buttonColors(Color.White),
+                elevation = ButtonDefaults.buttonElevation(7.dp)) {
+
+                Text(text = "인기 게시물", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
+            }
+
+            Button(onClick = { navController.navigate(LatestPostScreenRoute.route) },
+                modifier
+                    .size(150.dp, 50.dp)
+                    .weight(0.5f)
+                    .padding(start = 10.dp, end = 10.dp),
+                colors = ButtonDefaults.buttonColors(Color.White),
+                elevation = ButtonDefaults.buttonElevation(7.dp)) {
+
+                Text(text = "최신 게시물", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
+            }
+        }
+
+        Spacer(modifier = modifier.size(30.dp))
+
+        Row(
+            modifier.fillMaxWidth()
+        ){
+            Button(onClick = { /*TODO*/ },
+                modifier
+                    .size(150.dp, 50.dp)
+                    .weight(0.5f)
+                    .padding(start = 10.dp, end = 10.dp),
+                colors = ButtonDefaults.buttonColors(Color.White),
+                elevation = ButtonDefaults.buttonElevation(7.dp)) {
+
+                Text(text = "갓생 자극", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
+            }
+
+            Button(onClick = { /*TODO*/ },
+                modifier
+                    .size(150.dp, 50.dp)
+                    .weight(0.5f)
+                    .padding(start = 10.dp, end = 10.dp),
+                colors = ButtonDefaults.buttonColors(Color.White),
+                elevation = ButtonDefaults.buttonElevation(7.dp)) {
+
+                Text(text = "명예의 전당", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
+            }
+        }
+
+    }
+}
+
+object LatestPostScreenRoute{
+    const val route = "LatestPostScreen"
+}
 
 @Preview(showBackground = true)
 @Composable
