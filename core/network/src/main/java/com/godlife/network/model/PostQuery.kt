@@ -25,5 +25,8 @@ data class PostDetailBody(
     val isBoardOwner: Boolean,
     val tags: List<String>?,
     val title: String,
-    val commentCount: Int
+    val commentCount: Int,
+    val profileURL: String?,
+    val nickname: String,
+    val tier: String,
 )

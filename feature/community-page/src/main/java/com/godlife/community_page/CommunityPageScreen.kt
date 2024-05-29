@@ -1,12 +1,10 @@
 package com.godlife.community_page
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,8 +16,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.SnackbarHost
@@ -31,18 +27,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.godlife.designsystem.component.CommunityFamousPostList
-import com.godlife.designsystem.component.CommunityLatestPostList
+import com.godlife.designsystem.list.CommunityFamousPostList
+import com.godlife.designsystem.list.CommunityLatestPostList
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite2
 import com.godlife.designsystem.theme.GreyWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.FamousPostItem
@@ -71,73 +64,81 @@ fun CommunityPageView(navController: NavController, modifier: Modifier = Modifie
 
     GodLifeTheme {
 
-
-        LazyColumn(
+        Column(
             modifier
                 .fillMaxSize()
                 .background(GreyWhite3)
-        ) {
-            item {
-                Surface(shadowElevation = 7.dp) {
-                    Box(
-                        modifier
-                            .background(Color.White)
-                            .fillMaxWidth()
-                            .height(70.dp)
-                            .padding(10.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Text(text = "Guset님! 다른 갓생러들은 어떻게 살고 있을까요?", style = GodLifeTypography.titleSmall)
-                    }
-                }
-            }
-
-            item { Spacer(modifier.size(8.dp)) }
-
-            item { CategoryView(navController) }
-
-            item { Spacer(modifier.size(8.dp)) }
-
-            item { FamousPostPreview() }
-
-            item { Spacer(modifier.size(8.dp)) }
-
-            //item { LatestPostPreview() }
-
-
-
-            item{
-
+        ){
+            Surface(shadowElevation = 7.dp) {
                 Box(
                     modifier
                         .background(Color.White)
                         .fillMaxWidth()
-                        .padding(
-                            top = 10.dp,
-                            bottom = 10.dp
-                        ),
+                        .height(70.dp)
+                        .padding(10.dp),
                     contentAlignment = Alignment.CenterStart
-                ){
-                    Column {
-
-                        Box(modifier.padding(start = 10.dp)){
-                            Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
-                        }
-
-                        Spacer(modifier.size(10.dp))
-
-                    }
+                ) {
+                    Text(text = "Guset님! 다른 갓생러들은 어떻게 살고 있을까요?", style = GodLifeTypography.titleSmall)
                 }
             }
 
-            val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
-                TagItem("TAG1"), TagItem("TAG2")
-            )),
-                LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
+            LazyColumn(
+                modifier
+                    .fillMaxSize()
+                    .background(GreyWhite3)
+            ) {
+                item {
 
-            itemsIndexed(latestPostItem) { index, item ->
-                CommunityLatestPostList(latestPostItem = item)
+                }
+
+                item { Spacer(modifier.size(8.dp)) }
+
+                item { CategoryView(navController) }
+
+                item { Spacer(modifier.size(8.dp)) }
+
+                item { FamousPostPreview() }
+
+                item { Spacer(modifier.size(8.dp)) }
+
+                //item { LatestPostPreview() }
+
+
+
+                item{
+
+                    Box(
+                        modifier
+                            .background(Color.White)
+                            .fillMaxWidth()
+                            .padding(
+                                top = 10.dp,
+                                bottom = 10.dp
+                            ),
+                        contentAlignment = Alignment.CenterStart
+                    ){
+                        Column {
+
+                            Box(modifier.padding(start = 10.dp)){
+                                Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
+                            }
+
+                            Spacer(modifier.size(10.dp))
+
+                        }
+                    }
+                }
+
+                val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
+                    TagItem("TAG1"), TagItem("TAG2")
+                )),
+                    LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
+
+                itemsIndexed(latestPostItem) { index, item ->
+                    CommunityLatestPostList(latestPostItem = item)
+                }
             }
+
         }
 
 
@@ -225,75 +226,81 @@ object LatestPostScreenRoute{
 fun CommunityPagePreview(modifier: Modifier = Modifier){
 
     GodLifeTheme {
-
-
-        LazyColumn(
+        Column(
             modifier
                 .fillMaxSize()
                 .background(GreyWhite3)
         ) {
-            item {
-                Surface(shadowElevation = 7.dp) {
-                    Box(
-                        modifier
-                            .background(Color.White)
-                            .fillMaxWidth()
-                            .height(70.dp)
-                            .padding(10.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Text(text = "Guset님! 다른 갓생러들은 어떻게 살고 있을까요?", style = GodLifeTypography.titleSmall)
-                    }
-                }
-            }
-
-            item { Spacer(modifier.size(8.dp)) }
-
-            item { CategoryPreview() }
-
-            item { Spacer(modifier.size(8.dp)) }
-
-            item { FamousPostPreview() }
-
-            item { Spacer(modifier.size(8.dp)) }
-
-            //item { LatestPostPreview() }
-
-
-
-            item{
-
+            Surface(shadowElevation = 7.dp) {
                 Box(
                     modifier
                         .background(Color.White)
                         .fillMaxWidth()
-                        .padding(
-                            top = 10.dp,
-                            bottom = 10.dp
-                        ),
+                        .height(70.dp)
+                        .padding(10.dp),
                     contentAlignment = Alignment.CenterStart
-                ){
-                    Column {
-
-                        Box(modifier.padding(start = 10.dp)){
-                            Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
-                        }
-
-                        Spacer(modifier.size(10.dp))
-
-                    }
+                ) {
+                    Text(text = "Guest님! 다른 갓생러들은 어떻게 살고 있을까요?", style = GodLifeTypography.titleSmall)
                 }
             }
 
-            val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
-                TagItem("TAG1"), TagItem("TAG2")
-            )),
-                LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
+            LazyColumn(
+                modifier
+                    .background(GreyWhite3)
+            ) {
 
-            itemsIndexed(latestPostItem) { index, item ->
-                CommunityLatestPostList(latestPostItem = item)
+
+                item { Spacer(modifier.size(8.dp)) }
+
+                item { CategoryPreview() }
+
+                item { Spacer(modifier.size(8.dp)) }
+
+                item { FamousPostPreview() }
+
+                item { Spacer(modifier.size(8.dp)) }
+
+                //item { LatestPostPreview() }
+
+
+
+                item{
+
+                    Box(
+                        modifier
+                            .background(Color.White)
+                            .fillMaxWidth()
+                            .padding(
+                                top = 10.dp,
+                                bottom = 10.dp
+                            ),
+                        contentAlignment = Alignment.CenterStart
+                    ){
+                        Column {
+
+                            Box(modifier.padding(start = 10.dp)){
+                                Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
+                            }
+
+                            Spacer(modifier.size(10.dp))
+
+                        }
+                    }
+                }
+
+                val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
+                    TagItem("TAG1"), TagItem("TAG2")
+                )),
+                    LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
+
+                itemsIndexed(latestPostItem) { index, item ->
+                    CommunityLatestPostList(latestPostItem = item)
+                }
             }
+
         }
+
+
 
 
     }

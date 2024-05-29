@@ -1,4 +1,4 @@
-package com.godlife.designsystem.component
+package com.godlife.designsystem.list
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

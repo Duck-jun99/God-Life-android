@@ -5,31 +5,31 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,9 +39,14 @@ import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.LatestPostScreen
 import com.godlife.community_page.LatestPostScreenRoute
 import com.godlife.community_page.navigation.CommunityPageRoute
+import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GreyWhite
+import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.navigation.MainPageRoute
+import com.godlife.model.navigationbar.BottomNavItem
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
@@ -69,74 +74,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-data class TabBarItem(
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val badgeAmount: Int? = null,
-    val route:String
-)
-
-@Composable
-fun TabView(tabBarItems: List<TabBarItem>, navController: NavController) {
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-
-    NavigationBar {
-        tabBarItems.forEach { tabBarItem ->
-            NavigationBarItem(
-                selected = currentRoute == tabBarItem.route,
-                onClick = {
-                    navController.navigate(tabBarItem.route){
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                },
-
-                icon = {
-                    TabBarIconView(
-                        isSelected = currentRoute == tabBarItem.route,
-                        selectedIcon = tabBarItem.selectedIcon,
-                        unselectedIcon = tabBarItem.unselectedIcon,
-                        title = tabBarItem.title,
-                        badgeAmount = tabBarItem.badgeAmount
-                    )
-                },
-                label = {Text(tabBarItem.title)})
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TabBarIconView(
-    isSelected: Boolean,
-    selectedIcon: ImageVector,
-    unselectedIcon: ImageVector,
-    title: String,
-    badgeAmount: Int? = null
-) {
-    BadgedBox(badge = { TabBarBadgeView(badgeAmount) }) {
-        Icon(
-            imageVector = if (isSelected) selectedIcon else unselectedIcon,
-            contentDescription = title
-        )
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun TabBarBadgeView(count: Int? = null) {
-    if (count != null) {
-        Badge {
-            Text(count.toString())
-        }
-    }
-}
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainUiTheme(
@@ -147,9 +84,9 @@ fun MainUiTheme(
 ){
     GodLifeTheme {
 
-        val mainTab = TabBarItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-        val communityTab = TabBarItem(title = "God Life", selectedIcon = Icons.Filled.List, unselectedIcon = Icons.Outlined.List, route = CommunityPageRoute.route)
-        val settingTab = TabBarItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
+        val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
+        val communityTab = BottomNavItem(title = "God Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+        val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
 
         val tabBarItems = listOf(mainTab, communityTab, settingTab)
@@ -164,9 +101,9 @@ fun MainUiTheme(
         ) {
 
             Scaffold(
-                bottomBar = { TabView(tabBarItems, navController) }
-            ) {
-                NavHost(navController = navController, startDestination = mainTab.route) {
+                bottomBar = { MyBottomNavigation(tabBarItems, navController) }
+            ) { innerPadding ->
+                NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(innerPadding)) {
 
 
                     //bottomBar
@@ -194,10 +131,51 @@ fun MainUiTheme(
     }
 }
 
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview(showBackground = true)
 @Composable
-fun MainPreview() {
-    //MainUiTheme()
+fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavController) {
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+
+    NavigationBar(
+        containerColor = Color.White,
+        contentColor = contentColorFor(backgroundColor = Color.White),
+        tonalElevation = 7.dp
+    ) {
+        bottomNavItems.forEach { bottomNavItem ->
+            NavigationBarItem(
+                selected = currentRoute == bottomNavItem.route,
+                onClick = {
+                    navController.navigate(bottomNavItem.route){
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                },
+
+                icon = {
+                    TabIconView(
+                        isSelected = currentRoute == bottomNavItem.route,
+                        selectedIcon = bottomNavItem.selectedIcon,
+                        unselectedIcon = bottomNavItem.unselectedIcon,
+                        title = bottomNavItem.title,
+                        badgeAmount = bottomNavItem.badgeAmount
+                    )
+                },
+                label = {
+                    if(currentRoute == bottomNavItem.route){
+                        Text(bottomNavItem.title) }
+                    else null
+                        },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = PurpleMain,
+                    selectedTextColor = PurpleMain,
+                    unselectedIconColor = GreyWhite,
+                    unselectedTextColor = GreyWhite,
+                    disabledIconColor = GreyWhite3,
+                    disabledTextColor = GreyWhite3,
+                    indicatorColor = Color.White),
+                )
+        }
+    }
 }

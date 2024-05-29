@@ -16,7 +16,7 @@ class LatestPostRepository @Inject constructor(
 ) {
     fun getLatestPost() = Pager(
         config = PagingConfig(
-            pageSize = 20,
+            pageSize = 10,
         ),
         pagingSourceFactory = {
             LatestPostPagingSource(localPreferenceUserRepository, networkApi)
