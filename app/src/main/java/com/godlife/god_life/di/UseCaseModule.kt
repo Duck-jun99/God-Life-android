@@ -1,6 +1,9 @@
 package com.godlife.god_life.di
 
+import com.godlife.data.repository.LatestPostRepository
 import com.godlife.data.repository.NetworkRepository
+import com.godlife.domain.CreatePostUseCase
+import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.SignUpUseCase
 import dagger.Module
@@ -20,4 +23,12 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideSignUpUseCase(repository: NetworkRepository) = SignUpUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideCreatePostUseCase(repository: NetworkRepository) = CreatePostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetLatestPostUseCase(repository: LatestPostRepository) = GetLatestPostUseCase(repository)
 }

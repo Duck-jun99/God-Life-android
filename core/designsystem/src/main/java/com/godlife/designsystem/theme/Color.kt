@@ -14,6 +14,7 @@ val PurpleMain = Color(0xFF495C9F)
 val PurpleSecond = Color(0xFF9FA8DA)
 
 val GreyWhite2 = Color(0xFFDBDBDB)
+val GreyWhite3 = Color(0xFFF7F7F7)
 
 
 //Text Color

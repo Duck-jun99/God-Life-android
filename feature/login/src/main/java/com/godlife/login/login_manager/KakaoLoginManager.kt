@@ -11,6 +11,7 @@ import com.godlife.login.LoginActivity
 import com.godlife.login.LoginViewModel
 import com.godlife.login.SignUpScreenRoute
 import com.godlife.navigator.MainNavigator
+import com.godlife.network.model.BodyQuery
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -118,10 +119,13 @@ private fun getUserInfo(
             // KaKao 로그인 후 서버에 회원가입 되어있는지 여부에 따라 checkLoginOrSignUp == false이면 회원가입 진행, true면 MainActivity로 이동
 
             var checkLoginOrSignUp:Boolean? = null
+            var userInfo: BodyQuery? = null
             CoroutineScope(Dispatchers.Main).launch {
 
                 launch {
-                    checkLoginOrSignUp = loginViewModel.checkUserExistence(user.id.toString())
+                    userInfo = loginViewModel.checkUserExistence(user.id.toString())
+                    checkLoginOrSignUp = userInfo?.alreadySignUp
+                    //checkLoginOrSignUp = loginViewModel.checkUserExistence(user.id.toString())
                 }.join()
 
                 launch {
@@ -131,6 +135,16 @@ private fun getUserInfo(
                     if (!checkLoginOrSignUp!!) {
                         navController.navigate(SignUpScreenRoute.route)
                     } else {
+                        userInfo?.let { it.accessToken?.let { it1 ->
+                            loginViewModel.saveAccessToken(
+                                it1
+                            )
+                        } }
+                        userInfo?.let { it.refershToken?.let { it1 ->
+                            loginViewModel.saveRefreshToken(
+                                it1
+                            )
+                        } }
                         moveMainActivity(mainNavigator, loginActivity)
                     }
 

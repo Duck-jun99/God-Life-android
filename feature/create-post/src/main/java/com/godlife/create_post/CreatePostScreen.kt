@@ -1,6 +1,8 @@
 package com.godlife.create_post
 
+import android.content.ContentProvider
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
@@ -62,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
@@ -76,6 +79,10 @@ import com.godlife.designsystem.theme.GreyWhite
 import com.godlife.designsystem.theme.GreyWhite2
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @Composable
 fun CreatePostScreen(
@@ -85,21 +92,29 @@ fun CreatePostScreen(
     modifier: Modifier = Modifier
 ){
 
+    val context = LocalContext.current
+
     val selectedImgList by createPostViewModel.selectedImgUri.collectAsState()
 
     var title by remember { createPostViewModel.title }
     var text by remember { createPostViewModel.text }
 
+
     // 갤러리에서 사진 가져오기
     val launcher = rememberLauncherForActivityResult(contract =
     ActivityResultContracts.GetContent()) { uri: Uri? ->
 
-        Log.e("CreatePostScreen", uri.toString())
-
         if (uri != null) {
-            createPostViewModel.saveImg(uri)
+            var resizeUri = convertResizeImage(uri, context)
+
+            if (resizeUri != null) {
+                createPostViewModel.saveImg(resizeUri)
+
+                val file = File(resizeUri.path)
+                Log.e("CreatePostScreen", file.length().toString())
+            }
         }
-        
+
     }
 
     GodLifeTheme {
@@ -207,10 +222,13 @@ fun CreatePostScreen(
 
                 item{
                     LazyRow {
-                        itemsIndexed(selectedImgList){ index, item ->
-                            Log.e("fbjkkjhsad",index.toString())
-                            SelectImage(index, item, LocalContext.current)
+                        selectedImgList?.let {
+                            itemsIndexed(it){ index, item ->
+                                Log.e("fbjkkjhsad",index.toString())
+                                SelectImage(index, item, LocalContext.current)
+                            }
                         }
+
                     }
                 }
 
@@ -258,7 +276,8 @@ fun CreatePostScreen(
                         Card(
                             modifier = Modifier
                                 .padding(12.dp)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .clickable { createPostViewModel.createPost() },
                             shape = RoundedCornerShape(8.dp),
                             elevation = CardDefaults.cardElevation(7.dp),
                             colors = CardDefaults.cardColors(PurpleMain)
@@ -299,26 +318,8 @@ fun TagItem(tagItem: TagItem, modifier: Modifier = Modifier){
 
 }
 
-private fun setImgUri(imgUri: Uri, context: Context) {
-    imgUri.let {
-        val bitmap: Bitmap
-        if (Build.VERSION.SDK_INT < 28) {
-            bitmap = MediaStore.Images.Media.getBitmap(
-                context.contentResolver,
-                imgUri
-            )
-            //binding.ivImg.setImageBitmap(bitmap)
-        } else {
-            val source =
-                ImageDecoder.createSource(context.contentResolver, imgUri)
-            bitmap = ImageDecoder.decodeBitmap(source)
-            //binding.ivImg.setImageBitmap(bitmap)
-        }
-    }
-}
-
 @Composable
-fun SelectImage(index:Int, imgUri: Uri, context: Context){
+fun SelectImage(index:Int, imageUri: Uri, context: Context){
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     val num = index+1
@@ -334,7 +335,7 @@ fun SelectImage(index:Int, imgUri: Uri, context: Context){
 
         Glide.with(context)
             .asBitmap()
-            .load(imgUri)
+            .load(imageUri)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     bitmap.value = resource
@@ -360,6 +361,57 @@ fun SelectImage(index:Int, imgUri: Uri, context: Context){
             Text(text = num.toString(), style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) ,modifier = Modifier.align(Alignment.Center))
         }
     }
+}
+
+private fun convertResizeImage(imageUri: Uri, context: Context):Uri? {
+
+    val bitmap: Bitmap
+
+    if (Build.VERSION.SDK_INT >= 29) {
+
+        val source: ImageDecoder.Source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
+
+        try {
+            bitmap = ImageDecoder.decodeBitmap(source)
+
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.width / 2, bitmap.height / 2, true)
+
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
+
+            val tempFile = File.createTempFile("resized_image", ".jpg", context.cacheDir)
+            val fileOutputStream = FileOutputStream(tempFile)
+            fileOutputStream.write(byteArrayOutputStream.toByteArray())
+            fileOutputStream.close()
+
+            return Uri.fromFile(tempFile)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    } else {
+
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+            //val resizedBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.width / 2, bitmap.height / 2, true)
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.width / 2, bitmap.height / 2, true)
+
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
+
+            val tempFile = File.createTempFile("resized_image", ".jpg", context.cacheDir)
+            val fileOutputStream = FileOutputStream(tempFile)
+            fileOutputStream.write(byteArrayOutputStream.toByteArray())
+            fileOutputStream.close()
+
+            return Uri.fromFile(tempFile)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    return null
 }
 
 @Preview

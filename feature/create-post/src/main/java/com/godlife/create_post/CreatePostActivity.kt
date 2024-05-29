@@ -27,7 +27,7 @@ import com.godlife.create_post.CreatePostScreen
 
 @AndroidEntryPoint
 class CreatePostActivity: ComponentActivity() {
-    private val createPostViewModel: CreatePostViewModel by viewModels<CreatePostViewModel>()
+    //private val createPostViewModel: CreatePostViewModel by viewModels<CreatePostViewModel>()
 
     lateinit var getResult: ActivityResultLauncher<Intent>
 
@@ -42,7 +42,7 @@ class CreatePostActivity: ComponentActivity() {
 
         // 읽기 권한과 쓰기 권한에 대해서 설정이 되어있지 않다면
         if (writePermission == PackageManager.PERMISSION_DENIED || readPermission == PackageManager.PERMISSION_DENIED) {
-            // 읽기, 쓰기 권한을 요청합니다.
+            // 읽기, 쓰기 권한을 요청.
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -55,7 +55,7 @@ class CreatePostActivity: ComponentActivity() {
 
         setContent {
 
-            CreatePostUI(createPostViewModel, this)
+            CreatePostUI(this)
         }
 
     }
@@ -63,7 +63,10 @@ class CreatePostActivity: ComponentActivity() {
 }
 
 @Composable
-fun CreatePostUI(createPostViewModel:CreatePostViewModel, createPostActivity: CreatePostActivity){
+fun CreatePostUI(
+    createPostActivity: CreatePostActivity,
+    createPostViewModel: CreatePostViewModel = hiltViewModel()
+){
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

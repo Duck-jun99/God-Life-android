@@ -81,9 +81,12 @@ fun CreatePostPreviewScreen(
                     modifier
                         .fillMaxWidth()
                         .height(400.dp)) {
-                    itemsIndexed(createPostViewModel.selectedImgUri.value){index, item ->
-                        ImageView(imgUri = item, context = LocalContext.current)
+                    createPostViewModel.selectedImgUri.value?.let {
+                        itemsIndexed(it){index, item ->
+                            ImageView(imgUri = item, context = LocalContext.current)
+                        }
                     }
+
                 } }
 
 
