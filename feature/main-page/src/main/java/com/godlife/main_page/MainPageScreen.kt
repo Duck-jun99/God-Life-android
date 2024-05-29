@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -121,34 +122,31 @@ fun MainPageScreen(
                 .fillMaxSize()
                 .background(GreyWhite3)
         ){
-            Surface(shadowElevation = 7.dp) {
-                Box(
+            Box(
+                modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .padding(10.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(
                     modifier
-                        .background(Color.White)
-                        .fillMaxWidth()
                         .height(70.dp)
-                        .padding(10.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Row(
-                        modifier
-                            .height(70.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Box(modifier.weight(0.9f)){
-                            Text(text = "Guest님 환영해요!", style = GodLifeTypography.titleMedium,)
-                        }
-
-                        Box(modifier.weight(0.1f)){
-
-                            Icon(imageVector = Icons.Filled.Notifications,
-                                contentDescription = "Notification",
-                                tint = GreyWhite,
-                                modifier = modifier.align(Alignment.TopEnd))
-                        }
-
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Box(modifier.weight(0.9f)){
+                        Text(text = "Guest님 환영해요!", style = GodLifeTypography.titleMedium,)
                     }
+
+                    Box(modifier.weight(0.1f)){
+
+                        Icon(imageVector = Icons.Filled.Notifications,
+                            contentDescription = "Notification",
+                            tint = GreyWhite,
+                            modifier = modifier.align(Alignment.TopEnd))
+                    }
+
                 }
             }
 
@@ -166,8 +164,8 @@ fun MainPageScreen(
                 item { Spacer(modifier = modifier.size(10.dp)) }
 
 
-                item {Text(text = viewModel.todayTimeText("Guest"), style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
-                }
+                //item {Text(text = viewModel.todayTimeText("Guest"), style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                item { TextToday(viewModel) }
 
                 item { Spacer(modifier = modifier.size(10.dp)) }
 
@@ -181,7 +179,13 @@ fun MainPageScreen(
 
                 if (todayBoolean) {
 
-                    item {Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+                    //item {Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+
+                    item { Row(modifier.fillMaxWidth()
+                        .height(20.dp)){
+                        Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
+                        Spacer(modifier.size(5.dp))
+                        Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
                     }
 
                     item { Spacer(modifier = modifier.size(10.dp)) }
@@ -480,6 +484,19 @@ fun CompletedTodayList(
     }
 }
 
+//MainTodoListBox위에 보여질 Text
+@Composable
+fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
+    val item = viewModel.todayTimeText("GUEST")
+    //item[0] -> Text, item[1] -> Icon resource
+    Row(modifier.fillMaxWidth()
+        .height(20.dp)){
+        Icon(painter = painterResource(item[1].toString().toInt()), contentDescription = "", tint = Color.Unspecified)
+        Spacer(modifier.size(5.dp))
+        Text(text = item[0].toString(), style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+    }
+}
+
 
 //Preview
 
@@ -645,6 +662,17 @@ fun CompletedTodayListPreview(){
     }
 }
 
+//MainTodoListBox위에 보여질 Text
+@Preview(showBackground = true)
+@Composable
+fun TextTodayPreview(modifier: Modifier = Modifier){
+    Row(modifier.fillMaxWidth()
+        .height(20.dp)){
+        Icon(painter = painterResource(R.drawable.sun_icons8), contentDescription = "", tint = Color.Unspecified)
+        Spacer(modifier.size(5.dp))
+        Text(text = "Hello World!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+    }
+}
 
 private fun moveCreateActivity(createNavigator: CreatetodolistNavigator, mainActivity: Activity){
     createNavigator.navigateFrom(

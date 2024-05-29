@@ -77,16 +77,16 @@ class MainPageViewModel @Inject constructor(
 
 
     // 현재 시간대에 따른 인사말
-    fun todayTimeText(nickname: String): String {
+    fun todayTimeText(nickname: String): List<Any> {
         val hour = LocalDateTime.now().hour
 
         return when (hour) {
-            in 6..8 -> "아침부터 부지런하시군요!"
-            in 9 .. 11 -> "활기찬 오전 보내세요!"
-            in 12..18 -> "오후도 화이팅이에요!"
-            in 19..23 -> "저녁에도 노력하시는 모습이 멋있어요!"
-            in 0..5 -> "${nickname}님이 어두운 새벽을 빚내주고 있어요."
-            else -> "화이팅이에요 항상!" // 예외 상황 처리
+            in 0..5 -> listOf("${nickname}님이 어두운 새벽을 빛내주고 있어요.", R.drawable.moon_icon8)
+            in 6..8 -> listOf("아침부터 부지런하시군요!", R.drawable.sun_icons8)
+            in 9 .. 11 -> listOf("활기찬 오전 보내세요!", R.drawable.sun_icons8)
+            in 12..18 -> listOf("오후도 화이팅이에요!", R.drawable.sun_icons8)
+            in 19..23 -> listOf("저녁에도 노력하시는 모습이 멋있어요!", R.drawable.moon_icon8)
+            else -> listOf("화이팅이에요 항상!", R.drawable.sun_icons8) // 예외 상황 처리
         }
     }
 }
