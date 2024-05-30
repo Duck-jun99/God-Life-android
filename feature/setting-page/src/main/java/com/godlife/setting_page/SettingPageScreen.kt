@@ -161,6 +161,13 @@ fun SettingPageScreen(
 
                 item { ProfileButton(imageVector = Icons.Outlined.Warning, text = "회원 탈퇴") }
 
+                item{ Spacer(modifier.size(200.dp)) }
+
+                item {
+                    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        Text(text = "Version 1.0.0\nIcons by Icons8", textAlign = TextAlign.Center)
+                    }
+                }
 
             }
 
@@ -370,6 +377,14 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
 
                 item { ProfileButton(imageVector = Icons.Outlined.Warning, text = "회원 탈퇴") }
 
+                item{ Spacer(modifier.size(200.dp)) }
+
+                item {
+                    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        Text(text = "Version 1.0.0\nIcons by Icons8", textAlign = TextAlign.Center)
+                    }
+                }
+
 
             }
 
@@ -478,7 +493,11 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
         Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
 
-            Box(modifier.weight(0.3f), contentAlignment = Alignment.Center){
+            Box(
+                modifier
+                    .weight(0.3f)
+                    .clickable { /* TODO */ },
+                contentAlignment = Alignment.Center){
 
                 Column {
                     Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
@@ -493,7 +512,11 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
             }
 
-            Box(modifier.weight(0.3f), contentAlignment = Alignment.Center){
+            Box(
+                modifier
+                    .weight(0.3f)
+                    .clickable { /* TODO */ },
+                contentAlignment = Alignment.Center){
 
                 Column {
                     Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
@@ -508,7 +531,11 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
             }
 
-            Box(modifier.weight(0.3f), contentAlignment = Alignment.Center){
+            Box(
+                modifier
+                    .weight(0.3f)
+                    .clickable { /* TODO */ },
+                contentAlignment = Alignment.Center){
 
                 Column {
                     Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
