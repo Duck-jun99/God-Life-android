@@ -10,10 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -36,7 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.godlife.community_page.CommunityPageScreen
-import com.godlife.community_page.LatestPostScreen
+import com.godlife.community_page.latest.LatestPostScreen
 import com.godlife.community_page.LatestPostScreenRoute
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.designsystem.component.TabIconView
@@ -112,17 +110,21 @@ fun MainUiTheme(
                     }
 
                     composable(communityTab.route) {
-                        CommunityPageScreen(navController)
+                        CommunityPageScreen()
                     }
 
                     composable(settingTab.route) {
                         SettingPageScreen(mainActivity, loginNavigator)
                     }
 
+
+                    /*
                     //Community 세부 기능
                     composable(LatestPostScreenRoute.route) {
                         LatestPostScreen()
                     }
+
+                     */
 
 
                 }

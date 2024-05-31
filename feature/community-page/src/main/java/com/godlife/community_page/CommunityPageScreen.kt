@@ -42,6 +42,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.godlife.community_page.famous.FamousPostPreview
+import com.godlife.community_page.famous.FamousPostScreen
+import com.godlife.community_page.latest.LatestPostScreen
+import com.godlife.community_page.navigation.FamousPostRoute
+import com.godlife.community_page.navigation.LatestPostRoute
+import com.godlife.community_page.navigation.RankingRoute
+import com.godlife.community_page.navigation.StimulusPostRoute
+import com.godlife.community_page.ranking.RankingScreen
+import com.godlife.community_page.stimulus.StimulusPostScreen
 import com.godlife.designsystem.list.CommunityFamousPostList
 import com.godlife.designsystem.list.CommunityLatestPostList
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -57,7 +72,7 @@ import com.godlife.model.community.TagItem
 
 @Composable
 fun CommunityPageScreen(
-    navController: NavController,
+    modifier: Modifier = Modifier,
     viewModel: CommunityPageViewModel = hiltViewModel()
 
 ) {
@@ -68,12 +83,7 @@ fun CommunityPageScreen(
 
     }
 
-    CommunityPageView(navController)
-
-}
-
-@Composable
-fun CommunityPageView(navController: NavController, modifier: Modifier = Modifier){
+    val navController = rememberNavController()
 
     GodLifeTheme {
         Column(
@@ -109,163 +119,75 @@ fun CommunityPageView(navController: NavController, modifier: Modifier = Modifie
 
                 item { Spacer(modifier.size(12.dp)) }
 
-                item {
-                    Box(
-                        modifier
-                            .padding(start = 20.dp, end = 20.dp)
-                            .height(20.dp)){
-                        Row(modifier.fillMaxWidth()){
-                            Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
-                            Spacer(modifier.size(5.dp))
-                            Text(text = "실시간 인기 갓생 인증글을 확인해보세요!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
-                        }
-                    }
-                }
+                item { CommunityPageView(navController = navController) }
 
-                item { Spacer(modifier.size(12.dp)) }
-
-                item { FamousPostPreview() }
-
-                item { Spacer(modifier.size(12.dp)) }
-
-                //item { LatestPostPreview() }
-
-
-                item{
-
-                    Box(
-                        modifier
-                            .background(Color.White)
-                            .fillMaxWidth()
-                            .padding(
-                                top = 10.dp,
-                                bottom = 10.dp
-                            ),
-                        contentAlignment = Alignment.CenterStart
-                    ){
-                        Column {
-
-                            Box(modifier.padding(start = 10.dp)){
-                                Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
-                            }
-
-                            Spacer(modifier.size(10.dp))
-
-                        }
-                    }
-                }
-
-                val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
-                    TagItem("TAG1"), TagItem("TAG2")
-                )),
-                    LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
-
-                itemsIndexed(latestPostItem) { index, item ->
-                    CommunityLatestPostList(latestPostItem = item)
-                }
             }
 
+
         }
-
-
     }
+
+
+
 }
 
-
 @Composable
-fun CategoryView(navController: NavController, modifier: Modifier = Modifier){
+fun CommunityPageView(modifier: Modifier = Modifier, navController: NavHostController){
 
-    Box(modifier.padding(start = 20.dp, end = 20.dp)){
+    NavHost(navController = navController, startDestination = FamousPostRoute.route) {
+
+        composable(FamousPostRoute.route){
+            FamousPostScreen()
+        }
+
+        composable(LatestPostRoute.route) {
+            LatestPostScreen()
+        }
+
+        composable(StimulusPostRoute.route) {
+            StimulusPostScreen()
+        }
+
+        composable(RankingRoute.route) {
+            RankingScreen()
+        }
+    }
+
+    /*
+
+    Column {
 
         Box(
             modifier
-                .background(Color.White, shape = RoundedCornerShape(20.dp))
-                .fillMaxWidth()
-        ){
-
-            Column(
-                modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 10.dp,
-                        end = 10.dp,
-                        top = 30.dp,
-                        bottom = 30.dp
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Row(
-                    modifier.fillMaxWidth()
-                ){
-                    Button(onClick = { /*TODO*/ },
-                        modifier
-                            .size(150.dp, 50.dp)
-                            .weight(0.5f)
-                            .padding(start = 10.dp, end = 10.dp),
-                        colors = ButtonDefaults.buttonColors(Color.White),
-                        elevation = ButtonDefaults.buttonElevation(7.dp)) {
-
-                        Text(text = "인기 게시물", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
-                    }
-
-                    Button(onClick = { navController.navigate(LatestPostScreenRoute.route) },
-                        modifier
-                            .size(150.dp, 50.dp)
-                            .weight(0.5f)
-                            .padding(start = 10.dp, end = 10.dp),
-                        colors = ButtonDefaults.buttonColors(Color.White),
-                        elevation = ButtonDefaults.buttonElevation(7.dp)) {
-
-                        Text(text = "최신 게시물", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
-                    }
-                }
-
-                Spacer(modifier = modifier.size(30.dp))
-
-                Row(
-                    modifier.fillMaxWidth()
-                ){
-                    Button(onClick = { /*TODO*/ },
-                        modifier
-                            .size(150.dp, 50.dp)
-                            .weight(0.5f)
-                            .padding(start = 10.dp, end = 10.dp),
-                        colors = ButtonDefaults.buttonColors(Color.White),
-                        elevation = ButtonDefaults.buttonElevation(7.dp)) {
-
-                        Text(text = "갓생 자극", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
-                    }
-
-                    Button(onClick = { /*TODO*/ },
-                        modifier
-                            .size(150.dp, 50.dp)
-                            .weight(0.5f)
-                            .padding(start = 10.dp, end = 10.dp),
-                        colors = ButtonDefaults.buttonColors(Color.White),
-                        elevation = ButtonDefaults.buttonElevation(7.dp)) {
-
-                        Text(text = "명예의 전당", style = GodLifeTypography.bodyLarge.copy(color = PurpleMain))
-                    }
-                }
-
+                .padding(start = 20.dp, end = 20.dp)
+                .height(20.dp)){
+            Row(modifier.fillMaxWidth()){
+                Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
+                Spacer(modifier.size(5.dp))
+                Text(text = "실시간 인기 갓생 인증글을 확인해보세요!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
             }
-
         }
 
+        Spacer(modifier.size(12.dp))
+
+        FamousPostPreview()
+
+        Spacer(modifier.size(12.dp))
 
     }
 
 
+     */
 }
 
 @Composable
 fun CategoryBox(modifier: Modifier = Modifier, navController: NavController){
 
     val categoryItem: List<CategoryItem> = listOf(
-        CategoryItem(title = "#인기 게시물", imgPath = R.drawable.category1, route = ""),
+        CategoryItem(title = "#인기 게시물", imgPath = R.drawable.category1, route = FamousPostRoute.route),
         CategoryItem(title = "#최신 게시물", imgPath = R.drawable.category2, route = LatestPostScreenRoute.route),
-        CategoryItem(title = "#갓생 자극", imgPath = R.drawable.category3, route = ""),
-        CategoryItem(title = "#명예의 전당", imgPath = R.drawable.category4, route = ""),
+        CategoryItem(title = "#갓생 자극", imgPath = R.drawable.category3, route = StimulusPostRoute.route),
+        CategoryItem(title = "#명예의 전당", imgPath = R.drawable.category4, route = RankingRoute.route),
     )
 
     Box(
@@ -312,7 +234,10 @@ fun CategoryItem(
             contentScale = ContentScale.Crop
         )
 
-        Box(modifier.fillMaxSize().background(color = OpaqueDark, shape = RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+        Box(
+            modifier
+                .fillMaxSize()
+                .background(color = OpaqueDark, shape = RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
 
             Text(
                 text = title,
@@ -362,7 +287,7 @@ fun CommunityPagePreview(modifier: Modifier = Modifier){
 
                 item { Spacer(modifier.size(12.dp)) }
 
-                item { CategoryPreview() }
+                item { CategoryBoxPreview() }
 
                 item { Spacer(modifier.size(12.dp)) }
 
@@ -567,7 +492,10 @@ fun CategoryItemPreview(
             contentScale = ContentScale.Crop
         )
 
-        Box(modifier.fillMaxSize().background(color = OpaqueDark, shape = RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+        Box(
+            modifier
+                .fillMaxSize()
+                .background(color = OpaqueDark, shape = RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
 
             Text(
                 text = title,
@@ -580,102 +508,85 @@ fun CategoryItemPreview(
     }
 }
 
-@Preview
+
+/*
 @Composable
-fun FamousPostPreview(modifier: Modifier = Modifier){
+fun CommunityPageView(modifier: Modifier = Modifier){
 
-    var famousPost =
-        listOf(FamousPostItem(
-            "Name1", "Title1", "Text1", rank = "마스터", tagItem = listOf(TagItem("Tag1"), TagItem("Tag2"))),
-            FamousPostItem(
-                "Name2", "Title2", "Text2", rank = "실버", tagItem = listOf(TagItem("Tag1"), TagItem("Tag2")))
-        )
+    val navController = rememberNavController()
 
-    Box(
+    LazyColumn(
         modifier
-            .background(Color.White)
-            .fillMaxWidth()
-            .padding(
-                start = 10.dp,
-                end = 10.dp,
-                top = 10.dp,
-                bottom = 10.dp
-            ),
-        contentAlignment = Alignment.CenterStart
-    ){
-        Column {
+            //.fillMaxSize()
+            .background(GreyWhite3)
+    ) {
+
+        item {
+            Box(modifier.padding(start = 20.dp, end = 20.dp)){
+                Text(text = "Guest님이 원하는 정보를 찾아보세요.", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            }
+        }
+        item { Spacer(modifier.size(12.dp)) }
 
 
-            Spacer(modifier.size(10.dp))
+        item { CategoryBox(navController = navController) }
 
-            LazyRow {
-                itemsIndexed(famousPost) { index, item ->
-                    CommunityFamousPostList(famousPostItem = item)
+        item { Spacer(modifier.size(12.dp)) }
+
+        item {
+            Box(
+                modifier
+                    .padding(start = 20.dp, end = 20.dp)
+                    .height(20.dp)){
+                Row(modifier.fillMaxWidth()){
+                    Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
+                    Spacer(modifier.size(5.dp))
+                    Text(text = "실시간 인기 갓생 인증글을 확인해보세요!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
                 }
             }
+        }
 
-            Spacer(modifier.size(10.dp))
+        item { Spacer(modifier.size(12.dp)) }
 
-            Button(onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color.White),
-                modifier = modifier.size(30.dp)
-            ) {
-                Text(text = "> 더보기", style = GodLifeTypography.titleSmall)
+        item { FamousPostPreview() }
+
+        item { Spacer(modifier.size(12.dp)) }
+
+        //item { LatestPostPreview() }
+
+
+        item{
+
+            Box(
+                modifier
+                    .background(Color.White)
+                    .fillMaxWidth()
+                    .padding(
+                        top = 10.dp,
+                        bottom = 10.dp
+                    ),
+                contentAlignment = Alignment.CenterStart
+            ){
+                Column {
+
+                    Box(modifier.padding(start = 10.dp)){
+                        Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
+                    }
+
+                    Spacer(modifier.size(10.dp))
+
+                }
             }
+        }
 
+        val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
+            TagItem("TAG1"), TagItem("TAG2")
+        )),
+            LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
 
+        itemsIndexed(latestPostItem) { index, item ->
+            CommunityLatestPostList(latestPostItem = item)
         }
     }
 }
-
-@Preview
-@Composable
-fun LatestPostPreview(modifier: Modifier = Modifier){
-
-    val latestPostItem: List<LatestPostItem> = listOf(LatestPostItem(name = "Name1", title = "Title1", rank = "마스터", tagItem = listOf(
-        TagItem("TAG1"), TagItem("TAG2")
-    )),
-        LatestPostItem(name = "Name2", title = "Title2", rank = "마스터", tagItem = listOf(TagItem("TAG1"), TagItem("TAG2"))))
-    Box(
-        modifier
-            .background(Color.White)
-            .fillMaxWidth()
-            .padding(
-                top = 10.dp,
-                bottom = 10.dp
-            ),
-        contentAlignment = Alignment.CenterStart
-    ){
-        Column {
-
-            Box(modifier.padding(start = 10.dp)){
-                Text(text = "따끈따끈 최신 게시물", style = GodLifeTypography.titleSmall)
-            }
-
-            Spacer(modifier.size(10.dp))
-
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(1),
-                modifier = Modifier.height(300.dp)
-            ) {
-                itemsIndexed(latestPostItem) { index, item ->
-                    CommunityLatestPostList(latestPostItem = item)
-                }
-            }
-
-
-
-            Spacer(modifier.size(10.dp))
-
-            Button(onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color.White),
-                modifier = modifier.size(30.dp)
-            ) {
-                Text(text = "> 더보기", style = GodLifeTypography.titleSmall)
-            }
-
-
-        }
-    }
-}
+ */

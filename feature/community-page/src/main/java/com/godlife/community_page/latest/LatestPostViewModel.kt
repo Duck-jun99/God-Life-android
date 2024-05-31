@@ -1,4 +1,4 @@
-package com.godlife.community_page.navigation
+package com.godlife.community_page.latest
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

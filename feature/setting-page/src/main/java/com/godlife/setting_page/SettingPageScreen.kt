@@ -335,7 +335,7 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Box(modifier.weight(0.9f)){
-                        Text(text = "설정", style = GodLifeTypography.titleMedium,)
+                        Text(text = "설정", style = GodLifeTypography.titleMedium)
                     }
 
                     Box(modifier.weight(0.1f)){

@@ -182,7 +182,7 @@ fun MainPageScreen(
                     //item {Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
 
                     item { Row(modifier.fillMaxWidth()
-                        .height(20.dp)){
+                        .height(25.dp)){
                         Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
                         Spacer(modifier.size(5.dp))
                         Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
@@ -489,8 +489,10 @@ fun CompletedTodayList(
 fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
     val item = viewModel.todayTimeText("GUEST")
     //item[0] -> Text, item[1] -> Icon resource
+
+
     Row(modifier.fillMaxWidth()
-        .height(20.dp)){
+        .height(25.dp)){
         Icon(painter = painterResource(item[1].toString().toInt()), contentDescription = "", tint = Color.Unspecified)
         Spacer(modifier.size(5.dp))
         Text(text = item[0].toString(), style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
