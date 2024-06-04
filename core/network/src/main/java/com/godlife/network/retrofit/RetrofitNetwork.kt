@@ -4,6 +4,7 @@ import androidx.tracing.trace
 import com.godlife.network.BuildConfig
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
@@ -69,6 +70,14 @@ interface RetrofitNetworkApi {
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
     ): LatestPostQuery
+
+    @GET("/board/{id}")
+    suspend fun getPostDetail(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+    ): PostDetailQuery
+
+
 
 }
 

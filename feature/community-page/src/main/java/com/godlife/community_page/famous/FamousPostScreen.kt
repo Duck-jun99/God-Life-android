@@ -27,13 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.community_page.R
-import com.godlife.community_page.latest.LatestPostListView
-import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.designsystem.list.CommunityFamousPostList
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.model.community.FamousPostItem
 import com.godlife.model.community.TagItem
 
@@ -44,7 +42,7 @@ fun FamousPostScreen(modifier: Modifier = Modifier){
         Column(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite3)
+                .background(GrayWhite3)
         ) {
             Box(
                 modifier
@@ -53,7 +51,7 @@ fun FamousPostScreen(modifier: Modifier = Modifier){
                 Row(modifier.fillMaxWidth()){
                     Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
                     Spacer(modifier.size(5.dp))
-                    Text(text = "실시간 인기 갓생 인증글을 확인해보세요!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+                    Text(text = "실시간 인기 갓생 인증글을 확인해보세요!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
                 }
             }
 

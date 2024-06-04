@@ -1,40 +1,29 @@
 package com.godlife.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite2
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.PurpleMain
 
 @Composable
@@ -51,7 +40,8 @@ fun GodLifeTextField(
         keyboardActions = keyboardActions,
         decorationBox = {
 
-            Column(modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier
+                .fillMaxWidth()
                 .padding(5.dp)) {
                 Text(text = text, style = TextStyle(
                     color = Color.White,
@@ -71,7 +61,9 @@ fun GodLifeTextFieldGray(
     onTextChanged: (String) -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    hint: String = "",
 ) {
+
     BasicTextField(
         value = text,
         onValueChange = onTextChanged,
@@ -79,14 +71,51 @@ fun GodLifeTextFieldGray(
         keyboardActions = keyboardActions,
         decorationBox = {
 
-            Column(modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier
+                .fillMaxWidth()
                 .padding(5.dp)) {
-                Text(text = text, style = TextStyle(
-                    color = GreyWhite,
+
+                Text(text = if (text.isEmpty()) hint else text, style = TextStyle(
+                    color = GrayWhite,
                     fontSize = 15.sp
                 )
                 )
-                //Divider(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), color = GreyWhite2)
+                //Divider(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), color = GrayWhite2)
+            }
+
+        }
+    )
+}
+
+@Composable
+fun GodLifeSearchTextField(
+    text: String,
+    onTextChanged: (String) -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    hint: String = "검색어를 입력해주세요."
+
+    ) {
+
+    BasicTextField(
+        value = text,
+        onValueChange = onTextChanged,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        decorationBox = {
+
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)) {
+
+                Text(text = if (text.isEmpty()) hint else text, style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 15.sp)
+                )
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                    color = GrayWhite2
+                )
             }
 
         }
@@ -97,10 +126,26 @@ fun GodLifeTextFieldGray(
 @Composable
 fun TextFiledPreview(){
     GodLifeTheme {
-        Column(modifier = Modifier.fillMaxSize()
-            .background(PurpleMain)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            ) {
             var text = "Hi"
-            GodLifeTextField(text = text, onTextChanged = { it -> text })
+
+            Box(modifier = Modifier.background(PurpleMain)){
+
+                GodLifeTextField(text = text, onTextChanged = { it -> text })
+            }
+            
+            Spacer(modifier = Modifier.size(20.dp))
+
+            Box(modifier = Modifier.background(Color.White)){
+                
+                GodLifeSearchTextField(text = text, onTextChanged = {it -> text})
+            }
+
+
         }
+
+
     }
 }

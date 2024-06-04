@@ -1,13 +1,13 @@
 package com.godlife.community_page.latest
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -40,34 +43,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
+import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
+import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
 
 @Composable
-fun LatestPostScreen(modifier: Modifier = Modifier){
+fun LatestPostScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: CommunityPageViewModel){
 
-    val viewModel = hiltViewModel<LatestPostViewModel>()
+    //val viewModel = hiltViewModel<LatestPostViewModel>()
 
-    val postList = viewModel.getLatestPost().collectAsLazyPagingItems()
+    //val postList = viewModel.getLatestPost().collectAsLazyPagingItems()
+    val postList = viewModel.latestPostList.collectAsLazyPagingItems()
 
     GodLifeTheme {
+
         Column(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite3)
+                .background(GrayWhite3)
         ) {
-            Box(modifier.padding(start = 20.dp, end = 20.dp).height(25.dp)){
-                Text(text = "따끈따끈 최신 게시물이에요.", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            Box(
+                modifier
+                    .padding(start = 20.dp, end = 20.dp)
+                    .height(25.dp)){
+                Text(text = "따끈따끈 최신 게시물이에요.", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
             }
 
             //PagingListScreen()
@@ -79,7 +89,7 @@ fun LatestPostScreen(modifier: Modifier = Modifier){
                 postList[i]?.let { item ->
 
                     Box(modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp)){
-                        LatestPostListView(item)
+                        LatestPostListView(item = item, navController = navController)
                     }
 
                 }
@@ -87,16 +97,21 @@ fun LatestPostScreen(modifier: Modifier = Modifier){
 
 
         }
+
+
     }
 }
 
 @Composable
-fun LatestPostListView(item: PostDetailBody, modifier: Modifier = Modifier){
+fun LatestPostListView(item: PostDetailBody, navController: NavController, modifier: Modifier = Modifier){
+
+    val postId = item.board_id.toString()
 
     Column(
         modifier
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(15.dp))
+            .clickable { navController.navigate("${PostDetailRoute.route}/$postId") }
     ){
         Row(
             modifier
@@ -115,7 +130,7 @@ fun LatestPostListView(item: PostDetailBody, modifier: Modifier = Modifier){
                     .size(50.dp, 50.dp)
                     .clip(CircleShape)
                     .fillMaxSize()
-                    .background(color = GreyWhite)
+                    .background(color = GrayWhite)
 
                 if(item.profileURL != ""){
                     Glide.with(LocalContext.current)
@@ -183,7 +198,7 @@ fun LatestPostListView(item: PostDetailBody, modifier: Modifier = Modifier){
                 Text(text = item.tier, style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
             }
             Box(modifier.weight(0.2f)){
-                Text(text = item.writtenAt, style = TextStyle(color = GreyWhite, fontSize = 15.sp))
+                Text(text = item.writtenAt, style = TextStyle(color = GrayWhite, fontSize = 15.sp))
             }
         }
 
@@ -242,17 +257,19 @@ fun LatestPostListView(item: PostDetailBody, modifier: Modifier = Modifier){
     }
 }
 
+
 @Preview
 @Composable
 fun LatestPostScreenPreview(modifier: Modifier = Modifier){
     GodLifeTheme {
+
         Column(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite3)
+                .background(GrayWhite3)
         ) {
             Box(modifier.padding(start = 20.dp, end = 20.dp)){
-                Text(text = "따끈따끈 최신 게시물이에요.", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+                Text(text = "따끈따끈 최신 게시물이에요.", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
             }
 
             LazyColumn {
@@ -267,6 +284,7 @@ fun LatestPostScreenPreview(modifier: Modifier = Modifier){
             }
 
         }
+
     }
 }
 
@@ -314,7 +332,7 @@ fun LatestPostListPreview(modifier: Modifier = Modifier){
 
             }
             Box(modifier.weight(0.2f), contentAlignment = Alignment.TopCenter){
-                Text(text = "39분전", style = TextStyle(color = GreyWhite, fontSize = 15.sp))
+                Text(text = "39분전", style = TextStyle(color = GrayWhite, fontSize = 15.sp))
             }
 
         }

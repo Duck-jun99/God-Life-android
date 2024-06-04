@@ -4,7 +4,6 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,34 +12,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -67,13 +60,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.godlife.designsystem.component.GodLifeButton
-import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite2
-import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.LoginNavigator
 
@@ -82,7 +72,7 @@ fun SettingPageScreen(
     mainActivity: Activity,
     loginNavigator: LoginNavigator,
     viewModel: SettingPageViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.statusBarsPadding()
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -102,7 +92,7 @@ fun SettingPageScreen(
         Column(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite3)
+                .background(GrayWhite3)
         ){
 
             Box(
@@ -127,7 +117,7 @@ fun SettingPageScreen(
                         /*
                         Icon(imageVector = Icons.Filled.Notifications,
                             contentDescription = "Notification",
-                            tint = GreyWhite,
+                            tint = GrayWhite,
                             modifier = modifier.align(Alignment.TopEnd))
 
                          */
@@ -139,7 +129,7 @@ fun SettingPageScreen(
             LazyColumn(
                 modifier
                     .fillMaxSize()
-                    .background(GreyWhite3)
+                    .background(GrayWhite3)
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
 
@@ -223,7 +213,7 @@ fun ProfileCard(
                     .size(50.dp, 50.dp)
                     .clip(CircleShape)
                     .fillMaxSize()
-                    .background(color = GreyWhite)
+                    .background(color = GrayWhite)
 
                 Glide.with(LocalContext.current)
                     .asBitmap()
@@ -298,7 +288,7 @@ fun ProfileButton(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = text,
-                    color = GreyWhite,
+                    color = GrayWhite,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 )
             }
@@ -318,7 +308,7 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
         Column(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite3)
+                .background(GrayWhite3)
         ){
 
             Box(
@@ -343,7 +333,7 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
                         /*
                         Icon(imageVector = Icons.Filled.Notifications,
                             contentDescription = "Notification",
-                            tint = GreyWhite,
+                            tint = GrayWhite,
                             modifier = modifier.align(Alignment.TopEnd))
 
                          */
@@ -355,7 +345,7 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
             LazyColumn(
                 modifier
                     .fillMaxSize()
-                    .background(GreyWhite3)
+                    .background(GrayWhite3)
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
 
@@ -507,7 +497,7 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "프로필 수정", style = TextStyle(color = GreyWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "프로필 수정", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
 
             }
@@ -526,7 +516,7 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "갓생 점수", style = TextStyle(color = GreyWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "갓생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
 
             }
@@ -545,7 +535,7 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "레포트 요청", style = TextStyle(color = GreyWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "레포트 요청", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
 
             }
@@ -577,7 +567,7 @@ fun SelectMenu2(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "프로필 수정", style = TextStyle(color = GreyWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "프로필 수정", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
             }
 
@@ -600,7 +590,7 @@ fun SelectMenu2(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "갓생 점수", style = TextStyle(color = GreyWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "갓생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
             }
 
@@ -623,7 +613,7 @@ fun SelectMenu2(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "레포트 요청", style = TextStyle(color = GreyWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "레포트 요청", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
             }
 

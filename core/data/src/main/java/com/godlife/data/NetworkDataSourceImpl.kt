@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
@@ -82,7 +83,9 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getLatestPost(authorization, page, keyword, tag)
     }
 
-
+    override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
+        return networkApi.getPostDetail(authorization, postId)
+    }
 
 
 }

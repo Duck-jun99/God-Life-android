@@ -13,6 +13,13 @@ data class LatestPostQuery(
     val message: String
 )
 
+//게시물 상세 조회
+data class PostDetailQuery(
+    val status: String,
+    val body: PostDetailBody?,
+    val message: String
+)
+
 
 //게시물 상세 바디
 data class PostDetailBody(

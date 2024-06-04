@@ -47,7 +47,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.GreyWhite
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.PurpleMain
 
 @Composable
@@ -68,7 +68,7 @@ fun CreatePostPreviewScreen(
                         .background(Color.White),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "미리 보기", style = TextStyle(color = GreyWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                    Text(text = "미리 보기", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
                 }
             }
 
@@ -121,19 +121,19 @@ fun Content(
             Spacer(modifier.size(10.dp))
 
             Column {
-                Text(text = "Nickname", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                Text(text = "Nickname", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = "Introduce", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
             }
         }
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = createPostViewModel.title.value, style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
+        Text(text = createPostViewModel.title.value, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = createPostViewModel.text.value, style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Text(text = createPostViewModel.text.value, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 
@@ -150,7 +150,7 @@ fun Content(
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = "yyyy-mm-dd(게시물 올린 날짜,시간)", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Text(text = "yyyy-mm-dd(게시물 올린 날짜,시간)", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 
@@ -207,7 +207,7 @@ fun CreatePostPreviewScreenPreview(modifier: Modifier = Modifier){
                         .background(Color.White),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "미리 보기", style = TextStyle(color = GreyWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                    Text(text = "미리 보기", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
                 }
             }
 
@@ -226,7 +226,7 @@ fun CreatePostPreviewScreenPreview(modifier: Modifier = Modifier){
                     modifier
                         .fillMaxWidth()
                         .height(400.dp)
-                        .background(GreyWhite)){
+                        .background(GrayWhite)){
 
                 }}
 
@@ -259,19 +259,19 @@ fun ContentPreview(modifier: Modifier = Modifier){
             Spacer(modifier.size(10.dp))
 
             Column {
-                Text(text = "Nickname", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                Text(text = "Nickname", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = "Introduce", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
             }
         }
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = "Title", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
+        Text(text = "Title", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = "text", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Text(text = "text", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 
@@ -288,7 +288,7 @@ fun ContentPreview(modifier: Modifier = Modifier){
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = "yyyy-mm-dd(게시물 올린 날짜,시간)", style = TextStyle(color = GreyWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Text(text = "yyyy-mm-dd(게시물 올린 날짜,시간)", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.godlife.designsystem.theme.GreyWhite
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.PurpleMain
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,13 +26,13 @@ fun GodLifeTimeInput(
             timeSelectorSelectedContainerColor = Color.White,
             timeSelectorSelectedContentColor = PurpleMain,
             timeSelectorUnselectedContainerColor = Color.White,
-            timeSelectorUnselectedContentColor = GreyWhite,
+            timeSelectorUnselectedContentColor = GrayWhite,
 
             periodSelectorBorderColor = PurpleMain,
             periodSelectorSelectedContainerColor = PurpleMain,
             periodSelectorSelectedContentColor = Color.White,
             periodSelectorUnselectedContainerColor = Color.White,
-            periodSelectorUnselectedContentColor = GreyWhite,
+            periodSelectorUnselectedContentColor = GrayWhite,
 
             containerColor = PurpleMain,
             selectorColor = PurpleMain,
@@ -62,13 +62,13 @@ fun CustomTimeInputPreview(){
             timeSelectorSelectedContainerColor = Color.White,
             timeSelectorSelectedContentColor = PurpleMain,
             timeSelectorUnselectedContainerColor = Color.White,
-            timeSelectorUnselectedContentColor = GreyWhite,
+            timeSelectorUnselectedContentColor = GrayWhite,
 
             periodSelectorBorderColor = PurpleMain,
             periodSelectorSelectedContainerColor = PurpleMain,
             periodSelectorSelectedContentColor = Color.White,
             periodSelectorUnselectedContainerColor = Color.White,
-            periodSelectorUnselectedContentColor = GreyWhite,
+            periodSelectorUnselectedContentColor = GrayWhite,
 
             containerColor = PurpleMain,
             selectorColor = PurpleMain,

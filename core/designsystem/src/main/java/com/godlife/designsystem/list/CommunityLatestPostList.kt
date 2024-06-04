@@ -1,6 +1,5 @@
 package com.godlife.designsystem.list
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,9 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite2
-import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.LatestPostItem
 
@@ -37,7 +35,7 @@ fun CommunityLatestPostList(modifier: Modifier = Modifier,
     GodLifeTheme(
         modifier
             .height(375.dp)
-            .background(GreyWhite3)
+            .background(GrayWhite3)
     ) {
         Box(
             modifier
@@ -92,7 +90,7 @@ fun CommunityLatestPostList(modifier: Modifier = Modifier,
                         Text(text = latestPostItem.rank, style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
                     }
                     Box(modifier.weight(0.2f)){
-                        Text(text = "39분전", style = TextStyle(color = GreyWhite, fontSize = 15.sp))
+                        Text(text = "39분전", style = TextStyle(color = GrayWhite, fontSize = 15.sp))
                     }
                 }
 
@@ -133,7 +131,7 @@ fun CommunityLatestPostList(modifier: Modifier = Modifier,
 fun CommunityLatestPostListPreview(modifier: Modifier = Modifier){
     GodLifeTheme(
         modifier.height(375.dp)
-            .background(GreyWhite3)
+            .background(GrayWhite3)
     ) {
         Surface(
             shadowElevation = 7.dp
@@ -173,7 +171,7 @@ fun CommunityLatestPostListPreview(modifier: Modifier = Modifier){
 
                     }
                     Box(modifier.weight(0.2f)){
-                        Text(text = "39분전", style = TextStyle(color = GreyWhite, fontSize = 15.sp))
+                        Text(text = "39분전", style = TextStyle(color = GrayWhite, fontSize = 15.sp))
                     }
 
                 }

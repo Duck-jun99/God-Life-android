@@ -26,3 +26,8 @@ object StimulusPostRoute{
 object RankingRoute{
     const val route = "RankingScreen"
 }
+
+object PostDetailRoute{
+    const val route = "PostDetailScreen"
+
+}

@@ -1,5 +1,6 @@
 package com.godlife.main
 
+import CommunityPageScreen
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +13,10 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -33,14 +37,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.godlife.community_page.CommunityPageScreen
-import com.godlife.community_page.latest.LatestPostScreen
-import com.godlife.community_page.LatestPostScreenRoute
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.navigation.MainPageRoute
@@ -99,10 +100,12 @@ fun MainUiTheme(
         ) {
 
             Scaffold(
-                bottomBar = { MyBottomNavigation(tabBarItems, navController) }
-            ) { innerPadding ->
-                NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(innerPadding)) {
+                bottomBar = { MyBottomNavigation(tabBarItems, navController) },
 
+            ) { innerPadding ->
+                NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
+
+                    val bottomPaddingValue = innerPadding.calculateBottomPadding().value.dp
 
                     //bottomBar
                     composable(mainTab.route) {
@@ -110,7 +113,7 @@ fun MainUiTheme(
                     }
 
                     composable(communityTab.route) {
-                        CommunityPageScreen()
+                        CommunityPageScreen(paddingValue = bottomPaddingValue)
                     }
 
                     composable(settingTab.route) {
@@ -172,10 +175,10 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = PurpleMain,
                     selectedTextColor = PurpleMain,
-                    unselectedIconColor = GreyWhite,
-                    unselectedTextColor = GreyWhite,
-                    disabledIconColor = GreyWhite3,
-                    disabledTextColor = GreyWhite3,
+                    unselectedIconColor = GrayWhite,
+                    unselectedTextColor = GrayWhite,
+                    disabledIconColor = GrayWhite3,
+                    disabledTextColor = GrayWhite3,
                     indicatorColor = Color.White),
                 )
         }

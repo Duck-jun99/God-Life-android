@@ -15,6 +15,11 @@ class LatestPostViewModel @Inject constructor(
     private val latestPostUseCase: GetLatestPostUseCase
 ): ViewModel() {
 
+
+    //LatestPostScreen이 그려질때마다 통신이 이뤄져서 CommunityPageViewModel로 옮김.
+    /*
     fun getLatestPost(): Flow<PagingData<PostDetailBody>>
     = latestPostUseCase.executeGetLatestPost().cachedIn(viewModelScope)
+
+     */
 }

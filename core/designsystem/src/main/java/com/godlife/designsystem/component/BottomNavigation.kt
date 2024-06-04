@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite3
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.navigationbar.BottomNavItem
 
@@ -91,10 +91,10 @@ fun BottomNavigationPreview() {
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = PurpleMain,
                     selectedTextColor = PurpleMain,
-                    unselectedIconColor = GreyWhite,
-                    unselectedTextColor = GreyWhite,
-                    disabledIconColor = GreyWhite3,
-                    disabledTextColor = GreyWhite3,
+                    unselectedIconColor = GrayWhite,
+                    unselectedTextColor = GrayWhite,
+                    disabledIconColor = GrayWhite3,
+                    disabledTextColor = GrayWhite3,
                     indicatorColor = Color.White
                 ),
             )

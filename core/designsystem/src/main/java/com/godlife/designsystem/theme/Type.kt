@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.sp
 
 val GodLifeTypography = Typography(
     bodyLarge = TextStyle(
-        color = GreyWhite,
+        color = GrayWhite,
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
@@ -19,7 +19,7 @@ val GodLifeTypography = Typography(
     ),
 
     titleLarge = TextStyle(
-        color = GreyWhite,
+        color = GrayWhite,
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
@@ -28,7 +28,7 @@ val GodLifeTypography = Typography(
     ),
 
     titleMedium = TextStyle(
-        color = GreyWhite,
+        color = GrayWhite,
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp
