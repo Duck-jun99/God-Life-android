@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,6 +73,7 @@ import com.godlife.community_page.navigation.StimulusPostRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
+import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -103,7 +105,8 @@ fun CommunityPageScreen(
     Log.e("deviceHeight", deviceHeight.toString())
     Log.e("paddingValue", paddingValue.toString())
 
-    val searchText by remember { mutableStateOf("") }
+    val searchText by viewModel.searchText.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
 
     GodLifeTheme(modifier.fillMaxSize()) {
 
@@ -147,18 +150,12 @@ fun CommunityPageScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                SearchBar(
-                    modifier = modifier.height(40.dp),
-                    query = searchText,
-                    onQueryChange = { it -> searchText },
-                    onSearch = { it -> searchText },
-                    active = false,
-                    onActiveChange = {  },
-                    leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null, tint = Color.White) },
-                    colors = SearchBarDefaults.colors(containerColor = OpaqueLight)
-                ) {
-
-                }
+                GodLifeSearchBar(
+                    searchText = searchText,
+                    containerColor = OpaqueLight,
+                    onTextChanged = { viewModel.onSearchTextChange(it) },
+                    onSearchClicked = {  }
+                )
 
             }
 
@@ -239,6 +236,7 @@ fun CommunityPageScreen(
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
             sheetPeekHeight = initBottomSheetHeight,
+            sheetContainerColor = Color.White,
             sheetContent = {
                 Box(modifier = modifier
                     .fillMaxWidth()
@@ -308,8 +306,6 @@ fun CommunityPageView(modifier: Modifier = Modifier, navController: NavHostContr
         composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
             val postId = it.arguments?.getString("postId")
             if (postId != null) {
-
-                viewModel.changeCategoryViewInvisible()
                 PostDetailScreen(postId = postId)
             }
         }
@@ -367,8 +363,16 @@ fun ScreenEx2(modifier: Modifier = Modifier){
 
                 Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
+                GodLifeSearchBar(
+                    searchText = searchText,
+                    containerColor = OpaqueLight,
+                    onTextChanged = { it -> searchText },
+                    onSearchClicked = {  }
+                )
+
+                /*
                 SearchBar(
                     modifier = modifier.height(40.dp),
                     query = searchText,
@@ -376,11 +380,14 @@ fun ScreenEx2(modifier: Modifier = Modifier){
                     onSearch = { it -> searchText },
                     active = false,
                     onActiveChange = {  },
+                    placeholder = { Text(text = "검색어를 입력하세요.") },
                     leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null, tint = Color.White) },
                     colors = SearchBarDefaults.colors(containerColor = OpaqueLight)
                 ) {
 
                 }
+
+                 */
 
             }
 

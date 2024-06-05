@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -54,6 +55,7 @@ import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
@@ -68,23 +70,17 @@ fun LatestPostScreen(modifier: Modifier = Modifier, navController: NavController
 
     GodLifeTheme {
 
-        Column(
+        LazyColumn(
             modifier
                 .fillMaxSize()
                 .background(GrayWhite3)
         ) {
-            Box(
-                modifier
-                    .padding(start = 20.dp, end = 20.dp)
-                    .height(25.dp)){
-                Text(text = "따끈따끈 최신 게시물이에요.", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+
+            items(postList.itemCount){
+                postList[it]?.let { it1 -> LatestPostListView(item = it1, navController = navController) }
             }
 
-            //PagingListScreen()
-
-
-            Spacer(modifier = modifier.size(20.dp))
-
+            /*
             for(i in 0 until postList.itemCount){
                 postList[i]?.let { item ->
 
@@ -94,6 +90,8 @@ fun LatestPostScreen(modifier: Modifier = Modifier, navController: NavController
 
                 }
             }
+
+             */
 
 
         }
@@ -109,6 +107,7 @@ fun LatestPostListView(item: PostDetailBody, navController: NavController, modif
 
     Column(
         modifier
+            .padding(start = 10.dp, end = 10.dp, bottom = 5.dp, top = 5.dp)
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(15.dp))
             .clickable { navController.navigate("${PostDetailRoute.route}/$postId") }
@@ -127,7 +126,7 @@ fun LatestPostListView(item: PostDetailBody, navController: NavController, modif
 
                 val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
                 val imageModifier: Modifier = modifier
-                    .size(50.dp, 50.dp)
+                    .size(30.dp, 30.dp)
                     .clip(CircleShape)
                     .fillMaxSize()
                     .background(color = GrayWhite)
@@ -190,12 +189,12 @@ fun LatestPostListView(item: PostDetailBody, navController: NavController, modif
 
                 Spacer(modifier.size(10.dp))
 
-                Text(text = item.nickname, style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 20.sp))
+                Text(text = item.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = item.tier, style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
             }
             Box(modifier.weight(0.2f)){
                 Text(text = item.writtenAt, style = TextStyle(color = GrayWhite, fontSize = 15.sp))
@@ -288,11 +287,6 @@ fun LatestPostScreenPreview(modifier: Modifier = Modifier){
     }
 }
 
-@Preview
-@Composable
-fun SearchBoxPreview(modifier: Modifier = Modifier){
-
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -323,12 +317,12 @@ fun LatestPostListPreview(modifier: Modifier = Modifier){
 
                 Spacer(modifier.size(10.dp))
 
-                Text(text = "Name", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 20.sp))
+                Text(text = "Name", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
             }
             Box(modifier.weight(0.2f), contentAlignment = Alignment.TopCenter){

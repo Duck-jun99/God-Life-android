@@ -12,6 +12,9 @@ import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.network.model.PostDetailBody
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +24,31 @@ class CommunityPageViewModel @Inject constructor(
 
     //현재 선택되어 있는 뷰
     var selectedRoute = mutableStateOf("")
+
+    //검색어
+    private val _searchText = MutableStateFlow("")
+    val searchText: StateFlow<String> = _searchText
+
+    //검색 뷰가 보일지 여부
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching: StateFlow<Boolean> = _isSearching
+
+    //검색어 변경
+    fun onSearchTextChange(text: String) {
+        _searchText.value = text
+    }
+
+    fun onToogleSearch() {
+        _isSearching.value = !_isSearching.value
+
+        /*
+        if (!_isSearching.value) {
+            onSearchTextChange("")
+        }
+
+         */
+    }
+
 
     //최상단 타이틀
     var topTitle = mutableStateOf("굿생 커뮤니티")
@@ -56,18 +84,6 @@ class CommunityPageViewModel @Inject constructor(
     private var latestFlag = mutableIntStateOf(0)
 
     lateinit var latestPostList: Flow<PagingData<PostDetailBody>>
-
-
-    //카테고리 선택 뷰가 보일지 여부에 대한 플래그 (true면 보이게, false이면 안보이게)
-    var isCategoryViewVisible = mutableStateOf(true)
-
-    fun changeCategoryViewVisible(){
-        isCategoryViewVisible.value = true
-    }
-
-    fun changeCategoryViewInvisible(){
-        isCategoryViewVisible.value = false
-    }
 
     fun changeCurrentRoute(route: String){
         selectedRoute.value = route
