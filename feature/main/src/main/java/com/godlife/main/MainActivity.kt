@@ -1,6 +1,5 @@
 package com.godlife.main
 
-import CommunityPageScreen
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -37,6 +36,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme

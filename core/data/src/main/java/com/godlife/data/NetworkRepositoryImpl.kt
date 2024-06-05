@@ -62,6 +62,16 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.getLatestPost(authorization, page, keyword, tag)
     }
 
+    override suspend fun getSearchedPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String,
+        nickname: String
+    ): LatestPostQuery {
+        return networkDataSource.getSearchedPost(authorization, page, keyword, tag, nickname)
+    }
+
     override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
         return networkDataSource.getPostDetail(authorization, postId)
     }

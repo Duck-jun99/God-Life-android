@@ -1,5 +1,6 @@
 package com.godlife.designsystem.component
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -113,10 +114,9 @@ fun GodLifeSearchBar(
         .height(40.dp),
     searchText: String = "",
     hint: String = "검색어를 입력해주세요.",
-    onTextChanged: (String) -> Unit = { },
+    onTextChanged: (String) -> Unit = {},
     containerColor: Color = OpaqueDark,
-    onSearchClicked: () -> Unit =  { }
-
+    onSearchClicked: () -> Unit =  {}
     ) {
 
     Row(
@@ -131,7 +131,7 @@ fun GodLifeSearchBar(
         Icon(
             modifier = Modifier
                 .size(30.dp)
-                .clickable { if(searchText.isNotEmpty()) onSearchClicked },
+                .clickable { onSearchClicked() },
             imageVector = Icons.Default.Search,
             contentDescription = null,
             tint = Color.White
@@ -143,7 +143,7 @@ fun GodLifeSearchBar(
             value = searchText,
             onValueChange = onTextChanged,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { if(searchText.isNotEmpty()) onSearchClicked }),
+            keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
             singleLine = true,
             decorationBox = {
 

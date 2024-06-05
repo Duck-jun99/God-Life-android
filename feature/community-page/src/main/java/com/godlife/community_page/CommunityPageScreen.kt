@@ -1,3 +1,5 @@
+package com.godlife.community_page
+
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
@@ -61,6 +63,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
@@ -106,7 +109,10 @@ fun CommunityPageScreen(
     Log.e("paddingValue", paddingValue.toString())
 
     val searchText by viewModel.searchText.collectAsState()
+    val searchedPostList = viewModel.searchedPosts.collectAsLazyPagingItems()
     val isSearching by viewModel.isSearching.collectAsState()
+
+    Log.e("hkjfsa", searchedPostList.toString())
 
     GodLifeTheme(modifier.fillMaxSize()) {
 
@@ -154,7 +160,10 @@ fun CommunityPageScreen(
                     searchText = searchText,
                     containerColor = OpaqueLight,
                     onTextChanged = { viewModel.onSearchTextChange(it) },
-                    onSearchClicked = {  }
+                    onSearchClicked = {
+                        //viewModel.onSearch(keyword = searchText)
+                        viewModel.getSearchedPost(keyword = searchText)
+                    }
                 )
 
             }
@@ -231,7 +240,7 @@ fun CommunityPageScreen(
         //BottomSheetScaffold의 상태에 따라 viewModel의 TopTitle을 변경
         viewModel.changeTopTitle(scaffoldState.bottomSheetState.currentValue.toString())
 
-        Log.e("dsadasdsa", scaffoldState.bottomSheetState.currentValue.toString())
+        //Log.e("bottomSheetState", scaffoldState.bottomSheetState.currentValue.toString())
 
         BottomSheetScaffold(
             scaffoldState = scaffoldState,

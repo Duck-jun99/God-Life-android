@@ -83,6 +83,16 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getLatestPost(authorization, page, keyword, tag)
     }
 
+    override suspend fun getSearchedPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String,
+        nickname: String
+    ): LatestPostQuery {
+        return networkApi.searchPost(authorization, page, keyword, tag, nickname)
+    }
+
     override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
         return networkApi.getPostDetail(authorization, postId)
     }

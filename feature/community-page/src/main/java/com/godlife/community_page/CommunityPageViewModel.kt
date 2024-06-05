@@ -9,20 +9,28 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.godlife.domain.GetLatestPostUseCase
+import com.godlife.domain.SearchPostUseCase
 import com.godlife.network.model.PostDetailBody
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CommunityPageViewModel @Inject constructor(
-    private val latestPostUseCase: GetLatestPostUseCase
+    private val latestPostUseCase: GetLatestPostUseCase,
+    private val searchPostUseCase: SearchPostUseCase
 ): ViewModel(){
 
-    //현재 선택되어 있는 뷰
+    //현재 선택되어 있는 라우트 이름
     var selectedRoute = mutableStateOf("")
 
     //검색어
@@ -38,17 +46,59 @@ class CommunityPageViewModel @Inject constructor(
         _searchText.value = text
     }
 
-    fun onToogleSearch() {
-        _isSearching.value = !_isSearching.value
 
-        /*
-        if (!_isSearching.value) {
-            onSearchTextChange("")
-        }
+    /*
 
-         */
+    //검색 결과 담을 변수
+    private val _searchedPostList = MutableStateFlow(PagingData.empty<PostDetailBody>())
+    val searchedPostList: StateFlow<PagingData<PostDetailBody>> = _searchedPostList
+
+
+
+    //검색 수행
+    fun onSearch(
+        keyword: String,
+        tags: String = "",
+        nickname: String = ""
+    ) {
+
+        _searchedPostList.value = searchPostUseCase.executeSearchPost(keyword, tags, nickname)
+            .cachedIn(viewModelScope)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), PagingData.empty())
+            .value
+
     }
 
+     */
+
+    /*
+    fun getSearchedPost(
+        keyword: String,
+        tags: String = "",
+        nickname: String = ""
+    ): Flow<PagingData<PostDetailBody>>
+            = searchPostUseCase.executeSearchPost(keyword, tags, nickname).cachedIn(viewModelScope)
+
+     */
+
+    private val _searchedPosts = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
+    val searchedPosts: StateFlow<PagingData<PostDetailBody>> = _searchedPosts
+
+    fun getSearchedPost(
+        keyword: String,
+        tags: String = "",
+        nickname: String = ""
+    ) {
+        viewModelScope.launch {
+
+            searchPostUseCase.executeSearchPost(keyword, tags, nickname)
+                .cachedIn(viewModelScope)
+                .collectLatest {
+                    _searchedPosts.value = it
+                }
+
+        }
+    }
 
     //최상단 타이틀
     var topTitle = mutableStateOf("굿생 커뮤니티")
@@ -63,7 +113,6 @@ class CommunityPageViewModel @Inject constructor(
     }
 
     fun mapingRouteToTitle(route: String): String{
-        Log.e("hkfdjkjasf", route)
         var title = ""
         if(route == "FamousPostScreen"){
             title = "인기 게시물"

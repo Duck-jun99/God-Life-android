@@ -40,6 +40,14 @@ interface NetworkRepository {
         tag: String,
     ): LatestPostQuery
 
+    suspend fun getSearchedPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String,
+        nickname: String
+    ): LatestPostQuery
+
     suspend fun getPostDetail(
         authorization: String,
         postId: String

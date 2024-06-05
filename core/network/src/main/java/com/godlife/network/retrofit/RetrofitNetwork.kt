@@ -32,27 +32,33 @@ import javax.inject.Singleton
 
 interface RetrofitNetworkApi {
 
+    // 아이디 존재여부 확인
     @GET("check/id")
     suspend fun getUserInfo(
         @Query("memberId") id: String?,
     ): UserExistenceCheckResult
 
+    // 닉네임 중복체크
     @GET("check/nickname")
     suspend fun checkNickname(
         @Query("nickname") nickname :String?
     ): SignUpCheckNicknameQuery
 
+    // 이메일 중복체크
     @GET("check/email")
     suspend fun checkEmail(
         @Query("email") email :String?
     ): SignUpCheckEmailQuery
 
 
+    // 회원가입
     @POST("/signup")
     suspend fun signUp(
         @Body request: SignUpRequest
     ): SignUpQuery
 
+
+    // 게시물 생성
     @Multipart
     @POST("/board")
     suspend fun createPost(
@@ -63,6 +69,8 @@ interface RetrofitNetworkApi {
         @Part images: List<MultipartBody.Part>?,
     ): PostQuery
 
+
+    // 최신 게시물 조회
     @GET("/boards")
     suspend fun getLatestPost(
         @Header("Authorization") authorization: String,
@@ -71,11 +79,24 @@ interface RetrofitNetworkApi {
         @Query("Tag") tag: String,
     ): LatestPostQuery
 
+    //게시물 검색
+    @GET("/boards")
+    suspend fun searchPost(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("keyword") keyword: String,
+        @Query("Tag") tag: String,
+        @Query("Nickname") nickname: String
+    ): LatestPostQuery
+
+
+    //게시물 상세 조회
     @GET("/board/{id}")
     suspend fun getPostDetail(
         @Header("Authorization") authorization: String,
         @Path("id") id: String,
     ): PostDetailQuery
+
 
 
 
