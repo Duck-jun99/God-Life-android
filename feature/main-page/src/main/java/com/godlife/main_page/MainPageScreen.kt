@@ -3,7 +3,6 @@ package com.godlife.main_page
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -16,16 +15,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -38,7 +34,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,21 +58,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.godlife.createtodolist.CardTodoList
-import com.godlife.createtodolist.CreateActivity
-import com.godlife.createtodolist.SelectedCardTodoList
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite3
-import com.godlife.designsystem.theme.NullColor
-import com.godlife.designsystem.theme.Purple40
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.designsystem.theme.PurpleSecond
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
@@ -90,7 +78,7 @@ fun MainPageScreen(
     createNavigator: CreatetodolistNavigator,
     createPostNavigator: CreatePostNavigator,
     viewModel: MainPageViewModel = hiltViewModel(),
-    modifier:Modifier = Modifier
+    modifier:Modifier = Modifier.statusBarsPadding()
 ) {
 
 
@@ -120,7 +108,7 @@ fun MainPageScreen(
         Column(
             modifier
                 .fillMaxSize()
-                .background(GreyWhite3)
+                .background(GrayWhite3)
         ){
             Box(
                 modifier
@@ -143,7 +131,7 @@ fun MainPageScreen(
 
                         Icon(imageVector = Icons.Filled.Notifications,
                             contentDescription = "Notification",
-                            tint = GreyWhite,
+                            tint = GrayWhite,
                             modifier = modifier.align(Alignment.TopEnd))
                     }
 
@@ -164,7 +152,7 @@ fun MainPageScreen(
                 item { Spacer(modifier = modifier.size(10.dp)) }
 
 
-                //item {Text(text = viewModel.todayTimeText("Guest"), style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                //item {Text(text = viewModel.todayTimeText("Guest"), style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
                 item { TextToday(viewModel) }
 
                 item { Spacer(modifier = modifier.size(10.dp)) }
@@ -179,13 +167,13 @@ fun MainPageScreen(
 
                 if (todayBoolean) {
 
-                    //item {Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                    //item {Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
 
                     item { Row(modifier.fillMaxWidth()
-                        .height(20.dp)){
+                        .height(25.dp)){
                         Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
                         Spacer(modifier.size(5.dp))
-                        Text(text = "오늘의 투두리스트", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                        Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
                     }
 
                     item { Spacer(modifier = modifier.size(10.dp)) }
@@ -241,7 +229,7 @@ fun MainTodoListBox(viewModel: MainPageViewModel,
 
                 Column(modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "진행상황", style = TextStyle(color = GreyWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+                    Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
                     Text(text = "${todoListCount[1]} / ${todoListCount[0]}", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
                 }
 
@@ -327,7 +315,7 @@ fun MainNoTodoListBox(context: Context,
 
                 Column(modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "오늘의 투두리스트를\n 만들어주세요!", style = TextStyle(color = GreyWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+                    Text(text = "오늘의 투두리스트를\n 만들어주세요!", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
                     //Text(text = "2/5", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
                 }
 
@@ -463,11 +451,11 @@ fun CompletedTodayList(
                 .padding(10.dp)
         ) {
             Text(text = todo.name,
-                style = TextStyle(fontSize = 20.sp, color = GreyWhite)
+                style = TextStyle(fontSize = 20.sp, color = GrayWhite)
             )
 
             Divider(
-                color = GreyWhite,
+                color = GrayWhite,
                 thickness = 2.dp,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -476,7 +464,7 @@ fun CompletedTodayList(
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(GreyWhite)) {
+                colors = ButtonDefaults.buttonColors(GrayWhite)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))
             }
 
@@ -489,11 +477,13 @@ fun CompletedTodayList(
 fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
     val item = viewModel.todayTimeText("GUEST")
     //item[0] -> Text, item[1] -> Icon resource
+
+
     Row(modifier.fillMaxWidth()
-        .height(20.dp)){
+        .height(25.dp)){
         Icon(painter = painterResource(item[1].toString().toInt()), contentDescription = "", tint = Color.Unspecified)
         Spacer(modifier.size(5.dp))
-        Text(text = item[0].toString(), style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+        Text(text = item[0].toString(), style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
     }
 }
 
@@ -529,7 +519,7 @@ fun NotificationBox(modifier: Modifier = Modifier){
                     .weight(0.8f)
                     .padding(start = 10.dp)
                     .align(Alignment.CenterVertically)){
-                Text(text = "공지가 도착했어요!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+                Text(text = "공지가 도착했어요!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
 
             }
 
@@ -641,11 +631,11 @@ fun CompletedTodayListPreview(){
                 .padding(10.dp)
         ) {
             Text(text = "아침 식사",
-                style = TextStyle(fontSize = 20.sp, color = GreyWhite)
+                style = TextStyle(fontSize = 20.sp, color = GrayWhite)
             )
 
             Divider(
-                color = GreyWhite,
+                color = GrayWhite,
                 thickness = 2.dp,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -654,7 +644,7 @@ fun CompletedTodayListPreview(){
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(GreyWhite)) {
+                colors = ButtonDefaults.buttonColors(GrayWhite)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))
             }
 
@@ -670,7 +660,7 @@ fun TextTodayPreview(modifier: Modifier = Modifier){
         .height(20.dp)){
         Icon(painter = painterResource(R.drawable.sun_icons8), contentDescription = "", tint = Color.Unspecified)
         Spacer(modifier.size(5.dp))
-        Text(text = "Hello World!", style = TextStyle(color = GreyWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+        Text(text = "Hello World!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
     }
 }
 

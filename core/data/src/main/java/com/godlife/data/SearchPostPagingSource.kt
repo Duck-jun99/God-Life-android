@@ -12,9 +12,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class LatestPostPagingSource @Inject constructor(
+class SearchPostPagingSource @Inject constructor(
     private val localPreferenceUserRepository: LocalPreferenceUserRepository,
-    private val networkApi: RetrofitNetworkApi
+    private val networkApi: RetrofitNetworkApi,
+
+    private val keyword: String,
+    private val tags: String,
+    private val nickname: String
+
 ): PagingSource<Int, PostDetailBody>() {
 
     override fun getRefreshKey(state: PagingState<Int, PostDetailBody>): Int? {
@@ -31,10 +36,8 @@ class LatestPostPagingSource @Inject constructor(
                 "Bearer ${localPreferenceUserRepository.getAccessToken()}"
             }
 
-            //Log.e("LatestPostPagingSource", "authorization: ${authorization}")
-
             val page = params.key ?: 1
-            val response = networkApi.getLatestPost(authorization = authorization, page = page, keyword = "", tag = "")
+            val response = networkApi.searchPost(authorization = authorization, page = page, keyword = keyword, tag = tags, nickname = nickname)
 
             LoadResult.Page(
                 data = response.body,

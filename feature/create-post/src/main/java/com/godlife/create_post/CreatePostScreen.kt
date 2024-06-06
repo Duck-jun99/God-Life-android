@@ -1,12 +1,9 @@
 package com.godlife.create_post
 
-import android.content.ContentProvider
 import android.content.Context
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
-import android.graphics.fonts.FontStyle
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -16,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -36,7 +31,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -52,31 +46,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
-import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.GreyWhite
-import com.godlife.designsystem.theme.GreyWhite2
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
 import java.io.ByteArrayOutputStream
@@ -131,7 +120,7 @@ fun CreatePostScreen(
                         .padding(10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "게시물 작성", style = TextStyle(color = GreyWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                    Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
                 }
             }
 
@@ -142,7 +131,7 @@ fun CreatePostScreen(
                 item{ Text(text = "제목", style = GodLifeTypography.titleMedium) }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -156,7 +145,7 @@ fun CreatePostScreen(
                 item{ Text(text = "내용", style = GodLifeTypography.titleMedium) }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -170,7 +159,7 @@ fun CreatePostScreen(
                 item{ Text(text = "투두 목록", style = GodLifeTypography.titleMedium) }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -214,7 +203,7 @@ fun CreatePostScreen(
                 }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -435,7 +424,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                         .padding(10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "게시물 작성", style = TextStyle(color = GreyWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                    Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
                 }
             }
 
@@ -446,7 +435,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                 item{ Text(text = "제목", style = GodLifeTypography.titleMedium) }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -460,7 +449,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                 item{ Text(text = "내용", style = GodLifeTypography.titleMedium) }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -474,7 +463,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                 item{ Text(text = "투두 목록", style = GodLifeTypography.titleMedium) }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -518,7 +507,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                 }
 
                 item{ Divider(
-                    color = GreyWhite2,
+                    color = GrayWhite2,
                     thickness = 2.dp,
                     modifier = Modifier
                         .padding(vertical = 10.dp)
@@ -526,7 +515,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
 
                 item{ Box(
                     modifier
-                        .background(GreyWhite)
+                        .background(GrayWhite)
                         .size(150.dp)) }
 
                 item{ Spacer(modifier.padding(10.dp)) }
@@ -654,7 +643,7 @@ fun SelectImagePreview(){
         //Image 부분
         Box(modifier = Modifier
             .size(150.dp)
-            .background(GreyWhite)){
+            .background(GrayWhite)){
 
         }
         Box(modifier = Modifier

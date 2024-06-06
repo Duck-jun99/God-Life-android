@@ -44,7 +44,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun GodLifeTheme(
-    modifier: Modifier = Modifier.statusBarsPadding(),
+    modifier: Modifier = Modifier,
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
@@ -63,16 +63,18 @@ fun GodLifeTheme(
 
     val view = LocalView.current
 
+
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
 
             //window.statusBarColor = Color.TRANSPARENT
             //WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-
+            window.statusBarColor = Color.TRANSPARENT
             WindowCompat.setDecorFitsSystemWindows(window, false)
         }
     }
+
 
     Box(
         modifier = modifier,

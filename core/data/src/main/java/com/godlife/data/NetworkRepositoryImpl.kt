@@ -5,6 +5,7 @@ import android.net.Uri
 import com.godlife.data.repository.NetworkRepository
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
@@ -59,6 +60,20 @@ class NetworkRepositoryImpl @Inject constructor(
         tag: String
     ): LatestPostQuery {
         return networkDataSource.getLatestPost(authorization, page, keyword, tag)
+    }
+
+    override suspend fun getSearchedPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String,
+        nickname: String
+    ): LatestPostQuery {
+        return networkDataSource.getSearchedPost(authorization, page, keyword, tag, nickname)
+    }
+
+    override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
+        return networkDataSource.getPostDetail(authorization, postId)
     }
 
 }

@@ -3,6 +3,7 @@ package com.godlife.data.repository
 import android.graphics.Bitmap
 import android.net.Uri
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
@@ -38,6 +39,19 @@ interface NetworkRepository {
         keyword: String,
         tag: String,
     ): LatestPostQuery
+
+    suspend fun getSearchedPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String,
+        nickname: String
+    ): LatestPostQuery
+
+    suspend fun getPostDetail(
+        authorization: String,
+        postId: String
+    ): PostDetailQuery
 
 
 }

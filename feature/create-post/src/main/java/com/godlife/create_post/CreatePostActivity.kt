@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -74,7 +75,7 @@ fun CreatePostUI(
 
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().statusBarsPadding()
     ) {
         NavHost(navController = navController, startDestination = "CreatePostScreen", modifier = Modifier.fillMaxSize()){
             composable("CreatePostScreen"){
