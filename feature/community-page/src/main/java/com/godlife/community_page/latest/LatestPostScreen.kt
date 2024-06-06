@@ -134,7 +134,7 @@ fun LatestPostListView(item: PostDetailBody, navController: NavController, modif
                 if(item.profileURL != ""){
                     Glide.with(LocalContext.current)
                         .asBitmap()
-                        .load(item.profileURL)
+                        .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.profileURL)
                         .error(R.drawable.ic_person)
                         .into(object : CustomTarget<Bitmap>() {
                             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {

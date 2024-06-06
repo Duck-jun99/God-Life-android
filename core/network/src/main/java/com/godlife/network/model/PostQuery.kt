@@ -36,4 +36,5 @@ data class PostDetailBody(
     val profileURL: String?,
     val nickname: String,
     val tier: String,
+    val whoAmI: String,
 )

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,16 +20,12 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -46,8 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +48,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -64,7 +56,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
 import com.godlife.community_page.latest.LatestPostScreen
@@ -72,9 +63,11 @@ import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.community_page.navigation.LatestPostRoute
 import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.community_page.navigation.RankingRoute
+import com.godlife.community_page.navigation.SearchResultRoute
 import com.godlife.community_page.navigation.StimulusPostRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.ranking.RankingScreen
+import com.godlife.community_page.search.SearchResultScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
 import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -109,10 +102,8 @@ fun CommunityPageScreen(
     Log.e("paddingValue", paddingValue.toString())
 
     val searchText by viewModel.searchText.collectAsState()
-    val searchedPostList = viewModel.searchedPosts.collectAsLazyPagingItems()
-    val isSearching by viewModel.isSearching.collectAsState()
 
-    Log.e("hkjfsa", searchedPostList.toString())
+    val isSearching by viewModel.isSearching.collectAsState()
 
     GodLifeTheme(modifier.fillMaxSize()) {
 
@@ -161,8 +152,8 @@ fun CommunityPageScreen(
                     containerColor = OpaqueLight,
                     onTextChanged = { viewModel.onSearchTextChange(it) },
                     onSearchClicked = {
-                        //viewModel.onSearch(keyword = searchText)
                         viewModel.getSearchedPost(keyword = searchText)
+                        navController.navigate(SearchResultRoute.route)
                     }
                 )
 
@@ -319,6 +310,12 @@ fun CommunityPageView(modifier: Modifier = Modifier, navController: NavHostContr
             }
         }
 
+        //검색 결과 뷰
+        composable(SearchResultRoute.route){
+            viewModel.changeCurrentRoute(route = SearchResultRoute.route)
+            SearchResultScreen(viewModel = viewModel, navController = navController)
+        }
+
 
     }
 }
@@ -458,6 +455,7 @@ fun ScreenEx2(modifier: Modifier = Modifier){
         }
 
         BottomSheetScaffold(
+            modifier = modifier.fillMaxWidth(),
             sheetPeekHeight = deviceHeight.dp - 250.dp,
             sheetShape = RoundedCornerShape(
                 bottomStart = 0.dp,

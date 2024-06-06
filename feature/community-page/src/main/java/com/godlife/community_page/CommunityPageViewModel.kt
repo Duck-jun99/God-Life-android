@@ -126,6 +126,9 @@ class CommunityPageViewModel @Inject constructor(
         else if(route == "RankingScreen"){
             title = "명예의 전당"
         }
+        else if(route == "SearchResultScreen"){
+            title = "검색 결과"
+        }
         return title
     }
 

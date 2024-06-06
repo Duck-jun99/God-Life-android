@@ -28,6 +28,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -146,7 +147,7 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
     NavigationBar(
         containerColor = Color.White,
         contentColor = contentColorFor(backgroundColor = Color.White),
-        tonalElevation = 7.dp
+        modifier = Modifier.shadow(7.dp)
     ) {
         bottomNavItems.forEach { bottomNavItem ->
             NavigationBarItem(

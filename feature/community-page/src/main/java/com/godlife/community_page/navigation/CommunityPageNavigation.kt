@@ -31,3 +31,8 @@ object PostDetailRoute{
     const val route = "PostDetailScreen"
 
 }
+
+object SearchResultRoute{
+    const val route = "SearchResultScreen"
+
+}

@@ -3,6 +3,7 @@ package com.godlife.community_page.post_detail
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,10 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +50,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
+import com.godlife.community_page.R
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
@@ -67,13 +71,17 @@ fun PostDetailScreen(
 
     GodLifeTheme {
 
-        Column(modifier.background(Color.White).fillMaxSize()) {
+        LazyColumn(modifier.background(Color.White).fillMaxSize()) {
 
             if (postDetail.body?.imagesURL?.isNotEmpty() == true){
-                ImageBox(imgUriList = postDetail.body?.imagesURL!!)
+                item{ ImageBox(imgUriList = postDetail.body?.imagesURL!!) }
             }
 
-            Content(postDetail = postDetail)
+            postDetail.body?.let {
+                Log.e("postDetail", it.toString())
+                item{ Content(postDetailBody = it) }
+            }
+
         }
 
 
@@ -159,7 +167,8 @@ fun ImageView(modifier: Modifier = Modifier, context: Context, imgUri: String){
 
 @Composable
 fun Content(modifier: Modifier = Modifier,
-            postDetail: PostDetailQuery){
+            postDetailBody: PostDetailBody){
+
     Column(
         modifier
             .fillMaxWidth()
@@ -170,27 +179,58 @@ fun Content(modifier: Modifier = Modifier,
                 .height(100.dp),
             verticalAlignment = Alignment.CenterVertically){
 
-            Box(
-                modifier
-                    .background(PurpleMain, shape = CircleShape)
-                    .size(70.dp))
+            //프로필 이미지 부분
+            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+            val imageModifier: Modifier = modifier
+                .size(50.dp, 50.dp)
+                .clip(CircleShape)
+                .fillMaxSize()
+                .background(color = GrayWhite)
+
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetailBody.profileURL)
+                .error(R.drawable.ic_person)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = imageModifier
+                )   //bitmap이 없다면
+            } ?: Image(
+                painter = painterResource(id = R.drawable.ic_person),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = imageModifier
+            )
 
             Spacer(modifier.size(10.dp))
 
             Column {
-                Text(text = "Nickname", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                Text(text = postDetailBody.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = "postDetailBody.whoAmI", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
             }
+
+
         }
 
         Spacer(modifier.size(20.dp))
 
-        postDetail.body?.let { Text(text = it.title, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)) }
+        Text(text = postDetailBody.title, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
 
-        postDetail.body?.let { Text(text = it.body, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp)) }
+        Text(text = postDetailBody.body, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 
@@ -207,7 +247,7 @@ fun Content(modifier: Modifier = Modifier,
 
         Spacer(modifier.size(20.dp))
 
-        postDetail.body?.let { Text(text = it.writtenAt, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp)) }
+        Text(text = postDetailBody.writtenAt, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 
@@ -256,6 +296,8 @@ fun ImageBoxPreview(modifier: Modifier = Modifier){
             .height(400.dp)
             .background(Color.Black)
     ){
+
+
 
         Box(
             modifier
