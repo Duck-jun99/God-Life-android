@@ -3,6 +3,7 @@ package com.godlife.network.retrofit
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -11,6 +12,8 @@ import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
 import okhttp3.MultipartBody
+import okhttp3.Request
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -50,13 +53,14 @@ interface RetrofitNetworkApi {
 
 
     // 게시물 생성
+    @JvmSuppressWildcards
     @Multipart
     @POST("/board")
     suspend fun createPost(
         @Header("Authorization") authorization: String,
-        @Part("title") title: String,
-        @Part("content") content: String,
-        @Part("tags") tags: List<String>,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("tags") tags: List<RequestBody>,
         @Part images: List<MultipartBody.Part>?,
     ): PostQuery
 
@@ -109,6 +113,13 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Path("commentId") commentId: String,
     ): CommentQuery
+
+    //갓생 인정
+    @POST("/like/board/{boardId}")
+    suspend fun agreeGodLife(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: Int,
+    ): GodScoreQuery
 
 
 

@@ -67,6 +67,8 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -127,7 +129,37 @@ fun PostDetailScreen(
                             item{ Content(postDetailBody = it) }
                         }
 
+                        postDetail.body?.let {
+
+                            //갓생 인정을 안한 게시물이라면
+                            if(!it.memberLikedBoard){
+
+                                item {
+
+                                    GodLifeButtonWhite(
+                                        onClick = { postDetailViewModel.agreeGodLife(postId) },
+                                        text = { Text(text = "갓생, 인정하시나요?") }
+                                    )
+                                }
+                            }
+                            //이미 갓생 인정을 한 게시물이라면
+                            else{
+
+                                item {
+
+                                    GodLifeButton(
+                                        onClick = { null },
+                                        text = { Text(text = "이미 갓생 인정하신 글이에요.") }
+                                    )
+                                }
+
+                            }
+
+
+                        }
+
                         item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
+
 
                     }
 

@@ -56,9 +56,9 @@ class KakaoLoginManager @Inject constructor(
                 Log.e("KakaoLoginManager","${error.message} 카카오 계정으로 로그인 실패")
             } else if (token != null) {
                 updateSocialToken(token.accessToken)
-                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.accessToken}")
-                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.idToken}")
-                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.refreshToken}")
+                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, accessToken:${token.accessToken}")
+                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, idToken:${token.idToken}")
+                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, refreshToken:${token.refreshToken}")
 
                 //loginViewModel.saveAccessToken(token.accessToken)
 
@@ -74,11 +74,21 @@ class KakaoLoginManager @Inject constructor(
             if (error != null) {
                 // 카카오톡으로 로그인 실패
                 if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                    Log.e("KakaoLoginManager","${error.message} 카카오톡으로 로그인 실패")
                     return@loginWithKakaoTalk
                 }
                 onKakaoAccountLogin()
             } else if (token != null) {
                 updateSocialToken(token.accessToken)
+
+                Log.e("KakaoLoginManager","카카오톡으로 로그인 성공, accessToken:${token.accessToken}")
+                Log.e("KakaoLoginManager","카카오톡으로 로그인 성공, idToken:${token.idToken}")
+                Log.e("KakaoLoginManager","카카오톡으로 로그인 성공, refreshToken:${token.refreshToken}")
+
+                //loginViewModel.saveAccessToken(token.accessToken)
+
+                getUserInfo(context, loginViewModel, navController, mainNavigator, loginActivity)
+
             }
         }
     }

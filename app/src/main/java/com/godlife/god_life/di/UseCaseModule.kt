@@ -10,6 +10,7 @@ import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.domain.SignUpUseCase
 import dagger.Module
@@ -57,4 +58,8 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideDeleteCommentUseCase(repository: NetworkRepository) = DeleteCommentUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun providePlusGodScoreUseCase(repository: NetworkRepository) = PlusGodScoreUseCase(repository)
 }

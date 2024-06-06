@@ -6,6 +6,12 @@ data class PostQuery(
     val message: String
 )
 
+data class GodScoreQuery(
+    val status: String,
+    val body: String,
+    val message: String
+)
+
 //최신 게시물 조회
 data class LatestPostQuery(
     val status: String,
@@ -37,4 +43,5 @@ data class PostDetailBody(
     val nickname: String,
     val tier: String,
     val whoAmI: String,
+    val memberLikedBoard: Boolean
 )

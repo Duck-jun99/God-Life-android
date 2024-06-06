@@ -65,6 +65,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.NullColor
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
@@ -150,6 +151,10 @@ fun MainPageScreen(
                 }
 
                 item { Spacer(modifier = modifier.size(10.dp)) }
+
+
+                //TEST CREATE POST
+                item { TestCreatePost(createPostNavigator, mainActivity) }
 
 
                 //item {Text(text = viewModel.todayTimeText("Guest"), style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
@@ -487,6 +492,17 @@ fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
     }
 }
 
+@Composable
+fun TestCreatePost(createPostNavigator: CreatePostNavigator, mainActivity: Activity){
+    Button(
+        onClick = {
+        moveCreatePostActivity(createPostNavigator, mainActivity)
+        }
+    ) {
+        Text(text = "CreatePost")
+    }
+
+}
 
 //Preview
 

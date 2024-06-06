@@ -6,6 +6,7 @@ import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -16,7 +17,9 @@ import com.godlife.network.model.SignUpRequest
 import com.godlife.network.retrofit.RetrofitNetworkApi
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import javax.inject.Inject
 
@@ -55,6 +58,11 @@ class NetworkDataSourceImpl @Inject constructor(
         tags: List<String>,
         imagePath: List<Uri>?
     ): PostQuery {
+
+        val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val tags = tags.map { it -> it.toRequestBody("text/plain".toMediaTypeOrNull()) }
 
         val imageParts = imagePath?.map { it ->
 
@@ -109,6 +117,10 @@ class NetworkDataSourceImpl @Inject constructor(
 
     override suspend fun deleteComment(authorization: String, commentId: String): CommentQuery {
         return networkApi.deleteComment(authorization, commentId)
+    }
+
+    override suspend fun agreeGodLife(authorization: String, postId: Int): GodScoreQuery {
+        return networkApi.agreeGodLife(authorization, postId)
     }
 
 

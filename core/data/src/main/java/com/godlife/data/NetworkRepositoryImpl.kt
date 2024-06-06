@@ -6,6 +6,7 @@ import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -90,6 +91,10 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun deleteComment(authorization: String, commentId: String): CommentQuery {
         return networkDataSource.deleteComment(authorization, commentId)
+    }
+
+    override suspend fun agreeGodLife(authorization: String, postId: Int): GodScoreQuery {
+        return networkDataSource.agreeGodLife(authorization, postId)
     }
 
 }

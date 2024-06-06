@@ -4,6 +4,7 @@ import android.net.Uri
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -69,5 +70,10 @@ interface NetworkDataSource {
         authorization: String,
         commentId: String
     ): CommentQuery
+
+    suspend fun agreeGodLife(
+        authorization: String,
+        postId: Int
+    ): GodScoreQuery
 
 }
