@@ -6,7 +6,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.godlife.network.NetworkDataSource
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostCommentQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -95,6 +97,18 @@ class NetworkDataSourceImpl @Inject constructor(
 
     override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
         return networkApi.getPostDetail(authorization, postId)
+    }
+
+    override suspend fun getComments(authorization: String, postId: String): GetCommentsQuery {
+        return networkApi.getComments(authorization, postId)
+    }
+
+    override suspend fun createComment(
+        authorization: String,
+        postId: String,
+        comment: String
+    ): PostCommentQuery {
+        return networkApi.createComment(authorization, postId, comment)
     }
 
 

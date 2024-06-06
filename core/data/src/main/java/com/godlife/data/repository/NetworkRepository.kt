@@ -2,7 +2,9 @@ package com.godlife.data.repository
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostCommentQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -52,6 +54,17 @@ interface NetworkRepository {
         authorization: String,
         postId: String
     ): PostDetailQuery
+
+    suspend fun getComments(
+        authorization: String,
+        postId: String
+    ): GetCommentsQuery
+
+    suspend fun createComment(
+        authorization: String,
+        postId: String,
+        comment: String
+    ): PostCommentQuery
 
 
 }

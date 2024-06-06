@@ -3,7 +3,9 @@ package com.godlife.god_life.di
 import com.godlife.data.repository.LatestPostRepository
 import com.godlife.data.repository.NetworkRepository
 import com.godlife.data.repository.SearchPostRepository
+import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.CreatePostUseCase
+import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetUserInfoUseCase
@@ -42,5 +44,13 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideGetPostDetailUseCase(repository: NetworkRepository) = GetPostDetailUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetCommentUseCase(repository: NetworkRepository) = GetCommentsUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideCreateCommentUseCase(repository: NetworkRepository) = CreateCommentUseCase(repository)
 
 }

@@ -3,7 +3,9 @@ package com.godlife.network
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.paging.PagingData
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostCommentQuery
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
@@ -55,5 +57,16 @@ interface NetworkDataSource {
         authorization: String,
         postId: String
     ): PostDetailQuery
+
+    suspend fun getComments(
+        authorization: String,
+        postId: String
+    ): GetCommentsQuery
+
+    suspend fun createComment(
+        authorization: String,
+        postId: String,
+        comment: String
+    ): PostCommentQuery
 
 }

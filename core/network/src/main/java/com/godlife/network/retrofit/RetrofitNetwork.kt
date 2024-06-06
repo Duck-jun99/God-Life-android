@@ -3,7 +3,9 @@ package com.godlife.network.retrofit
 import androidx.tracing.trace
 import com.godlife.network.BuildConfig
 import com.godlife.network.NetworkDataSource
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.PostCommentQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -96,6 +98,21 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Path("id") id: String,
     ): PostDetailQuery
+
+    //댓글 조회
+    @GET("/comment/{boardId}")
+    suspend fun getComments(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: String,
+    ): GetCommentsQuery
+
+    //댓글 생성
+    @POST("/comment/{boardId}")
+    suspend fun createComment(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: String,
+        @Body comment: String,
+    ): PostCommentQuery
 
 
 
