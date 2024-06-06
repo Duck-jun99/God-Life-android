@@ -1,19 +1,17 @@
 package com.godlife.data
 
-import android.graphics.Bitmap
 import android.net.Uri
 import com.godlife.data.repository.NetworkRepository
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
-import com.godlife.network.model.PostCommentQuery
+import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(
@@ -86,8 +84,12 @@ class NetworkRepositoryImpl @Inject constructor(
         authorization: String,
         postId: String,
         comment: String
-    ): PostCommentQuery {
+    ): CommentQuery {
         return networkDataSource.createComment(authorization, postId, comment)
+    }
+
+    override suspend fun deleteComment(authorization: String, commentId: String): CommentQuery {
+        return networkDataSource.deleteComment(authorization, commentId)
     }
 
 }

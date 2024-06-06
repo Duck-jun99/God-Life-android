@@ -5,6 +5,7 @@ import com.godlife.data.repository.NetworkRepository
 import com.godlife.data.repository.SearchPostRepository
 import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.CreatePostUseCase
+import com.godlife.domain.DeleteCommentUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
@@ -53,4 +54,7 @@ class UseCaseModule {
     @Singleton
     fun provideCreateCommentUseCase(repository: NetworkRepository) = CreateCommentUseCase(repository)
 
+    @Provides
+    @Singleton
+    fun provideDeleteCommentUseCase(repository: NetworkRepository) = DeleteCommentUseCase(repository)
 }

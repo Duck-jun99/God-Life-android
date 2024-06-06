@@ -103,9 +103,22 @@ fun CommunityPageScreen(
 
     val searchText by viewModel.searchText.collectAsState()
 
-    val isSearching by viewModel.isSearching.collectAsState()
-
-    GodLifeTheme(modifier.fillMaxSize()) {
+    GodLifeTheme(modifier
+        .fillMaxSize()
+        .background(
+            brush = Brush.linearGradient(
+                listOf(
+                    Color(0xCC496B9F),
+                    Color(0xCB494A9F),
+                    Color(0xCC6A499F),
+                    Color(0xCC6A499F),
+                    Color(0xCC96499F),
+                    Color(0xCCDB67AD),
+                    Color(0xCCFF5E5E),
+                )
+            )
+        )
+    ) {
 
         Column(
             modifier
@@ -330,7 +343,22 @@ fun ScreenEx2(modifier: Modifier = Modifier){
 
     val searchText by remember { mutableStateOf("") }
 
-    Scaffold(modifier.fillMaxSize()) {
+    Scaffold(modifier
+        .fillMaxSize()
+        .background(
+            brush = Brush.linearGradient(
+                listOf(
+                    Color(0xCC496B9F),
+                    Color(0xCB494A9F),
+                    Color(0xCC6A499F),
+                    Color(0xCC6A499F),
+                    Color(0xCC96499F),
+                    Color(0xCCDB67AD),
+                    Color(0xCCFF5E5E),
+                )
+            )
+        )
+    ) {
 
         Column(
             modifier
@@ -457,6 +485,7 @@ fun ScreenEx2(modifier: Modifier = Modifier){
         BottomSheetScaffold(
             modifier = modifier.fillMaxWidth(),
             sheetPeekHeight = deviceHeight.dp - 250.dp,
+            sheetContainerColor = OpaqueLight,
             sheetShape = RoundedCornerShape(
                 bottomStart = 0.dp,
                 bottomEnd = 0.dp,

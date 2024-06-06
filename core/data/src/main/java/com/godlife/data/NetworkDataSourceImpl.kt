@@ -2,13 +2,10 @@ package com.godlife.data
 
 import android.net.Uri
 import android.util.Log
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
-import com.godlife.network.model.PostCommentQuery
+import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -21,7 +18,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.util.concurrent.Flow
 import javax.inject.Inject
 
 class NetworkDataSourceImpl @Inject constructor(
@@ -107,8 +103,12 @@ class NetworkDataSourceImpl @Inject constructor(
         authorization: String,
         postId: String,
         comment: String
-    ): PostCommentQuery {
+    ): CommentQuery {
         return networkApi.createComment(authorization, postId, comment)
+    }
+
+    override suspend fun deleteComment(authorization: String, commentId: String): CommentQuery {
+        return networkApi.deleteComment(authorization, commentId)
     }
 
 

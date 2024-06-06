@@ -1,11 +1,8 @@
 package com.godlife.network.retrofit
 
-import androidx.tracing.trace
-import com.godlife.network.BuildConfig
-import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
-import com.godlife.network.model.PostCommentQuery
+import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.UserExistenceCheckResult
@@ -13,15 +10,9 @@ import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.Call
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import retrofit2.Retrofit
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -29,8 +20,6 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
-import javax.inject.Inject
-import javax.inject.Singleton
 
 interface RetrofitNetworkApi {
 
@@ -112,7 +101,14 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: String,
         @Body comment: String,
-    ): PostCommentQuery
+    ): CommentQuery
+
+    //댓글 삭제
+    @DELETE("/comment/{commentId}")
+    suspend fun deleteComment(
+        @Header("Authorization") authorization: String,
+        @Path("commentId") commentId: String,
+    ): CommentQuery
 
 
 

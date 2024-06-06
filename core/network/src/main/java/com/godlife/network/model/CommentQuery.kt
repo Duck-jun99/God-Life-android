@@ -14,10 +14,10 @@ data class CommentBody(
     val aboutMe: String,
     val writtenAt: String,
     val profileURL: String,
-    val commentOwner: String
+    val commentOwner: Boolean
 )
 
-data class PostCommentQuery(
+data class CommentQuery(
     val status: String,
     val body: Boolean,
     val message: String,
