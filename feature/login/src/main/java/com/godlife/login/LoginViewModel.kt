@@ -3,7 +3,7 @@ package com.godlife.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.CheckUserExistenceUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.navigator.MainNavigator
 import com.godlife.network.model.BodyQuery
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getUserInfoUseCase: GetUserInfoUseCase
+    private val checkUserExistenceUseCase: CheckUserExistenceUseCase
 ) : ViewModel() {
 
     private val _userExistenceResult = MutableStateFlow<Boolean?>(null)
@@ -58,7 +58,7 @@ class LoginViewModel @Inject constructor(
 
     suspend fun checkUserExistence(userId :String): BodyQuery {
 
-        return getUserInfoUseCase.executeGetUserInfo(userId)!!.body
+        return checkUserExistenceUseCase.executeGetUserInfo(userId)!!.body
     }
 
 }

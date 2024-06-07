@@ -2,6 +2,7 @@ package com.godlife.god_life.di
 
 import com.godlife.network.BuildConfig
 import com.godlife.network.retrofit.RetrofitNetworkApi
+import com.skydoves.sandwich.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,6 +44,7 @@ internal object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.SERVER_DOMAIN)
             .client(okHttpClient)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
             .addConverterFactory(gsonConverterFactory)
             .build()
     }

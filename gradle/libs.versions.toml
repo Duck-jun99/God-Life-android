@@ -66,6 +66,8 @@ constraintlayout = "2.1.4"
 paging = "3.3.0"
 pagingCommonAndroid = "3.3.0"
 
+sandwich = "1.2.4"
+
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -168,6 +170,8 @@ androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.r
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging"}
 androidx-paging-common-android = { group = "androidx.paging", name = "paging-common-android", version.ref = "pagingCommonAndroid" }
 
+# retrofit error handling
+sandwich = { module = "com.github.skydoves:sandwich", version.ref = "sandwich" }
 
 
 [bundles]

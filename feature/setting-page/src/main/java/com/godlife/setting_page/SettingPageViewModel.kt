@@ -3,7 +3,9 @@ package com.godlife.setting_page
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
+import com.godlife.network.model.UserInfoBody
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +16,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingPageViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase
+    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
+    private val getUserInfoUseCase: GetUserInfoUseCase
 ): ViewModel(){
+
+    // 유저 정보 초기화
+    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", ""))
+    val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     private val _logoutResult = MutableStateFlow<Boolean?>(null)
     val logoutResult: StateFlow<Boolean?> = _logoutResult
+
+    init {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            //Access Token을 통해 유저 정보 초기화
+            var auth = ""
+            launch { auth = "Bearer ${localPreferenceUserUseCase.getAccessToken()}" }.join()
+
+            //_userInfo.value = getUserInfoUseCase.executeGetUserInfo(auth).body
+
+        }
+    }
+
+
 
     fun logout() {
         viewModelScope.launch {

@@ -7,13 +7,16 @@ import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.UserInfoQuery
+import com.skydoves.sandwich.ApiResponse
 
 interface NetworkDataSource {
-    suspend fun getUserInfo(id: String): UserExistenceCheckResult?
+    suspend fun checkUserExistence(id: String): UserExistenceCheckResult?
 
     suspend fun checkNickname(nickname: String): SignUpCheckNicknameQuery?
 
@@ -26,6 +29,10 @@ interface NetworkDataSource {
                        providerId: String,
                        providerName: String
     ): SignUpQuery
+
+    suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery>
+
+    suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
 
     suspend fun createPost(
         authorization: String,

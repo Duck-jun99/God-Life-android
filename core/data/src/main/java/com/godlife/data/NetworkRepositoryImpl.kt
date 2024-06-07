@@ -9,20 +9,23 @@ import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.UserInfoQuery
+import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(
     private val networkDataSource: NetworkDataSource
 ) : NetworkRepository {
-    override suspend fun getUserInfo(
+    override suspend fun checkUserExistence(
         id: String
     ): UserExistenceCheckResult? {
         //return Mapper.mapperGithub(githubDataSource.getGithub(remoteErrorEmitter, owner))
-        return networkDataSource.getUserInfo(id)
+        return networkDataSource.checkUserExistence(id)
     }
 
     override suspend fun checkNickname(nickname: String): SignUpCheckNicknameQuery? {
@@ -42,6 +45,14 @@ class NetworkRepositoryImpl @Inject constructor(
         providerName: String
     ): SignUpQuery {
         return networkDataSource.signUp(nickname, email, age, sex, providerId, providerName)
+    }
+
+    override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
+        return networkDataSource.getUserInfo(authorization)
+    }
+
+    override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
+        return networkDataSource.reissue(authorization)
     }
 
     override suspend fun createPost(

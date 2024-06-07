@@ -7,6 +7,7 @@ import com.godlife.god_life.configureHiltAndroid
 import com.godlife.god_life.configureKotest
 import com.godlife.god_life.configureKotlinAndroid
 import com.godlife.god_life.configureLottie
+import com.godlife.god_life.configureSandwich
 import com.godlife.god_life.configureSecurityCrypto
 
 plugins {
@@ -22,4 +23,5 @@ configureSecurityCrypto()
 configureAndroidRoom()
 configureGson()
 configureAndroidPaging()
+configureSandwich()
 

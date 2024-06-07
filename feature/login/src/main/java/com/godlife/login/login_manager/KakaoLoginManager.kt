@@ -2,11 +2,7 @@ package com.godlife.login.login_manager
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.login.LoginActivity
 import com.godlife.login.LoginViewModel
 import com.godlife.login.SignUpScreenRoute
@@ -19,7 +15,6 @@ import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -134,6 +129,7 @@ private fun getUserInfo(
 
                 launch {
                     userInfo = loginViewModel.checkUserExistence(user.id.toString())
+                    Log.e(TAG, userInfo.toString())
                     checkLoginOrSignUp = userInfo?.alreadySignUp
                     //checkLoginOrSignUp = loginViewModel.checkUserExistence(user.id.toString())
                 }.join()
@@ -150,7 +146,7 @@ private fun getUserInfo(
                                 it1
                             )
                         } }
-                        userInfo?.let { it.refershToken?.let { it1 ->
+                        userInfo?.let { it.refreshToken?.let { it1 ->
                             loginViewModel.saveRefreshToken(
                                 it1
                             )

@@ -9,12 +9,15 @@ import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
+import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.retrofit.RetrofitNetworkApi
+import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -27,8 +30,8 @@ class NetworkDataSourceImpl @Inject constructor(
     private val networkApi: RetrofitNetworkApi
 ) : NetworkDataSource {
 
-    override suspend fun getUserInfo( id : String): UserExistenceCheckResult? {
-        return networkApi.getUserInfo(id = id)
+    override suspend fun checkUserExistence(id : String): UserExistenceCheckResult? {
+        return networkApi.checkUserExistence(id = id)
 
     }
 
@@ -49,6 +52,14 @@ class NetworkDataSourceImpl @Inject constructor(
         providerName: String
     ): SignUpQuery {
         return networkApi.signUp(SignUpRequest( nickname, email, age, sex, providerId, providerName))
+    }
+
+    override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
+        return networkApi.getUserInfo(authorization)
+    }
+
+    override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
+        return networkApi.reissue(authorization)
     }
 
     override suspend fun createPost(

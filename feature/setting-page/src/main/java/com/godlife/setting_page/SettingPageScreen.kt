@@ -66,6 +66,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.LoginNavigator
+import com.godlife.network.model.UserInfoBody
 
 @Composable
 fun SettingPageScreen(
@@ -82,6 +83,7 @@ fun SettingPageScreen(
     }
 
     val logoutResult by viewModel.logoutResult.collectAsState()
+    val userInfo by viewModel.userInfo.collectAsState()
 
     if(logoutResult == true){
         moveLoginActivity(loginNavigator, mainActivity)
@@ -133,7 +135,7 @@ fun SettingPageScreen(
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
 
-                item { ProfileCard() }
+                item { ProfileCard(userInfo = userInfo) }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -186,7 +188,8 @@ private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Acti
 
 @Composable
 fun ProfileCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    userInfo: UserInfoBody
 
 ) {
     Card(
@@ -250,7 +253,7 @@ fun ProfileCard(
 
                 HorizontalDivider(modifier.padding(top = 10.dp, bottom = 10.dp))
 
-                Text(text = "Nickname", style = GodLifeTypography.titleMedium)
+                Text(text = userInfo.nickname, style = GodLifeTypography.titleMedium)
             }
 
         }

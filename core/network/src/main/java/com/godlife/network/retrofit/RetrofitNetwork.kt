@@ -6,13 +6,15 @@ import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
+import com.godlife.network.model.UserInfoQuery
+import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
-import okhttp3.Request
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -28,7 +30,7 @@ interface RetrofitNetworkApi {
 
     // 아이디 존재여부 확인
     @GET("check/id")
-    suspend fun getUserInfo(
+    suspend fun checkUserExistence(
         @Query("memberId") id: String?,
     ): UserExistenceCheckResult
 
@@ -50,6 +52,18 @@ interface RetrofitNetworkApi {
     suspend fun signUp(
         @Body request: SignUpRequest
     ): SignUpQuery
+
+    // 로그인 시 유저 정보 받아옴
+    @GET("/member")
+    suspend fun getUserInfo(
+        @Header("Authorization") authorization: String,
+    ): ApiResponse<UserInfoQuery>
+
+    // 엑세스 토큰 갱신
+    @POST("/reissue")
+    suspend fun reissue(
+        @Header("Authorization") authorization: String,
+    ): ApiResponse<ReissueQuery>
 
 
     // 게시물 생성
@@ -144,11 +158,11 @@ internal class RetrofitNetwork @Inject constructor(
             .create(RetrofitNetworkApi::class.java)
     }
 
-    override suspend fun getUserInfo(
+    override suspend fun checkUserExistence(
         //remoteErrorEmitter: RemoteErrorEmitter,
         id: String
     ): UserExistenceCheckResult? =
-        networkApi.getUserInfo(id = id)
+        networkApi.checkUserExistence(id = id)
 
     override suspend fun checkNickname(
         nickname: String
