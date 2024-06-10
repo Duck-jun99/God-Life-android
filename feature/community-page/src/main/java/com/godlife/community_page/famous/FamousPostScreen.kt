@@ -44,16 +44,23 @@ fun FamousPostScreen(modifier: Modifier = Modifier){
                 .fillMaxSize()
                 .background(GrayWhite3)
         ) {
+
             Box(
                 modifier
                     .padding(start = 20.dp, end = 20.dp)
                     .height(25.dp)){
+
+
                 Row(modifier.fillMaxWidth()){
                     Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
                     Spacer(modifier.size(5.dp))
                     Text(text = "실시간 인기 갓생 인증글을 확인해보세요!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
                 }
+
+
             }
+
+
 
             Spacer(modifier = modifier.size(20.dp))
 

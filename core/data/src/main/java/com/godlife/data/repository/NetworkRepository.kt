@@ -40,14 +40,14 @@ interface NetworkRepository {
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
-    ): PostQuery
+    ): ApiResponse<PostQuery>
 
     suspend fun getLatestPost(
         authorization: String,
         page: Int,
         keyword: String,
         tag: String,
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
 
     suspend fun getSearchedPost(
         authorization: String,
@@ -55,33 +55,33 @@ interface NetworkRepository {
         keyword: String,
         tag: String,
         nickname: String
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
 
     suspend fun getPostDetail(
         authorization: String,
         postId: String
-    ): PostDetailQuery
+    ): ApiResponse<PostDetailQuery>
 
     suspend fun getComments(
         authorization: String,
         postId: String
-    ): GetCommentsQuery
+    ): ApiResponse<GetCommentsQuery>
 
     suspend fun createComment(
         authorization: String,
         postId: String,
         comment: String
-    ): CommentQuery
+    ): ApiResponse<CommentQuery>
 
     suspend fun deleteComment(
         authorization: String,
         commentId: String
-    ): CommentQuery
+    ): ApiResponse<CommentQuery>
 
     suspend fun agreeGodLife(
         authorization: String,
         postId: Int
-    ): GodScoreQuery
+    ): ApiResponse<GodScoreQuery>
 
 
 

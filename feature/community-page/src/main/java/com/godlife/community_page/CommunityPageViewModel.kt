@@ -24,11 +24,26 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class CommunityPageUiState {
+    object Loading : CommunityPageUiState()
+    data class Success(val data: String) : CommunityPageUiState()
+    data class Error(val message: String) : CommunityPageUiState()
+}
+
 @HiltViewModel
 class CommunityPageViewModel @Inject constructor(
     private val latestPostUseCase: GetLatestPostUseCase,
     private val searchPostUseCase: SearchPostUseCase
 ): ViewModel(){
+
+
+    /**
+     * State 관련
+     */
+
+    // 전체 UI 상태
+    private val _uiState = MutableStateFlow<CommunityPageUiState>(CommunityPageUiState.Loading)
+    val uiState: StateFlow<CommunityPageUiState> = _uiState
 
     //현재 선택되어 있는 라우트 이름
     var selectedRoute = mutableStateOf("")
@@ -46,40 +61,6 @@ class CommunityPageViewModel @Inject constructor(
         _searchText.value = text
     }
 
-
-    /*
-
-    //검색 결과 담을 변수
-    private val _searchedPostList = MutableStateFlow(PagingData.empty<PostDetailBody>())
-    val searchedPostList: StateFlow<PagingData<PostDetailBody>> = _searchedPostList
-
-
-
-    //검색 수행
-    fun onSearch(
-        keyword: String,
-        tags: String = "",
-        nickname: String = ""
-    ) {
-
-        _searchedPostList.value = searchPostUseCase.executeSearchPost(keyword, tags, nickname)
-            .cachedIn(viewModelScope)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), PagingData.empty())
-            .value
-
-    }
-
-     */
-
-    /*
-    fun getSearchedPost(
-        keyword: String,
-        tags: String = "",
-        nickname: String = ""
-    ): Flow<PagingData<PostDetailBody>>
-            = searchPostUseCase.executeSearchPost(keyword, tags, nickname).cachedIn(viewModelScope)
-
-     */
 
     private val _searchedPosts = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
     val searchedPosts: StateFlow<PagingData<PostDetailBody>> = _searchedPosts
@@ -142,29 +123,42 @@ class CommunityPageViewModel @Inject constructor(
     }
 
 
+    /*
+
+    // 곧 지워야 함. 밑에 getLatestPost()로 변경
     //최신 게시물 불러오기
     init {
 
         if(latestFlag.value == 0){
+
             latestPostList = latestPostUseCase.executeGetLatestPost().cachedIn(viewModelScope)
             latestFlag.value += 1
         }
 
     }
 
-    /*
+     */
 
-    //검색 뷰가 보일지 여부에 대한 플래그 (true이면 보이게, false이면 안보이게)
-    var isSearchViewVisible = mutableStateOf(false)
 
-    fun changeSearchViewVisible(){
-        isSearchViewVisible.value = true
 
+
+    //최신 게시물 불러오기
+    fun getLatestPost(){
+
+        // 최신 게시물 API를 호출한 적이 없을 때에만 실행
+        if(latestFlag.value == 0){
+
+            // Loading으로 초기화
+            _uiState.value = CommunityPageUiState.Loading
+
+            latestPostList = latestPostUseCase.executeGetLatestPost().cachedIn(viewModelScope)
+
+            _uiState.value = CommunityPageUiState.Success("최신 게시물 조회 완료")
+
+            latestFlag.value += 1
+
+        }
     }
 
-    fun changeSearchViewInvisible(){
-        isSearchViewVisible.value = false
-    }
 
- */
 }

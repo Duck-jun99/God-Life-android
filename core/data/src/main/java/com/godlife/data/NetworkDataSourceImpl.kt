@@ -16,7 +16,7 @@ import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
-import com.godlife.network.retrofit.RetrofitNetworkApi
+import com.godlife.network.api.RetrofitNetworkApi
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -68,7 +68,7 @@ class NetworkDataSourceImpl @Inject constructor(
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
-    ): PostQuery {
+    ): ApiResponse<PostQuery> {
 
         val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
         val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -95,7 +95,7 @@ class NetworkDataSourceImpl @Inject constructor(
         page: Int,
         keyword: String,
         tag: String
-    ): LatestPostQuery {
+    ): ApiResponse<LatestPostQuery> {
 
         return networkApi.getLatestPost(authorization, page, keyword, tag)
     }
@@ -106,15 +106,15 @@ class NetworkDataSourceImpl @Inject constructor(
         keyword: String,
         tag: String,
         nickname: String
-    ): LatestPostQuery {
+    ): ApiResponse<LatestPostQuery> {
         return networkApi.searchPost(authorization, page, keyword, tag, nickname)
     }
 
-    override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
+    override suspend fun getPostDetail(authorization: String, postId: String): ApiResponse<PostDetailQuery> {
         return networkApi.getPostDetail(authorization, postId)
     }
 
-    override suspend fun getComments(authorization: String, postId: String): GetCommentsQuery {
+    override suspend fun getComments(authorization: String, postId: String): ApiResponse<GetCommentsQuery> {
         return networkApi.getComments(authorization, postId)
     }
 
@@ -122,15 +122,15 @@ class NetworkDataSourceImpl @Inject constructor(
         authorization: String,
         postId: String,
         comment: String
-    ): CommentQuery {
+    ): ApiResponse<CommentQuery> {
         return networkApi.createComment(authorization, postId, comment)
     }
 
-    override suspend fun deleteComment(authorization: String, commentId: String): CommentQuery {
+    override suspend fun deleteComment(authorization: String, commentId: String): ApiResponse<CommentQuery> {
         return networkApi.deleteComment(authorization, commentId)
     }
 
-    override suspend fun agreeGodLife(authorization: String, postId: Int): GodScoreQuery {
+    override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
         return networkApi.agreeGodLife(authorization, postId)
     }
 

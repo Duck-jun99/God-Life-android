@@ -4,6 +4,7 @@ package com.godlife.main_page
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -65,21 +66,23 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.NullColor
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
+import com.godlife.navigator.LoginNavigator
 import kotlinx.coroutines.delay
 
 
 @Composable
 fun MainPageScreen(
+    modifier:Modifier = Modifier.statusBarsPadding(),
     mainActivity: Activity,
     createNavigator: CreatetodolistNavigator,
     createPostNavigator: CreatePostNavigator,
-    viewModel: MainPageViewModel = hiltViewModel(),
-    modifier:Modifier = Modifier.statusBarsPadding()
+    loginNavigator: LoginNavigator,
+    viewModel: MainPageViewModel = hiltViewModel()
+
 ) {
 
 
@@ -87,7 +90,7 @@ fun MainPageScreen(
     SnackbarHost(hostState = snackBarHostState)
     LaunchedEffect(key1 = true) {
         
-        Log.e("MainPageScreen", viewModel.todoList.value.toString())
+        Log.e("MainPageScreen", viewModel.todayTodoList.value.toString())
         
     }
 
@@ -95,107 +98,134 @@ fun MainPageScreen(
     var showNotificationBox by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+
         delay(2000) // 2초 대기
         showNotificationBox = true
     }
 
+
+    //Ui State 관찰
+    val uiState by viewModel.uiState.collectAsState()
+
     val context = LocalContext.current
 
-    val todayBoolean by viewModel.todayBoolean.collectAsState()
+    val todayTodoListExists by viewModel.todayTodoListExists.collectAsState()
 
     val userInfo by viewModel.userInfo.collectAsState()
 
 
+    when(uiState){
+        is MainPageUiState.Loading -> {
 
-    GodLifeTheme {
+        }
+        is MainPageUiState.Success -> {
+
+            GodLifeTheme {
 
 
-        Column(
-            modifier
-                .fillMaxSize()
-                .background(GrayWhite3)
-        ){
-            Box(
-                modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .padding(10.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Row(
+                Column(
                     modifier
-                        .height(70.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
+                        .background(GrayWhite3)
                 ){
-                    Box(modifier.weight(0.9f)){
-                        Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium,)
-                    }
-
-                    Box(modifier.weight(0.1f)){
-
-                        Icon(imageVector = Icons.Filled.Notifications,
-                            contentDescription = "Notification",
-                            tint = GrayWhite,
-                            modifier = modifier.align(Alignment.TopEnd))
-                    }
-
-                }
-            }
-
-            LazyColumn(
-                modifier
-                    .fillMaxSize()
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
-
-                if (showNotificationBox){
-                    item { AnimatedVisibility(visible = true, enter = fadeIn(initialAlpha = 0.5f) ) {
-                        NotificationBox()
-                    } }
-                }
-
-                item { Spacer(modifier = modifier.size(10.dp)) }
-
-
-                //TEST CREATE POST
-                item { TestCreatePost(createPostNavigator, mainActivity) }
-
-
-                //item {Text(text = viewModel.todayTimeText("Guest"), style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
-                item { TextToday(viewModel) }
-
-                item { Spacer(modifier = modifier.size(10.dp)) }
-
-                if (todayBoolean) {
-                    item{ MainTodoListBox(viewModel)}
-                } else {
-                    item{ MainNoTodoListBox(context, mainActivity, createNavigator) }
-                }
-
-                item { Spacer(modifier = modifier.size(30.dp)) }
-
-                if (todayBoolean) {
-
-                    //item {Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
-
-                    item { Row(
+                    Box(
                         modifier
                             .fillMaxWidth()
-                            .height(25.dp)){
-                        Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
-                        Spacer(modifier.size(5.dp))
-                        Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                            .height(70.dp)
+                            .padding(10.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(
+                            modifier
+                                .height(70.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Box(modifier.weight(0.9f)){
+                                Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium,)
+                            }
+
+                            Box(modifier.weight(0.1f)){
+
+                                Icon(imageVector = Icons.Filled.Notifications,
+                                    contentDescription = "Notification",
+                                    tint = GrayWhite,
+                                    modifier = modifier.align(Alignment.TopEnd))
+                            }
+
+                        }
                     }
 
-                    item { Spacer(modifier = modifier.size(10.dp)) }
+                    LazyColumn(
+                        modifier
+                            .fillMaxSize()
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
 
-                    item{ TodoListBox(viewModel)}
+                        if (showNotificationBox){
+                            item { AnimatedVisibility(visible = true, enter = fadeIn(initialAlpha = 0.5f) ) {
+                                NotificationBox()
+                            } }
+                        }
+
+                        item { Spacer(modifier = modifier.size(10.dp)) }
+
+
+                        //TEST CREATE POST
+                        item { TestCreatePost(createPostNavigator, mainActivity) }
+
+
+                        item { TextToday(viewModel) }
+
+                        item { Spacer(modifier = modifier.size(10.dp)) }
+
+                        when(todayTodoListExists){
+                            //오늘 설정한 투두리스트가 있을 경우
+                            true -> {
+
+                                item{ MainTodoListBox(viewModel)}
+
+                                item { Row(
+                                    modifier
+                                        .fillMaxWidth()
+                                        .height(25.dp)){
+                                    Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
+                                    Spacer(modifier.size(5.dp))
+                                    Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                                }
+
+                                item { Spacer(modifier = modifier.size(10.dp)) }
+
+                                item{ TodoListBox(viewModel)}
+
+                            }
+
+                            //오늘 설정한 투두리스트가 없을 경우
+                            false -> {
+
+                                item{ MainNoTodoListBox(context, mainActivity, createNavigator) }
+
+                            }
+                        }
+
+                        // item { Spacer(modifier = modifier.size(30.dp)) }
+
+
+                    }
+
                 }
-
             }
 
         }
+        is MainPageUiState.Error -> {
+
+            Toast.makeText(context, (uiState as MainPageUiState.Error).message, Toast.LENGTH_SHORT).show()
+
+            //moveLoginActivity(loginNavigator, mainActivity)
+
+        }
     }
+
+
 
 }
 
@@ -370,7 +400,7 @@ fun MainNoTodoListBox(context: Context,
                 contentAlignment = Alignment.Center){
 
                 GodLifeButtonWhite(
-                    onClick = { moveCreateActivity(createNavigator, mainActivity) },
+                    onClick = { moveCreateTodoListActivity(createNavigator, mainActivity) },
                     text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
 
@@ -386,7 +416,7 @@ fun TodoListBox(
     viewModel:MainPageViewModel,
     modifier: Modifier = Modifier){
 
-    val todayTodoList by viewModel.todoList.collectAsState()
+    val todayTodoList by viewModel.todayTodoList.collectAsState()
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -396,7 +426,7 @@ fun TodoListBox(
         )){
 
         /*
-        itemsIndexed(todayTodoList.todoList){index, item ->
+        itemsIndexed(todayTodoList.todayTodoList){index, item ->
             if(item.iscompleted) CompletedTodayList(item, viewModel) else NoCompletedTodayList(item, viewModel)
         }
 
@@ -439,7 +469,7 @@ fun NoCompletedTodayList(
 
             GodLifeButton(
                 onClick = {
-                    viewModel.completeTodo(todo)
+                    viewModel.setTodoValueCompleted(todo)
                 },
                 modifier = Modifier.align(Alignment.End)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))
@@ -486,7 +516,7 @@ fun CompletedTodayList(
 //MainTodoListBox위에 보여질 Text
 @Composable
 fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
-    val item = viewModel.todayTimeText("GUEST")
+    val item = viewModel.setTodayTimeText("GUEST")
     //item[0] -> Text, item[1] -> Icon resource
 
 
@@ -690,7 +720,7 @@ fun TextTodayPreview(modifier: Modifier = Modifier){
     }
 }
 
-private fun moveCreateActivity(createNavigator: CreatetodolistNavigator, mainActivity: Activity){
+private fun moveCreateTodoListActivity(createNavigator: CreatetodolistNavigator, mainActivity: Activity){
     createNavigator.navigateFrom(
         activity = mainActivity,
         withFinish = false
@@ -704,4 +734,11 @@ private fun moveCreatePostActivity(createPostNavigator: CreatePostNavigator, mai
         withFinish = false
     )
 
+}
+
+private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Activity){
+    loginNavigator.navigateFrom(
+        activity = mainActivity,
+        withFinish = true
+    )
 }

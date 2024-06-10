@@ -28,7 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CreateActivity :ComponentActivity() {
+class CreateTodoListActivity :ComponentActivity() {
 
     @Inject
     lateinit var mainNavigator: MainNavigator
@@ -46,7 +46,7 @@ class CreateActivity :ComponentActivity() {
 @Composable
 fun CreateTodoList(
     mainNavigator: MainNavigator,
-    createActivity: CreateActivity,
+    createTodoListActivity: CreateTodoListActivity,
     createViewModel: CreateTodoListViewModel = hiltViewModel()
 
 ) {
@@ -82,7 +82,7 @@ fun CreateTodoList(
             composable(CreateTodoListScreen3Route.route){
                 CreateTodoListScreen3(
                     navController,
-                    createActivity,
+                    createTodoListActivity,
                     mainNavigator,
                     createViewModel = createViewModel
                 )
@@ -138,7 +138,7 @@ fun CreateTodoList(
                     }
                     //세번째 화면
                     else{
-                        MoveMainActivity(mainNavigator = mainNavigator, createActivity = createActivity)
+                        MoveMainActivity(mainNavigator = mainNavigator, createTodoListActivity = createTodoListActivity)
                     }
                 },
                 modifier = Modifier

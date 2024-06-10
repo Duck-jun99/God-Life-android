@@ -110,7 +110,11 @@ fun MainUiTheme(
 
                     //bottomBar
                     composable(mainTab.route) {
-                        MainPageScreen(mainActivity, createNavigator, createPostNavigator)
+                        MainPageScreen(
+                            mainActivity = mainActivity,
+                            createNavigator = createNavigator,
+                            createPostNavigator = createPostNavigator,
+                            loginNavigator = loginNavigator)
                     }
 
                     composable(communityTab.route) {

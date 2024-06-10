@@ -1,4 +1,4 @@
-package com.godlife.network.retrofit
+package com.godlife.network.api
 
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
@@ -76,7 +76,7 @@ interface RetrofitNetworkApi {
         @Part("content") content: RequestBody,
         @Part("tags") tags: List<RequestBody>,
         @Part images: List<MultipartBody.Part>?,
-    ): PostQuery
+    ): ApiResponse<PostQuery>
 
 
     // 최신 게시물 조회
@@ -86,7 +86,7 @@ interface RetrofitNetworkApi {
         @Query("page") page: Int,
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
 
     //게시물 검색
     @GET("/boards")
@@ -96,7 +96,7 @@ interface RetrofitNetworkApi {
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
         @Query("Nickname") nickname: String
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
 
 
     //게시물 상세 조회
@@ -104,14 +104,14 @@ interface RetrofitNetworkApi {
     suspend fun getPostDetail(
         @Header("Authorization") authorization: String,
         @Path("id") id: String,
-    ): PostDetailQuery
+    ): ApiResponse<PostDetailQuery>
 
     //댓글 조회
     @GET("/comment/{boardId}")
     suspend fun getComments(
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: String,
-    ): GetCommentsQuery
+    ): ApiResponse<GetCommentsQuery>
 
     //댓글 생성
     @POST("/comment/{boardId}")
@@ -119,21 +119,21 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: String,
         @Body comment: String,
-    ): CommentQuery
+    ): ApiResponse<CommentQuery>
 
     //댓글 삭제
     @DELETE("/comment/{commentId}")
     suspend fun deleteComment(
         @Header("Authorization") authorization: String,
         @Path("commentId") commentId: String,
-    ): CommentQuery
+    ): ApiResponse<CommentQuery>
 
     //갓생 인정
     @POST("/like/board/{boardId}")
     suspend fun agreeGodLife(
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: Int,
-    ): GodScoreQuery
+    ): ApiResponse<GodScoreQuery>
 
 
 

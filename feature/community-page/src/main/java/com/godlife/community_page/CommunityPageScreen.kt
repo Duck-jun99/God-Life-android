@@ -59,6 +59,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
 import com.godlife.community_page.latest.LatestPostScreen
+import com.godlife.community_page.latest.LoadingLatestPostList
 import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.community_page.navigation.LatestPostRoute
 import com.godlife.community_page.navigation.PostDetailRoute
@@ -90,6 +91,7 @@ fun CommunityPageScreen(
 
     }
 
+    val uiState by viewModel.uiState.collectAsState()
 
     val navController = rememberNavController()
 
@@ -103,21 +105,22 @@ fun CommunityPageScreen(
 
     val searchText by viewModel.searchText.collectAsState()
 
-    GodLifeTheme(modifier
-        .fillMaxSize()
-        .background(
-            brush = Brush.linearGradient(
-                listOf(
-                    Color(0xCC496B9F),
-                    Color(0xCB494A9F),
-                    Color(0xCC6A499F),
-                    Color(0xCC6A499F),
-                    Color(0xCC96499F),
-                    Color(0xCCDB67AD),
-                    Color(0xCCFF5E5E),
+    GodLifeTheme(
+        modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.linearGradient(
+                    listOf(
+                        Color(0xCC496B9F),
+                        Color(0xCB494A9F),
+                        Color(0xCC6A499F),
+                        Color(0xCC6A499F),
+                        Color(0xCC96499F),
+                        Color(0xCCDB67AD),
+                        Color(0xCCFF5E5E),
+                    )
                 )
             )
-        )
     ) {
 
         Column(
@@ -254,7 +257,7 @@ fun CommunityPageScreen(
                 Box(modifier = modifier
                     .fillMaxWidth()
                     .heightIn(max = expandedBottomSheetHeight)){
-                    CommunityPageView(navController = navController, viewModel = viewModel)
+                    CommunityPageView(uiState = uiState, navController = navController, viewModel = viewModel)
                 }
 
             }
@@ -291,7 +294,7 @@ fun CategoryBox(route: String, categoryName: String, modifier: Modifier = Modifi
 }
 
 @Composable
-fun CommunityPageView(modifier: Modifier = Modifier, navController: NavHostController, viewModel: CommunityPageViewModel){
+fun CommunityPageView(modifier: Modifier = Modifier, uiState: CommunityPageUiState, navController: NavHostController, viewModel: CommunityPageViewModel){
 
     NavHost(navController = navController, startDestination = FamousPostRoute.route) {
 
@@ -302,7 +305,23 @@ fun CommunityPageView(modifier: Modifier = Modifier, navController: NavHostContr
 
         composable(LatestPostRoute.route) {
             viewModel.changeCurrentRoute(route = LatestPostRoute.route)
-            LatestPostScreen(navController = navController, viewModel = viewModel)
+            viewModel.getLatestPost()
+
+            when(uiState){
+
+                is CommunityPageUiState.Loading -> {
+                    LoadingLatestPostList()
+                }
+
+                is CommunityPageUiState.Success -> {
+                    LatestPostScreen(navController = navController, viewModel = viewModel)
+                }
+
+                is CommunityPageUiState.Error -> {
+
+                }
+            }
+
         }
 
         composable(StimulusPostRoute.route) {
@@ -343,21 +362,22 @@ fun ScreenEx2(modifier: Modifier = Modifier){
 
     val searchText by remember { mutableStateOf("") }
 
-    Scaffold(modifier
-        .fillMaxSize()
-        .background(
-            brush = Brush.linearGradient(
-                listOf(
-                    Color(0xCC496B9F),
-                    Color(0xCB494A9F),
-                    Color(0xCC6A499F),
-                    Color(0xCC6A499F),
-                    Color(0xCC96499F),
-                    Color(0xCCDB67AD),
-                    Color(0xCCFF5E5E),
+    Scaffold(
+        modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.linearGradient(
+                    listOf(
+                        Color(0xCC496B9F),
+                        Color(0xCB494A9F),
+                        Color(0xCC6A499F),
+                        Color(0xCC6A499F),
+                        Color(0xCC96499F),
+                        Color(0xCCDB67AD),
+                        Color(0xCCFF5E5E),
+                    )
                 )
             )
-        )
     ) {
 
         Column(

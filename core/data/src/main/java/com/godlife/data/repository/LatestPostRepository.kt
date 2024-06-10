@@ -3,8 +3,7 @@ package com.godlife.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.godlife.data.LatestPostPagingSource
-import com.godlife.data.LocalPreferenceUserDataSourceImpl
-import com.godlife.network.retrofit.RetrofitNetworkApi
+import com.godlife.network.api.RetrofitNetworkApi
 import javax.inject.Inject
 
 /**

@@ -61,7 +61,7 @@ class NetworkRepositoryImpl @Inject constructor(
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
-    ): PostQuery {
+    ): ApiResponse<PostQuery> {
         return networkDataSource.createPost(authorization, title, content, tags, imagePath)
     }
 
@@ -70,7 +70,7 @@ class NetworkRepositoryImpl @Inject constructor(
         page: Int,
         keyword: String,
         tag: String
-    ): LatestPostQuery {
+    ): ApiResponse<LatestPostQuery> {
         return networkDataSource.getLatestPost(authorization, page, keyword, tag)
     }
 
@@ -80,15 +80,15 @@ class NetworkRepositoryImpl @Inject constructor(
         keyword: String,
         tag: String,
         nickname: String
-    ): LatestPostQuery {
+    ): ApiResponse<LatestPostQuery> {
         return networkDataSource.getSearchedPost(authorization, page, keyword, tag, nickname)
     }
 
-    override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
+    override suspend fun getPostDetail(authorization: String, postId: String): ApiResponse<PostDetailQuery> {
         return networkDataSource.getPostDetail(authorization, postId)
     }
 
-    override suspend fun getComments(authorization: String, postId: String): GetCommentsQuery {
+    override suspend fun getComments(authorization: String, postId: String): ApiResponse<GetCommentsQuery> {
         return networkDataSource.getComments(authorization, postId)
     }
 
@@ -96,15 +96,15 @@ class NetworkRepositoryImpl @Inject constructor(
         authorization: String,
         postId: String,
         comment: String
-    ): CommentQuery {
+    ): ApiResponse<CommentQuery> {
         return networkDataSource.createComment(authorization, postId, comment)
     }
 
-    override suspend fun deleteComment(authorization: String, commentId: String): CommentQuery {
+    override suspend fun deleteComment(authorization: String, commentId: String): ApiResponse<CommentQuery> {
         return networkDataSource.deleteComment(authorization, commentId)
     }
 
-    override suspend fun agreeGodLife(authorization: String, postId: Int): GodScoreQuery {
+    override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
         return networkDataSource.agreeGodLife(authorization, postId)
     }
 

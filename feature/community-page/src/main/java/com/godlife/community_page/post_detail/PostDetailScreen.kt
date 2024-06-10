@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -92,92 +93,111 @@ fun PostDetailScreen(
 
     val cScope = rememberCoroutineScope()
 
-
-    postDetailViewModel.initPostDetail(postId)
+    //Ui State 관찰
+    val uiState by postDetailViewModel.uiState.collectAsState()
 
     val postDetail by postDetailViewModel.postDetail.collectAsState()
     val comments by postDetailViewModel.comments.collectAsState()
 
     val writeComment by postDetailViewModel.writeComment.collectAsState()
 
-    GodLifeTheme {
+    when(uiState){
+        is PostDetailUiState.Loading -> {
 
-        Scaffold(
-            snackbarHost = {
-                SnackbarHost(hostState = snackBarHostState)
-            },
-        ) {
+            LoadingPostDetailScreen()
 
+            postDetailViewModel.initPostDetailInfo(postId = postId)
 
+        }
 
-            Column {
+        is PostDetailUiState.Success -> {
 
-                Box(
-                    modifier = modifier.weight(0.8f)
+            GodLifeTheme {
+
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackBarHostState)
+                    },
                 ) {
-                    LazyColumn(
-                        modifier
-                            .background(Color.White)
-                            .fillMaxSize()) {
 
-                        if (postDetail.body?.imagesURL?.isNotEmpty() == true){
-                            item{ ImageBox(imgUriList = postDetail.body?.imagesURL!!) }
-                        }
 
-                        postDetail.body?.let {
-                            Log.e("postDetail", it.toString())
-                            item{ Content(postDetailBody = it) }
-                        }
 
-                        postDetail.body?.let {
+                    Column {
 
-                            //갓생 인정을 안한 게시물이라면
-                            if(!it.memberLikedBoard){
+                        Box(
+                            modifier = modifier.weight(0.8f)
+                        ) {
+                            LazyColumn(
+                                modifier
+                                    .background(Color.White)
+                                    .fillMaxSize()) {
 
-                                item {
-
-                                    GodLifeButtonWhite(
-                                        onClick = { postDetailViewModel.agreeGodLife(postId) },
-                                        text = { Text(text = "갓생, 인정하시나요?") }
-                                    )
-                                }
-                            }
-                            //이미 갓생 인정을 한 게시물이라면
-                            else{
-
-                                item {
-
-                                    GodLifeButton(
-                                        onClick = { null },
-                                        text = { Text(text = "이미 갓생 인정하신 글이에요.") }
-                                    )
+                                if (postDetail.body?.imagesURL?.isNotEmpty() == true){
+                                    item{ ImageBox(imgUriList = postDetail.body?.imagesURL!!) }
                                 }
 
-                            }
+                                postDetail.body?.let {
+                                    Log.e("postDetail", it.toString())
+                                    item{ Content(postDetailBody = it) }
+                                }
 
+                                postDetail.body?.let {
+
+                                    //갓생 인정을 안한 게시물이라면
+                                    if(!it.memberLikedBoard){
+
+                                        item {
+
+                                            GodLifeButtonWhite(
+                                                onClick = { postDetailViewModel.agreeGodLife() },
+                                                text = { Text(text = "갓생, 인정하시나요?") }
+                                            )
+                                        }
+                                    }
+                                    //이미 갓생 인정을 한 게시물이라면
+                                    else{
+
+                                        item {
+
+                                            GodLifeButton(
+                                                onClick = { null },
+                                                text = { Text(text = "이미 갓생 인정하신 글이에요.") }
+                                            )
+                                        }
+
+                                    }
+
+
+                                }
+
+                                item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
+
+
+                            }
 
                         }
 
-                        item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
+                        GodLifeCreateCommentBar(
+                            comment = writeComment,
+                            onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
+                            onPostClicked = { postDetailViewModel.createComment() }
+                        )
 
 
                     }
 
                 }
 
-                GodLifeCreateCommentBar(
-                    comment = writeComment,
-                    onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
-                    onPostClicked = { postDetailViewModel.createComment(postId) }
-                )
-
 
             }
 
         }
+        is PostDetailUiState.Error -> {
 
-
+        }
     }
+
+
 }
 
 @Composable
@@ -525,6 +545,15 @@ fun DropDownDeleteItem(modifier: Modifier = Modifier, snackbarHostState: Snackba
     )
 }
 
+@Preview(showBackground = true)
+@Composable
+fun LoadingPostDetailScreen(modifier: Modifier = Modifier){
+    GodLifeTheme {
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            CircularProgressIndicator()
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
