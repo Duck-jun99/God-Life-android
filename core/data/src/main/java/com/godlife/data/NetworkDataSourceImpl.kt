@@ -2,32 +2,36 @@ package com.godlife.data
 
 import android.net.Uri
 import android.util.Log
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.godlife.network.NetworkDataSource
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
-import com.godlife.network.retrofit.RetrofitNetworkApi
+import com.godlife.network.model.UserInfoQuery
+import com.godlife.network.api.RetrofitNetworkApi
+import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.util.concurrent.Flow
 import javax.inject.Inject
 
 class NetworkDataSourceImpl @Inject constructor(
     private val networkApi: RetrofitNetworkApi
 ) : NetworkDataSource {
 
-    override suspend fun getUserInfo( id : String): UserExistenceCheckResult? {
-        return networkApi.getUserInfo(id = id)
+    override suspend fun checkUserExistence(id : String): UserExistenceCheckResult? {
+        return networkApi.checkUserExistence(id = id)
 
     }
 
@@ -50,13 +54,26 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.signUp(SignUpRequest( nickname, email, age, sex, providerId, providerName))
     }
 
+    override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
+        return networkApi.getUserInfo(authorization)
+    }
+
+    override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
+        return networkApi.reissue(authorization)
+    }
+
     override suspend fun createPost(
         authorization: String,
         title: String,
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
-    ): PostQuery {
+    ): ApiResponse<PostQuery> {
+
+        val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val tags = tags.map { it -> it.toRequestBody("text/plain".toMediaTypeOrNull()) }
 
         val imageParts = imagePath?.map { it ->
 
@@ -78,9 +95,13 @@ class NetworkDataSourceImpl @Inject constructor(
         page: Int,
         keyword: String,
         tag: String
-    ): LatestPostQuery {
+    ): ApiResponse<LatestPostQuery> {
 
         return networkApi.getLatestPost(authorization, page, keyword, tag)
+    }
+
+    override suspend fun getWeeklyFamousPost(authorization: String): ApiResponse<LatestPostQuery> {
+        return networkApi.getWeeklyFamousPost(authorization)
     }
 
     override suspend fun getSearchedPost(
@@ -89,12 +110,32 @@ class NetworkDataSourceImpl @Inject constructor(
         keyword: String,
         tag: String,
         nickname: String
-    ): LatestPostQuery {
+    ): ApiResponse<LatestPostQuery> {
         return networkApi.searchPost(authorization, page, keyword, tag, nickname)
     }
 
-    override suspend fun getPostDetail(authorization: String, postId: String): PostDetailQuery {
+    override suspend fun getPostDetail(authorization: String, postId: String): ApiResponse<PostDetailQuery> {
         return networkApi.getPostDetail(authorization, postId)
+    }
+
+    override suspend fun getComments(authorization: String, postId: String): ApiResponse<GetCommentsQuery> {
+        return networkApi.getComments(authorization, postId)
+    }
+
+    override suspend fun createComment(
+        authorization: String,
+        postId: String,
+        comment: String
+    ): ApiResponse<CommentQuery> {
+        return networkApi.createComment(authorization, postId, comment)
+    }
+
+    override suspend fun deleteComment(authorization: String, commentId: String): ApiResponse<CommentQuery> {
+        return networkApi.deleteComment(authorization, commentId)
+    }
+
+    override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
+        return networkApi.agreeGodLife(authorization, postId)
     }
 
 

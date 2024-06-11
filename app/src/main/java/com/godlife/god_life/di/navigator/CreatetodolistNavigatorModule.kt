@@ -3,7 +3,7 @@ package com.godlife.god_life.di.navigator
 import android.app.Activity
 import android.content.Intent
 import com.godlife.common.extension.startActivityWithAnimation
-import com.godlife.createtodolist.CreateActivity
+import com.godlife.createtodolist.CreateTodoListActivity
 import com.godlife.navigator.CreatetodolistNavigator
 import dagger.Binds
 import dagger.Module
@@ -18,7 +18,7 @@ internal class CreatetodolistNavigatorImpl @Inject constructor() : Createtodolis
         intentBuilder: Intent.() -> Intent,
         withFinish: Boolean,
     ) {
-        activity.startActivityWithAnimation<CreateActivity>(
+        activity.startActivityWithAnimation<CreateTodoListActivity>(
             intentBuilder = intentBuilder,
             withFinish = withFinish,
         )

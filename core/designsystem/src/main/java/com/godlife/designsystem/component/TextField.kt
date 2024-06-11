@@ -17,7 +17,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -156,6 +158,63 @@ fun GodLifeSearchBar(
         )
 
         Spacer(modifier = Modifier.size(15.dp))
+
+    }
+
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun GodLifeCreateCommentBar(
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(40.dp),
+    comment: String = "",
+    hint: String = "댓글을 입력해주세요.",
+    onTextChanged: (String) -> Unit = {},
+    containerColor: Color = OpaqueDark,
+    onPostClicked: () -> Unit =  {}
+) {
+
+    Row(
+        modifier = modifier
+            .background(color = containerColor)
+            .padding(5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Spacer(modifier = Modifier.size(15.dp))
+
+
+        BasicTextField(
+            modifier = modifier.weight(0.8f),
+            value = comment,
+            onValueChange = onTextChanged,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Send),
+            singleLine = true,
+            decorationBox = {
+
+                Text(text = if (comment.isEmpty()) hint else comment,
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 15.sp
+                    )
+
+                )
+
+            }
+        )
+
+        Icon(
+            modifier = Modifier
+                .size(30.dp)
+                .clickable { onPostClicked() },
+            imageVector = Icons.AutoMirrored.Filled.Send,
+            contentDescription = null,
+            tint = Color.White
+        )
+
 
     }
 

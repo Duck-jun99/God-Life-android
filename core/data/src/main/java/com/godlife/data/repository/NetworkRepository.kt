@@ -1,17 +1,22 @@
 package com.godlife.data.repository
 
-import android.graphics.Bitmap
 import android.net.Uri
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.UserInfoQuery
+import com.skydoves.sandwich.ApiResponse
 
 interface NetworkRepository {
-    suspend fun getUserInfo(id : String) : UserExistenceCheckResult?
+    suspend fun checkUserExistence(id : String) : UserExistenceCheckResult?
 
     //SignUp Check
     suspend fun checkNickname(nickname : String) : SignUpCheckNicknameQuery?
@@ -25,20 +30,28 @@ interface NetworkRepository {
                        providerName: String
                        ): SignUpQuery
 
+    suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery>
+
+    suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
+
     suspend fun createPost(
         authorization: String,
         title: String,
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
-    ): PostQuery
+    ): ApiResponse<PostQuery>
 
     suspend fun getLatestPost(
         authorization: String,
         page: Int,
         keyword: String,
         tag: String,
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
+
+    suspend fun getWeeklyFamousPost(
+        authorization: String
+    ): ApiResponse<LatestPostQuery>
 
     suspend fun getSearchedPost(
         authorization: String,
@@ -46,12 +59,34 @@ interface NetworkRepository {
         keyword: String,
         tag: String,
         nickname: String
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
 
     suspend fun getPostDetail(
         authorization: String,
         postId: String
-    ): PostDetailQuery
+    ): ApiResponse<PostDetailQuery>
+
+    suspend fun getComments(
+        authorization: String,
+        postId: String
+    ): ApiResponse<GetCommentsQuery>
+
+    suspend fun createComment(
+        authorization: String,
+        postId: String,
+        comment: String
+    ): ApiResponse<CommentQuery>
+
+    suspend fun deleteComment(
+        authorization: String,
+        commentId: String
+    ): ApiResponse<CommentQuery>
+
+    suspend fun agreeGodLife(
+        authorization: String,
+        postId: Int
+    ): ApiResponse<GodScoreQuery>
+
 
 
 }

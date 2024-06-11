@@ -3,10 +3,17 @@ package com.godlife.god_life.di
 import com.godlife.data.repository.LatestPostRepository
 import com.godlife.data.repository.NetworkRepository
 import com.godlife.data.repository.SearchPostRepository
+import com.godlife.domain.CheckUserExistenceUseCase
+import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.CreatePostUseCase
+import com.godlife.domain.DeleteCommentUseCase
+import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.GetWeeklyFamousPostUseCase
+import com.godlife.domain.PlusGodScoreUseCase
+import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.domain.SignUpUseCase
 import dagger.Module
@@ -21,7 +28,15 @@ class UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetUserRepoUseCase(repository: NetworkRepository) = GetUserInfoUseCase(repository)
+    fun provideGetUserInfoUseCase(repository: NetworkRepository) = GetUserInfoUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideReissueUseCase(repository: NetworkRepository) = ReissueUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideCheckUserExistUseCase(repository: NetworkRepository) = CheckUserExistenceUseCase(repository)
 
     @Provides
     @Singleton
@@ -37,10 +52,29 @@ class UseCaseModule {
 
     @Provides
     @Singleton
+    fun provideGetWeeklyFamousPostUseCase(repository: NetworkRepository) = GetWeeklyFamousPostUseCase(repository)
+
+    @Provides
+    @Singleton
     fun provideSearchPostUseCase(repository: SearchPostRepository) = SearchPostUseCase(repository)
 
     @Provides
     @Singleton
     fun provideGetPostDetailUseCase(repository: NetworkRepository) = GetPostDetailUseCase(repository)
 
+    @Provides
+    @Singleton
+    fun provideGetCommentUseCase(repository: NetworkRepository) = GetCommentsUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideCreateCommentUseCase(repository: NetworkRepository) = CreateCommentUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideDeleteCommentUseCase(repository: NetworkRepository) = DeleteCommentUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun providePlusGodScoreUseCase(repository: NetworkRepository) = PlusGodScoreUseCase(repository)
 }

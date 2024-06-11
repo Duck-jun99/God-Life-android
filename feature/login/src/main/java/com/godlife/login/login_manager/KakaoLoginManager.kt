@@ -2,11 +2,7 @@ package com.godlife.login.login_manager
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.login.LoginActivity
 import com.godlife.login.LoginViewModel
 import com.godlife.login.SignUpScreenRoute
@@ -19,7 +15,6 @@ import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -56,9 +51,9 @@ class KakaoLoginManager @Inject constructor(
                 Log.e("KakaoLoginManager","${error.message} 카카오 계정으로 로그인 실패")
             } else if (token != null) {
                 updateSocialToken(token.accessToken)
-                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.accessToken}")
-                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.idToken}")
-                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, token:${token.refreshToken}")
+                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, accessToken:${token.accessToken}")
+                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, idToken:${token.idToken}")
+                Log.e("KakaoLoginManager","카카오 계정으로 로그인 성공, refreshToken:${token.refreshToken}")
 
                 //loginViewModel.saveAccessToken(token.accessToken)
 
@@ -74,11 +69,21 @@ class KakaoLoginManager @Inject constructor(
             if (error != null) {
                 // 카카오톡으로 로그인 실패
                 if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                    Log.e("KakaoLoginManager","${error.message} 카카오톡으로 로그인 실패")
                     return@loginWithKakaoTalk
                 }
                 onKakaoAccountLogin()
             } else if (token != null) {
                 updateSocialToken(token.accessToken)
+
+                Log.e("KakaoLoginManager","카카오톡으로 로그인 성공, accessToken:${token.accessToken}")
+                Log.e("KakaoLoginManager","카카오톡으로 로그인 성공, idToken:${token.idToken}")
+                Log.e("KakaoLoginManager","카카오톡으로 로그인 성공, refreshToken:${token.refreshToken}")
+
+                //loginViewModel.saveAccessToken(token.accessToken)
+
+                getUserInfo(context, loginViewModel, navController, mainNavigator, loginActivity)
+
             }
         }
     }
@@ -124,6 +129,7 @@ private fun getUserInfo(
 
                 launch {
                     userInfo = loginViewModel.checkUserExistence(user.id.toString())
+                    Log.e(TAG, userInfo.toString())
                     checkLoginOrSignUp = userInfo?.alreadySignUp
                     //checkLoginOrSignUp = loginViewModel.checkUserExistence(user.id.toString())
                 }.join()
@@ -140,7 +146,7 @@ private fun getUserInfo(
                                 it1
                             )
                         } }
-                        userInfo?.let { it.refershToken?.let { it1 ->
+                        userInfo?.let { it.refreshToken?.let { it1 ->
                             loginViewModel.saveRefreshToken(
                                 it1
                             )

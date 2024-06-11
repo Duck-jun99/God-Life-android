@@ -10,6 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+
+
 @HiltViewModel
 class LatestPostViewModel @Inject constructor(
     private val latestPostUseCase: GetLatestPostUseCase

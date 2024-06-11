@@ -1,7 +1,6 @@
 package com.godlife.network.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.Objects
 
 data class UserExistenceCheckResult(
     val status:String,
@@ -37,6 +36,6 @@ data class SignUpQuery(
 
 data class BodyQuery(
     val accessToken: String?,
-    val refershToken: String?,
+    val refreshToken: String?,
     val alreadySignUp: Boolean
 )

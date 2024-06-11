@@ -76,6 +76,8 @@ dependencies {
     implementation(libs.retrofit.kotlin.serialization)
     implementation(libs.converter.gson)
 
+    implementation(libs.sandwich)
+
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.core.ktx)

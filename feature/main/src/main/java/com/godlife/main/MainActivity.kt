@@ -27,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -84,6 +86,8 @@ fun MainUiTheme(
 ){
     GodLifeTheme {
 
+
+
         val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
         val communityTab = BottomNavItem(title = "God Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
         val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
@@ -94,6 +98,8 @@ fun MainUiTheme(
 
         val navController = rememberNavController()
 
+        val currentRoute = remember { mutableStateOf(MainPageRoute.route)}
+
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -101,34 +107,34 @@ fun MainUiTheme(
         ) {
 
             Scaffold(
-                bottomBar = { MyBottomNavigation(tabBarItems, navController) },
-
-            ) { innerPadding ->
+                bottomBar = {
+                    MyBottomNavigation(tabBarItems, navController)
+                            },
+                ) { innerPadding ->
                 NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
 
                     val bottomPaddingValue = innerPadding.calculateBottomPadding().value.dp
 
                     //bottomBar
                     composable(mainTab.route) {
-                        MainPageScreen(mainActivity, createNavigator, createPostNavigator)
+                        MainPageScreen(
+                            mainActivity = mainActivity,
+                            createNavigator = createNavigator,
+                            createPostNavigator = createPostNavigator,
+                            loginNavigator = loginNavigator)
+
+                        currentRoute.value = mainTab.route
                     }
 
                     composable(communityTab.route) {
                         CommunityPageScreen(paddingValue = bottomPaddingValue)
+                        currentRoute.value = communityTab.route
                     }
 
                     composable(settingTab.route) {
                         SettingPageScreen(mainActivity, loginNavigator)
+                        currentRoute.value = settingTab.route
                     }
-
-
-                    /*
-                    //Community 세부 기능
-                    composable(LatestPostScreenRoute.route) {
-                        LatestPostScreen()
-                    }
-
-                     */
 
 
                 }

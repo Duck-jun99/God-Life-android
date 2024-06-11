@@ -37,7 +37,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun CreateTodoListScreen3(
     navController: NavController,
-    createActivity: CreateActivity,
+    createTodoListActivity: CreateTodoListActivity,
     mainNavigator: MainNavigator,
     createViewModel: CreateTodoListViewModel
 ){
@@ -52,7 +52,7 @@ fun CreateTodoListScreen3(
     if (showDoneUI.value) {
         DoneLodingUI(
             navController = navController,
-            createActivity = createActivity,
+            createTodoListActivity = createTodoListActivity,
             mainNavigator = mainNavigator,
             createViewModel = createViewModel
         )
@@ -98,7 +98,7 @@ fun LoadingUI(
 @Composable
 fun DoneLodingUI(
     navController: NavController,
-    createActivity: CreateActivity,
+    createTodoListActivity: CreateTodoListActivity,
     mainNavigator: MainNavigator,
     createViewModel: CreateTodoListViewModel
 ){
@@ -129,7 +129,7 @@ fun DoneLodingUI(
                 .weight(0.2f)){
 
                 GodLifeButton(onClick = {
-                    moveMainActivity(mainNavigator, createActivity)
+                    moveMainActivity(mainNavigator, createTodoListActivity)
                 },
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -221,11 +221,11 @@ fun CreateTodoListScreen3Preview(){
     }
 }
 
-private fun moveMainActivity(mainNavigator: MainNavigator, createActivity: CreateActivity){
+private fun moveMainActivity(mainNavigator: MainNavigator, createTodoListActivity: CreateTodoListActivity){
     //val intent = Intent(context, MainActivity::class.java)
     //ContextCompat.startActivity(context, intent, null)
     mainNavigator.navigateFrom(
-        activity = createActivity,
+        activity = createTodoListActivity,
         withFinish = true
     )
 }

@@ -1,25 +1,23 @@
-package com.godlife.network.retrofit
+package com.godlife.network.api
 
-import androidx.tracing.trace
-import com.godlife.network.BuildConfig
-import com.godlife.network.NetworkDataSource
+import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
+import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
+import com.godlife.network.model.ReissueQuery
 import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.Call
-import okhttp3.MediaType.Companion.toMediaType
+import com.godlife.network.model.UserInfoQuery
+import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
-import retrofit2.Retrofit
+import okhttp3.RequestBody
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -27,14 +25,12 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
-import javax.inject.Inject
-import javax.inject.Singleton
 
 interface RetrofitNetworkApi {
 
     // 아이디 존재여부 확인
     @GET("check/id")
-    suspend fun getUserInfo(
+    suspend fun checkUserExistence(
         @Query("memberId") id: String?,
     ): UserExistenceCheckResult
 
@@ -57,17 +53,30 @@ interface RetrofitNetworkApi {
         @Body request: SignUpRequest
     ): SignUpQuery
 
+    // 로그인 시 유저 정보 받아옴
+    @GET("/member")
+    suspend fun getUserInfo(
+        @Header("Authorization") authorization: String,
+    ): ApiResponse<UserInfoQuery>
+
+    // 엑세스 토큰 갱신
+    @POST("/reissue")
+    suspend fun reissue(
+        @Header("Authorization") authorization: String,
+    ): ApiResponse<ReissueQuery>
+
 
     // 게시물 생성
+    @JvmSuppressWildcards
     @Multipart
     @POST("/board")
     suspend fun createPost(
         @Header("Authorization") authorization: String,
-        @Part("title") title: String,
-        @Part("content") content: String,
-        @Part("tags") tags: List<String>,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("tags") tags: List<RequestBody>,
         @Part images: List<MultipartBody.Part>?,
-    ): PostQuery
+    ): ApiResponse<PostQuery>
 
 
     // 최신 게시물 조회
@@ -77,7 +86,14 @@ interface RetrofitNetworkApi {
         @Query("page") page: Int,
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
+
+    //일주일 인기 게시물 조회
+    @GET("/popularBoards")
+    suspend fun getWeeklyFamousPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<LatestPostQuery>
+
 
     //게시물 검색
     @GET("/boards")
@@ -87,7 +103,7 @@ interface RetrofitNetworkApi {
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
         @Query("Nickname") nickname: String
-    ): LatestPostQuery
+    ): ApiResponse<LatestPostQuery>
 
 
     //게시물 상세 조회
@@ -95,7 +111,36 @@ interface RetrofitNetworkApi {
     suspend fun getPostDetail(
         @Header("Authorization") authorization: String,
         @Path("id") id: String,
-    ): PostDetailQuery
+    ): ApiResponse<PostDetailQuery>
+
+    //댓글 조회
+    @GET("/comment/{boardId}")
+    suspend fun getComments(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: String,
+    ): ApiResponse<GetCommentsQuery>
+
+    //댓글 생성
+    @POST("/comment/{boardId}")
+    suspend fun createComment(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: String,
+        @Body comment: String,
+    ): ApiResponse<CommentQuery>
+
+    //댓글 삭제
+    @DELETE("/comment/{commentId}")
+    suspend fun deleteComment(
+        @Header("Authorization") authorization: String,
+        @Path("commentId") commentId: String,
+    ): ApiResponse<CommentQuery>
+
+    //갓생 인정
+    @POST("/like/board/{boardId}")
+    suspend fun agreeGodLife(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: Int,
+    ): ApiResponse<GodScoreQuery>
 
 
 
@@ -120,11 +165,11 @@ internal class RetrofitNetwork @Inject constructor(
             .create(RetrofitNetworkApi::class.java)
     }
 
-    override suspend fun getUserInfo(
+    override suspend fun checkUserExistence(
         //remoteErrorEmitter: RemoteErrorEmitter,
         id: String
     ): UserExistenceCheckResult? =
-        networkApi.getUserInfo(id = id)
+        networkApi.checkUserExistence(id = id)
 
     override suspend fun checkNickname(
         nickname: String
