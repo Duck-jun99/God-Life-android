@@ -3,6 +3,8 @@ package com.godlife.main_page
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -11,6 +13,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -31,6 +35,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
@@ -38,6 +43,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,12 +51,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -60,6 +69,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -117,11 +129,13 @@ fun MainPageScreen(
     when(uiState){
         is MainPageUiState.Loading -> {
 
+            LoadingMainPageScreen()
+
         }
+
         is MainPageUiState.Success -> {
 
             GodLifeTheme {
-
 
                 Column(
                     modifier
@@ -141,8 +155,74 @@ fun MainPageScreen(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ){
-                            Box(modifier.weight(0.9f)){
+                            Box(modifier.weight(0.8f)){
                                 Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium,)
+                            }
+
+                            Box(modifier.weight(0.1f)){
+
+                                //프로필 사진
+                                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+                                val imageModifier: Modifier = modifier
+                                    .size(30.dp, 30.dp)
+                                    .clip(CircleShape)
+                                    .fillMaxSize()
+                                    .background(color = GrayWhite)
+
+                                if(userInfo.profileImage != ""){
+                                    Glide.with(LocalContext.current)
+                                        .asBitmap()
+                                        .load(BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage)
+                                        .error(R.drawable.ic_person)
+                                        .into(object : CustomTarget<Bitmap>() {
+                                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                                bitmap.value = resource
+                                            }
+
+                                            override fun onLoadCleared(placeholder: Drawable?) {}
+                                        })
+
+                                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                                        Image(
+                                            bitmap = fetchedBitmap,
+                                            contentDescription = null,
+                                            contentScale = ContentScale.FillWidth,
+                                            modifier = imageModifier
+                                        )   //bitmap이 없다면
+                                    } ?: Image(
+                                        painter = painterResource(id = R.drawable.ic_person),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.FillWidth,
+                                        modifier = imageModifier
+                                    )
+                                }
+
+                                else{
+                                    Glide.with(LocalContext.current)
+                                        .asBitmap()
+                                        .load(R.drawable.ic_person)
+                                        .into(object : CustomTarget<Bitmap>() {
+                                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                                bitmap.value = resource
+                                            }
+
+                                            override fun onLoadCleared(placeholder: Drawable?) {}
+                                        })
+
+                                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                                        Image(
+                                            bitmap = fetchedBitmap,
+                                            contentDescription = null,
+                                            contentScale = ContentScale.FillWidth,
+                                            modifier = imageModifier
+                                        )   //bitmap이 없다면
+                                    } ?: Image(
+                                        painter = painterResource(id = R.drawable.ic_person),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.FillWidth,
+                                        modifier = imageModifier
+                                    )
+                                }
                             }
 
                             Box(modifier.weight(0.1f)){
@@ -150,7 +230,10 @@ fun MainPageScreen(
                                 Icon(imageVector = Icons.Filled.Notifications,
                                     contentDescription = "Notification",
                                     tint = GrayWhite,
-                                    modifier = modifier.align(Alignment.TopEnd))
+                                    modifier = modifier
+                                        .size(30.dp, 30.dp)
+                                        .align(Alignment.TopEnd)
+                                )
                             }
 
                         }
@@ -218,9 +301,11 @@ fun MainPageScreen(
         }
         is MainPageUiState.Error -> {
 
-            Toast.makeText(context, (uiState as MainPageUiState.Error).message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, (uiState as MainPageUiState.Error).message.toString(), Toast.LENGTH_SHORT).show()
 
-            //moveLoginActivity(loginNavigator, mainActivity)
+            if((uiState as MainPageUiState.Error).message == ErrorType.REFRESH_TOKEN_EXPIRED){
+                moveLoginActivity(loginNavigator, mainActivity)
+            }
 
         }
     }
@@ -540,6 +625,16 @@ fun TestCreatePost(createPostNavigator: CreatePostNavigator, mainActivity: Activ
         Text(text = "CreatePost")
     }
 
+}
+
+@Preview
+@Composable
+fun LoadingMainPageScreen(modifier: Modifier = Modifier){
+    GodLifeTheme(modifier.background(Color.White)) {
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            CircularProgressIndicator()
+        }
+    }
 }
 
 //Preview

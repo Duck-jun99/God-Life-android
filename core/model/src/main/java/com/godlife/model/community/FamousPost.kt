@@ -1,19 +1,22 @@
 package com.godlife.model.community
 
 data class FamousPostItem(
-    val name: String,
+
+    val board_id: Int,
+    val imagesURL: List<String>?,
+    val writtenAt: String,
+    val views: Int,
+    val godScore: Int,
+    val body: String,
+    val isBoardOwner: Boolean,
+    val tags: List<String>,
     val title: String,
-    val text: String,
-    val tagItem: List<TagItem>,
-
-    //수정 필요
-    val rank: String,
-    val image: String = "",
-
-    //조회수
-    val view: Int = 10,
-    //댓글
-    val comments: Int = 1
+    val commentCount: Int,
+    val profileURL: String?,
+    val nickname: String,
+    val tier: String,
+    val whoAmI: String,
+    val memberLikedBoard: Boolean
 )
 
 data class TagItem(

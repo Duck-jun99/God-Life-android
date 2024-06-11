@@ -36,7 +36,7 @@ data class PostDetailBody(
     val godScore: Int,
     val body: String,
     val isBoardOwner: Boolean,
-    val tags: List<String>?,
+    val tags: List<String>,
     val title: String,
     val commentCount: Int,
     val profileURL: String?,

@@ -284,7 +284,7 @@ class PostDetailViewModel @Inject constructor(
 
     }
 
-    // refresh token 갱신 후 getUserInfo 다시 실행
+    // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){
         viewModelScope.launch(Dispatchers.IO) {
 

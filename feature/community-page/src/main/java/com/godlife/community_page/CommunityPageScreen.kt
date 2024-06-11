@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -59,7 +60,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
 import com.godlife.community_page.latest.LatestPostScreen
-import com.godlife.community_page.latest.LoadingLatestPostList
+import com.godlife.community_page.latest.LoadingLatestPostScreen
 import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.community_page.navigation.LatestPostRoute
 import com.godlife.community_page.navigation.PostDetailRoute
@@ -74,6 +75,7 @@ import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -92,6 +94,8 @@ fun CommunityPageScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+
+    Log.e("CommunityPageScreen", uiState.toString())
 
     val navController = rememberNavController()
 
@@ -300,7 +304,22 @@ fun CommunityPageView(modifier: Modifier = Modifier, uiState: CommunityPageUiSta
 
         composable(FamousPostRoute.route){
             viewModel.changeCurrentRoute(route = FamousPostRoute.route)
-            FamousPostScreen()
+            viewModel.getWeeklyFamousPost()
+
+            when(uiState){
+
+                is CommunityPageUiState.Loading -> {
+                    LoadingFamousPostScreen()
+                }
+
+                is CommunityPageUiState.Success -> {
+                    FamousPostScreen(navController = navController, viewModel = viewModel)
+                }
+
+                is CommunityPageUiState.Error -> {
+
+                }
+            }
         }
 
         composable(LatestPostRoute.route) {
@@ -310,7 +329,7 @@ fun CommunityPageView(modifier: Modifier = Modifier, uiState: CommunityPageUiSta
             when(uiState){
 
                 is CommunityPageUiState.Loading -> {
-                    LoadingLatestPostList()
+                    LoadingLatestPostScreen()
                 }
 
                 is CommunityPageUiState.Success -> {
@@ -523,6 +542,16 @@ fun ScreenEx2(modifier: Modifier = Modifier){
     }
 }
 
+
+@Preview(showBackground = true)
+@Composable
+fun LoadingFamousPostScreen(modifier: Modifier = Modifier){
+    GodLifeTheme(modifier.background(Color.White)) {
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            CircularProgressIndicator()
+        }
+    }
+}
 
 
 @Composable

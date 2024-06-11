@@ -11,6 +11,7 @@ import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.GetWeeklyFamousPostUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
@@ -48,6 +49,10 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideGetLatestPostUseCase(repository: LatestPostRepository) = GetLatestPostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetWeeklyFamousPostUseCase(repository: NetworkRepository) = GetWeeklyFamousPostUseCase(repository)
 
     @Provides
     @Singleton

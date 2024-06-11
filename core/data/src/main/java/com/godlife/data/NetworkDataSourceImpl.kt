@@ -100,6 +100,10 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getLatestPost(authorization, page, keyword, tag)
     }
 
+    override suspend fun getWeeklyFamousPost(authorization: String): ApiResponse<LatestPostQuery> {
+        return networkApi.getWeeklyFamousPost(authorization)
+    }
+
     override suspend fun getSearchedPost(
         authorization: String,
         page: Int,

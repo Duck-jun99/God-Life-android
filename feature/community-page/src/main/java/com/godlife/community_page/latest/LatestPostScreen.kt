@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -65,6 +66,7 @@ import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
+import com.godlife.designsystem.component.shimmerEffect
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -270,60 +272,66 @@ fun LatestPostListView(item: PostDetailBody, navController: NavController, modif
 
 @Preview
 @Composable
-fun LoadingLatestPostList(modifier: Modifier = Modifier){
+fun LoadingLatestPostScreen(modifier: Modifier = Modifier){
+    GodLifeTheme {
 
-    Column(
-        modifier
-            .padding(start = 10.dp, end = 10.dp, bottom = 5.dp, top = 5.dp)
-            .fillMaxWidth()
-            .background(Color.White, shape = RoundedCornerShape(15.dp))
-    ){
-        Row(
+        LazyColumn(
             modifier
-                .fillMaxWidth()
-                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Box(
-                modifier = modifier
-                    .size(30.dp, 30.dp)
-                    .clip(CircleShape)
-                    .fillMaxSize()
-                    .shimmerEffect()
-            )
+                .fillMaxSize()
+                .background(GrayWhite3)
+        ) {
+            items(3) {
+
+                Column(
+                    modifier
+                        .padding(start = 10.dp, end = 10.dp, bottom = 5.dp, top = 5.dp)
+                        .fillMaxWidth()
+                        .background(Color.White, shape = RoundedCornerShape(15.dp))
+                ){
+                    Row(
+                        modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Box(
+                            modifier = modifier
+                                .size(30.dp, 30.dp)
+                                .clip(CircleShape)
+                                .fillMaxSize()
+                                .shimmerEffect()
+                        )
 
 
-            Spacer(modifier.size(10.dp))
+                        Spacer(modifier.size(10.dp))
 
-            Box(modifier = modifier
-                .size(width = 200.dp, height = 18.dp)
-                .shimmerEffect()
-            )
+                        Box(modifier = modifier
+                            .size(width = 200.dp, height = 18.dp)
+                            .shimmerEffect()
+                        )
 
 
+
+                    }
+
+                    Box(
+                        modifier
+                            .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                            .size(width = 200.dp, height = 18.dp)
+                            .shimmerEffect()
+                    )
+
+                    Box(
+                        modifier
+                            .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                            .size(width = 100.dp, height = 18.dp)
+                            .shimmerEffect()
+                    )
+                }
+
+            }
 
         }
-
-        Box(
-            modifier
-                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
-                .size(width = 200.dp, height = 18.dp)
-                .shimmerEffect()
-        )
-
-        //게시물 대표 사진 보여질 곳
-        Box(modifier = modifier
-            .height(500.dp)
-            .fillMaxSize()
-            .shimmerEffect()
-        )
-
-        Box(
-            modifier
-                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
-                .size(width = 100.dp, height = 18.dp)
-                .shimmerEffect()
-        )
     }
 }
 
@@ -429,33 +437,3 @@ fun LatestPostListPreview(modifier: Modifier = Modifier){
     }
 }
 
-@Composable
-fun Modifier.shimmerEffect(): Modifier = composed {
-    var size by remember {
-        mutableStateOf(IntSize.Zero)
-    }
-    val transition = rememberInfiniteTransition()
-    val startOffsetX by transition.animateFloat(
-        initialValue = -2 * size.width.toFloat(),
-        targetValue = 2 * size.width.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000)
-        ),
-        label = ""
-    )
-
-    background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                Color(0xFFB8B5B5),
-                Color(0xFF8F8B8B),
-                Color(0xFFB8B5B5),
-            ),
-            start = Offset(startOffsetX, 0f),
-            end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
-        )
-    )
-        .onGloballyPositioned {
-            size = it.size
-        }
-}

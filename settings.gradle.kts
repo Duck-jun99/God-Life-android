@@ -35,6 +35,7 @@ include(
     ":feature:setting-page",
     ":feature:createtodolist",
     ":feature:create-post",
+    ":feature:profile",
 
     ":feature:navigator"
 )

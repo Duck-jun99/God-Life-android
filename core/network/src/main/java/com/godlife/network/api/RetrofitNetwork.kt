@@ -88,6 +88,13 @@ interface RetrofitNetworkApi {
         @Query("Tag") tag: String,
     ): ApiResponse<LatestPostQuery>
 
+    //일주일 인기 게시물 조회
+    @GET("/popularBoards")
+    suspend fun getWeeklyFamousPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<LatestPostQuery>
+
+
     //게시물 검색
     @GET("/boards")
     suspend fun searchPost(

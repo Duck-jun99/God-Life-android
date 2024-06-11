@@ -49,6 +49,10 @@ interface NetworkRepository {
         tag: String,
     ): ApiResponse<LatestPostQuery>
 
+    suspend fun getWeeklyFamousPost(
+        authorization: String
+    ): ApiResponse<LatestPostQuery>
+
     suspend fun getSearchedPost(
         authorization: String,
         page: Int,

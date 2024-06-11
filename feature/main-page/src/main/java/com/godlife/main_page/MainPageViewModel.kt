@@ -28,7 +28,22 @@ import javax.inject.Inject
 sealed class MainPageUiState {
     object Loading : MainPageUiState()
     data class Success(val data: String) : MainPageUiState()
-    data class Error(val message: String) : MainPageUiState()
+    data class Error(val message: ErrorType) : MainPageUiState()
+}
+
+enum class ErrorType {
+    REFRESH_TOKEN_EXPIRED{
+        override fun toString(): String {
+            return "세션이 만료되었습니다. 다시 로그인해주세요." }
+    },
+    UNKNOWN_ERROR{
+        override fun toString(): String {
+            return "알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요." }
+    },
+    SERVER_ERROR{
+        override fun toString(): String {
+            return "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." }
+    }
 }
 
 @HiltViewModel
@@ -166,7 +181,7 @@ class MainPageViewModel @Inject constructor(
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = MainPageUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
 
                 }
 
@@ -201,8 +216,8 @@ class MainPageViewModel @Inject constructor(
 
                         deleteLocalToken()
 
-                        // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = MainPageUiState.Error("재로그인 해주세요.")
+                        // UI State Error로 변경
+                        _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
 
                     }
 
@@ -210,7 +225,7 @@ class MainPageViewModel @Inject constructor(
                     else{
 
                         // UI State Error로 변경
-                        _uiState.value = MainPageUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
                     }
 
                 }
@@ -218,7 +233,7 @@ class MainPageViewModel @Inject constructor(
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = MainPageUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
 
                 }
 
