@@ -17,6 +17,8 @@ import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
+import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.UpdateIntroduceQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -62,6 +64,32 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.reissue(authorization)
     }
 
+    override suspend fun imageUpload(
+        authorization: String,
+        imageType: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+
+        val imageType: RequestBody = imageType.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val file = File(image.path!!)
+
+        Log.e("NetworkDataSourceImpl", image.path!!.toString())
+
+        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+
+        val image = MultipartBody.Part.createFormData("images", file.name, requestFile)
+
+        return networkApi.imageUpload(authorization, imageType, image)
+    }
+
+    override suspend fun updateIntroduce(
+        authorization: String,
+        introduce: String
+    ): ApiResponse<UpdateIntroduceQuery> {
+        return networkApi.updateIntroduce(authorization = authorization, whoAmI = introduce)
+    }
+
     override suspend fun createPost(
         authorization: String,
         title: String,
@@ -78,6 +106,8 @@ class NetworkDataSourceImpl @Inject constructor(
         val imageParts = imagePath?.map { it ->
 
             val file = File(it.path)
+            Log.e("NetworkDataSourceImpl", it.path!!.toString())
+
             Log.e("NetworkDataSourceImpl", file.readBytes().toString())
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
 

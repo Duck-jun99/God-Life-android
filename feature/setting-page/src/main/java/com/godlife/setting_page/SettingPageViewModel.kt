@@ -21,7 +21,7 @@ class SettingPageViewModel @Inject constructor(
 ): ViewModel(){
 
     // 유저 정보 초기화
-    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", ""))
+    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", ""))
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     private val _logoutResult = MutableStateFlow<Boolean?>(null)

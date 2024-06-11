@@ -100,7 +100,7 @@ fun CreatePostScreen(
                 createPostViewModel.saveImg(resizeUri)
 
                 val file = File(resizeUri.path)
-                Log.e("CreatePostScreen", file.length().toString())
+                Log.e("이미지 사이즈", file.length().toString())
             }
         }
 

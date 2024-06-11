@@ -4,6 +4,7 @@ import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
+import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -12,6 +13,7 @@ import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
+import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
@@ -21,6 +23,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -64,6 +67,22 @@ interface RetrofitNetworkApi {
     suspend fun reissue(
         @Header("Authorization") authorization: String,
     ): ApiResponse<ReissueQuery>
+
+    // 프로필 이미지, 배경사진 변경
+    @Multipart
+    @POST("/image-upload")
+    suspend fun imageUpload(
+        @Header("Authorization") authorization: String,
+        @Part("imageType") imageType: RequestBody,
+        @Part image: MultipartBody.Part
+    ): ApiResponse<ImageUploadQuery>
+
+    //소개글 수정
+    @PATCH("/member")
+    suspend fun updateIntroduce(
+        @Header("Authorization") authorization: String,
+        @Body whoAmI: String
+    ): ApiResponse<UpdateIntroduceQuery>
 
 
     // 게시물 생성

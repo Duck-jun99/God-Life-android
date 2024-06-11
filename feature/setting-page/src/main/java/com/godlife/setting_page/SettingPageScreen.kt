@@ -57,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -67,11 +68,13 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.LoginNavigator
 import com.godlife.network.model.UserInfoBody
+import com.godlife.profile.navigation.ProfileEditScreenRoute
 
 @Composable
 fun SettingPageScreen(
     mainActivity: Activity,
     loginNavigator: LoginNavigator,
+    navController: NavController,
     viewModel: SettingPageViewModel = hiltViewModel(),
     modifier: Modifier = Modifier.statusBarsPadding()
 ) {
@@ -139,7 +142,7 @@ fun SettingPageScreen(
 
                 item{ Spacer(modifier.size(12.dp)) }
 
-                item { SelectMenu1() }
+                item { SelectMenu1(navController = navController) }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -301,6 +304,84 @@ fun ProfileButton(
     }
 }
 
+@Composable
+fun SelectMenu1(
+    modifier: Modifier = Modifier,
+    navController: NavController){
+
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .height(150.dp)
+        .background(shape = RoundedCornerShape(20.dp), color = Color.White),
+        contentAlignment = Alignment.Center){
+
+        Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+
+            //프로필 수정
+            Box(
+                modifier
+                    .weight(0.3f)
+                    .clickable { navController.navigate(ProfileEditScreenRoute.route) },
+                contentAlignment = Alignment.Center){
+
+                Column {
+                    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        Icon(painter = painterResource(id = R.drawable.person_icons8), contentDescription = "", tint = Color.Unspecified, modifier = modifier.size(70.dp))
+
+                    }
+
+                    HorizontalDivider(modifier.padding(10.dp))
+
+                    Text(text = "프로필 수정", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                }
+
+            }
+
+            //갓생 점수
+            Box(
+                modifier
+                    .weight(0.3f)
+                    .clickable { /* TODO */ },
+                contentAlignment = Alignment.Center){
+
+                Column {
+                    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        Icon(painter = painterResource(id = R.drawable.graph_icons8), contentDescription = "", tint = Color.Unspecified, modifier = modifier.size(70.dp))
+
+                    }
+
+                    HorizontalDivider(modifier.padding(10.dp))
+
+                    Text(text = "갓생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                }
+
+            }
+
+            //레포트 요청
+            Box(
+                modifier
+                    .weight(0.3f)
+                    .clickable { /* TODO */ },
+                contentAlignment = Alignment.Center){
+
+                Column {
+                    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        Icon(painter = painterResource(id = R.drawable.report_icons8), contentDescription = "", tint = Color.Unspecified, modifier = modifier.size(70.dp))
+
+                    }
+
+                    HorizontalDivider(modifier.padding(10.dp))
+
+                    Text(text = "레포트 요청", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                }
+
+            }
+
+        }
+    }
+
+}
+
 
 
 @Preview
@@ -356,7 +437,7 @@ fun SettingPagePreview(modifier: Modifier = Modifier){
 
                 item{ Spacer(modifier.size(12.dp)) }
 
-                item { SelectMenu1() }
+                item { SelectMenu1Preview() }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -476,7 +557,8 @@ fun ProfileButtonPreview(
 
 @Preview
 @Composable
-fun SelectMenu1(modifier: Modifier = Modifier){
+fun SelectMenu1Preview(
+    modifier: Modifier = Modifier){
 
     Box(modifier = modifier
         .fillMaxWidth()
@@ -486,6 +568,7 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
         Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
 
+            //프로필 수정
             Box(
                 modifier
                     .weight(0.3f)
@@ -505,6 +588,7 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
             }
 
+            //갓생 점수
             Box(
                 modifier
                     .weight(0.3f)
@@ -524,6 +608,7 @@ fun SelectMenu1(modifier: Modifier = Modifier){
 
             }
 
+            //레포트 요청
             Box(
                 modifier
                     .weight(0.3f)

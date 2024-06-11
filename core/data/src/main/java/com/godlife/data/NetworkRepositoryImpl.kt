@@ -7,6 +7,7 @@ import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
+import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -14,6 +15,7 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
@@ -53,6 +55,21 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
         return networkDataSource.reissue(authorization)
+    }
+
+    override suspend fun imageUpload(
+        authorization: String,
+        imageType: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+        return networkDataSource.imageUpload(authorization, imageType, image)
+    }
+
+    override suspend fun updateIntroduce(
+        authorization: String,
+        introduce: String
+    ): ApiResponse<UpdateIntroduceQuery> {
+        return networkDataSource.updateIntroduce(authorization, introduce)
     }
 
     override suspend fun createPost(

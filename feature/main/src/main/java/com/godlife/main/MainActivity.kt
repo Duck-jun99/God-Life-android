@@ -1,6 +1,7 @@
 package com.godlife.main
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -52,6 +55,10 @@ import com.godlife.model.navigationbar.BottomNavItem
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
+import com.godlife.profile.ProfileEditScreen
+import com.godlife.profile.ProfileScreen
+import com.godlife.profile.navigation.ProfileEditScreenRoute
+import com.godlife.profile.navigation.ProfileScreenRoute
 import com.godlife.setting_page.SettingPageScreen
 import com.godlife.setting_page.navigation.SettingPageRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,6 +76,25 @@ class MainActivity : ComponentActivity() {
     lateinit var createPostNavigator: CreatePostNavigator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 현재 기기에 설정된 쓰기 권한을 가져오기 위한 변수
+        var writePermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE )
+
+        // 현재 기기에 설정된 읽기 권한을 가져오기 위한 변수
+        var readPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        // 읽기 권한과 쓰기 권한에 대해서 설정이 되어있지 않다면
+        if (writePermission == PackageManager.PERMISSION_DENIED || readPermission == PackageManager.PERMISSION_DENIED) {
+            // 읽기, 쓰기 권한을 요청.
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                ),
+                1
+            )
+        }
 
         setContent {
             MainUiTheme(this, createNavigator, loginNavigator, createPostNavigator)
@@ -108,7 +134,9 @@ fun MainUiTheme(
 
             Scaffold(
                 bottomBar = {
-                    MyBottomNavigation(tabBarItems, navController)
+                    if(currentRoute.value != ProfileScreenRoute.route && currentRoute.value != ProfileEditScreenRoute.route){
+                        MyBottomNavigation(tabBarItems, navController)
+                    }
                             },
                 ) { innerPadding ->
                 NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
@@ -121,7 +149,8 @@ fun MainUiTheme(
                             mainActivity = mainActivity,
                             createNavigator = createNavigator,
                             createPostNavigator = createPostNavigator,
-                            loginNavigator = loginNavigator)
+                            loginNavigator = loginNavigator,
+                            navController = navController)
 
                         currentRoute.value = mainTab.route
                     }
@@ -132,8 +161,20 @@ fun MainUiTheme(
                     }
 
                     composable(settingTab.route) {
-                        SettingPageScreen(mainActivity, loginNavigator)
+                        SettingPageScreen(mainActivity = mainActivity, loginNavigator = loginNavigator, navController = navController)
                         currentRoute.value = settingTab.route
+                    }
+
+                    //프로필 화면
+                    composable(ProfileScreenRoute.route){
+                        ProfileScreen()
+                        currentRoute.value = ProfileScreenRoute.route
+                    }
+
+                    //프로필 수정 화면
+                    composable(ProfileEditScreenRoute.route){
+                        ProfileEditScreen()
+                        currentRoute.value = ProfileEditScreenRoute.route
                     }
 
 

@@ -1,10 +1,12 @@
 package com.godlife.network
 
 import android.net.Uri
+import androidx.room.Update
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
+import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -12,6 +14,7 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.skydoves.sandwich.ApiResponse
 
@@ -33,6 +36,18 @@ interface NetworkDataSource {
     suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery>
 
     suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
+
+    suspend fun imageUpload(
+        authorization: String,
+        imageType: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery>
+
+    suspend fun updateIntroduce(
+        authorization: String,
+        introduce: String
+    ): ApiResponse<UpdateIntroduceQuery>
+
 
     suspend fun createPost(
         authorization: String,

@@ -15,6 +15,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,6 +70,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -83,6 +85,7 @@ import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
+import com.godlife.profile.navigation.ProfileScreenRoute
 import kotlinx.coroutines.delay
 
 
@@ -93,6 +96,7 @@ fun MainPageScreen(
     createNavigator: CreatetodolistNavigator,
     createPostNavigator: CreatePostNavigator,
     loginNavigator: LoginNavigator,
+    navController: NavController,
     viewModel: MainPageViewModel = hiltViewModel()
 
 ) {
@@ -168,6 +172,7 @@ fun MainPageScreen(
                                     .clip(CircleShape)
                                     .fillMaxSize()
                                     .background(color = GrayWhite)
+                                    .clickable { navController.navigate(ProfileScreenRoute.route) }
 
                                 if(userInfo.profileImage != ""){
                                     Glide.with(LocalContext.current)

@@ -1,7 +1,10 @@
 package com.godlife.profile
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,15 +12,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,35 +29,42 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.godlife.designsystem.component.shimmerEffect
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
-import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.profile.navigation.ImageZoomInScreenRoute
+import com.godlife.profile.navigation.ProfileScreenRoute
 
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier) {
+
+    val navController = rememberNavController()
 
     GodLifeTheme {
 
@@ -62,7 +72,30 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 
         ) { innerPadding ->
 
-            ProfileIntroduceBox(innerPadding = innerPadding)
+            NavHost(navController = navController, startDestination = ProfileScreenRoute.route) {
+
+                composable(ProfileScreenRoute.route){
+                    ProfileBox(innerPadding = innerPadding, navController = navController, previewMode = false)
+                }
+
+                composable(ImageZoomInScreenRoute.route){
+                    ImageZoomInScreen(navController = navController)
+                }
+
+                /*
+                //PostDeatil Screen
+                composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+                    val postId = it.arguments?.getString("postId")
+                    if (postId != null) {
+                        PostDetailScreen(postId = postId)
+                    }
+                }
+
+                 */
+
+            }
+
+            ProfileBox(innerPadding = innerPadding, previewMode = false, navController = navController)
 
         }
 
@@ -72,9 +105,11 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun ProfileIntroduceBox(
+fun ProfileBox(
     modifier: Modifier = Modifier,
-    innerPadding: PaddingValues = PaddingValues(10.dp)
+    innerPadding: PaddingValues = PaddingValues(10.dp),
+    previewMode: Boolean = true,
+    navController: NavController? = null
 ){
     Box(
         modifier = modifier
@@ -83,12 +118,49 @@ fun ProfileIntroduceBox(
     ){
 
         //배경 사진
-        Image(
-            modifier = modifier.fillMaxSize(),
-            painter = painterResource(id = R.drawable.category3),
-            contentDescription = "background",
-            contentScale = ContentScale.Crop
-        )
+        if(!previewMode){
+
+            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+            val imageModifier: Modifier = modifier
+                .fillMaxSize()
+                .clickable { /*navController?.navigate(ImageZoomInScreenRoute.route)*/ }
+
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load(R.drawable.category3)
+                .error(R.drawable.category3)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = imageModifier
+                )   //bitmap이 없다면
+            } ?: Image(
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = imageModifier
+            )
+        }
+
+        else{
+            Image(
+                modifier = modifier
+                    .fillMaxSize(),
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = "background",
+                contentScale = ContentScale.Crop
+            )
+        }
 
         //배경 사진 필터
         Box(
@@ -103,7 +175,8 @@ fun ProfileIntroduceBox(
                 modifier = modifier
                     .fillMaxWidth()
                     .weight(0.4f)
-                    .padding(10.dp),
+                    .padding(10.dp)
+                    .statusBarsPadding(),
                 contentAlignment = Alignment.TopEnd
             ){
 
@@ -123,15 +196,54 @@ fun ProfileIntroduceBox(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+
                 //프로필 사진
-                Image(
-                    modifier = modifier
-                        .size(150.dp)
-                        .clip(CircleShape),
-                    painter = painterResource(id = R.drawable.category1),
-                    contentDescription = "profile",
-                    contentScale = ContentScale.Crop
-                )
+                if(!previewMode){
+
+                    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+                    val imageModifier: Modifier = modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .clickable { /*navController?.navigate(ImageZoomInScreenRoute.route)*/ }
+
+                    Glide.with(LocalContext.current)
+                        .asBitmap()
+                        .load(R.drawable.category4)
+                        .error(R.drawable.category4)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                bitmap.value = resource
+                            }
+
+                            override fun onLoadCleared(placeholder: Drawable?) {}
+                        })
+
+                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                        Image(
+                            bitmap = fetchedBitmap,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = imageModifier
+                        )   //bitmap이 없다면
+                    } ?: Image(
+                        painter = painterResource(id = R.drawable.category4),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = imageModifier
+                    )
+                }
+
+                else{
+                    Image(
+                        modifier = modifier
+                            .size(130.dp)
+                            .clip(CircleShape),
+                        painter = painterResource(id = R.drawable.category4),
+                        contentDescription = "background",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
 
                 Spacer(modifier = modifier.size(20.dp))
 
@@ -283,14 +395,14 @@ fun ProfileIntroduceBox(
                     ){
 
                         Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
+                            imageVector = Icons.Default.KeyboardArrowUp,
                             contentDescription = "",
                             tint = GrayWhite2
                         )
 
                         Spacer(modifier.size(5.dp))
 
-                        Text(text = "아래로 내려보세요.",
+                        Text(text = "위로 올려서 게시물을 확인하세요.",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 15.sp,
@@ -311,11 +423,12 @@ fun ProfileIntroduceBox(
         BottomSheetScaffold(
             modifier = modifier
                 .fillMaxWidth(),
+            sheetContainerColor = OpaqueDark,
             sheetShape = RoundedCornerShape(
                 bottomStart = 0.dp,
                 bottomEnd = 0.dp,
-                topStart = 12.dp,
-                topEnd = 12.dp
+                topStart = 20.dp,
+                topEnd = 20.dp
             ),
             sheetContent = {  ProfileContentBox() }
         ) {

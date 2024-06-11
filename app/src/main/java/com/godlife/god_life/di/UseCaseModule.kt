@@ -16,6 +16,7 @@ import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.domain.SignUpUseCase
+import com.godlife.domain.UpdateUserInfoUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,6 +42,10 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideSignUpUseCase(repository: NetworkRepository) = SignUpUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideUpdateUserInfoUseCase(repository: NetworkRepository) = UpdateUserInfoUseCase(repository)
 
     @Provides
     @Singleton

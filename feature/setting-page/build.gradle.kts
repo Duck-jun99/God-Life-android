@@ -15,6 +15,7 @@ android {
 dependencies {
 
     implementation(projects.feature.navigator)
+    implementation(projects.feature.profile)
 
     implementation(projects.core.model)
     implementation(projects.core.designsystem)

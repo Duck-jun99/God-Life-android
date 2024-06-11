@@ -75,7 +75,7 @@ class MainPageViewModel @Inject constructor(
      */
 
     // 유저 정보 초기화
-    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", ""))
+    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", ""))
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     // 오늘 투두리스트

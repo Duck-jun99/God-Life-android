@@ -327,7 +327,7 @@ fun Content(modifier: Modifier = Modifier,
             Column {
                 Text(text = postDetailBody.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = "postDetailBody.whoAmI", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = postDetailBody.whoAmI, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
             }
 
 
