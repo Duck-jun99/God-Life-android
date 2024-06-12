@@ -36,11 +36,15 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +76,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.profile.navigation.ProfileScreenRoute
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -81,6 +86,7 @@ import java.io.IOException
 @Composable
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
+    navController: NavController,
     viewModel: ProfileEditViewModel = hiltViewModel()
 ) {
 
@@ -88,6 +94,8 @@ fun ProfileEditScreen(
     val selectedImageType by viewModel.selectedImageType.collectAsState()
 
     val context = LocalContext.current
+
+    Log.e("ProfileEditScreen", "uiState : ${uiState.toString()}")
 
     //갤러리에서 사진 가져오기
     val launcher = rememberLauncherForActivityResult(contract =
@@ -113,33 +121,44 @@ fun ProfileEditScreen(
     }
 
     GodLifeTheme {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
 
         Scaffold(
-
+            snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
-
-            when(uiState){
-
+            when (val state = uiState) {
                 is ProfileEditUiState.Loading -> {
-
                     /* TODO */
-
                 }
-
                 is ProfileEditUiState.Success -> {
+                    ProfileEditBox(innerPadding = innerPadding, viewModel = viewModel, launcher = launcher)
+                }
+                is ProfileEditUiState.Error -> {
+                    /* TODO */
+                }
+                is ProfileEditUiState.Result -> {
 
                     ProfileEditBox(innerPadding = innerPadding, viewModel = viewModel, launcher = launcher)
 
+                    SideEffect {
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = state.message,
+                                actionLabel = "이동하기",
+                                withDismissAction = true
+                            )
+                            if (state.success) {
+
+                                when (result) {
+                                    SnackbarResult.ActionPerformed -> navController.navigate(ProfileScreenRoute.route)
+                                    SnackbarResult.Dismissed -> { /* TODO */ }
+                                }
+                            }
+                        }
+                    }
                 }
-
-                is ProfileEditUiState.Error -> {
-
-                    /* TODO */
-
-                }
-
             }
-
         }
     }
 }

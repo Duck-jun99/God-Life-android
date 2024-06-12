@@ -20,6 +20,7 @@ import com.godlife.network.api.RetrofitNetworkApi
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.skydoves.sandwich.ApiResponse
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -76,11 +77,11 @@ class NetworkDataSourceImpl @Inject constructor(
 
         Log.e("NetworkDataSourceImpl", image.path!!.toString())
 
-        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val requestFile = file.asRequestBody("image/*".toMediaType())
 
-        val image = MultipartBody.Part.createFormData("images", file.name, requestFile)
+        val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
 
-        return networkApi.imageUpload(authorization, imageType, image)
+        return networkApi.imageUpload(authorization, imageType, imageMultiPart)
     }
 
     override suspend fun updateIntroduce(

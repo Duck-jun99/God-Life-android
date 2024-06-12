@@ -30,6 +30,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -57,14 +60,17 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.profile.navigation.ImageZoomInScreenRoute
 import com.godlife.profile.navigation.ProfileScreenRoute
 
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: ProfileViewModel = hiltViewModel()
+) {
 
-    val navController = rememberNavController()
+    val uiState by viewModel.uiState.collectAsState()
 
     GodLifeTheme {
 
@@ -72,30 +78,25 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 
         ) { innerPadding ->
 
-            NavHost(navController = navController, startDestination = ProfileScreenRoute.route) {
+            when(uiState){
+                is ProfileUiState.Loading -> {
 
-                composable(ProfileScreenRoute.route){
-                    ProfileBox(innerPadding = innerPadding, navController = navController, previewMode = false)
+                    /* TODO */
+
                 }
 
-                composable(ImageZoomInScreenRoute.route){
-                    ImageZoomInScreen(navController = navController)
+                is ProfileUiState.Success -> {
+
+                    ProfileBox(innerPadding = innerPadding, navController = navController, viewModel = viewModel)
+
                 }
 
-                /*
-                //PostDeatil Screen
-                composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
-                    val postId = it.arguments?.getString("postId")
-                    if (postId != null) {
-                        PostDetailScreen(postId = postId)
-                    }
+                is ProfileUiState.Error -> {
+
+                    /* TODO */
+
                 }
-
-                 */
-
             }
-
-            ProfileBox(innerPadding = innerPadding, previewMode = false, navController = navController)
 
         }
 
@@ -103,14 +104,16 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun ProfileBox(
     modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel,
     innerPadding: PaddingValues = PaddingValues(10.dp),
-    previewMode: Boolean = true,
     navController: NavController? = null
 ){
+
+    val fullImageVisibility by viewModel.fullImageVisibility.collectAsState()
+
     Box(
         modifier = modifier
             .fillMaxSize(),
@@ -118,49 +121,39 @@ fun ProfileBox(
     ){
 
         //배경 사진
-        if(!previewMode){
+        val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+        val imageModifier: Modifier = modifier
+            .fillMaxSize()
+            .clickable {
+                bitmap.value?.let { viewModel.setFullImageBitmap(it) }
+                viewModel.setFullImageVisibility()
+            }
 
-            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-            val imageModifier: Modifier = modifier
-                .fillMaxSize()
-                .clickable { /*navController?.navigate(ImageZoomInScreenRoute.route)*/ }
+        Glide.with(LocalContext.current)
+            .asBitmap()
+            .load(R.drawable.category3)
+            .error(R.drawable.category3)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    bitmap.value = resource
+                }
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(R.drawable.category3)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
-                    }
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = imageModifier
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.category3),
+        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+            Image(
+                bitmap = fetchedBitmap,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = imageModifier
-            )
-        }
-
-        else{
-            Image(
-                modifier = modifier
-                    .fillMaxSize(),
-                painter = painterResource(id = R.drawable.category3),
-                contentDescription = "background",
-                contentScale = ContentScale.Crop
-            )
-        }
+            )   //bitmap이 없다면
+        } ?: Image(
+            painter = painterResource(id = R.drawable.category3),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = imageModifier
+        )
 
         //배경 사진 필터
         Box(
@@ -198,51 +191,40 @@ fun ProfileBox(
 
 
                 //프로필 사진
-                if(!previewMode){
+                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+                val imageModifier: Modifier = modifier
+                    .size(130.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        bitmap.value?.let { viewModel.setFullImageBitmap(it) }
+                        viewModel.setFullImageVisibility()
+                    }
 
-                    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                    val imageModifier: Modifier = modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .clickable { /*navController?.navigate(ImageZoomInScreenRoute.route)*/ }
+                Glide.with(LocalContext.current)
+                    .asBitmap()
+                    .load(R.drawable.category4)
+                    .error(R.drawable.category4)
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            bitmap.value = resource
+                        }
 
-                    Glide.with(LocalContext.current)
-                        .asBitmap()
-                        .load(R.drawable.category4)
-                        .error(R.drawable.category4)
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                bitmap.value = resource
-                            }
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
 
-                            override fun onLoadCleared(placeholder: Drawable?) {}
-                        })
-
-                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                        Image(
-                            bitmap = fetchedBitmap,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = imageModifier
-                        )   //bitmap이 없다면
-                    } ?: Image(
-                        painter = painterResource(id = R.drawable.category4),
+                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                    Image(
+                        bitmap = fetchedBitmap,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = imageModifier
-                    )
-                }
-
-                else{
-                    Image(
-                        modifier = modifier
-                            .size(130.dp)
-                            .clip(CircleShape),
-                        painter = painterResource(id = R.drawable.category4),
-                        contentDescription = "background",
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                    )   //bitmap이 없다면
+                } ?: Image(
+                    painter = painterResource(id = R.drawable.category4),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = imageModifier
+                )
 
 
                 Spacer(modifier = modifier.size(20.dp))
@@ -435,6 +417,39 @@ fun ProfileBox(
 
         }
 
+        //이미지 확대
+        if(fullImageVisibility){
+            ImageZoomInBox(viewModel = viewModel)
+        }
+
+    }
+}
+
+@Composable
+fun ImageZoomInBox(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel
+){
+
+    val imgBitmap by viewModel.fullImageBitmap.collectAsState()
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xCB000000))
+            .clickable { viewModel.setFullImageVisibility() }
+            .padding(30.dp),
+        contentAlignment = Alignment.Center
+    ){
+
+        imgBitmap?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier.fillMaxSize()
+            )
+        }
 
     }
 }
@@ -494,6 +509,268 @@ fun PostListPreview(modifier: Modifier = Modifier){
 
             //조회수, 댓글 수
             Text(text = "조회 수: 100, 댓글 수: 10", style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal))
+
+        }
+
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun ProfileBoxPreview(
+    modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(10.dp),
+    navController: NavController? = null
+){
+    Box(
+        modifier = modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ){
+
+        //배경 사진
+        Image(
+            modifier = modifier
+                .fillMaxSize(),
+            painter = painterResource(id = R.drawable.category3),
+            contentDescription = "background",
+            contentScale = ContentScale.Crop
+        )
+
+        //배경 사진 필터
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(OpaqueDark)
+        )
+        Column(
+            modifier = modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .weight(0.4f)
+                    .padding(10.dp)
+                    .statusBarsPadding(),
+                contentAlignment = Alignment.TopEnd
+            ){
+
+                //본인의 프로필이 아니면 아래 아이콘, 본인의 프로필이면 설정 아이콘
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Menu",
+                    tint = Color.White
+                )
+            }
+
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .weight(0.6f)
+                    .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+
+                //프로필 사진
+                Image(
+                    modifier = modifier
+                        .size(130.dp)
+                        .clip(CircleShape),
+                    painter = painterResource(id = R.drawable.category4),
+                    contentDescription = "background",
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = modifier.size(20.dp))
+
+                //닉네임
+                Text(text = "닉네임",
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = modifier.size(10.dp))
+
+                //소개글
+                Text(text = "안녕하세요! 갓생을 꿈꾸는 유저입니다.",
+                    style = TextStyle(
+                        color = GrayWhite2,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = modifier.size(30.dp))
+
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.33f)
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "갓생 티어",
+                            style = TextStyle(
+                                color = GrayWhite2,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier.size(5.dp))
+
+                        HorizontalDivider(
+                            modifier
+                                .background(GrayWhite2)
+                                .width(70.dp))
+
+                        Spacer(modifier.size(10.dp))
+
+                        //티어 보일 공간
+                        Text(text = "마스터",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.33f)
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "갓생 점수",
+                            style = TextStyle(
+                                color = GrayWhite2,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier.size(5.dp))
+
+                        HorizontalDivider(
+                            modifier
+                                .background(GrayWhite2)
+                                .width(70.dp))
+
+                        Spacer(modifier.size(10.dp))
+
+                        //티어 보일 공간
+                        Text(text = "630점",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.33f)
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "게시물 수",
+                            style = TextStyle(
+                                color = GrayWhite2,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier.size(5.dp))
+
+                        HorizontalDivider(
+                            modifier
+                                .background(GrayWhite2)
+                                .width(70.dp))
+
+                        Spacer(modifier.size(10.dp))
+
+                        //티어 보일 공간
+                        Text(text = "173개",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+
+                }
+
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                    , contentAlignment = Alignment.BottomCenter
+                ){
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "",
+                            tint = GrayWhite2
+                        )
+
+                        Spacer(modifier.size(5.dp))
+
+                        Text(text = "위로 올려서 게시물을 확인하세요.",
+                            style = TextStyle(
+                                color = GrayWhite2,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Thin
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                    }
+                }
+
+
+            }
+
+
+        }
+
+        BottomSheetScaffold(
+            modifier = modifier
+                .fillMaxWidth(),
+            sheetContainerColor = OpaqueDark,
+            sheetShape = RoundedCornerShape(
+                bottomStart = 0.dp,
+                bottomEnd = 0.dp,
+                topStart = 20.dp,
+                topEnd = 20.dp
+            ),
+            sheetContent = {  ProfileContentBox() }
+        ) {
 
         }
 

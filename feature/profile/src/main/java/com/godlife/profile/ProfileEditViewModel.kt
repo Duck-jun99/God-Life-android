@@ -2,6 +2,7 @@ package com.godlife.profile
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +18,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +28,16 @@ sealed class ProfileEditUiState {
     object Loading : ProfileEditUiState()
     data class Success(val data: String) : ProfileEditUiState()
     data class Error(val message: String) : ProfileEditUiState()
+
+    data class Result(val success: Boolean, val message: String) : ProfileEditUiState()
 }
+
+sealed class UploadState {
+    object Loading : UploadState()
+    data class Success(val data: String) : UploadState()
+    data class Error(val message: String) : UploadState()
+}
+
 
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
@@ -54,9 +67,21 @@ class ProfileEditViewModel @Inject constructor(
     private val _introduceChangeState = MutableStateFlow(false)
     val introduceChangeState: StateFlow<Boolean> = _introduceChangeState
 
-    //소개글 수정 뷰 보여줄지 여부에 대한 상태 (false면 보여주지 않음, true이면 보여줌)
+    //소개글 수정 뷰 Visiblity 상태 (false면 보여주지 않음, true이면 보여줌)
     private val _showIntroduceChangeViewState = MutableStateFlow(false)
     val showIntroduceChangeViewState: StateFlow<Boolean> = _showIntroduceChangeViewState
+
+    //프로필 이미지 서버 통신 성공 여부
+    private val _profileUploadState = MutableStateFlow<UploadState>(UploadState.Loading)
+    val profileUploadState = _profileUploadState.asStateFlow()
+
+    //배경 이미지 서버 통신 성공 여부
+    private val _backgroundUploadState = MutableStateFlow<UploadState>(UploadState.Loading)
+    val backgroundUploadState = _backgroundUploadState.asStateFlow()
+
+    //소개글 서버 통신 성공 여부
+    private val _introduceUploadState = MutableStateFlow<UploadState>(UploadState.Loading)
+    val introduceUploadState = _introduceUploadState.asStateFlow()
 
     /**
      * Data
@@ -65,12 +90,6 @@ class ProfileEditViewModel @Inject constructor(
     //엑세스 토큰 저장 변수
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
-
-    /*
-    //사용자 정보
-    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", ""))
-    val userInfo: StateFlow<UserInfoBody> = _userInfo
-     */
 
     //선택한 이미지 타입 변수
     private val _selectedImageType = MutableStateFlow("")
@@ -103,6 +122,41 @@ class ProfileEditViewModel @Inject constructor(
 
             //사용자 정보 초기화
             initUserInfo()
+
+            combine(
+                profileUploadState,
+                backgroundUploadState,
+                introduceUploadState
+            ) { profileUpload, backgroundUpload, introduceUpload ->
+                Triple(profileUpload, backgroundUpload, introduceUpload)
+            }.collectLatest { (profileUpload, backgroundUpload, introduceUpload) ->
+                when {
+                    profileUpload is UploadState.Loading ||
+                            backgroundUpload is UploadState.Loading ||
+                            introduceUpload is UploadState.Loading -> {
+                        _uiState.value = ProfileEditUiState.Loading
+                    }
+                    profileUpload is UploadState.Error ||
+                            backgroundUpload is UploadState.Error ||
+                            introduceUpload is UploadState.Error -> {
+                        _uiState.value = ProfileEditUiState.Result(
+                            success = false,
+                            message = (profileUpload as? UploadState.Error)?.message ?:
+                            (backgroundUpload as? UploadState.Error)?.message ?:
+                            (introduceUpload as? UploadState.Error)?.message ?:
+                            "오류가 발생했습니다."
+                        )
+                    }
+                    profileUpload is UploadState.Success &&
+                            backgroundUpload is UploadState.Success &&
+                            introduceUpload is UploadState.Success -> {
+                        _uiState.value = ProfileEditUiState.Result(
+                            success = true,
+                            message = "프로필 수정이 완료되었습니다."
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -149,41 +203,13 @@ class ProfileEditViewModel @Inject constructor(
     //수정 완료 시 서버 통신 후 사용자 정보 반영
     fun completeUpdate(){
 
-        viewModelScope.launch(Dispatchers.IO) {
+        completeUpdateProfileImage()
 
-            //프로필 이미지에 수정이 있었을 때
-            if(profileChangeState.value){
-                updateUserInfoUseCase.executeImageUpload(
-                    authorization = auth.value,
-                    imageType = "profile",
-                    imagePath = profileImage.value
-                )
-            }
+        completeUpdateBackgroundImage()
 
-            //배경 이미지에 수정이 있었을 때
-            if(backgroundChangeState.value){
+        completeUpdateIntroduce()
 
-                updateUserInfoUseCase.executeImageUpload(
-                    authorization = auth.value,
-                    imageType = "background",
-                    imagePath = backgroundImage.value
-                )
-
-            }
-
-            //소개글에 수정이 있었을 때
-            if(introduceChangeState.value){
-
-                updateUserInfoUseCase.executeUpdateIntroduce(
-                    authorization = auth.value,
-                    introduce = introduce.value
-                )
-
-            }
-
-        }
-
-
+        //checkAllUpdatesSuccess()
 
     }
 
@@ -253,6 +279,140 @@ class ProfileEditViewModel @Inject constructor(
         }
 
     }
+
+    //프로필 이미지에 수정이 있었을 때 서버에 요청
+    private fun completeUpdateProfileImage(){
+
+        if(profileChangeState.value){
+
+            viewModelScope.launch(Dispatchers.IO) {
+                val result = updateUserInfoUseCase.executeImageUpload(
+                    authorization = auth.value,
+                    imageType = "profile",
+                    imagePath = profileImage.value
+                )
+
+                result
+                    .onSuccess {
+                        _profileUploadState.value = UploadState.Success("success")
+                    }
+                    .onError {
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken(callback = { completeUpdateProfileImage() })
+
+                        }
+                        else {
+                            _profileUploadState.value = UploadState.Error("오류가 발생했습니다.")
+                        }
+
+                    }
+                    .onException {
+
+                        _profileUploadState.value = UploadState.Error("오류가 발생했습니다.")
+
+                    }
+            }
+
+        }
+
+        else {
+
+            _profileUploadState.value = UploadState.Success("success")
+        }
+
+    }
+
+    //배경 이미지에 수정이 있었을 때 서버에 요청
+    private fun completeUpdateBackgroundImage(){
+
+        if(backgroundChangeState.value){
+
+            viewModelScope.launch(Dispatchers.IO) {
+
+                val result = updateUserInfoUseCase.executeImageUpload(
+                    authorization = auth.value,
+                    imageType = "background",
+                    imagePath = backgroundImage.value
+                )
+                result
+                    .onSuccess {
+                        _backgroundUploadState.value = UploadState.Success("success")
+
+                    }
+                    .onError {
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken(callback = { completeUpdateBackgroundImage() })
+
+                        }
+
+                        else{
+                            _backgroundUploadState.value = UploadState.Error("오류가 발생했습니다.")
+
+                        }
+
+                    }
+                    .onException {
+                        _backgroundUploadState.value = UploadState.Error("오류가 발생했습니다.")
+
+                    }
+
+            }
+
+        }
+        else{
+            _backgroundUploadState.value = UploadState.Success("success")
+        }
+    }
+
+    //소개글에 수정이 있었을 때 서버에 요청
+    private fun completeUpdateIntroduce(){
+        if(introduceChangeState.value){
+
+            viewModelScope.launch(Dispatchers.IO) {
+
+                val result = updateUserInfoUseCase.executeUpdateIntroduce(
+                    authorization = auth.value,
+                    introduce = introduce.value
+                )
+
+                result
+                    .onSuccess {
+                        _introduceUploadState.value = UploadState.Success("success")
+                    }
+                    .onError {
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken(callback = { completeUpdateIntroduce() })
+
+                        }
+                        else{
+                            _introduceUploadState.value = UploadState.Error("오류가 발생했습니다.")
+
+                        }
+
+                    }
+                    .onException {
+                        _introduceUploadState.value = UploadState.Error("오류가 발생했습니다.")
+                    }
+
+            }
+
+
+        }
+
+        else{
+            _introduceUploadState.value = UploadState.Success("success")
+        }
+    }
+
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){

@@ -22,6 +22,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 
 import androidx.compose.material3.Text
@@ -112,6 +114,8 @@ fun MainUiTheme(
 ){
     GodLifeTheme {
 
+        val snackBarHostState = remember { SnackbarHostState() }
+        SnackbarHost(hostState = snackBarHostState)
 
 
         val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
@@ -138,6 +142,7 @@ fun MainUiTheme(
                         MyBottomNavigation(tabBarItems, navController)
                     }
                             },
+                snackbarHost = { SnackbarHost(snackBarHostState)}
                 ) { innerPadding ->
                 NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
 
@@ -167,13 +172,13 @@ fun MainUiTheme(
 
                     //프로필 화면
                     composable(ProfileScreenRoute.route){
-                        ProfileScreen()
+                        ProfileScreen(navController = navController)
                         currentRoute.value = ProfileScreenRoute.route
                     }
 
                     //프로필 수정 화면
                     composable(ProfileEditScreenRoute.route){
-                        ProfileEditScreen()
+                        ProfileEditScreen(navController = navController)
                         currentRoute.value = ProfileEditScreenRoute.route
                     }
 

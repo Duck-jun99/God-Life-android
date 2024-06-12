@@ -174,60 +174,31 @@ fun MainPageScreen(
                                     .background(color = GrayWhite)
                                     .clickable { navController.navigate(ProfileScreenRoute.route) }
 
-                                if(userInfo.profileImage != ""){
-                                    Glide.with(LocalContext.current)
-                                        .asBitmap()
-                                        .load(BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage)
-                                        .error(R.drawable.ic_person)
-                                        .into(object : CustomTarget<Bitmap>() {
-                                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                                bitmap.value = resource
-                                            }
+                                Glide.with(LocalContext.current)
+                                    .asBitmap()
+                                    .load(if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person)
+                                    .error(R.drawable.ic_person)
+                                    .into(object : CustomTarget<Bitmap>() {
+                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                            bitmap.value = resource
+                                        }
 
-                                            override fun onLoadCleared(placeholder: Drawable?) {}
-                                        })
+                                        override fun onLoadCleared(placeholder: Drawable?) {}
+                                    })
 
-                                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                                        Image(
-                                            bitmap = fetchedBitmap,
-                                            contentDescription = null,
-                                            contentScale = ContentScale.FillWidth,
-                                            modifier = imageModifier
-                                        )   //bitmap이 없다면
-                                    } ?: Image(
-                                        painter = painterResource(id = R.drawable.ic_person),
+                                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                                    Image(
+                                        bitmap = fetchedBitmap,
                                         contentDescription = null,
                                         contentScale = ContentScale.FillWidth,
                                         modifier = imageModifier
-                                    )
-                                }
-
-                                else{
-                                    Glide.with(LocalContext.current)
-                                        .asBitmap()
-                                        .load(R.drawable.ic_person)
-                                        .into(object : CustomTarget<Bitmap>() {
-                                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                                bitmap.value = resource
-                                            }
-
-                                            override fun onLoadCleared(placeholder: Drawable?) {}
-                                        })
-
-                                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                                        Image(
-                                            bitmap = fetchedBitmap,
-                                            contentDescription = null,
-                                            contentScale = ContentScale.FillWidth,
-                                            modifier = imageModifier
-                                        )   //bitmap이 없다면
-                                    } ?: Image(
-                                        painter = painterResource(id = R.drawable.ic_person),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.FillWidth,
-                                        modifier = imageModifier
-                                    )
-                                }
+                                    )   //bitmap이 없다면
+                                } ?: Image(
+                                    painter = painterResource(id = R.drawable.ic_person),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.FillWidth,
+                                    modifier = imageModifier
+                                )
                             }
 
                             Box(modifier.weight(0.1f)){
@@ -606,17 +577,27 @@ fun CompletedTodayList(
 //MainTodoListBox위에 보여질 Text
 @Composable
 fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
-    val item = viewModel.setTodayTimeText("GUEST")
+    val item = viewModel.setTodayTimeText()
     //item[0] -> Text, item[1] -> Icon resource
 
-
     Row(
-        modifier
-            .fillMaxWidth()
-            .height(25.dp)){
-        Icon(painter = painterResource(item[1].toString().toInt()), contentDescription = "", tint = Color.Unspecified)
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Icon(
+            modifier = modifier.size(25.dp),
+            painter = painterResource(item[1].toString().toInt()),
+            contentDescription = "",
+            tint = Color.Unspecified
+        )
         Spacer(modifier.size(5.dp))
-        Text(text = item[0].toString(), style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+
+        Text(
+            text = item[0].toString(),
+            style = TextStyle(color = GrayWhite, fontSize = 18.sp)
+        )
+
     }
 }
 
@@ -811,12 +792,20 @@ fun CompletedTodayListPreview(){
 @Composable
 fun TextTodayPreview(modifier: Modifier = Modifier){
     Row(
-        modifier
-            .fillMaxWidth()
-            .height(20.dp)){
-        Icon(painter = painterResource(R.drawable.sun_icons8), contentDescription = "", tint = Color.Unspecified)
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+        ){
+        Icon(
+            modifier = modifier.size(25.dp),
+            painter = painterResource(R.drawable.sun_icons8),
+            contentDescription = "",
+            tint = Color.Unspecified
+        )
+
         Spacer(modifier.size(5.dp))
-        Text(text = "Hello World!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+
+        Text(text = "Hello World!Hello World!Hello World!Hello World!Hello World!Hello World!", style = TextStyle(color = GrayWhite, fontSize = 18.sp))
     }
 }
 
