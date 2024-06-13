@@ -50,9 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -60,17 +58,20 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.profile.navigation.ProfileScreenRoute
+import com.godlife.network.model.PostDetailBody
 
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    userId: String,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+
+    viewModel.getUserProfile(userId)
 
     GodLifeTheme {
 
@@ -109,8 +110,10 @@ fun ProfileBox(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel,
     innerPadding: PaddingValues = PaddingValues(10.dp),
-    navController: NavController? = null
+    navController: NavController
 ){
+
+    val userInfo by viewModel.userInfo.collectAsState()
 
     val fullImageVisibility by viewModel.fullImageVisibility.collectAsState()
 
@@ -131,7 +134,7 @@ fun ProfileBox(
 
         Glide.with(LocalContext.current)
             .asBitmap()
-            .load(R.drawable.category3)
+            .load( if(userInfo.backgroundImageURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.backgroundImageURL else (R.drawable.category3) )
             .error(R.drawable.category3)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
@@ -202,7 +205,7 @@ fun ProfileBox(
 
                 Glide.with(LocalContext.current)
                     .asBitmap()
-                    .load(R.drawable.category4)
+                    .load( if(userInfo.profileImageURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImageURL else (R.drawable.category4) )
                     .error(R.drawable.category4)
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
@@ -230,7 +233,7 @@ fun ProfileBox(
                 Spacer(modifier = modifier.size(20.dp))
 
                 //닉네임
-                Text(text = "닉네임",
+                Text(text = userInfo.nickname,
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 20.sp,
@@ -242,7 +245,7 @@ fun ProfileBox(
                 Spacer(modifier = modifier.size(10.dp))
 
                 //소개글
-                Text(text = "안녕하세요! 갓생을 꿈꾸는 유저입니다.",
+                Text(text = userInfo.whoAmI,
                     style = TextStyle(
                         color = GrayWhite2,
                         fontSize = 15.sp,
@@ -319,7 +322,7 @@ fun ProfileBox(
                         Spacer(modifier.size(10.dp))
 
                         //티어 보일 공간
-                        Text(text = "630점",
+                        Text(text = "${userInfo.godLifeScore}점",
                             style = TextStyle(
                                 color = Color.White,
                                 fontSize = 20.sp,
@@ -353,8 +356,8 @@ fun ProfileBox(
 
                         Spacer(modifier.size(10.dp))
 
-                        //티어 보일 공간
-                        Text(text = "173개",
+                        // 게시물 개수
+                        Text(text = "${userInfo.memberBoardCount}개",
                             style = TextStyle(
                                 color = Color.White,
                                 fontSize = 20.sp,
@@ -369,8 +372,8 @@ fun ProfileBox(
 
                 Box(
                     modifier = modifier
-                        .fillMaxSize()
-                    , contentAlignment = Alignment.BottomCenter
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.BottomCenter
                 ){
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -412,7 +415,7 @@ fun ProfileBox(
                 topStart = 20.dp,
                 topEnd = 20.dp
             ),
-            sheetContent = {  ProfileContentBox() }
+            sheetContent = { UserPostListBox(viewModel = viewModel, navController = navController) }
         ) {
 
         }
@@ -454,9 +457,112 @@ fun ImageZoomInBox(
     }
 }
 
+@Composable
+fun UserPostListBox(
+    viewModel: ProfileViewModel,
+    navController: NavController
+){
+    val userPostList = viewModel.userPostList.collectAsLazyPagingItems()
+
+    val nickname = viewModel.userInfo.collectAsState().value.nickname
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+    ){
+        Text(text = "${nickname}님의 게시물", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
+
+        LazyColumn {
+
+
+            items(userPostList.itemCount){
+                userPostList[it]?.let { it1 -> PostList(item = it1, navController = navController) }
+
+            }
+        }
+
+
+    }
+}
+
+@Composable
+fun PostList(
+    modifier: Modifier = Modifier,
+    item: PostDetailBody,
+    navController: NavController
+){
+
+    Row(
+        modifier
+            .padding(5.dp)
+            .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(15.dp))
+            .padding(10.dp)
+            .clickable { navController.navigate("PostDetailScreen/${item.board_id}") },
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        //대표 이미지 보일 부분
+        val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+        val imageModifier: Modifier = modifier
+            .size(70.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .fillMaxSize()
+
+        Glide.with(LocalContext.current)
+            .asBitmap()
+            .load(if(item.imagesURL.isNullOrEmpty()) R.drawable.category3 else BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL!![0])
+            .error(R.drawable.category3)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    bitmap.value = resource
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+
+        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+            Image(
+                bitmap = fetchedBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = imageModifier
+            )   //bitmap이 없다면
+        } ?: Image(
+            painter = painterResource(id = R.drawable.category3),
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            modifier = imageModifier
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Column {
+
+            // 게시물 제목
+            Text(text = item.title, style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+
+            Spacer(modifier.size(5.dp))
+
+            //날짜
+            Text(text = item.writtenAt, style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal))
+
+            Spacer(modifier.size(5.dp))
+
+            //조회수, 댓글 수
+            Text(text = "조회 수: ${item.views}, 댓글 수: ${item.commentCount}", style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal))
+
+        }
+
+
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-fun ProfileContentBox(){
+fun UserPostListBoxPreview(){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -769,7 +875,7 @@ fun ProfileBoxPreview(
                 topStart = 20.dp,
                 topEnd = 20.dp
             ),
-            sheetContent = {  ProfileContentBox() }
+            sheetContent = {  UserPostListBoxPreview() }
         ) {
 
         }

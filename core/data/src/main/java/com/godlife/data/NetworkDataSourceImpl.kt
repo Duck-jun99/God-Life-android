@@ -19,6 +19,7 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.UpdateIntroduceQuery
+import com.godlife.network.model.UserProfileQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -59,6 +60,13 @@ class NetworkDataSourceImpl @Inject constructor(
 
     override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
         return networkApi.getUserInfo(authorization)
+    }
+
+    override suspend fun getUserProfile(
+        authorization: String,
+        memberId: String
+    ): ApiResponse<UserProfileQuery> {
+        return networkApi.getUserProfile(authorization, memberId)
     }
 
     override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {

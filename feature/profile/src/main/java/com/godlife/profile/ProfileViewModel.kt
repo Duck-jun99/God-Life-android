@@ -4,15 +4,24 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.SearchPostUseCase
+import com.godlife.network.model.PostDetailBody
+import com.godlife.network.model.UserProfileBody
+import com.godlife.network.model.UserProfileQuery
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -27,7 +36,8 @@ sealed class ProfileUiState {
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val getSearchPostUseCase: SearchPostUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel(){
 
@@ -57,10 +67,75 @@ class ProfileViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
+    //사용자 정보
+    private val _userInfo = MutableStateFlow<UserProfileBody>(UserProfileBody("", "", "", "", 0, 0, true))
+    val userInfo: StateFlow<UserProfileBody> = _userInfo
+
+    //조회된 사용자 게시물, 페이징을 이용하기에 지연 초기화
+    //lateinit var userPostList: Flow<PagingData<PostDetailBody>>
+    private val _userPostList = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
+    val userPostList: StateFlow<PagingData<PostDetailBody>> = _userPostList
+
+
+    /**
+     * Init
+     */
+    init {
+        viewModelScope.launch {
+            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
+        }
+    }
+
 
     /**
      * ProfileScreen에서 사용할 함수
      */
+
+    // 사용자 정보 가져오기
+    fun getUserProfile(memberId: String){
+
+        if(auth.value != ""){
+
+            val memberId = memberId
+
+            viewModelScope.launch(Dispatchers.IO) {
+                val result = getUserProfileUseCase.executeGetUserProfile(auth.value, memberId)
+
+                result
+                    .onSuccess {
+
+                        _userInfo.value = data.body
+
+                        getUserPosts()
+
+                        _uiState.value = ProfileUiState.Success("success")
+
+
+                    }
+                    .onError {
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken { getUserProfile(memberId) }
+
+                        }
+                        else {
+                            _uiState.value = ProfileUiState.Error("오류가 발생했습니다.")
+                        }
+
+                    }
+                    .onException {
+
+                        _uiState.value = ProfileUiState.Error("오류가 발생했습니다.")
+
+                    }
+
+            }
+
+        }
+
+    }
 
     // 이미지 확대 뷰 Visiblity 상태 변경
     fun setFullImageVisibility(){
@@ -76,14 +151,24 @@ class ProfileViewModel @Inject constructor(
      * Private 함수
      */
 
+    // 조회한 사용자의 게시물 불러오기
+    private fun getUserPosts(){
+        if(userInfo.value.nickname != null){
+
+            viewModelScope.launch {
+                getSearchPostUseCase.executeSearchPost(keyword = "", tags = "", nickname = userInfo.value.nickname).cachedIn(viewModelScope).collect {
+                    _userPostList.value = it
+                }
+            }
+
+        }
+    }
+
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){
         viewModelScope.launch(Dispatchers.IO) {
 
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
+            val response = reissueUseCase.executeReissue(auth.value)
 
             response
                 //성공적으로 넘어오면 유저 정보의 토큰을 갱신

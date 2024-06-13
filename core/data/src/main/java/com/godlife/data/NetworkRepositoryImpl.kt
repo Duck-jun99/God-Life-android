@@ -17,6 +17,7 @@ import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
+import com.godlife.network.model.UserProfileQuery
 import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
 
@@ -51,6 +52,13 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
         return networkDataSource.getUserInfo(authorization)
+    }
+
+    override suspend fun getUserProfile(
+        authorization: String,
+        memberId: String
+    ): ApiResponse<UserProfileQuery> {
+        return networkDataSource.getUserProfile(authorization, memberId)
     }
 
     override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {

@@ -16,6 +16,7 @@ import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
+import com.godlife.network.model.UserProfileQuery
 import com.skydoves.sandwich.ApiResponse
 
 interface NetworkDataSource {
@@ -34,6 +35,11 @@ interface NetworkDataSource {
     ): SignUpQuery
 
     suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery>
+
+    suspend fun getUserProfile(
+        authorization: String,
+        memberId: String
+    ): ApiResponse<UserProfileQuery>
 
     suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
 

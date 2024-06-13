@@ -30,6 +30,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +39,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -77,6 +81,8 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,6 +100,9 @@ fun CommunityPageScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val refreshState = rememberPullToRefreshState()
 
     Log.e("CommunityPageScreen", uiState.toString())
 
@@ -127,118 +136,134 @@ fun CommunityPageScreen(
             )
     ) {
 
-        Column(
-            modifier
-                .fillMaxWidth()
-                .height(280.dp)
-                .background(
-                    brush = Brush.linearGradient(
-                        listOf(
-                            Color(0xCC496B9F),
-                            Color(0xCB494A9F),
-                            Color(0xCC6A499F),
-                            Color(0xCC6A499F),
-                            Color(0xCC96499F),
-                            Color(0xCCDB67AD),
-                            Color(0xCCFF5E5E),
-                        )
-                    )
-                )
-                .statusBarsPadding()
-            , verticalArrangement = Arrangement.Top
-        ){
 
-            Box(
-                modifier
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                    .height(50.dp)
-                    .fillMaxWidth()){
 
-                Text(text = topTitle, style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            state = refreshState,
+            onRefresh = {
+
+                viewModel.refresh()
 
             }
+        ) {
 
             Column(
-                modifier
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                    .height(80.dp)) {
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                Color(0xCC496B9F),
+                                Color(0xCB494A9F),
+                                Color(0xCC6A499F),
+                                Color(0xCC6A499F),
+                                Color(0xCC96499F),
+                                Color(0xCCDB67AD),
+                                Color(0xCCFF5E5E),
+                            )
+                        )
+                    )
+                    .statusBarsPadding(),
+                verticalArrangement = Arrangement.Top
+            ){
 
-                Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+                Box(
+                    modifier
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                        .height(50.dp)
+                        .fillMaxWidth()){
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Text(text = topTitle, style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
 
-                GodLifeSearchBar(
-                    searchText = searchText,
-                    containerColor = OpaqueLight,
-                    onTextChanged = { viewModel.onSearchTextChange(it) },
-                    onSearchClicked = {
-                        viewModel.getSearchedPost(keyword = searchText)
-                        navController.navigate(SearchResultRoute.route)
+                }
+
+                Column(
+                    modifier
+                        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                        .height(80.dp)) {
+
+                    Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    GodLifeSearchBar(
+                        searchText = searchText,
+                        containerColor = OpaqueLight,
+                        onTextChanged = { viewModel.onSearchTextChange(it) },
+                        onSearchClicked = {
+                            viewModel.getSearchedPost(keyword = searchText)
+                            navController.navigate(SearchResultRoute.route)
+                        }
+                    )
+
+                }
+
+                Row(modifier = modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                    verticalAlignment = Alignment.Top) {
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp)
+                            .clickable { navController.navigate(FamousPostRoute.route) },
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
+
+                        CategoryBox(route = FamousPostRoute.route, categoryName = "인기 게시물", viewModel = viewModel)
+
                     }
-                )
 
-            }
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp)
+                            .clickable { navController.navigate(LatestPostRoute.route) },
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
 
-            Row(modifier = modifier
-                .fillMaxWidth()
-                .height(50.dp),
-                verticalAlignment = Alignment.Top) {
+                        CategoryBox(route = LatestPostRoute.route, categoryName = "최신 게시물", viewModel = viewModel)
 
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp)
-                        .clickable { navController.navigate(FamousPostRoute.route) },
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
+                    }
 
-                    CategoryBox(route = FamousPostRoute.route, categoryName = "인기 게시물", viewModel = viewModel)
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp)
+                            .clickable { navController.navigate(StimulusPostRoute.route) },
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
 
-                }
+                        CategoryBox(route = StimulusPostRoute.route, categoryName = "갓생 자극", viewModel = viewModel)
 
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp)
-                        .clickable { navController.navigate(LatestPostRoute.route) },
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
+                    }
 
-                    CategoryBox(route = LatestPostRoute.route, categoryName = "최신 게시물", viewModel = viewModel)
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp)
+                            .clickable { navController.navigate(RankingRoute.route) },
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
 
-                }
+                        CategoryBox(route = RankingRoute.route, categoryName = "명예의 전당", viewModel = viewModel)
 
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp)
-                        .clickable { navController.navigate(StimulusPostRoute.route) },
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
-
-                    CategoryBox(route = StimulusPostRoute.route, categoryName = "갓생 자극", viewModel = viewModel)
-
-                }
-
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp)
-                        .clickable { navController.navigate(RankingRoute.route) },
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
-
-                    CategoryBox(route = RankingRoute.route, categoryName = "명예의 전당", viewModel = viewModel)
+                    }
 
                 }
 
             }
 
         }
+
+
 
         //BottomSheet가 접혀있을 때 높이
         val initBottomSheetHeight = deviceHeight.dp - 170.dp - paddingValue
@@ -260,7 +285,8 @@ fun CommunityPageScreen(
             sheetContent = {
                 Box(modifier = modifier
                     .fillMaxWidth()
-                    .heightIn(max = expandedBottomSheetHeight)){
+                    .heightIn(max = expandedBottomSheetHeight)
+                ){
                     CommunityPageView(uiState = uiState, navController = navController, viewModel = viewModel)
                 }
 
@@ -381,7 +407,13 @@ fun ScreenEx2(modifier: Modifier = Modifier){
 
     val searchText by remember { mutableStateOf("") }
 
-    Scaffold(
+    var isRefreshing by remember { mutableStateOf(false) }
+
+    val cScope = rememberCoroutineScope()
+
+    val refreshState = rememberPullToRefreshState()
+
+    GodLifeTheme(
         modifier
             .fillMaxSize()
             .background(
@@ -399,142 +431,160 @@ fun ScreenEx2(modifier: Modifier = Modifier){
             )
     ) {
 
-        Column(
-            modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .background(
-                    brush = Brush.linearGradient(
-                        listOf(
-                            Color(0xCC496B9F),
-                            Color(0xCB494A9F),
-                            Color(0xCC6A499F),
-                            Color(0xCC6A499F),
-                            Color(0xCC96499F),
-                            Color(0xCCDB67AD),
-                            Color(0xCCFF5E5E),
-                        )
-                    )
-                )
-            , verticalArrangement = Arrangement.Top
-        ){
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            state = refreshState,
+            onRefresh = {
 
-            Box(
-                modifier
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                    .height(50.dp)
-                    .fillMaxWidth()){
+                cScope.launch {
+                    isRefreshing = !isRefreshing
+                    delay(2000L)
+                    isRefreshing = !isRefreshing
+                }
 
-                Text(text = "굿생 커뮤니티", style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
+
 
             }
+        ) {
 
             Column(
                 modifier
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                    .height(80.dp)) {
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                Color(0xCC496B9F),
+                                Color(0xCB494A9F),
+                                Color(0xCC6A499F),
+                                Color(0xCC6A499F),
+                                Color(0xCC96499F),
+                                Color(0xCCDB67AD),
+                                Color(0xCCFF5E5E),
+                            )
+                        )
+                    )
+                , verticalArrangement = Arrangement.Top
+            ){
 
-                Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+                Box(
+                    modifier
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                        .height(50.dp)
+                        .fillMaxWidth()){
 
-                Spacer(modifier = Modifier.height(15.dp))
-
-                GodLifeSearchBar(
-                    searchText = searchText,
-                    containerColor = OpaqueLight,
-                    onTextChanged = { it -> searchText },
-                    onSearchClicked = {  }
-                )
-
-                /*
-                SearchBar(
-                    modifier = modifier.height(40.dp),
-                    query = searchText,
-                    onQueryChange = { it -> searchText },
-                    onSearch = { it -> searchText },
-                    active = false,
-                    onActiveChange = {  },
-                    placeholder = { Text(text = "검색어를 입력하세요.") },
-                    leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null, tint = Color.White) },
-                    colors = SearchBarDefaults.colors(containerColor = OpaqueLight)
-                ) {
+                    Text(text = "굿생 커뮤니티", style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
 
                 }
 
-                 */
+                Column(
+                    modifier
+                        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                        .height(80.dp)) {
+
+                    Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    GodLifeSearchBar(
+                        searchText = searchText,
+                        containerColor = OpaqueLight,
+                        onTextChanged = { it -> searchText },
+                        onSearchClicked = {  }
+                    )
+
+                    /*
+                    SearchBar(
+                        modifier = modifier.height(40.dp),
+                        query = searchText,
+                        onQueryChange = { it -> searchText },
+                        onSearch = { it -> searchText },
+                        active = false,
+                        onActiveChange = {  },
+                        placeholder = { Text(text = "검색어를 입력하세요.") },
+                        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null, tint = Color.White) },
+                        colors = SearchBarDefaults.colors(containerColor = OpaqueLight)
+                    ) {
+
+                    }
+
+                     */
+
+                }
+
+                Row(modifier = modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                    verticalAlignment = Alignment.Top) {
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
+
+                        CategoryBoxPreview(categoryName = "인기 게시물", isSelected = true)
+
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
+
+                        CategoryBoxPreview(categoryName = "최신 게시물", isSelected = false)
+
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
+
+                        CategoryBoxPreview(categoryName = "갓생 자극", isSelected = false)
+
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .weight(0.25f)
+                            .padding(bottom = 5.dp),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )  {
+
+                        CategoryBoxPreview(categoryName = "명예의 전당", isSelected = false)
+
+                    }
+
+                }
 
             }
 
-            Row(modifier = modifier
-                .fillMaxWidth()
-                .height(50.dp),
-                verticalAlignment = Alignment.Top) {
-
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
-
-                    CategoryBoxPreview(categoryName = "인기 게시물", isSelected = true)
-
+            BottomSheetScaffold(
+                modifier = modifier.fillMaxWidth(),
+                sheetPeekHeight = deviceHeight.dp - 250.dp,
+                sheetContainerColor = OpaqueLight,
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 12.dp,
+                    topEnd = 12.dp
+                ),
+                sheetContent = {
+                    LatestPostScreen2Preview(deviceHeight = deviceHeight.dp)
                 }
-
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
-
-                    CategoryBoxPreview(categoryName = "최신 게시물", isSelected = false)
-
-                }
-
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
-
-                    CategoryBoxPreview(categoryName = "갓생 자극", isSelected = false)
-
-                }
-
-                Column(
-                    modifier = modifier
-                        .weight(0.25f)
-                        .padding(bottom = 5.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )  {
-
-                    CategoryBoxPreview(categoryName = "명예의 전당", isSelected = false)
-
-                }
+            ) {
 
             }
-
-        }
-
-        BottomSheetScaffold(
-            modifier = modifier.fillMaxWidth(),
-            sheetPeekHeight = deviceHeight.dp - 250.dp,
-            sheetContainerColor = OpaqueLight,
-            sheetShape = RoundedCornerShape(
-                bottomStart = 0.dp,
-                bottomEnd = 0.dp,
-                topStart = 12.dp,
-                topEnd = 12.dp
-            ),
-            sheetContent = {
-                LatestPostScreen2Preview(deviceHeight = deviceHeight.dp)
-            }
-        ) {
 
         }
 

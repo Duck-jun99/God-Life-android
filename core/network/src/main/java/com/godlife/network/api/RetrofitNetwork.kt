@@ -15,6 +15,7 @@ import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
+import com.godlife.network.model.UserProfileQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -62,6 +63,13 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
     ): ApiResponse<UserInfoQuery>
 
+    // 회원 정보 조회 (프로필)
+    @GET("/member/{memberId}")
+    suspend fun getUserProfile(
+        @Header("Authorization") authorization: String,
+        @Path("memberId") memberId: String
+    ): ApiResponse<UserProfileQuery>
+
     // 엑세스 토큰 갱신
     @POST("/reissue")
     suspend fun reissue(
@@ -105,6 +113,7 @@ interface RetrofitNetworkApi {
         @Query("page") page: Int,
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
+        //@Query("nickname") nickname: String = ""
     ): ApiResponse<LatestPostQuery>
 
     //일주일 인기 게시물 조회

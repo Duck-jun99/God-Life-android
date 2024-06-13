@@ -40,12 +40,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.navigation.CommunityPageRoute
+import com.godlife.community_page.navigation.PostDetailRoute
+import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
@@ -138,7 +142,10 @@ fun MainUiTheme(
 
             Scaffold(
                 bottomBar = {
-                    if(currentRoute.value != ProfileScreenRoute.route && currentRoute.value != ProfileEditScreenRoute.route){
+                    if(currentRoute.value != ProfileScreenRoute.route
+                        && currentRoute.value != ProfileEditScreenRoute.route
+                        && currentRoute.value != PostDetailRoute.route
+                        ) {
                         MyBottomNavigation(tabBarItems, navController)
                     }
                             },
@@ -171,15 +178,29 @@ fun MainUiTheme(
                     }
 
                     //프로필 화면
-                    composable(ProfileScreenRoute.route){
-                        ProfileScreen(navController = navController)
-                        currentRoute.value = ProfileScreenRoute.route
+                    composable("${ProfileScreenRoute.route}/{userId}", arguments =
+                    listOf(navArgument("userId"){type = NavType.StringType})
+                    ){
+                        val userId = it.arguments?.getString("userId")
+                        if(userId != null){
+                            ProfileScreen(navController = navController, userId = userId)
+                            currentRoute.value = ProfileScreenRoute.route
+                        }
+
                     }
 
                     //프로필 수정 화면
                     composable(ProfileEditScreenRoute.route){
                         ProfileEditScreen(navController = navController)
                         currentRoute.value = ProfileEditScreenRoute.route
+                    }
+
+                    //게시물 상세 화면
+                    composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+                        val postId = it.arguments?.getString("postId")
+                        if (postId != null) {
+                            PostDetailScreen(postId = postId)
+                        }
                     }
 
 

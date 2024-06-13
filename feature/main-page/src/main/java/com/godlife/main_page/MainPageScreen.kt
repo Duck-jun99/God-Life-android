@@ -172,7 +172,7 @@ fun MainPageScreen(
                                     .clip(CircleShape)
                                     .fillMaxSize()
                                     .background(color = GrayWhite)
-                                    .clickable { navController.navigate(ProfileScreenRoute.route) }
+                                    .clickable { navController.navigate("${ProfileScreenRoute.route}/${userInfo.memberId}") }
 
                                 Glide.with(LocalContext.current)
                                     .asBitmap()
