@@ -79,7 +79,7 @@ fun FamousPostScreen(
             Box(
                 modifier
                     .padding(start = 20.dp, end = 20.dp)
-                    .height(25.dp)){
+            ){
 
 
                 Row(modifier.fillMaxWidth()){

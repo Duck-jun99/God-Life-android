@@ -77,6 +77,7 @@ import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.profile.navigation.ProfileScreenRoute
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -139,22 +140,15 @@ fun ProfileEditScreen(
                 }
                 is ProfileEditUiState.Result -> {
 
-                    ProfileEditBox(innerPadding = innerPadding, viewModel = viewModel, launcher = launcher)
-
                     SideEffect {
                         scope.launch {
-                            val result = snackbarHostState.showSnackbar(
+                            snackbarHostState.showSnackbar(
                                 message = state.message,
-                                actionLabel = "이동하기",
                                 withDismissAction = true
                             )
-                            if (state.success) {
+                            delay(2000L)
 
-                                when (result) {
-                                    SnackbarResult.ActionPerformed -> navController.navigate(ProfileScreenRoute.route)
-                                    SnackbarResult.Dismissed -> { /* TODO */ }
-                                }
-                            }
+
                         }
                     }
                 }

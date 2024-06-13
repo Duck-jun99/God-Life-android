@@ -193,8 +193,9 @@ private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Acti
 fun ProfileCard(
     modifier: Modifier = Modifier,
     userInfo: UserInfoBody
-
 ) {
+
+    Log.e("ProfileCard", userInfo.nickname)
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -209,43 +210,37 @@ fun ProfileCard(
             verticalAlignment = Alignment.CenterVertically){
 
             //프로필 이미지 부분
-            Box(
-                modifier
-                    .size(100.dp),
-                contentAlignment = Alignment.Center){
+            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+            val imageModifier: Modifier = modifier
+                .size(50.dp, 50.dp)
+                .clip(CircleShape)
+                .fillMaxSize()
+                .background(color = GrayWhite)
 
-                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                val imageModifier: Modifier = modifier
-                    .size(50.dp, 50.dp)
-                    .clip(CircleShape)
-                    .fillMaxSize()
-                    .background(color = GrayWhite)
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load( if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
 
-                Glide.with(LocalContext.current)
-                    .asBitmap()
-                    .load(R.drawable.ic_person)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmap.value = resource
-                        }
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
 
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
-
-                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = imageModifier
-                    )   //bitmap이 없다면
-                } ?: Image(
-                    painter = painterResource(id = R.drawable.ic_person),
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                     modifier = imageModifier
-                )
-            }
+                )   //bitmap이 없다면
+            } ?: Image(
+                painter = painterResource(id = R.drawable.ic_person),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = imageModifier
+            )
 
             Spacer(modifier.size(10.dp))
 
