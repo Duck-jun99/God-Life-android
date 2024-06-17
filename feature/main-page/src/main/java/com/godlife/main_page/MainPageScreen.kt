@@ -16,6 +16,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -146,6 +147,8 @@ fun MainPageScreen(
                         .fillMaxSize()
                         .background(GrayWhite3)
                 ){
+
+
                     Box(
                         modifier
                             .fillMaxWidth()
@@ -153,17 +156,24 @@ fun MainPageScreen(
                             .padding(10.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
+
+                        //HERE
+
                         Row(
                             modifier
                                 .height(70.dp)
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ){
-                            Box(modifier.weight(0.8f)){
-                                Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium,)
-                            }
 
-                            Box(modifier.weight(0.1f)){
+                            Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
+
+
+                            Row(
+                                modifier = modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ){
 
                                 //프로필 사진
                                 val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
@@ -199,16 +209,14 @@ fun MainPageScreen(
                                     contentScale = ContentScale.FillWidth,
                                     modifier = imageModifier
                                 )
-                            }
 
-                            Box(modifier.weight(0.1f)){
+                                Spacer(modifier.size(10.dp))
 
                                 Icon(imageVector = Icons.Filled.Notifications,
                                     contentDescription = "Notification",
                                     tint = GrayWhite,
                                     modifier = modifier
-                                        .size(30.dp, 30.dp)
-                                        .align(Alignment.TopEnd)
+                                        .size(30.dp)
                                 )
                             }
 
@@ -261,7 +269,7 @@ fun MainPageScreen(
                             //오늘 설정한 투두리스트가 없을 경우
                             false -> {
 
-                                item{ MainNoTodoListBox(context, mainActivity, createNavigator) }
+                                item{ MainNoTodoListBox(mainActivity, createNavigator) }
 
                             }
                         }
@@ -291,12 +299,23 @@ fun MainPageScreen(
 }
 
 @Composable
-fun MainTodoListBox(viewModel: MainPageViewModel,
-                    modifier: Modifier = Modifier){
+fun MainTodoListBox(
+    viewModel: MainPageViewModel,
+    modifier: Modifier = Modifier
+){
 
-    var todoListCount = viewModel.getTodoListCount()
+    var todayTodoListSize = viewModel.todayTodoListSize.collectAsState().value
+    var completedTodoListSize = viewModel.completedTodoListSize.collectAsState().value
+    Log.e("MainTodoListBox", "todayTodoListSize: $todayTodoListSize, completedTodoListSize: $completedTodoListSize")
 
-    var todoPercent = 360 * (todoListCount[1].toFloat() / todoListCount[0].toFloat())
+
+    //var todoPercent = 360 * (todayTodoListSize.toFloat() / completedTodoListSize.toFloat())
+
+    val todoPercent = if (completedTodoListSize > 0) {
+        360 * (todayTodoListSize.toFloat() / completedTodoListSize.toFloat())
+    } else {
+        0f
+    }
 
     val animatedValue = remember { Animatable(0f) }
 
@@ -304,75 +323,69 @@ fun MainTodoListBox(viewModel: MainPageViewModel,
     // 특정 값으로 색을 채우는 Animation
     LaunchedEffect(Unit) {
         animatedValue.animateTo(
-            //targetValue = targetvalue,
             targetValue = todoPercent,
             animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
         )
     }
 
-
-
     Box(modifier = modifier
         .fillMaxWidth()
-        .height(360.dp)
+        .height(450.dp)
         .background(
             color = Color.White,
             shape = RoundedCornerShape(20.dp)
-        )){
+        ),
+        contentAlignment = Alignment.Center
+    ){
 
-        Column(
+        Box(
+            modifier = Modifier
+                .size(360.dp),
+            contentAlignment = Alignment.Center
         ) {
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(360.dp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                Column(modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-                    Text(text = "${todoListCount[1]} / ${todoListCount[0]}", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
-                }
-
-
-
-                Canvas(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    val size: Size = drawContext.size
-                    val sizeArc = size / 1.75F
-                    drawArc(
-                        color = Color(0xFFE1E2E9),
-                        startAngle = 0f,
-                        sweepAngle = 360f,
-                        useCenter = false,
-                        topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
-                        size = sizeArc,
-                        style = Stroke(width = 50f)
-                    )
-
-                    drawArc(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xff63C6C4), PurpleMain
-                            ),
-                            start = Offset.Zero,
-                            end = Offset.Infinite,
-                        ),
-                        startAngle = 100f,
-                        sweepAngle = animatedValue.value,
-                        useCenter = false,
-                        topLeft = Offset(
-                            (size.width - sizeArc.width) / 2f,
-                            (size.height - sizeArc.height) / 2f
-                        ),
-                        size = sizeArc,
-                        style = Stroke(width = 50f, cap = StrokeCap.Round)
-                    )
-                }
+                Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
             }
 
+
+            Canvas(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val size: Size = drawContext.size
+                val sizeArc = size / 1.75F
+                drawArc(
+                    color = Color(0xFFE1E2E9),
+                    startAngle = 0f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                    size = sizeArc,
+                    style = Stroke(width = 50f)
+                )
+
+                drawArc(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xff63C6C4), PurpleMain
+                        ),
+                        start = Offset.Zero,
+                        end = Offset.Infinite,
+                    ),
+                    startAngle = 100f,
+                    sweepAngle = animatedValue.value,
+                    useCenter = false,
+                    topLeft = Offset(
+                        (size.width - sizeArc.width) / 2f,
+                        (size.height - sizeArc.height) / 2f
+                    ),
+                    size = sizeArc,
+                    style = Stroke(width = 50f, cap = StrokeCap.Round)
+                )
+            }
         }
     }
 
@@ -380,10 +393,11 @@ fun MainTodoListBox(viewModel: MainPageViewModel,
 
 
 @Composable
-fun MainNoTodoListBox(context: Context,
-                      mainActivity: Activity,
-                      createNavigator: CreatetodolistNavigator,
-                      modifier: Modifier = Modifier){
+fun MainNoTodoListBox(
+    mainActivity: Activity,
+    createNavigator: CreatetodolistNavigator,
+    modifier: Modifier = Modifier
+){
 
     val animatedValue = remember { Animatable(0f) }
 
@@ -407,19 +421,22 @@ fun MainNoTodoListBox(context: Context,
             shape = RoundedCornerShape(20.dp)
         )){
 
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(360.dp)
+                    .size(360.dp),
+                contentAlignment = Alignment.Center
             ) {
 
-                Column(modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "오늘의 투두리스트를\n 만들어주세요!", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-                    //Text(text = "2/5", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
-                }
+                Text(
+                    text = "오늘의 투두리스트를\n 만들어주세요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 15.sp),
+                    textAlign = TextAlign.Center
+                )
 
                 Canvas(
                     modifier = Modifier.fillMaxSize()
@@ -493,7 +510,7 @@ fun TodoListBox(
 
          */
 
-        todayTodoList.todoList.forEachIndexed { index, item ->
+        todayTodoList?.todoList?.forEachIndexed { index, item ->
             if (item.iscompleted) {
                 CompletedTodayList(item, viewModel)
             } else {
@@ -530,7 +547,10 @@ fun NoCompletedTodayList(
 
             GodLifeButton(
                 onClick = {
+                    /*
                     viewModel.setTodoValueCompleted(todo)
+
+                     */
                 },
                 modifier = Modifier.align(Alignment.End)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))

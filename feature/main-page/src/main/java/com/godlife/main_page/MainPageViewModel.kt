@@ -8,9 +8,9 @@ import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
-import com.godlife.model.todo.EndTimeData
 import com.godlife.model.todo.NotificationTimeData
 import com.godlife.model.todo.TodoList
+import com.godlife.model.todo.TodoTimeData
 import com.godlife.network.model.UserInfoBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -79,12 +79,22 @@ class MainPageViewModel @Inject constructor(
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     // 오늘 투두리스트
-    private val _todayTodoList = MutableStateFlow<TodoEntity>(TodoEntity(0, emptyList(), EndTimeData(0,0,0,0,0), NotificationTimeData(0,0,0,0,0)))
-    val todayTodoList: StateFlow<TodoEntity> = _todayTodoList
+    private val _todayTodoList = MutableStateFlow<TodoEntity?>(null)
+    val todayTodoList: StateFlow<TodoEntity?> = _todayTodoList
 
     //오늘 투두리스트 진행 상황
     private val _completedCount = MutableStateFlow<Int>(0)
     val completedCount: StateFlow<Int> = _completedCount
+
+    //오늘 투두리스트 사이즈
+    private val _todayTodoListSize = MutableStateFlow<Int>(0)
+    val todayTodoListSize: StateFlow<Int> = _todayTodoListSize
+
+
+    //완료한 투두리스트 사이즈
+    private val _completedTodoListSize = MutableStateFlow<Int>(0)
+    val completedTodoListSize: StateFlow<Int> = _completedTodoListSize
+
 
 
     /**
@@ -122,6 +132,26 @@ class MainPageViewModel @Inject constructor(
     private fun getTodayTodoList(){
 
         viewModelScope.launch(Dispatchers.IO) {
+            _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
+
+            if(todayTodoList.value!=null){
+                _todayTodoListExists.value = true
+
+                _todayTodoListSize.value = todayTodoList.value!!.todoList.size
+
+                todayTodoList.value!!.todoList.forEach {
+                    if(it.iscompleted){
+                        _completedTodoListSize.value += 1
+                    }
+
+                }
+
+            }
+
+        }
+
+        /*
+        viewModelScope.launch(Dispatchers.IO) {
 
             val allTodoList = localDatabaseUseCase.getAllTodoList()
 
@@ -142,6 +172,8 @@ class MainPageViewModel @Inject constructor(
             }
 
         }
+
+         */
 
     }
 
@@ -258,16 +290,28 @@ class MainPageViewModel @Inject constructor(
 
     }
 
-    fun getTodoListCount():List<Int>{
-        var completedCount = 0
-        todayTodoList.value.todoList.forEach {
-            if(it.iscompleted){
-                completedCount+=1
+    /*
+    fun getTodoListCount(): List<Int?> {
+        val todayTodoListValue = todayTodoList.value
+
+        val completedCount = if (todayTodoListValue != null) {
+            var count = 0
+            todayTodoListValue.todoList.forEach {
+                if (it.iscompleted) {
+                    count += 1
+                }
             }
+            count
+        } else {
+            0
         }
-        return listOf(todayTodoList.value.todoList.size, completedCount)
+
+        return listOf(todayTodoListSize, completedCount)
     }
 
+     */
+
+    /*
     fun setTodoValueCompleted(todo: TodoList){
         viewModelScope.launch(Dispatchers.IO) {
             val newList = _todayTodoList.value
@@ -277,6 +321,8 @@ class MainPageViewModel @Inject constructor(
 
         }
     }
+
+     */
 
     // 현재 시간대에 따른 인사말
     fun setTodayTimeText(): List<Any> {

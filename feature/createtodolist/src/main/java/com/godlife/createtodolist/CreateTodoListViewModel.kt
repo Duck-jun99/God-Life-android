@@ -7,13 +7,14 @@ import com.godlife.createtodolist.model.TodoList
 import com.godlife.createtodolist.model.TodoListForm
 import com.godlife.database.model.TodoEntity
 import com.godlife.domain.LocalDatabaseUseCase
-import com.godlife.model.todo.EndTimeData
 import com.godlife.model.todo.NotificationTimeData
+import com.godlife.model.todo.TodoTimeData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,18 +29,20 @@ class CreateTodoListViewModel @Inject constructor(
     private val _selectedList = MutableStateFlow<List<String>>(emptyList())
     val selectedList: StateFlow<List<String>> = _selectedList
 
-    private val _endTime = MutableStateFlow<EndTimeData?>(null)
-    val endTime: StateFlow<EndTimeData?> = _endTime
+    private val _notificationTime = MutableStateFlow<NotificationTimeData>(NotificationTimeData(0,0,0,0,0))
+    private val notificationTime: StateFlow<NotificationTimeData> = _notificationTime
 
-    private val _notificationTime = MutableStateFlow<NotificationTimeData?>(null)
-    val notificationTime: StateFlow<NotificationTimeData?> = _notificationTime
+    private val _notificationSwitchState = MutableStateFlow(false)
+    val notificationSwitchState: StateFlow<Boolean> = _notificationSwitchState
+
+    //추가 플래그
+    private val _flag = MutableStateFlow(0)
+    val flag: StateFlow<Int> = _flag
 
     fun toggleSelect(todo: TodoListForm){
-        viewModelScope.launch(Dispatchers.IO) {
-            //_todoList.value[_todoList.value.indexOf(todo)].isSelected = !_todoList.value[_todoList.value.indexOf(todo)].isSelected
-            val newList = _todoList.value.map { if (it == todo) it.copy(isSelected = !it.isSelected) else it }
-            _todoList.value = newList
-        }
+
+        val newList = _todoList.value.map { if (it == todo) it.copy(isSelected = !it.isSelected) else it }
+        _todoList.value = newList
 
     }
 
@@ -63,21 +66,19 @@ class CreateTodoListViewModel @Inject constructor(
         }
     }
 
+    fun updateNotificationTime(time: NotificationTimeData) {
 
-    fun updateEndTime(time: EndTimeData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _endTime.value = time
-            Log.e("updateEndTime", _endTime.value.toString())
-            Log.e("updateEndTime", time.toString())
-        }
+        _notificationTime.value = time
 
     }
 
-    fun updateNotificationTime(time: NotificationTimeData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _notificationTime.value = time
-        }
+    fun updateNotificationSwitchState() {
+        _notificationSwitchState.value = !notificationSwitchState.value
 
+        //알림 설정 안하면 알림 시간도 초기화
+        if(!_notificationSwitchState.value){
+            _notificationTime.value = NotificationTimeData(0,0,0,0,0)
+        }
     }
 
     suspend fun getDatabase(){
@@ -88,22 +89,36 @@ class CreateTodoListViewModel @Inject constructor(
 
 
     fun addDatabase(){
+
+
+        //Format Data
+        val formattedTodoList: List<com.godlife.model.todo.TodoList>
+                = selectedList.value.map { com.godlife.model.todo.TodoList(it, false) }
+
+        val data = TodoEntity(
+            date = TodoTimeData(
+                LocalDateTime.now().year,
+                LocalDateTime.now().monthValue,
+                LocalDateTime.now().dayOfMonth
+            ),
+            todoList = formattedTodoList,
+            notificationBoolean = notificationSwitchState.value,
+            notificationTime = notificationTime.value,
+            isCompleted = false
+        )
+
+        //Log.e("CreateViewModel", "data: ${data.toString()}")
+
+
         viewModelScope.launch(Dispatchers.IO){
-            Log.e("CreateViewModel","addDatabase()")
-            val formattedTodoList:List<com.godlife.model.todo.TodoList>
-            = selectedList.value.map { com.godlife.model.todo.TodoList(it, false) }
 
-           val data = TodoEntity(
-                todoList = formattedTodoList,
-                endTime = endTime.value!!,
-                notificationTime = notificationTime.value!!
-            )
+            if(flag.value == 0){
+                localDatabaseUseCase.insertTodo(data)
+                Log.e("CreateViewModel", localDatabaseUseCase.getAllTodoList().toString())
+                _flag.value = 1
+            }
 
-            Log.e("CreateViewModel", data.toString())
 
-            localDatabaseUseCase.insertTodo(data)
-
-            Log.e("CreateViewModel", localDatabaseUseCase.getAllTodoList().toString())
         }
 
     }

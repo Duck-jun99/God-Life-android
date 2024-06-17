@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -110,11 +113,14 @@ fun CommunityPageScreen(
 
     val topTitle by remember { viewModel.topTitle }
 
-    val deviceHeight = LocalConfiguration.current.screenHeightDp
+    val deviceHeight = LocalConfiguration.current.screenHeightDp.dp
+
+    var totalViewHeight by remember { mutableStateOf(0.dp) }
 
 
     Log.e("deviceHeight", deviceHeight.toString())
     Log.e("paddingValue", paddingValue.toString())
+    Log.e("totalViewSize", totalViewHeight.toString())
 
     val searchText by viewModel.searchText.collectAsState()
 
@@ -135,8 +141,6 @@ fun CommunityPageScreen(
                 )
             )
     ) {
-
-
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -165,7 +169,10 @@ fun CommunityPageScreen(
                             )
                         )
                     )
-                    .statusBarsPadding(),
+                    .statusBarsPadding()
+                    .onGloballyPositioned { layoutCoordinates ->
+                        totalViewHeight = layoutCoordinates.size.height.dp
+                    },
                 verticalArrangement = Arrangement.Top
             ){
 
@@ -266,7 +273,7 @@ fun CommunityPageScreen(
 
 
         //BottomSheet가 접혀있을 때 높이
-        val initBottomSheetHeight = deviceHeight.dp - 170.dp - paddingValue
+        val initBottomSheetHeight = deviceHeight - 170.dp - paddingValue
         //BottomSheet가 펼쳐졌을 때 높이
         val expandedBottomSheetHeight = initBottomSheetHeight + 110.dp
 
@@ -281,10 +288,10 @@ fun CommunityPageScreen(
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
             sheetPeekHeight = initBottomSheetHeight,
+            sheetMaxWidth = LocalConfiguration.current.screenWidthDp.dp,
             sheetContainerColor = Color.White,
             sheetContent = {
                 Box(modifier = modifier
-                    .fillMaxWidth()
                     .heightIn(max = expandedBottomSheetHeight)
                 ){
                     CommunityPageView(uiState = uiState, navController = navController, viewModel = viewModel)
@@ -401,7 +408,7 @@ fun CommunityPageView(modifier: Modifier = Modifier, uiState: CommunityPageUiSta
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = false)
 @Composable
-fun ScreenEx2(modifier: Modifier = Modifier){
+fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
 
     val deviceHeight = LocalConfiguration.current.screenHeightDp
 

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -70,30 +71,13 @@ fun FamousPostScreen(
 ){
 
     GodLifeTheme {
-        Column(
+        LazyColumn(
             modifier
                 .fillMaxSize()
                 .background(GrayWhite3)
         ) {
 
-            Box(
-                modifier
-                    .padding(start = 20.dp, end = 20.dp)
-            ){
-
-
-                Row(modifier.fillMaxWidth()){
-                    Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
-                    Spacer(modifier.size(5.dp))
-                    Text(text = "일주일동안 갓생 인정을 많이 받은 게시물이에요", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
-                }
-
-
-            }
-
-            Spacer(modifier = modifier.size(20.dp))
-
-            WeeklyFamousPostListView(viewModel = viewModel, navController = navController)
+            item{ WeeklyFamousPostListView(viewModel = viewModel, navController = navController) }
 
         }
     }
@@ -121,6 +105,16 @@ fun WeeklyFamousPostListView(
         contentAlignment = Alignment.CenterStart
     ){
         Column {
+
+            Row(modifier.fillMaxWidth()){
+                Icon(
+                    modifier = modifier.size(25.dp),
+                    painter = painterResource(R.drawable.star_icons8),
+                    contentDescription = "",
+                    tint = Color.Unspecified)
+                Spacer(modifier.size(5.dp))
+                Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            }
 
 
             Spacer(modifier.size(10.dp))
@@ -268,6 +262,16 @@ fun WeeklyFamousPostListViewPreview(modifier: Modifier = Modifier){
         contentAlignment = Alignment.CenterStart
     ){
         Column {
+
+            Row(modifier.fillMaxWidth()){
+                Icon(
+                    modifier = modifier.size(25.dp),
+                    painter = painterResource(R.drawable.star_icons8),
+                    contentDescription = "",
+                    tint = Color.Unspecified)
+                Spacer(modifier.size(5.dp))
+                Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            }
 
 
             Spacer(modifier.size(10.dp))

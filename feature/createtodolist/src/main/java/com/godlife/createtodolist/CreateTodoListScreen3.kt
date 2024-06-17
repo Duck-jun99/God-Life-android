@@ -68,10 +68,6 @@ fun LoadingUI(
 ){
     GodLifeTheme {
 
-        val selectedList by createViewModel.selectedList.collectAsState()
-        val endTime by createViewModel.endTime.collectAsState()
-        val notificationTime by createViewModel.notificationTime.collectAsState()
-
         createViewModel.addDatabase()
 
         Box(
