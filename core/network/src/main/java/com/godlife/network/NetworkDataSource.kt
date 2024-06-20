@@ -7,6 +7,8 @@ import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -17,6 +19,7 @@ import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
 
 interface NetworkDataSource {
@@ -108,4 +111,13 @@ interface NetworkDataSource {
         postId: Int
     ): ApiResponse<GodScoreQuery>
 
+
+    suspend fun getWeeklyFamousMembers(
+        authorization: String
+    ): ApiResponse<WeeklyRankingQuery>
+
+    suspend fun postNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
 }

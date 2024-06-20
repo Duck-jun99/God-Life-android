@@ -1,3 +1,4 @@
+import com.godlife.god_life.configureFirebase
 import com.godlife.god_life.configureHiltAndroid
 import com.godlife.god_life.configureKakaoSdk
 import com.godlife.god_life.configureKotestAndroid
@@ -11,3 +12,4 @@ configureKotlinAndroid()
 configureHiltAndroid()
 configureKotestAndroid()
 configureKakaoSdk()
+configureFirebase()

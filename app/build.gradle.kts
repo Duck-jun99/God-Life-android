@@ -10,6 +10,8 @@ plugins {
 
     id("god_life.android.hilt")
     id("god_life.android.room")
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -63,6 +65,8 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.database)
     implementation(projects.core.common)
+    implementation(projects.core.sharedpreference)
+    implementation(projects.core.service)
 
     implementation(projects.feature.main)
     implementation(projects.feature.login)

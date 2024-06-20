@@ -8,6 +8,8 @@ import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -18,6 +20,7 @@ import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
 
@@ -135,6 +138,17 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
         return networkDataSource.agreeGodLife(authorization, postId)
+    }
+
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+        return networkDataSource.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun postNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkDataSource.postNotificationTime(authorization, notificationTime)
     }
 
 }

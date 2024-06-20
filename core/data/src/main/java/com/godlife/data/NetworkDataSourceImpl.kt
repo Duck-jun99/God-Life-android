@@ -18,8 +18,11 @@ import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
 import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -175,6 +178,17 @@ class NetworkDataSourceImpl @Inject constructor(
 
     override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
         return networkApi.agreeGodLife(authorization, postId)
+    }
+
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+        return networkApi.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun postNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkApi.postNotificationTime(authorization, notificationTime)
     }
 
 

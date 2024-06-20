@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,18 +18,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -48,6 +46,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +54,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -63,7 +61,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
 import com.godlife.community_page.latest.LatestPostScreen
@@ -77,12 +74,11 @@ import com.godlife.community_page.navigation.StimulusPostRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
-import com.godlife.community_page.stimulus.StimulusPostScreen
+import com.godlife.community_page.stimulus.StimulusPostScreenPreview
 import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
-import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -113,20 +109,44 @@ fun CommunityPageScreen(
 
     val topTitle by remember { viewModel.topTitle }
 
-    val deviceHeight = LocalConfiguration.current.screenHeightDp.dp
+    //val deviceHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    var totalViewHeight by remember { mutableStateOf(0.dp) }
+    var height by remember {
+        mutableStateOf(0.dp)
+    }
 
+    val localDensity = LocalDensity.current
+/*
+    val statusBarPaddingValues = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
 
     Log.e("deviceHeight", deviceHeight.toString())
-    Log.e("paddingValue", paddingValue.toString())
-    Log.e("totalViewSize", totalViewHeight.toString())
+    Log.e("paddingValue", "${paddingValue.toString()} (innerPadding.calculateBottomPadding())")
+    Log.e("paddingValues", statusBarPaddingValues.toString())
+    //Log.e("totalViewSize", totalViewHeight.toString())
+
+
+ */
+    Log.e("height", height.toString())
+
+
+    //BottomSheet가 접혀있을 때 높이
+    val initBottomSheetHeight = height - 260.dp
+    //val initBottomSheetHeight = deviceHeight - 170.dp - paddingValue
+
+    /*
+    //BottomSheet가 펼쳐졌을 때 높이
+    val expandedBottomSheetHeight = initBottomSheetHeight + 110.dp
+
+     */
 
     val searchText by viewModel.searchText.collectAsState()
 
     GodLifeTheme(
         modifier
             .fillMaxSize()
+            .onGloballyPositioned { height = with(localDensity){
+                it.size.height.toDp()
+            } }
             .background(
                 brush = Brush.linearGradient(
                     listOf(
@@ -169,10 +189,7 @@ fun CommunityPageScreen(
                             )
                         )
                     )
-                    .statusBarsPadding()
-                    .onGloballyPositioned { layoutCoordinates ->
-                        totalViewHeight = layoutCoordinates.size.height.dp
-                    },
+                    .statusBarsPadding(),
                 verticalArrangement = Arrangement.Top
             ){
 
@@ -271,12 +288,6 @@ fun CommunityPageScreen(
         }
 
 
-
-        //BottomSheet가 접혀있을 때 높이
-        val initBottomSheetHeight = deviceHeight - 170.dp - paddingValue
-        //BottomSheet가 펼쳐졌을 때 높이
-        val expandedBottomSheetHeight = initBottomSheetHeight + 110.dp
-
         //BottomSheetScaffold의 상태
         val scaffoldState = rememberBottomSheetScaffoldState()
 
@@ -285,22 +296,26 @@ fun CommunityPageScreen(
 
         //Log.e("bottomSheetState", scaffoldState.bottomSheetState.currentValue.toString())
 
-        BottomSheetScaffold(
-            scaffoldState = scaffoldState,
-            sheetPeekHeight = initBottomSheetHeight,
-            sheetMaxWidth = LocalConfiguration.current.screenWidthDp.dp,
-            sheetContainerColor = Color.White,
-            sheetContent = {
-                Box(modifier = modifier
-                    .heightIn(max = expandedBottomSheetHeight)
-                ){
-                    CommunityPageView(uiState = uiState, navController = navController, viewModel = viewModel)
+        if(height!= 0.0.dp){
+            BottomSheetScaffold(
+                scaffoldState = scaffoldState,
+                sheetPeekHeight = initBottomSheetHeight,
+                sheetMaxWidth = LocalConfiguration.current.screenWidthDp.dp,
+                sheetContainerColor = Color.White,
+                sheetContent = {
+                    Box(
+                        modifier = modifier
+                            //.heightIn(max = expandedBottomSheetHeight)
+                    ){
+                        CommunityPageView(uiState = uiState, navController = navController, viewModel = viewModel)
+                    }
+
                 }
+            ) {
 
             }
-        ) {
-
         }
+
 
     }
 }
@@ -378,12 +393,13 @@ fun CommunityPageView(modifier: Modifier = Modifier, uiState: CommunityPageUiSta
 
         composable(StimulusPostRoute.route) {
             viewModel.changeCurrentRoute(route = StimulusPostRoute.route)
-            StimulusPostScreen()
+            //StimulusPostScreen()
+            StimulusPostScreenPreview()
         }
 
         composable(RankingRoute.route) {
             viewModel.changeCurrentRoute(route = RankingRoute.route)
-            RankingScreen()
+            RankingScreen(navController = navController, viewModel = viewModel)
         }
 
         //PostDeatil Screen
@@ -420,9 +436,18 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
 
     val refreshState = rememberPullToRefreshState()
 
+    var height by remember {
+        mutableStateOf(0.dp)
+    }
+
+    val localDensity = LocalDensity.current
+
     GodLifeTheme(
         modifier
             .fillMaxSize()
+            .onGloballyPositioned { height = with(localDensity){
+                it.size.height.toDp()
+            } }
             .background(
                 brush = Brush.linearGradient(
                     listOf(

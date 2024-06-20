@@ -1,4 +1,5 @@
 import com.godlife.god_life.configureAndroidPaging
+import com.godlife.god_life.configureFirebase
 import com.godlife.god_life.configureHiltAndroid
 import com.godlife.god_life.configureKakaoSdk
 import com.godlife.god_life.configureLottie
@@ -19,6 +20,7 @@ configureHiltAndroid()
 configureKakaoSdk()
 configureLottie()
 configureAndroidPaging()
+configureFirebase()
 
 dependencies {
     implementation(project(":core:model"))

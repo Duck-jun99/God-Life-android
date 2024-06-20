@@ -7,21 +7,56 @@ import com.godlife.createtodolist.model.TodoList
 import com.godlife.createtodolist.model.TodoListForm
 import com.godlife.database.model.TodoEntity
 import com.godlife.domain.LocalDatabaseUseCase
+import com.godlife.domain.LocalPreferenceUserUseCase
+import com.godlife.domain.PostNotificationTimeUseCase
 import com.godlife.model.todo.NotificationTimeData
 import com.godlife.model.todo.TodoTimeData
+import com.skydoves.sandwich.message
+import com.skydoves.sandwich.onError
+import com.skydoves.sandwich.onException
+import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
+sealed class CreateTodoListUiState {
+    object Loading : CreateTodoListUiState()
+    data class NotiSuccess(val data: String) : CreateTodoListUiState()
+    data class Success(val data: String) : CreateTodoListUiState()
+    data class Error(val message: String) : CreateTodoListUiState()
+}
+
 @HiltViewModel
 class CreateTodoListViewModel @Inject constructor(
-    private val localDatabaseUseCase: LocalDatabaseUseCase
+    private val localDatabaseUseCase: LocalDatabaseUseCase,
+    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
+    private val postNotificationTimeUseCase: PostNotificationTimeUseCase
 ) :ViewModel(){
 
+    /**
+     * State
+     */
+
+    // UI 상태 (알림 시간 서버에 전송 중 -> Loading, 성공 -> Success, 실패 -> Error)
+    private val _uiState = MutableStateFlow<CreateTodoListUiState>(CreateTodoListUiState.Loading)
+    val uiState: StateFlow<CreateTodoListUiState> = _uiState
+
+    //알림 설정 유무
+    private val _notificationSwitchState = MutableStateFlow(false)
+    val notificationSwitchState: StateFlow<Boolean> = _notificationSwitchState
+
+    /**
+     * Data
+     */
+
+    //엑세스 토큰 저장 변수
+    private val _auth = MutableStateFlow("")
+    val auth: StateFlow<String> = _auth
 
     private val _todoList = MutableStateFlow(TodoList().getTodoList())
     val todoList: StateFlow<List<TodoListForm>> = _todoList
@@ -32,12 +67,21 @@ class CreateTodoListViewModel @Inject constructor(
     private val _notificationTime = MutableStateFlow<NotificationTimeData>(NotificationTimeData(0,0,0,0,0))
     private val notificationTime: StateFlow<NotificationTimeData> = _notificationTime
 
-    private val _notificationSwitchState = MutableStateFlow(false)
-    val notificationSwitchState: StateFlow<Boolean> = _notificationSwitchState
 
-    //추가 플래그
-    private val _flag = MutableStateFlow(0)
-    val flag: StateFlow<Int> = _flag
+    //데이터베이스 추가 플래그
+    private val _dbFlag = MutableStateFlow(0)
+    val dbFlag: StateFlow<Int> = _dbFlag
+
+    //서버 알림 시간 전송 플래그
+    private val _serverFlag = MutableStateFlow(0)
+    val serverFlag: StateFlow<Int> = _serverFlag
+
+    init {
+        viewModelScope.launch {
+            //엑세스 토큰 저장
+            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
+        }
+    }
 
     fun toggleSelect(todo: TodoListForm){
 
@@ -75,21 +119,85 @@ class CreateTodoListViewModel @Inject constructor(
     fun updateNotificationSwitchState() {
         _notificationSwitchState.value = !notificationSwitchState.value
 
-        //알림 설정 안하면 알림 시간도 초기화
+        //알림 설정 안하면
         if(!_notificationSwitchState.value){
+            //알림 시간 초기화
             _notificationTime.value = NotificationTimeData(0,0,0,0,0)
+
+            //Ui State NotiSuccess로 변경
+            _uiState.value = CreateTodoListUiState.NotiSuccess("알림 시간 설정 안함")
+        }
+
+        //알림 설정하면
+        else{
+            //Ui State Loading으로 변경
+            _uiState.value = CreateTodoListUiState.Loading
         }
     }
 
-    suspend fun getDatabase(){
-        val allTodoList = localDatabaseUseCase.getAllTodoList()
-        Log.e("CreateViewModel", allTodoList.toString())
+    // 전체 과정 작업 (내부 DB 저장, 서버에 알림 시간 전송)
+    fun saveTodoList(){
+
+        when(notificationSwitchState.value){
+
+            //알림 설정하면 서버에 알림 시간 전송 후 성공하면 내부 DB에 저장
+            true -> {
+
+                viewModelScope.launch {
+
+                    if(serverFlag.value == 0){
+
+                        _serverFlag.value = 1
+
+                        delay(2000L)
+
+                        //서버에 알림 시간 전송 후 성공하면 내부 DB에 저장
+                        val result =
+                            postNotificationTimeUseCase.executePostNotificationTime(
+                                authorId = auth.value,
+                                notificationTime = notificationTime.value
+                            )
+
+                        result
+                            .onSuccess {
+
+                                _uiState.value = CreateTodoListUiState.NotiSuccess("알림 시간 전송 성공")
+
+                                addDatabase()
+
+                            }
+                            .onError {
+
+                                _uiState.value = CreateTodoListUiState.Error(this.message())
+
+                            }
+                            .onException {
+
+                                _uiState.value = CreateTodoListUiState.Error(this.message())
+
+                            }
+
+                    }
+
+
+
+                }
+
+            }
+            //알림 설정 안하면 그냥 내부 DB에 저장
+            false -> {
+
+                addDatabase()
+
+            }
+        }
+
+
+
 
     }
 
-
-    fun addDatabase(){
-
+    private fun addDatabase(){
 
         //Format Data
         val formattedTodoList: List<com.godlife.model.todo.TodoList>
@@ -112,14 +220,26 @@ class CreateTodoListViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO){
 
-            if(flag.value == 0){
+            if(dbFlag.value == 0){
+                _dbFlag.value = 1
+
                 localDatabaseUseCase.insertTodo(data)
                 Log.e("CreateViewModel", localDatabaseUseCase.getAllTodoList().toString())
-                _flag.value = 1
+
+                delay(3000L)
+
+                _uiState.value = CreateTodoListUiState.Success("성공")
+
+
             }
 
-
         }
+
+    }
+
+    suspend fun getDatabase(){
+        val allTodoList = localDatabaseUseCase.getAllTodoList()
+        Log.e("CreateViewModel", allTodoList.toString())
 
     }
 

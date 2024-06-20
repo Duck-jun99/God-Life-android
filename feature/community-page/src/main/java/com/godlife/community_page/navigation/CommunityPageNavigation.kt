@@ -32,6 +32,10 @@ object PostDetailRoute{
 
 }
 
+object StimulusPostDetailRoute{
+    const val route = "StimulusDetailScreen"
+}
+
 object SearchResultRoute{
     const val route = "SearchResultScreen"
 

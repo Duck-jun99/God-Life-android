@@ -2,6 +2,7 @@ import com.godlife.god_life.configureAndroidGlide
 import com.godlife.god_life.configureAndroidPaging
 import com.godlife.god_life.configureAndroidRoom
 import com.godlife.god_life.configureCoroutineAndroid
+import com.godlife.god_life.configureFirebase
 import com.godlife.god_life.configureGson
 import com.godlife.god_life.configureHiltAndroid
 import com.godlife.god_life.configureKotest

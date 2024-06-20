@@ -65,6 +65,7 @@ import com.godlife.profile.ProfileEditScreen
 import com.godlife.profile.ProfileScreen
 import com.godlife.profile.navigation.ProfileEditScreenRoute
 import com.godlife.profile.navigation.ProfileScreenRoute
+import com.godlife.service.MyFirebaseMessagingService
 import com.godlife.setting_page.SettingPageScreen
 import com.godlife.setting_page.navigation.SettingPageRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,6 +102,19 @@ class MainActivity : ComponentActivity() {
                 1
             )
         }
+
+        /** FCM설정, Token값 가져오기 */
+        MyFirebaseMessagingService().getFirebaseToken()
+
+        /*
+        /** PostNotification 대응 */
+        checkAppPushNotification()
+
+        //사용안하면 삭제하기
+        /** DynamicLink 수신확인 */
+        initDynamicLink()
+
+         */
 
         setContent {
             MainUiTheme(this, createNavigator, loginNavigator, createPostNavigator)
@@ -258,3 +272,5 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
         }
     }
 }
+
+

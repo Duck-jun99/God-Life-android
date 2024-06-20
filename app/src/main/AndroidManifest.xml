@@ -45,6 +45,14 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name="com.godlife.service.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
     <!--API 30 이상인 경우, 해당 부분이 있어야 web login 가능-->

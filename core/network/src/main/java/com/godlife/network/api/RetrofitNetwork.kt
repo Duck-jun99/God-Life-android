@@ -5,6 +5,8 @@ import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -16,6 +18,7 @@ import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -117,7 +120,7 @@ interface RetrofitNetworkApi {
     ): ApiResponse<LatestPostQuery>
 
     //일주일 인기 게시물 조회
-    @GET("/popularBoards")
+    @GET("/popular/boards/weekly")
     suspend fun getWeeklyFamousPost(
         @Header("Authorization") authorization: String
     ): ApiResponse<LatestPostQuery>
@@ -169,6 +172,19 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: Int,
     ): ApiResponse<GodScoreQuery>
+
+    //주간 명예의 전당
+    @GET("/popular/members/weekly")
+    suspend fun getWeeklyFamousMembers(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<WeeklyRankingQuery>
+
+    //알림 시간 전송
+    @POST("/fcm/alarm")
+    suspend fun postNotificationTime(
+        @Header("Authorization") authorization: String,
+        @Body notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
 
 
 

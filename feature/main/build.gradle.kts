@@ -32,6 +32,7 @@ dependencies {
     //implementation(projects.core.data)
     //implementation(projects.core.designsystem)
 
+    implementation(projects.core.service)
 
     implementation(projects.feature.mainPage)
     implementation(projects.feature.communityPage)

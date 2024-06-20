@@ -10,10 +10,12 @@ import com.godlife.domain.DeleteCommentUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
+import com.godlife.domain.GetRankingUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.GetWeeklyFamousPostUseCase
 import com.godlife.domain.PlusGodScoreUseCase
+import com.godlife.domain.PostNotificationTimeUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.domain.SignUpUseCase
@@ -87,4 +89,12 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun providePlusGodScoreUseCase(repository: NetworkRepository) = PlusGodScoreUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetRankingUseCase(repository: NetworkRepository) = GetRankingUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun providePostNotificationTimeUseCase(repository: NetworkRepository) = PostNotificationTimeUseCase(repository)
 }
