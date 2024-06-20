@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,11 +64,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
@@ -85,6 +88,7 @@ import kotlinx.coroutines.launch
 fun PostDetailScreen(
     modifier: Modifier = Modifier,
     postId: String,
+    parentNavController: NavController,
     postDetailViewModel: PostDetailViewModel = hiltViewModel()
 ) {
 
@@ -138,7 +142,12 @@ fun PostDetailScreen(
 
                                 postDetail.body?.let {
                                     Log.e("postDetail", it.toString())
-                                    item{ Content(postDetailBody = it) }
+                                    item{
+                                        Content(
+                                            postDetailBody = it,
+                                            parentNavController = parentNavController
+                                        )
+                                    }
                                 }
 
                                 postDetail.body?.let {
@@ -275,8 +284,11 @@ fun ImageView(modifier: Modifier = Modifier, context: Context, imgUri: String){
 }
 
 @Composable
-fun Content(modifier: Modifier = Modifier,
-            postDetailBody: PostDetailBody){
+fun Content(
+    modifier: Modifier = Modifier,
+    postDetailBody: PostDetailBody,
+    parentNavController: NavController
+){
 
     Column(
         modifier
@@ -295,6 +307,7 @@ fun Content(modifier: Modifier = Modifier,
                 .clip(CircleShape)
                 .fillMaxSize()
                 .background(color = GrayWhite)
+                .clickable { parentNavController.navigate("${"ProfileScreen"}/${postDetailBody.writerId}") }
 
             Glide.with(LocalContext.current)
                 .asBitmap()

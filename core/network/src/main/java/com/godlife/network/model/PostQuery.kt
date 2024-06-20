@@ -43,5 +43,6 @@ data class PostDetailBody(
     val nickname: String,
     val tier: String,
     val whoAmI: String,
-    val memberLikedBoard: Boolean
+    val memberLikedBoard: Boolean,
+    val writerId: Int,
 )

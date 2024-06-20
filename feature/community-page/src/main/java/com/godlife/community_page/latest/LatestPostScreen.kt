@@ -75,7 +75,11 @@ import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
 
 @Composable
-fun LatestPostScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: CommunityPageViewModel){
+fun LatestPostScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: CommunityPageViewModel
+){
 
     //val viewModel = hiltViewModel<LatestPostViewModel>()
 

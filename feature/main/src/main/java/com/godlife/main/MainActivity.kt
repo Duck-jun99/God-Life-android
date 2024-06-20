@@ -148,6 +148,8 @@ fun MainUiTheme(
 
         val currentRoute = remember { mutableStateOf(MainPageRoute.route)}
 
+        val bottomBarVisibleState = remember { mutableStateOf(true) }
+
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -156,18 +158,13 @@ fun MainUiTheme(
 
             Scaffold(
                 bottomBar = {
-                    if(currentRoute.value != ProfileScreenRoute.route
-                        && currentRoute.value != ProfileEditScreenRoute.route
-                        && currentRoute.value != PostDetailRoute.route
-                        ) {
-                        MyBottomNavigation(tabBarItems, navController)
-                    }
+                    if(bottomBarVisibleState.value) { MyBottomNavigation(tabBarItems, navController) }
                             },
                 snackbarHost = { SnackbarHost(snackBarHostState)}
                 ) { innerPadding ->
                 NavHost(navController = navController, startDestination = mainTab.route,modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
 
-                    val bottomPaddingValue = innerPadding.calculateBottomPadding().value.dp
+                    //val bottomPaddingValue = innerPadding.calculateBottomPadding().value.dp
 
                     //bottomBar
                     composable(mainTab.route) {
@@ -179,16 +176,22 @@ fun MainUiTheme(
                             navController = navController)
 
                         currentRoute.value = mainTab.route
+                        bottomBarVisibleState.value = true
                     }
 
                     composable(communityTab.route) {
-                        CommunityPageScreen(paddingValue = bottomPaddingValue)
+                        CommunityPageScreen(
+                            parentNavController = navController,
+                            bottomBarVisibleState = bottomBarVisibleState
+                        )
                         currentRoute.value = communityTab.route
+                        bottomBarVisibleState.value = true
                     }
 
                     composable(settingTab.route) {
                         SettingPageScreen(mainActivity = mainActivity, loginNavigator = loginNavigator, navController = navController)
                         currentRoute.value = settingTab.route
+                        bottomBarVisibleState.value = true
                     }
 
                     //프로필 화면
@@ -199,6 +202,7 @@ fun MainUiTheme(
                         if(userId != null){
                             ProfileScreen(navController = navController, userId = userId)
                             currentRoute.value = ProfileScreenRoute.route
+                            bottomBarVisibleState.value = false
                         }
 
                     }
@@ -207,13 +211,18 @@ fun MainUiTheme(
                     composable(ProfileEditScreenRoute.route){
                         ProfileEditScreen(navController = navController)
                         currentRoute.value = ProfileEditScreenRoute.route
+                        bottomBarVisibleState.value = false
                     }
 
                     //게시물 상세 화면
                     composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
                         val postId = it.arguments?.getString("postId")
                         if (postId != null) {
-                            PostDetailScreen(postId = postId)
+                            PostDetailScreen(
+                                postId = postId,
+                                parentNavController = navController
+                            )
+                            bottomBarVisibleState.value = false
                         }
                     }
 
