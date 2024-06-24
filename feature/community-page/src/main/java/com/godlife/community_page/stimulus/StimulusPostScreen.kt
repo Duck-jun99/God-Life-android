@@ -1,5 +1,6 @@
 package com.godlife.community_page.stimulus
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +25,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -54,10 +60,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.godlife.community_page.R
 import com.godlife.community_page.famous.WeeklyFamousPostListView
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostRoute
+import com.godlife.create_post.stimulus.CreateStimulusPostScreen
+import com.godlife.create_post.stimulus.CreateStimulusPostScreenPreview
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
@@ -73,81 +84,111 @@ fun StimulusPostScreen(
 
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview
 @Composable
 fun StimulusPostScreenPreview(
     modifier: Modifier = Modifier,
     navController: NavController? = null
 ){
+
+    val navController2 = rememberNavController()
+
+
     GodLifeTheme {
-        LazyColumn(
-            modifier
-                .fillMaxSize()
-                .background(Color.White)
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(onClick = { navController2.navigate("CreateStimulusPostScreen") }) {
+                    Icon(imageVector = Icons.Default.Warning, contentDescription = "")
+                }
+            }
         ) {
 
-            item {
-                StimulusPostContent1Preview(navController = navController)
+            NavHost(navController = navController2, startDestination = "StimulusPostScreenPreview"){
+
+                composable("StimulusPostScreenPreview"){
+
+                    LazyColumn(
+                        modifier
+                            .fillMaxSize()
+                            .background(Color.White)
+                    ) {
+
+                        item {
+                            StimulusPostContent1Preview(navController = navController)
+                        }
+
+
+                        item {
+
+                            Text(
+                                modifier = modifier
+                                    .padding(20.dp),
+                                text = "닉네임 님, 인기 글을 읽어보세요.",
+                                style = TextStyle(
+                                    color = Color.Black,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+
+                        }
+
+                        item {
+                            StimulusPostFamousContentPreview()
+                        }
+
+                        item {
+
+                            Text(
+                                modifier = modifier
+                                    .padding(20.dp),
+                                text = "최신글",
+                                style = TextStyle(
+                                    color = Color.Black,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+
+                        }
+
+                        item { StimulusPostLatestContentPreview() }
+
+                        item { RecommendUserContentPreview() }
+
+                        item {
+
+                            Text(
+                                modifier = modifier
+                                    .padding(20.dp),
+                                text = "추천 작가님의 게시물",
+                                style = TextStyle(
+                                    color = Color.Black,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+
+                        }
+
+                        item { StimulusPostLatestContentPreview() }
+
+
+                    }
+
+                }
+
+                composable("CreateStimulusPostScreen"){
+
+                    CreateStimulusPostScreen()
+
+                }
             }
 
-
-            item {
-
-                Text(
-                    modifier = modifier
-                        .padding(20.dp),
-                    text = "닉네임 님, 인기 글을 읽어보세요.",
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-            }
-
-            item {
-                StimulusPostFamousContentPreview()
-            }
-
-            item {
-
-                Text(
-                    modifier = modifier
-                        .padding(20.dp),
-                    text = "최신글",
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-            }
-
-            item { StimulusPostLatestContentPreview() }
-
-            item { RecommendUserContentPreview() }
-
-            item {
-
-                Text(
-                    modifier = modifier
-                        .padding(20.dp),
-                    text = "추천 작가님의 게시물",
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-            }
-
-            item { StimulusPostLatestContentPreview() }
-            
 
         }
+
     }
 }
 

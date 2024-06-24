@@ -76,7 +76,7 @@ fun SettingPageScreen(
     loginNavigator: LoginNavigator,
     navController: NavController,
     viewModel: SettingPageViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier.statusBarsPadding()
+    modifier: Modifier = Modifier
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -97,7 +97,8 @@ fun SettingPageScreen(
         Column(
             modifier
                 .fillMaxSize()
-                .background(GrayWhite3)
+                .background(Color.White)
+                .statusBarsPadding()
         ){
 
             Box(

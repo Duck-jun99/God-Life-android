@@ -1,4 +1,4 @@
-package com.godlife.create_post
+package com.godlife.create_post.post
 
 import android.content.Context
 import android.graphics.Bitmap

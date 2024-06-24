@@ -65,6 +65,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -92,7 +93,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun MainPageScreen(
-    modifier:Modifier = Modifier.statusBarsPadding(),
+    modifier:Modifier = Modifier,
     mainActivity: Activity,
     createNavigator: CreatetodolistNavigator,
     createPostNavigator: CreatePostNavigator,
@@ -145,7 +146,8 @@ fun MainPageScreen(
                 Column(
                     modifier
                         .fillMaxSize()
-                        .background(GrayWhite3)
+                        .background(Color.White)
+                        .statusBarsPadding()
                 ){
 
 
@@ -157,8 +159,6 @@ fun MainPageScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
 
-                        //HERE
-
                         Row(
                             modifier
                                 .height(70.dp)
@@ -166,7 +166,17 @@ fun MainPageScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ){
 
-                            Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
+                            //Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
+                            Text(text = "Good Life",
+                                style = TextStyle(
+                                    color = Color.Black,
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp,
+                                    lineHeight = 28.sp,
+                                    letterSpacing = 0.sp
+                                )
+                            )
 
 
                             Row(
@@ -304,8 +314,8 @@ fun MainTodoListBox(
     modifier: Modifier = Modifier
 ){
 
-    var todayTodoListSize = viewModel.todayTodoListSize.collectAsState().value
-    var completedTodoListSize = viewModel.completedTodoListSize.collectAsState().value
+    val todayTodoListSize = viewModel.todayTodoListSize.collectAsState().value
+    val completedTodoListSize = viewModel.completedTodoListSize.collectAsState().value
     Log.e("MainTodoListBox", "todayTodoListSize: $todayTodoListSize, completedTodoListSize: $completedTodoListSize")
 
 
@@ -332,7 +342,7 @@ fun MainTodoListBox(
         .fillMaxWidth()
         .height(450.dp)
         .background(
-            color = Color.White,
+            color = GrayWhite3,
             shape = RoundedCornerShape(20.dp)
         ),
         contentAlignment = Alignment.Center
@@ -417,7 +427,7 @@ fun MainNoTodoListBox(
         .fillMaxWidth()
         .height(450.dp)
         .background(
-            color = Color.White,
+            color = GrayWhite3,
             shape = RoundedCornerShape(20.dp)
         )){
 
@@ -499,7 +509,7 @@ fun TodoListBox(
     Column(modifier = modifier
         .fillMaxWidth()
         .background(
-            color = Color.White,
+            color = GrayWhite3,
             shape = RoundedCornerShape(20.dp)
         )){
 

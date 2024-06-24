@@ -3,7 +3,7 @@ package com.godlife.god_life.di.navigator
 import android.app.Activity
 import android.content.Intent
 import com.godlife.common.extension.startActivityWithAnimation
-import com.godlife.create_post.CreatePostActivity
+import com.godlife.create_post.post.CreatePostActivity
 import com.godlife.navigator.CreatePostNavigator
 import dagger.Binds
 import dagger.Module
