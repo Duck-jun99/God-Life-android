@@ -62,17 +62,26 @@ import com.godlife.designsystem.theme.PurpleMain
 @Composable
 fun CreateStimulusPostScreen(
     modifier: Modifier = Modifier,
+    bottomBarVisibleState: MutableState<Boolean>,
+    fabVisibleState: MutableState<Boolean>,
     viewModel: CreateStimulusPostViewModel = hiltViewModel()
 ){
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = CreateStimulusPostCoverRoute.route){
+
+
         composable(CreateStimulusPostCoverRoute.route){
+            bottomBarVisibleState.value = false
+            fabVisibleState.value = false
 
             CreateStimulusPostCover(navController = navController, viewModel = viewModel)
         }
 
         composable(CreateStimulusPostLoading.route){
+            bottomBarVisibleState.value = false
+            fabVisibleState.value = false
+
             CreateStimulusPostLoading(navController = navController, viewModel = viewModel)
         }
 
@@ -86,9 +95,11 @@ fun CreateStimulusPostScreen(
             }
         ){
 
-            //CreateStimulusPostContent(navController = navController, viewModel = viewModel)
+            bottomBarVisibleState.value = false
+            fabVisibleState.value = false
 
-            EX2()
+            CreateStimulusPostContent(navController = navController, viewModel = viewModel)
+
         }
 
     }

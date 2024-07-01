@@ -298,14 +298,14 @@ fun StimulusCoverItem(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
             )
         }
         else{
 
             Box(
                 modifier = modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .background(GrayWhite)
             )
 

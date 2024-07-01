@@ -328,7 +328,7 @@ fun CommunityPageScreen(
             bottomBarVisibleState.value = true
             viewModel.changeCurrentRoute(route = StimulusPostRoute.route)
             //StimulusPostScreen()
-            StimulusPostScreenPreview(navController = navController)
+            StimulusPostScreenPreview(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
 
         }
 

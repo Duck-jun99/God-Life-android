@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,35 +80,46 @@ import com.godlife.designsystem.theme.PurpleMain
 @Composable
 fun StimulusPostScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    bottomBarVisibleState: MutableState<Boolean>
 ){
 
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview
+//@Preview
 @Composable
 fun StimulusPostScreenPreview(
     modifier: Modifier = Modifier,
-    navController: NavController? = null
+    navController: NavController? = null,
+    bottomBarVisibleState: MutableState<Boolean>
 ){
 
+    bottomBarVisibleState.value = true
+
     val navController2 = rememberNavController()
+
+    val fabVisibleState = remember { mutableStateOf(true) }
 
 
     GodLifeTheme {
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(onClick = { navController2.navigate("CreateStimulusPostScreen") }) {
-                    Icon(imageVector = Icons.Default.Warning, contentDescription = "")
+                if(fabVisibleState.value){
+                    FloatingActionButton(
+                        onClick = { navController2.navigate("CreateStimulusPostScreen") }
+                    ) {
+                        Icon(imageVector = Icons.Default.Warning, contentDescription = "")
+                    }
                 }
+
             }
         ) {
 
             NavHost(navController = navController2, startDestination = "StimulusPostScreenPreview"){
 
                 composable("StimulusPostScreenPreview"){
-
+                    fabVisibleState.value = true
                     LazyColumn(
                         modifier
                             .fillMaxSize()
@@ -180,8 +192,8 @@ fun StimulusPostScreenPreview(
                 }
 
                 composable("CreateStimulusPostScreen"){
-
-                    CreateStimulusPostScreen()
+                    fabVisibleState.value = false
+                    CreateStimulusPostScreen(bottomBarVisibleState = bottomBarVisibleState, fabVisibleState = fabVisibleState)
 
                 }
             }
@@ -745,6 +757,15 @@ fun RecommendUserProfilePreview(
 
 
     }
+
+}
+
+@Preview
+@Composable
+fun RecommendUserPostListPreview(
+    modifier: Modifier = Modifier,
+    item: StimulusPostItem = StimulusPostItem(title = "이것이 제목이다", writer = "치킨 러버", coverImg = R.drawable.category3, introText = "갓생을 살고 싶어하는 당신을 위해 작성한 글!")
+){
 
 }
 

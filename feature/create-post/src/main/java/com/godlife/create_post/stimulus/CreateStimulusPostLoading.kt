@@ -66,17 +66,13 @@ fun CreateStimulusPostLoading(
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     val coverVisible = remember { mutableStateOf(false) }
-    val coverTextVisible = remember { mutableStateOf(false) }
     val guideVisible = remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
-        delay(1000L)
+        delay(1500L)
         coverVisible.value = true
 
-        delay(1000L)
-        coverTextVisible.value = true
-
-        delay(1000L)
+        delay(1500L)
         guideVisible.value = true
 
         delay(5000L)
@@ -127,19 +123,12 @@ fun CreateStimulusPostLoading(
                     visible = coverVisible.value ,
                     enter = fadeIn(initialAlpha = 0.4f)
                 ) {
-                    StimulusCoverItem(title = title.value, coverImg = bitmap.value)
-                }
-            }
-
-            item {
-                AnimatedVisibility(
-                    visible = coverTextVisible.value ,
-                    enter = fadeIn(initialAlpha = 0.4f)
-                ) {
-
+                    
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
+
+                        StimulusCoverItem(title = title.value, coverImg = bitmap.value)
 
                         Spacer(modifier.size(5.dp))
 
@@ -178,11 +167,9 @@ fun CreateStimulusPostLoading(
                         Spacer(modifier.size(50.dp))
 
                     }
-
-
-
                 }
             }
+
 
 
             item {
