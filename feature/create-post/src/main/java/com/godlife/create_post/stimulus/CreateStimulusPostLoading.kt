@@ -49,6 +49,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.theme.OpaqueLight
+import com.godlife.network.BuildConfig
 import kotlinx.coroutines.delay
 
 @Composable
@@ -88,7 +89,7 @@ fun CreateStimulusPostLoading(
 
         Glide.with(context)
             .asBitmap()
-            .load(coverImg.value)
+            .load(BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     bitmap.value = resource

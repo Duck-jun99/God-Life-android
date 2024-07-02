@@ -26,8 +26,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -67,6 +70,9 @@ fun CreateStimulusPostScreen(
     viewModel: CreateStimulusPostViewModel = hiltViewModel()
 ){
     val navController = rememberNavController()
+    val uiState by viewModel.uiState.collectAsState()
+
+    val cScope = rememberCoroutineScope()
 
     NavHost(navController = navController, startDestination = CreateStimulusPostCoverRoute.route){
 
@@ -75,7 +81,24 @@ fun CreateStimulusPostScreen(
             bottomBarVisibleState.value = false
             fabVisibleState.value = false
 
-            CreateStimulusPostCover(navController = navController, viewModel = viewModel)
+            viewModel.getTempBoardId()
+
+            when(uiState){
+
+                is CreateStimulusUiState.Loading -> {
+
+                }
+                is CreateStimulusUiState.Success -> {
+
+                    CreateStimulusPostCover(navController = navController, viewModel = viewModel, cScope = cScope)
+
+                }
+                is CreateStimulusUiState.Error -> {
+
+                }
+
+            }
+
         }
 
         composable(CreateStimulusPostLoading.route){
@@ -98,7 +121,7 @@ fun CreateStimulusPostScreen(
             bottomBarVisibleState.value = false
             fabVisibleState.value = false
 
-            CreateStimulusPostContent(navController = navController, viewModel = viewModel)
+            CreateStimulusPostContent(navController = navController, viewModel = viewModel, cScope = cScope)
 
         }
 

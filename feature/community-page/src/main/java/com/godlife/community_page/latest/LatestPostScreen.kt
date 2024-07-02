@@ -119,7 +119,11 @@ fun LatestPostScreen(
 }
 
 @Composable
-fun LatestPostListView(item: PostDetailBody, navController: NavController, modifier: Modifier = Modifier){
+fun LatestPostListView(
+    item: PostDetailBody,
+    navController: NavController,
+    modifier: Modifier = Modifier
+){
 
     val postId = item.board_id.toString()
 

@@ -78,7 +78,7 @@ import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.post_detail.StimulusDetailScreen
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
-import com.godlife.community_page.stimulus.StimulusPostScreenPreview
+import com.godlife.community_page.stimulus.StimulusPostScreen
 import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
@@ -327,8 +327,8 @@ fun CommunityPageScreen(
         composable(StimulusPostRoute.route){
             bottomBarVisibleState.value = true
             viewModel.changeCurrentRoute(route = StimulusPostRoute.route)
-            //StimulusPostScreen()
-            StimulusPostScreenPreview(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
+            StimulusPostScreen(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
+            //StimulusPostScreenPreview(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
 
         }
 

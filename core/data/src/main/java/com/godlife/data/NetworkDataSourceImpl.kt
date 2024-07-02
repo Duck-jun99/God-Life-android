@@ -17,9 +17,13 @@ import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
+import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
+import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.WeeklyRankingQuery
@@ -189,6 +193,41 @@ class NetworkDataSourceImpl @Inject constructor(
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery> {
         return networkApi.postNotificationTime(authorization, notificationTime)
+    }
+
+    override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
+        return networkApi.createStimulusPostTemp(authorization)
+    }
+
+    override suspend fun uploadStimulusPostImage(
+        authorization: String,
+        tmpBoardId: Int,
+        image: Uri
+    ): ApiResponse<ImageUploadStimulusQuery> {
+
+        val file = File(image.path!!)
+
+        Log.e("NetworkDataSourceImpl", image.path!!.toString())
+
+        val requestFile = file.asRequestBody("image/*".toMediaType())
+
+        val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        return networkApi.uploadStimulusPostImage(authorization, tmpBoardId, imageMultiPart)
+    }
+
+    override suspend fun createStimulusPost(
+        authorization: String,
+        stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery> {
+        return networkApi.createStimulusPost(authorization, stimulusPostBody)
+    }
+
+    override suspend fun getStimulusLatestPost(
+        authorization: String,
+        page: Int
+    ): ApiResponse<LatestStimulusPostQuery> {
+        return networkApi.getStimulusLatestPost(authorization, page)
     }
 
 

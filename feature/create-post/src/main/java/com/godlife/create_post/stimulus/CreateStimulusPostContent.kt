@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
@@ -27,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -47,13 +47,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.create_post.R
+import com.godlife.designsystem.component.GodLifeButtonWhite
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueLight
+import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.network.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -79,12 +84,15 @@ class QuillInterface(
 fun CreateStimulusPostContent(
     modifier: Modifier = Modifier,
     navController: NavController,
+    cScope: CoroutineScope,
     viewModel: CreateStimulusPostViewModel
 ) {
 
     val coverImg = viewModel.coverImg.collectAsState()
     val title = viewModel.title.collectAsState()
     val description = viewModel.description.collectAsState()
+
+    val dialogVisible = remember{ mutableStateOf(false) }
 
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
@@ -103,7 +111,7 @@ fun CreateStimulusPostContent(
 
                 //이때 이미지를 서버로 통신 후 받은 값을 이미지 태크 안에 보여줌
                 //insertImageToWebView(webViewRef.value!!, resizeUri)
-                insertImageTest(webViewRef.value!!, resizeUri)
+                insertImageToWebView(webViewRef.value!!, resizeUri, cScope, viewModel)
 
 
                 val file = File(resizeUri.path)
@@ -121,13 +129,11 @@ fun CreateStimulusPostContent(
         contentAlignment = Alignment.Center
     ){
 
-
-
         val context = LocalContext.current
 
         Glide.with(context)
             .asBitmap()
-            .load(coverImg.value)
+            .load(BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     bitmap.value = resource
@@ -148,8 +154,6 @@ fun CreateStimulusPostContent(
                     )
             )
         }
-
-
 
 
         LazyColumn(
@@ -245,13 +249,55 @@ fun CreateStimulusPostContent(
 
             }
 
+            item{
+                GodLifeButtonWhite(
+                    onClick = {
+                        webViewRef.value?.let { getHtmlFromWebView(it, viewModel) }
+                        dialogVisible.value = !dialogVisible.value
+                              },
+                    text = { Text(text = "글 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            }
+
+        }
+
+        if(dialogVisible.value){
+            AlertDialog(
+                onDismissRequest = { dialogVisible.value = !dialogVisible.value },
+                title = {
+                    Text(text = "글을 게시할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                },
+                text = {
+                    Text(text = "주의사항을 꼭 확인해주세요!", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+                },
+                confirmButton = {
+                    GodLifeButtonWhite(
+                        onClick = {
+
+                            cScope.launch {
+                                viewModel.completeCreateStimulusPost()
+                            }
+
+                            dialogVisible.value = !dialogVisible.value
+
+                                  },
+                        text = { Text(text = "글 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    )
+                },
+                dismissButton = {
+                    GodLifeButtonWhite(
+                        onClick = { dialogVisible.value = !dialogVisible.value },
+                        text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    )
+                }
+            )
         }
 
     }
 
 
 }
-
+/*
 fun insertImageToWebView(webView: WebView, imageUri: Uri) {
     val contentResolver = webView.context.contentResolver
     val inputStream = contentResolver.openInputStream(imageUri)
@@ -282,26 +328,47 @@ fun insertImageToWebView(webView: WebView, imageUri: Uri) {
      */
 }
 
-fun insertImageTest(webView: WebView, imageUri: Uri){
+ */
+
+fun insertImageToWebView(webView: WebView, imageUri: Uri, cScope: CoroutineScope, viewModel: CreateStimulusPostViewModel){
 
     /*
     서버에 이미지를 업로드 후 이미지 URL을 받아오는 코드 부분
-    여기서 imgTestUrl은 서버에서 받아온 URL로 가정
     */
 
-    val imgTestUrl = "https://storage.googleapis.com/god-life-bucket-image/31aeb647-74d7-4c9d-937f-e001f85179fe"
+    cScope.launch {
+        val imgUrl = viewModel.uploadImage(imageUri)
 
-    webView.evaluateJavascript("javascript:insertImage('$imgTestUrl');") { result ->
-        Log.e("WebView", "JavaScript execution result: $result")
+        webView.evaluateJavascript("javascript:insertImage('$imgUrl');") { result ->
+            Log.e("WebView", "JavaScript execution result: $result")
+        }
+
     }
 
 }
 
-fun getHtmlFromWebView(webView: WebView, callback: (String) -> Unit) {
+fun getHtmlFromWebView(webView: WebView, viewModel: CreateStimulusPostViewModel) {
+    webView.evaluateJavascript("javascript:getHtmlToAndroid();") { html ->
+        val decodedHtml = decodeJavaScriptString(html)
+        viewModel.setContent(content = decodedHtml)
 
-    webView.evaluateJavascript("javascript:getHtml();") { html ->
-        callback(html)
+        Log.e("WebViewHTML", decodedHtml)
+
     }
+}
+
+// JavaScript 문자열 디코딩 함수
+private fun decodeJavaScriptString(encodedString: String): String {
+    return encodedString
+        .replace("\\u003C", "<")
+        .replace("\\u003E", ">")
+        .replace("\\u0026", "&")
+        .replace("\\\"", "\"")
+        .replace("\\\'", "'")
+        .replace("\\n", "\n")
+        .replace("\\r", "\r")
+        .replace("\\t", "\t")
+        .removeSurrounding("\"")  // 문자열 앞뒤의 따옴표 제거
 }
 
 private fun convertResizeImage(imageUri: Uri, context: Context):Uri? {

@@ -1,6 +1,8 @@
 package com.godlife.community_page.stimulus
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,10 +23,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.FloatingActionButton
@@ -32,7 +32,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -43,58 +42,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
-import com.godlife.community_page.famous.WeeklyFamousPostListView
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
-import com.godlife.community_page.navigation.StimulusPostRoute
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
-import com.godlife.create_post.stimulus.CreateStimulusPostScreenPreview
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.network.model.StimulusPost
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StimulusPostScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    bottomBarVisibleState: MutableState<Boolean>
+    bottomBarVisibleState: MutableState<Boolean>,
+    viewModel: StimulusPostViewModel = hiltViewModel()
 ){
-
-}
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-//@Preview
-@Composable
-fun StimulusPostScreenPreview(
-    modifier: Modifier = Modifier,
-    navController: NavController? = null,
-    bottomBarVisibleState: MutableState<Boolean>
-){
-
     bottomBarVisibleState.value = true
 
     val navController2 = rememberNavController()
@@ -116,9 +103,9 @@ fun StimulusPostScreenPreview(
             }
         ) {
 
-            NavHost(navController = navController2, startDestination = "StimulusPostScreenPreview"){
+            NavHost(navController = navController2, startDestination = "StimulusPostScreen"){
 
-                composable("StimulusPostScreenPreview"){
+                composable("StimulusPostScreen"){
                     fabVisibleState.value = true
                     LazyColumn(
                         modifier
@@ -165,7 +152,7 @@ fun StimulusPostScreenPreview(
 
                         }
 
-                        item { StimulusPostLatestContentPreview() }
+                        item { LatestStimulusPostList(viewModel = viewModel, navController = navController) }
 
                         item { RecommendUserContentPreview() }
 
@@ -184,7 +171,7 @@ fun StimulusPostScreenPreview(
 
                         }
 
-                        item { StimulusPostLatestContentPreview() }
+                        item { LatestStimulusPostListPreview() }
 
 
                     }
@@ -202,7 +189,117 @@ fun StimulusPostScreenPreview(
         }
 
     }
+
 }
+
+@Composable
+fun LatestStimulusPostList(
+    modifier: Modifier = Modifier,
+    viewModel: StimulusPostViewModel,
+    navController: NavController
+){
+    val postList = viewModel.latestPostList.collectAsLazyPagingItems()
+
+    /*
+    items(postList.itemCount){
+        postList[it]?.let { it1 -> LatestPostListView(item = it1, navController = navController) }
+    }
+     */
+
+    LazyHorizontalGrid(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(500.dp),
+        rows = GridCells.Fixed(3)
+    ) {
+
+        items(postList.itemCount){
+            postList[it]?.let { it1 -> LatestStimulusItem(item = it1, navController = navController)  }
+        }
+    }
+}
+
+@Composable
+fun LatestStimulusItem(
+    modifier: Modifier = Modifier,
+    item: StimulusPost,
+    navController: NavController
+){
+    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
+    Row(
+        modifier = modifier
+            .height(150.dp)
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(10.dp)
+            .clickable { navController.navigate(StimulusPostDetailRoute.route) },
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Glide.with(LocalContext.current)
+            .asBitmap()
+            .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
+            .error(R.drawable.category3)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    bitmap.value = resource
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+
+        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+            Image(
+                bitmap = fetchedBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = modifier
+                    .size(100.dp)
+            )   //bitmap이 없다면
+        } ?: Image(
+            painter = painterResource(id = R.drawable.category3),
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            modifier = modifier
+                .size(100.dp)
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Column(
+
+        ) {
+            Text(
+                text = item.introduction,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                )
+            )
+
+            Spacer(modifier.size(5.dp))
+
+            HorizontalDivider()
+
+            Spacer(modifier.size(5.dp))
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "by ${item.nickname}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.End
+                )
+            )
+        }
+    }
+}
+
 
 @Preview
 @Composable
@@ -485,7 +582,7 @@ fun FamousStimulusItemPreview(
 
 @Preview
 @Composable
-fun StimulusPostLatestContentPreview(
+fun LatestStimulusPostListPreview(
     modifier: Modifier = Modifier
 ){
 

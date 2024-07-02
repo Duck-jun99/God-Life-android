@@ -6,6 +6,12 @@ data class ImageUploadQuery(
     val message: String
 )
 
+data class ImageUploadStimulusQuery(
+    val status: String,
+    val body: String,
+    val message: String
+)
+
 data class ImageUploadBody(
     val originalName: String,
     val serverName: String

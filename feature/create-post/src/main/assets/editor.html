@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset='utf-8'>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
@@ -20,8 +21,8 @@
 </head>
 <body>
 <div id="editor"></div>
-<button onclick="showHtml()">HTML 보기</button>
-<pre id="html-output"></pre>
+<!-- <button onclick="getHtmlToAndroid()">HTML 보기</button>
+<pre id="html-output"></pre> -->
 <script>
     var quill = new Quill('#editor', {
         modules: {
@@ -42,7 +43,20 @@
     });
 
     function getHtml() {
-        return quill.root.innerHTML;
+        return quill.getSemanticHTML()
+    }
+
+    function getHtmlToAndroid() {
+        var htmlContent = getHtml();
+        var convertedHtml = convertQuillClassesToStyles(htmlContent);
+        var decodedHtml = decodeHtml(convertedHtml);
+        return decodedHtml;
+    }
+
+    function decodeHtml(html) {
+        var txt = document.createElement("textarea");
+        txt.innerHTML = html;
+        return txt.value;
     }
 
     function setHtml(html) {
@@ -72,25 +86,7 @@
         return doc.body.innerHTML;
     }
 
-    function showHtml() {
-        var htmlContent = getHtml();
-        var convertedHtml = convertQuillClassesToStyles(htmlContent);
-        var escapedHtml = convertedHtml
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-        document.getElementById('html-output').innerHTML = escapedHtml;
-    }
 
-    // 실시간으로 HTML 업데이트
-    quill.on('text-change', function() {
-        showHtml();
-    });
-
-    // 초기 HTML 표시
-    showHtml();
 </script>
 </body>
 </html>

@@ -1,14 +1,17 @@
 package com.godlife.god_life.di
 
 import com.godlife.data.repository.LatestPostRepository
+import com.godlife.data.repository.LatestStimulusPostRepository
 import com.godlife.data.repository.NetworkRepository
 import com.godlife.data.repository.SearchPostRepository
 import com.godlife.domain.CheckUserExistenceUseCase
 import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.CreatePostUseCase
+import com.godlife.domain.CreateStimulusPostUseCase
 import com.godlife.domain.DeleteCommentUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetLatestPostUseCase
+import com.godlife.domain.GetLatestStimulusPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetRankingUseCase
 import com.godlife.domain.GetUserInfoUseCase
@@ -97,4 +100,12 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun providePostNotificationTimeUseCase(repository: NetworkRepository) = PostNotificationTimeUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideCreateStimulusPostUseCase(repository: NetworkRepository) = CreateStimulusPostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetLatestStimulusPostUseCase(repository: LatestStimulusPostRepository) = GetLatestStimulusPostUseCase(repository)
 }

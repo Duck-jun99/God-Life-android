@@ -13,3 +13,22 @@ data class CreatePostRequest(
     val thumbnailUrl: String,
     val introduction: String
 )
+
+data class LatestStimulusPostQuery(
+    val status: String,
+    val body: List<StimulusPost>,
+    val message: String,
+)
+
+data class StimulusPost(
+    val title: String,
+    val boardId: Int,
+    val thumbnailUrl: String,
+    val introduction: String,
+    val nickname: String,
+    val godLifeScore: Int,
+    val owner: Boolean,
+    val content: String,
+    val writerId: Int
+
+)

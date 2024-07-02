@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -58,6 +59,9 @@ import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.network.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -67,8 +71,11 @@ import java.io.IOException
 fun CreateStimulusPostCover(
     modifier: Modifier = Modifier,
     navController: NavController,
+    cScope: CoroutineScope,
     viewModel: CreateStimulusPostViewModel
 ){
+    //val cScope = rememberCoroutineScope()
+
     val coverImg = viewModel.coverImg.collectAsState()
     val title = viewModel.title.collectAsState()
     val description = viewModel.description.collectAsState()
@@ -88,7 +95,11 @@ fun CreateStimulusPostCover(
 
             if (resizeUri != null) {
 
-                viewModel.setCoverImg(uri = resizeUri)
+                cScope.launch {
+                    viewModel.setCoverImg(uri = resizeUri)
+                }
+
+
 
             }
         }
@@ -114,7 +125,7 @@ fun CreateStimulusPostCover(
 
                     Glide.with(context)
                         .asBitmap()
-                        .load(coverImg.value)
+                        .load(BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value)
                         .into(object : CustomTarget<Bitmap>() {
                             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                 bitmap.value = resource

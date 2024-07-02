@@ -6,6 +6,8 @@ import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -201,8 +203,8 @@ interface RetrofitNetworkApi {
     suspend fun uploadStimulusPostImage(
         @Header("Authorization") authorization: String,
         @Query("tmpBoardId") boardId: Int,
-        @Part("imageType") imageType: RequestBody
-    ): ApiResponse<ImageUploadQuery>
+        @Part image: MultipartBody.Part
+    ): ApiResponse<ImageUploadStimulusQuery>
 
     //갓생 자극 게시물 최종 생성
     @POST("/board/stimulation")
@@ -212,6 +214,12 @@ interface RetrofitNetworkApi {
     ): ApiResponse<StimulusPostQuery>
 
 
+    // 갓생 자극 최신 게시물 조회
+    @GET("/board/stimulation")
+    suspend fun getStimulusLatestPost(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int
+    ): ApiResponse<LatestStimulusPostQuery>
 
 }
 

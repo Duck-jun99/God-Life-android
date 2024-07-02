@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.godlife.community_page.post_detail.PostDetailUiState
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetWeeklyFamousPostUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
@@ -103,7 +102,7 @@ class CommunityPageViewModel @Inject constructor(
     }
 
     /**
-     * 함수
+     * Functions
      */
 
     //검색어 변경
