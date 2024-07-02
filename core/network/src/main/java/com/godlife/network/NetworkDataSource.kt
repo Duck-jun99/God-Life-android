@@ -19,6 +19,7 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
@@ -144,5 +145,10 @@ interface NetworkDataSource {
         authorization: String,
         page: Int
     ): ApiResponse<LatestStimulusPostQuery>
+
+    suspend fun getStimulusPostDetail(
+        authorization: String,
+        boardId: String
+    ): ApiResponse<StimulusPostDetailQuery>
 
 }

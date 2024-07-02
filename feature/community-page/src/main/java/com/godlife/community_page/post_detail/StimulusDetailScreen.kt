@@ -2,6 +2,7 @@ package com.godlife.community_page.post_detail
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -23,10 +24,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +42,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -51,24 +57,405 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OpaqueLight
+import com.godlife.network.model.StimulusPost
 import kotlinx.coroutines.delay
 
-@Preview
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StimulusDetailScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    postId: String = "",
+    viewModel: StimulusPostDetailViewModel = hiltViewModel()
 ) {
+
+    viewModel.initPostId(postId)
+    viewModel.getPostDetail()
+
+
+    val snackBarHostState = remember { SnackbarHostState() }
+    SnackbarHost(hostState = snackBarHostState)
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    var height by remember {
+        mutableStateOf(0.dp)
+    }
+    val localDensity = LocalDensity.current
+    val context = LocalContext.current
+    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
+    val postDetail = viewModel.postDetail.collectAsState()
+
+
+    GodLifeTheme {
+
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState)
+            }
+        ) {
+            Box(modifier = modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    height = with(localDensity) {
+                        it.size.height.toDp()
+                    }
+                }
+            ){
+
+                Glide.with(context)
+                    .asBitmap()
+                    .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.value?.thumbnailUrl)
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            bitmap.value = resource
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
+
+                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+
+                    Image(
+                        bitmap = fetchedBitmap,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = modifier
+                            .fillMaxSize()
+                            .blur(
+                                radiusX = 15.dp, radiusY = 15.dp
+                            )
+                    )
+
+                }
+
+                LazyColumn{
+
+
+                    item {
+                        postDetail.value?.let { it1 ->
+                            StimulusPostCover(
+                                height = height,
+                                postDetail = it1
+                            )
+                        }
+                    }
+
+                    item {
+                        postDetail.value?.let { it1 ->
+                            PostContent(
+                                height = height,
+                                postDetail = it1
+                            )
+                        }
+                    }
+
+
+                    item {
+                        AnotherPostPreview()
+                    }
+
+                }
+            }
+        }
+
+
+
+
+    }
+}
+
+@Composable
+fun StimulusPostCover(
+    modifier: Modifier = Modifier,
+    height: Dp,
+    postDetail: StimulusPost
+) {
+
+    val coverVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(true) {
+        delay(1500L)
+        coverVisible.value = true
+    }
+
+    Box(
+        modifier = modifier
+            .height(height)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+
+        AnimatedVisibility(
+            visible = coverVisible.value ,
+            enter = fadeIn(initialAlpha = 0.4f)
+        ) {
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+
+                StimulusCoverItem(
+                    postDetail = postDetail
+                )
+
+                Spacer(modifier.size(5.dp))
+
+                Text(
+                    text = postDetail.introduction,
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center
+                    )
+                )
+
+
+
+                Spacer(modifier.size(5.dp))
+
+                HorizontalDivider()
+
+                Spacer(modifier.size(5.dp))
+
+                //User 이름 들어갈 부분
+
+                Text(
+                    text = "by ${postDetail.nickname}",
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center
+                    )
+                )
+
+
+                Spacer(modifier.size(50.dp))
+
+            }
+
+        }
+
+
+
+    }
+
+}
+
+
+@Composable
+fun StimulusCoverItem(
+    modifier: Modifier = Modifier,
+    postDetail: StimulusPost
+){
+    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+    val context = LocalContext.current
+
+    Box(
+        modifier = modifier
+            .padding(10.dp)
+            .size(width = 200.dp, height = 250.dp)
+            .shadow(10.dp),
+        contentAlignment = Alignment.Center
+    ){
+
+        Glide.with(context)
+            .asBitmap()
+            .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    bitmap.value = resource
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+
+        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+
+            Image(
+                bitmap = fetchedBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .fillMaxSize()
+            )
+
+        }
+
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(30.dp)
+                .background(color = OpaqueDark)
+                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            Text(text = postDetail.title,
+                style = TextStyle(color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            )
+
+        }
+
+    }
+}
+
+@SuppressLint("SetJavaScriptEnabled")
+@Composable
+fun PostContent(
+    modifier: Modifier = Modifier,
+    height: Dp = 800.dp,
+    postDetail: StimulusPost
+){
+
+    LazyColumn(
+        modifier = modifier
+            .height(height)
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+            .background(color = Color.White, shape = RoundedCornerShape(18.dp))
+    ){
+
+        item {
+            AndroidView(
+                modifier = modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(18.dp)),
+                factory = { context ->
+                    WebView(context).apply {
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
+                                view?.evaluateJavascript(
+                                    """
+                        document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
+                        document.body.style.backgroundColor = 'transparent';
+                        document.documentElement.style.backgroundColor = 'transparent';
+                        """.trimIndent(),
+                                    null
+                                )
+                            }
+
+                        }
+                        settings.javaScriptEnabled = true
+                        settings.loadWithOverviewMode = true
+                        settings.useWideViewPort = true
+
+
+                        loadUrl("file:///android_asset/content_template.html")
+
+                    }
+                }
+            )
+        }
+
+        item {
+            Spacer(modifier.size(20.dp))
+        }
+
+        item {
+            Row {
+
+                Text(
+                    text = "조회수: 100",
+                    style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+                )
+
+                Spacer(modifier.size(20.dp))
+
+                Text(
+                    text = "댓글: 33",
+                    style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+                )
+            }
+
+            Spacer(modifier.size(20.dp))
+        }
+
+
+        item {
+            Column(modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.End){
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+
+                        Text(text = "작성자 닉네임",
+                            style = TextStyle(
+                                color = Color.Black
+                            )
+                        )
+
+                        Text(text = "대충 나를 이렇게 소개한다는 내용",
+                            style = TextStyle(
+                                color = Color.Black
+                            )
+                        )
+
+                    }
+
+
+                    Spacer(modifier.size(30.dp))
+
+                    Image(painter = painterResource(id = R.drawable.ic_person), contentDescription ="",
+                        modifier
+                            .background(color = GrayWhite, shape = CircleShape)
+                            .size(50.dp))
+
+                }
+
+            }
+
+        }
+
+
+
+    }
+
+
+
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Preview
+@Composable
+fun StimulusDetailScreenPreview(
+    modifier: Modifier = Modifier,
+    postId: String = "",
+
+) {
+
+    //val snackBarHostState = remember { SnackbarHostState() }
+    //SnackbarHost(hostState = snackBarHostState)
+
+    //val uiState by viewModel.uiState.collectAsState()
 
     var height by remember {
         mutableStateOf(0.dp)
     }
 
     val localDensity = LocalDensity.current
+
+    //viewModel.initPostId(postId)
+    //viewModel.getPostDetail()
 
 
     GodLifeTheme {
@@ -96,7 +483,7 @@ fun StimulusDetailScreen(
             LazyColumn{
 
 
-                item { StimulusPostCover(height = height) }
+                item { StimulusPostCoverPreview(height = height) }
 
                 item { PostContentPreview(height = height) }
 
@@ -105,13 +492,12 @@ fun StimulusDetailScreen(
             }
         }
 
-
     }
 }
 
 @Preview
 @Composable
-fun StimulusPostCover(
+fun StimulusPostCoverPreview(
     modifier: Modifier = Modifier,
     height: Dp = 800.dp
 ) {
@@ -141,7 +527,7 @@ fun StimulusPostCover(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
 
-                StimulusCoverItem(title = "title.value")
+                StimulusCoverItemPreview()
 
                 Spacer(modifier.size(5.dp))
 
@@ -189,13 +575,11 @@ fun StimulusPostCover(
 }
 
 
+@Preview
 @Composable
-fun StimulusCoverItem(
+fun StimulusCoverItemPreview(
     modifier: Modifier = Modifier,
-    title: String,
-    coverImg: Bitmap? = null
 ){
-
 
     Box(
         modifier = modifier
@@ -222,7 +606,7 @@ fun StimulusCoverItem(
             contentAlignment = Alignment.Center
         ){
 
-            Text(text = title,
+            Text(text = "postDetail.title",
                 style = TextStyle(color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             )
 
@@ -230,6 +614,7 @@ fun StimulusCoverItem(
 
     }
 }
+
 @SuppressLint("SetJavaScriptEnabled")
 @Preview
 @Composable

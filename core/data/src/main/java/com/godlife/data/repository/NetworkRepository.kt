@@ -8,6 +8,7 @@ import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -17,6 +18,7 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
@@ -139,6 +141,11 @@ interface NetworkRepository {
         authorization: String,
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>
+
+    suspend fun getStimulusPostDetail(
+        authorization: String,
+        boardId: String
+    ): ApiResponse<StimulusPostDetailQuery>
 
 
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.godlife.domain.GetLatestStimulusPostUseCase
+import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.PostDetailBody
@@ -27,6 +28,7 @@ sealed class StimulusPostUiState {
 class StimulusPostViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val latestStimulusPostUseCase: GetLatestStimulusPostUseCase,
+    private val getPostDetailUseCase: GetPostDetailUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 

@@ -23,6 +23,7 @@ import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LatestStimulusPostQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
+import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
@@ -228,6 +229,13 @@ class NetworkDataSourceImpl @Inject constructor(
         page: Int
     ): ApiResponse<LatestStimulusPostQuery> {
         return networkApi.getStimulusLatestPost(authorization, page)
+    }
+
+    override suspend fun getStimulusPostDetail(
+        authorization: String,
+        boardId: String
+    ): ApiResponse<StimulusPostDetailQuery> {
+        return networkApi.getStimulusPostDetail(authorization, boardId)
     }
 
 

@@ -10,6 +10,7 @@ import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -19,6 +20,7 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
@@ -174,6 +176,13 @@ class NetworkRepositoryImpl @Inject constructor(
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery> {
         return networkDataSource.createStimulusPost(authorization, stimulusPostBody)
+    }
+
+    override suspend fun getStimulusPostDetail(
+        authorization: String,
+        boardId: String
+    ): ApiResponse<StimulusPostDetailQuery> {
+        return networkDataSource.getStimulusPostDetail(authorization, boardId)
     }
 
 }

@@ -18,6 +18,7 @@ import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
+import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
@@ -220,6 +221,13 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Query("page") page: Int
     ): ApiResponse<LatestStimulusPostQuery>
+
+    // 갓생 자극 게시물 상세 조회
+    @GET("/board/stimulation/{boardId}")
+    suspend fun getStimulusPostDetail(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: String,
+    ): ApiResponse<StimulusPostDetailQuery>
 
 }
 

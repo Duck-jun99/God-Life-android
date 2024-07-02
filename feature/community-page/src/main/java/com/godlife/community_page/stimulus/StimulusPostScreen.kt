@@ -67,6 +67,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -225,6 +226,10 @@ fun LatestStimulusItem(
     item: StimulusPost,
     navController: NavController
 ){
+
+    val postId = item.boardId.toString()
+
+
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     Row(
@@ -233,7 +238,7 @@ fun LatestStimulusItem(
             .fillMaxWidth()
             .background(Color.White)
             .padding(10.dp)
-            .clickable { navController.navigate(StimulusPostDetailRoute.route) },
+            .clickable { navController.navigate("${StimulusPostDetailRoute.route}/$postId") },
         verticalAlignment = Alignment.CenterVertically
     ){
 

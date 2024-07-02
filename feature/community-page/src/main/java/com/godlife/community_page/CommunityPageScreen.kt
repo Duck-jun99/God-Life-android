@@ -333,10 +333,17 @@ fun CommunityPageScreen(
         }
 
         //Stimulus Post Detail Screen
-        composable(StimulusPostDetailRoute.route){
-            bottomBarVisibleState.value = false
-            StimulusDetailScreen()
+        composable("${StimulusPostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+            val postId = it.arguments?.getString("postId")
+            if (postId != null) {
+                bottomBarVisibleState.value = false
+                StimulusDetailScreen(
+                    postId = postId
+                )
+            }
+
         }
+
 
     }
 

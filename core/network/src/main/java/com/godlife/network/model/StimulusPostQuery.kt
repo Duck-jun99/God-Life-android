@@ -29,6 +29,11 @@ data class StimulusPost(
     val godLifeScore: Int,
     val owner: Boolean,
     val content: String,
-    val writerId: Int
+    val writerId: Int,
+)
 
+data class StimulusPostDetailQuery(
+    val status: String,
+    val body: StimulusPost,
+    val message: String,
 )
