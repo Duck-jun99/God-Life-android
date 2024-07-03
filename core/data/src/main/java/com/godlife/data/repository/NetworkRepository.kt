@@ -149,7 +149,7 @@ interface NetworkRepository {
 
     suspend fun searchStimulusPost(
         authorization: String,
-        title: Int,
+        title: String,
         nickname: String,
         introduction: String
     ): ApiResponse<LatestStimulusPostQuery>

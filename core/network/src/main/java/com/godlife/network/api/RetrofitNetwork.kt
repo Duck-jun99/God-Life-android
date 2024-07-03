@@ -233,7 +233,7 @@ interface RetrofitNetworkApi {
     @GET("/boards/stimulation/filter")
     suspend fun searchStimulusPost(
         @Header("Authorization") authorization: String,
-        @Query("title") title: Int,
+        @Query("title") title: String,
         @Query("nickname") nickname: String,
         @Query("introduction") introduction: String
     ): ApiResponse<LatestStimulusPostQuery>

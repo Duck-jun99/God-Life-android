@@ -25,7 +25,9 @@ data class StimulusPostList(
     val boardId: Int,
     val thumbnailUrl: String,
     val introduction: String,
-    val nickname: String
+    val nickname: String,
+    val godLifeScore: Int,
+    val views: Int,
 )
 
 data class StimulusPostDetailQuery(
@@ -41,7 +43,9 @@ data class StimulusPost(
     val introduction: String,
     val nickname: String,
     val godLifeScore: Int,
+    val views: Int,
     val owner: Boolean,
     val content: String,
     val writerId: Int,
+    val createDate: String
 )

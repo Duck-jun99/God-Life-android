@@ -71,7 +71,7 @@ class UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideSearchPostUseCase(repository: SearchPostRepository) = SearchPostUseCase(repository)
+    fun provideSearchPostUseCase(searchPostRepository: SearchPostRepository, networkRepository: NetworkRepository) = SearchPostUseCase(searchPostRepository, networkRepository)
 
     @Provides
     @Singleton

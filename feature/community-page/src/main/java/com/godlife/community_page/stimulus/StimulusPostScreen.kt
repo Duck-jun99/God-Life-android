@@ -91,6 +91,7 @@ import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
+import com.godlife.community_page.search.stimulus.StimulusSearchScreen
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
@@ -146,7 +147,7 @@ fun StimulusPostScreen(
                         onItemClick = { item ->
                             when(item.text){
                                 "글 작성" -> navController2.navigate("CreateStimulusPostScreen")
-                                "검색" -> navController2.navigate("SearchScreen")
+                                "검색" -> navController2.navigate("StimulusSearchScreen")
                             }
                         }
                     )
@@ -235,6 +236,13 @@ fun StimulusPostScreen(
                     CreateStimulusPostScreen(bottomBarVisibleState = bottomBarVisibleState, fabVisibleState = fabVisibleState)
 
                 }
+
+                composable("StimulusSearchScreen"){
+                    fabVisibleState.value = false
+                    StimulusSearchScreen()
+
+                }
+
             }
 
 
