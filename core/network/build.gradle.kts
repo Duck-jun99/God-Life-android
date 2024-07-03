@@ -25,6 +25,12 @@ android {
             properties.getProperty("SERVER_DOMAIN")
         )
 
+        buildConfigField(
+            "String",
+            "SERVER_IMAGE_DOMAIN",
+            properties.getProperty("SERVER_IMAGE_DOMAIN")
+        )
+
     }
 }
 

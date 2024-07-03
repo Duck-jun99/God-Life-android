@@ -75,7 +75,11 @@ import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
 
 @Composable
-fun LatestPostScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: CommunityPageViewModel){
+fun LatestPostScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: CommunityPageViewModel
+){
 
     //val viewModel = hiltViewModel<LatestPostViewModel>()
 
@@ -115,7 +119,11 @@ fun LatestPostScreen(modifier: Modifier = Modifier, navController: NavController
 }
 
 @Composable
-fun LatestPostListView(item: PostDetailBody, navController: NavController, modifier: Modifier = Modifier){
+fun LatestPostListView(
+    item: PostDetailBody,
+    navController: NavController,
+    modifier: Modifier = Modifier
+){
 
     val postId = item.board_id.toString()
 

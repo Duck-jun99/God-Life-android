@@ -3,7 +3,13 @@ package com.godlife.network.api
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.GodScoreQuery
+import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -12,7 +18,12 @@ import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
+import com.godlife.network.model.StimulusPostDetailQuery
+import com.godlife.network.model.StimulusPostQuery
+import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
+import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -21,6 +32,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -59,11 +71,34 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
     ): ApiResponse<UserInfoQuery>
 
+    // 회원 정보 조회 (프로필)
+    @GET("/member/{memberId}")
+    suspend fun getUserProfile(
+        @Header("Authorization") authorization: String,
+        @Path("memberId") memberId: String
+    ): ApiResponse<UserProfileQuery>
+
     // 엑세스 토큰 갱신
     @POST("/reissue")
     suspend fun reissue(
         @Header("Authorization") authorization: String,
     ): ApiResponse<ReissueQuery>
+
+    // 프로필 이미지, 배경사진 변경
+    @Multipart
+    @POST("/image-upload")
+    suspend fun imageUpload(
+        @Header("Authorization") authorization: String,
+        @Part("imageType") imageType: RequestBody,
+        @Part image: MultipartBody.Part
+    ): ApiResponse<ImageUploadQuery>
+
+    //소개글 수정
+    @PATCH("/member")
+    suspend fun updateIntroduce(
+        @Header("Authorization") authorization: String,
+        @Body whoAmI: String
+    ): ApiResponse<UpdateIntroduceQuery>
 
 
     // 게시물 생성
@@ -86,10 +121,11 @@ interface RetrofitNetworkApi {
         @Query("page") page: Int,
         @Query("keyword") keyword: String,
         @Query("Tag") tag: String,
+        //@Query("nickname") nickname: String = ""
     ): ApiResponse<LatestPostQuery>
 
     //일주일 인기 게시물 조회
-    @GET("/popularBoards")
+    @GET("/popular/boards/weekly")
     suspend fun getWeeklyFamousPost(
         @Header("Authorization") authorization: String
     ): ApiResponse<LatestPostQuery>
@@ -142,10 +178,69 @@ interface RetrofitNetworkApi {
         @Path("boardId") boardId: Int,
     ): ApiResponse<GodScoreQuery>
 
+    //주간 명예의 전당
+    @GET("/popular/members/weekly")
+    suspend fun getWeeklyFamousMembers(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<WeeklyRankingQuery>
+
+    //알림 시간 전송
+    @POST("/fcm/alarm")
+    suspend fun postNotificationTime(
+        @Header("Authorization") authorization: String,
+        @Body notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
 
 
+    //갓생 자극 게시물 임시 생성
+    @POST("/board/tmp")
+    suspend fun createStimulusPostTemp(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<StimulusPostQuery>
+
+    //갓생 자극 게시물 이미지 업로드
+    @Multipart
+    @POST("/board/image-upload")
+    suspend fun uploadStimulusPostImage(
+        @Header("Authorization") authorization: String,
+        @Query("tmpBoardId") boardId: Int,
+        @Part image: MultipartBody.Part
+    ): ApiResponse<ImageUploadStimulusQuery>
+
+    //갓생 자극 게시물 최종 생성
+    @POST("/board/stimulation")
+    suspend fun createStimulusPost(
+        @Header("Authorization") authorization: String,
+        @Body stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery>
+
+
+    // 갓생 자극 최신 게시물 조회
+    @GET("/boards/stimulation")
+    suspend fun getStimulusLatestPost(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int
+    ): ApiResponse<LatestStimulusPostQuery>
+
+    // 갓생 자극 게시물 상세 조회
+    @GET("/board/stimulation/{boardId}")
+    suspend fun getStimulusPostDetail(
+        @Header("Authorization") authorization: String,
+        @Path("boardId") boardId: String,
+    ): ApiResponse<StimulusPostDetailQuery>
+
+    //갓생 자극 게시물 검색
+    @GET("/boards/stimulation/filter")
+    suspend fun searchStimulusPost(
+        @Header("Authorization") authorization: String,
+        @Query("title") title: String,
+        @Query("nickname") nickname: String,
+        @Query("introduction") introduction: String
+    ): ApiResponse<LatestStimulusPostQuery>
 
 }
+
+
 
 /*
 @Singleton

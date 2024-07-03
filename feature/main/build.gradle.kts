@@ -32,10 +32,12 @@ dependencies {
     //implementation(projects.core.data)
     //implementation(projects.core.designsystem)
 
+    implementation(projects.core.service)
 
     implementation(projects.feature.mainPage)
     implementation(projects.feature.communityPage)
     implementation(projects.feature.settingPage)
+    implementation(projects.feature.profile)
 
     implementation(projects.feature.navigator)
     

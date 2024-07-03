@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+    <style>
+        #editor {
+            height: 1000px;
+            margin-bottom: 20px;
+        }
+        #html-output {
+            white-space: pre-wrap;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<div id="editor"></div>
+<!-- <button onclick="getHtmlToAndroid()">HTML 보기</button>
+<pre id="html-output"></pre> -->
+<script>
+    var quill = new Quill('#editor', {
+        modules: {
+            toolbar: [
+                [{ size: ['small', false, 'large', 'huge'] }],
+                ['bold', 'italic', 'underline', 'strike', { 'color': [] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                ['image'],
+                ['link'],
+            ],
+        },
+        theme: 'snow'
+    });
+
+    document.querySelector('.ql-image').addEventListener('click', function() {
+        QuillInterface.openImagePicker();
+    });
+
+    function getHtml() {
+        return quill.getSemanticHTML()
+    }
+
+    function getHtmlToAndroid() {
+        var htmlContent = getHtml();
+        var convertedHtml = convertQuillClassesToStyles(htmlContent);
+        var decodedHtml = decodeHtml(convertedHtml);
+        return decodedHtml;
+    }
+
+    function decodeHtml(html) {
+        var txt = document.createElement("textarea");
+        txt.innerHTML = html;
+        return txt.value;
+    }
+
+    function setHtml(html) {
+        quill.root.innerHTML = html;
+    }
+
+    function insertImage(url) {
+        var range = quill.getSelection();
+        quill.insertEmbed(range.index, 'image', url);
+    }
+
+    function convertQuillClassesToStyles(html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+
+        doc.querySelectorAll('*').forEach(function(el) {
+            if (el.classList.contains('ql-size-small')) {
+                el.style.fontSize = '0.75em';
+            } else if (el.classList.contains('ql-size-large')) {
+                el.style.fontSize = '1.5em';
+            } else if (el.classList.contains('ql-size-huge')) {
+                el.style.fontSize = '2.5em';
+            }
+            // 필요에 따라 다른 Quill 클래스에 대한 스타일 변환 로직을 추가할 수 있습니다.
+        });
+
+        return doc.body.innerHTML;
+    }
+
+
+</script>
+</body>
+</html>

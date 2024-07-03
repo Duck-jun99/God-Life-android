@@ -1,5 +1,8 @@
 package com.godlife.community_page.famous
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,11 +27,18 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +47,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
@@ -56,30 +71,13 @@ fun FamousPostScreen(
 ){
 
     GodLifeTheme {
-        Column(
+        LazyColumn(
             modifier
                 .fillMaxSize()
                 .background(GrayWhite3)
         ) {
 
-            Box(
-                modifier
-                    .padding(start = 20.dp, end = 20.dp)
-                    .height(25.dp)){
-
-
-                Row(modifier.fillMaxWidth()){
-                    Icon(painter = painterResource(R.drawable.star_icons8), contentDescription = "", tint = Color.Unspecified)
-                    Spacer(modifier.size(5.dp))
-                    Text(text = "일주일동안 갓생 인정을 많이 받은 게시물이에요", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
-                }
-
-
-            }
-
-            Spacer(modifier = modifier.size(20.dp))
-
-            WeeklyFamousPostListView(viewModel = viewModel, navController = navController)
+            item{ WeeklyFamousPostListView(viewModel = viewModel, navController = navController) }
 
         }
     }
@@ -107,6 +105,16 @@ fun WeeklyFamousPostListView(
         contentAlignment = Alignment.CenterStart
     ){
         Column {
+
+            Row(modifier.fillMaxWidth()){
+                Icon(
+                    modifier = modifier.size(25.dp),
+                    painter = painterResource(R.drawable.star_icons8),
+                    contentDescription = "",
+                    tint = Color.Unspecified)
+                Spacer(modifier.size(5.dp))
+                Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            }
 
 
             Spacer(modifier.size(10.dp))
@@ -161,7 +169,38 @@ fun WeeklyFamousPostList(modifier: Modifier = Modifier,
                         shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
                     )
             ){
-                Text(text = "IMAGE", modifier.align(Alignment.Center))
+                //Text(text = "IMAGE", modifier.align(Alignment.Center))
+
+                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+                val imageModifier: Modifier = modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+
+                Glide.with(LocalContext.current)
+                    .asBitmap()
+                    .load(if(famousPostItem.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + famousPostItem.imagesURL?.get(0).toString() else R.drawable.category3)
+                    .error(R.drawable.category3)
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            bitmap.value = resource
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
+
+                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                    Image(
+                        bitmap = fetchedBitmap,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = imageModifier
+                    )   //bitmap이 없다면
+                } ?: Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = imageModifier
+                )
             }
             Column(
                 modifier
@@ -223,6 +262,16 @@ fun WeeklyFamousPostListViewPreview(modifier: Modifier = Modifier){
         contentAlignment = Alignment.CenterStart
     ){
         Column {
+
+            Row(modifier.fillMaxWidth()){
+                Icon(
+                    modifier = modifier.size(25.dp),
+                    painter = painterResource(R.drawable.star_icons8),
+                    contentDescription = "",
+                    tint = Color.Unspecified)
+                Spacer(modifier.size(5.dp))
+                Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            }
 
 
             Spacer(modifier.size(10.dp))

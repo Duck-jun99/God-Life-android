@@ -42,7 +42,44 @@ fun CreateTodoListScreen3(
     createViewModel: CreateTodoListViewModel
 ){
 
-    val showDoneUI = remember { mutableStateOf(false) }
+    val uiState by createViewModel.uiState.collectAsState()
+
+    createViewModel.saveTodoList()
+
+    when (uiState) {
+        is CreateTodoListUiState.Loading -> {
+
+            LoadingUI(message = "투두 리스트를 만들고 있어요.")
+
+        }
+
+        is CreateTodoListUiState.NotiSuccess -> {
+
+            LoadingUI(message = "잠시만 기다려주세요.")
+
+        }
+
+        is CreateTodoListUiState.Success -> {
+
+
+            DoneLodingUI(
+                navController = navController,
+                createTodoListActivity = createTodoListActivity,
+                mainNavigator = mainNavigator,
+                createViewModel = createViewModel
+            )
+
+        }
+
+        is CreateTodoListUiState.Error -> {
+
+            LoadingUI(message = "죄송해요. 오류가 발생했어요.\n잠시 뒤 다시 실행해주세요.")
+
+        }
+
+    }
+
+    /*
 
     LaunchedEffect(Unit) {
         delay(5000) // 5초 지연
@@ -60,35 +97,32 @@ fun CreateTodoListScreen3(
         LoadingUI(createViewModel)
     }
 
+     */
+
 }
 
 @Composable
 fun LoadingUI(
-    createViewModel: CreateTodoListViewModel
+    modifier: Modifier = Modifier,
+    message: String
 ){
     GodLifeTheme {
 
-        val selectedList by createViewModel.selectedList.collectAsState()
-        val endTime by createViewModel.endTime.collectAsState()
-        val notificationTime by createViewModel.notificationTime.collectAsState()
-
-        createViewModel.addDatabase()
-
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
         ) {
             Column(
-                modifier = Modifier.align(Alignment.Center)
+                modifier = modifier.align(Alignment.Center)
             ) {
-                AnimatedPreLoader(modifier = Modifier
+                AnimatedPreLoader(modifier = modifier
                     .size(100.dp)
                     .align(Alignment.CenterHorizontally)
                 )
-                Spacer(modifier = Modifier.size(10.dp))
+                Spacer(modifier = modifier.size(10.dp))
 
-                Text(text = "투두 리스트를 만들고 있어요.", style = GodLifeTypography.bodyLarge)
+                Text(text = message, style = GodLifeTypography.bodyLarge)
             }
 
         }

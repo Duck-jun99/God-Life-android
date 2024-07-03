@@ -22,5 +22,7 @@ internal object DatabaseModule {
         context,
         LocalDatabase::class.java,
         "app-database",
-    ).build()
+    )
+        .fallbackToDestructiveMigration()
+        .build()
 }

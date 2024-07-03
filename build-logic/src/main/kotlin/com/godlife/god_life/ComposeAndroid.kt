@@ -20,6 +20,7 @@ internal fun Project.configureComposeAndroid() {
             add("androidTestImplementation", platform(bom))
             
             add("implementation", libs.findLibrary("androidx.compose.material3").get())
+            add("implementation", libs.findLibrary("androidx-compose-material3-window-size").get())
             add("implementation", libs.findLibrary("androidx.compose.ui").get())
             add("implementation", libs.findLibrary("androidx.compose.ui.tooling.preview").get())
             add("androidTestImplementation", libs.findLibrary("androidx.test.ext").get())

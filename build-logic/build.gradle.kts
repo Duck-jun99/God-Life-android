@@ -34,5 +34,9 @@ gradlePlugin {
             id = "god_life.android.security-crypto"
             implementationClass = "com.godlife.god_life.SecurityCryptoPlugin"
         }
+        register("firebase"){
+            id = "god_life.firebase"
+            implementationClass = "com.godlife.god_life.FirebasePlugin"
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.godlife.createtodolist
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,9 +24,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +77,8 @@ fun CreateTodoListScreen1(
 
     GodLifeTheme {
 
+        val context = LocalContext.current
+
         val coroutineScope = rememberCoroutineScope()
 
         val getOnClick: () -> Unit = {
@@ -89,6 +96,7 @@ fun CreateTodoListScreen1(
                 .fillMaxSize()
                 .background(Color.White)
         ) {
+
             Column(
                 modifier = Modifier
                     .padding(20.dp)
@@ -104,42 +112,12 @@ fun CreateTodoListScreen1(
                     columns = GridCells.Fixed(3),
                     modifier = Modifier
                         .padding(5.dp)
-                        .fillMaxHeight(0.7f)
+                        .fillMaxSize()
                 ) {
                     itemsIndexed(todoList){ index, item ->
                         if(!item.isSelected) CardTodoList(item, createViewModel)
                         else SelectedCardTodoList(item, createViewModel)
 
-                    }
-                }
-
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                ){
-
-                    Text(text = "선택한 목표",
-                        style = GodLifeTypography.titleMedium
-                    )
-
-                    GodLifeButton(onClick = getOnClick) {
-                        Text(text = "이전 목표 불러오기",
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-                }
-
-
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.2f)
-                ) {
-                    itemsIndexed(selectedList) { index, item ->
-                        SelectedTodoList(item)
                     }
                 }
 
@@ -152,7 +130,12 @@ fun CreateTodoListScreen1(
                 .weight(0.2f)){
 
                 GodLifeButton(onClick = {
-                    navController.navigate(CreateTodoListScreen2Route.route)
+                    if(selectedList.isNotEmpty()){
+                        navController.navigate(CreateTodoListScreen2Route.route)
+                    }
+                    else{
+                        Toast.makeText(context, "목표를 선택해주세요.", Toast.LENGTH_SHORT).show()
+                    }
                 },
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -423,6 +406,7 @@ fun SelectedTodoListPreview(){
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun MainUIPreview(){
@@ -434,6 +418,7 @@ fun MainUIPreview(){
                 .fillMaxSize()
                 .background(Color.White)
         ) {
+
             Column(
                 modifier = Modifier
                     .padding(20.dp)
@@ -452,32 +437,45 @@ fun MainUIPreview(){
                         .fillMaxHeight(0.7f)
                 ) {
 
-                }
-
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                ){
-
-                    Text(text = "선택한 목표",
-                        style = GodLifeTypography.titleMedium
-                    )
-
-                    GodLifeButton(onClick = {}) {
-                        Text(text = "이전 목표 불러오기",
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
+                    items(15){
+                        CardTodoListPreview()
                     }
+
                 }
 
+                BottomSheetScaffold(
+                    sheetContainerColor = Color.White,
+                    sheetContent = {
 
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.2f)
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                        ){
+
+                            Text(text = "선택한 목표",
+                                style = GodLifeTypography.titleMedium
+                            )
+
+                            GodLifeButton(onClick = {}) {
+                                Text(text = "이전 목표 불러오기",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
+                        }
+
+
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.2f)
+                        ) {
+
+                        }
+
+                    }
                 ) {
 
                 }
@@ -505,5 +503,6 @@ fun MainUIPreview(){
                 }
             }
         }
+
     }
 }

@@ -1,21 +1,24 @@
 package com.godlife.database.util
 
 import androidx.room.TypeConverter
-import com.godlife.model.todo.EndTimeData
 import com.godlife.model.todo.NotificationTimeData
+import com.godlife.model.todo.TodoTimeData
 
-class EndTimeDataConverter {
+
+class TodoTimeDataConverter{
     @TypeConverter
-    fun fromEndTimeData(endTimeData: EndTimeData): String {
-        return "${endTimeData.y} ${endTimeData.m} ${endTimeData.d} ${endTimeData.hour} ${endTimeData.minute}"
+    fun fromTodoTimeData(todoTimeData: TodoTimeData): String {
+        return "${todoTimeData.y} ${todoTimeData.m} ${todoTimeData.d}"
     }
 
     @TypeConverter
-    fun toEndTimeData(endTimeDataString: String): EndTimeData {
-        val parts = endTimeDataString.split(" ")
-        return EndTimeData(parts[0].toInt(), parts[1].toInt(), parts[2].toInt(), parts[3].toInt(), parts[4].toInt())
+    fun toTodoTimeData(todoTimeDataString: String): TodoTimeData {
+        val parts = todoTimeDataString.split(" ")
+        return TodoTimeData(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
     }
+
 }
+
 
 class NotificationTimeDataConverter {
     @TypeConverter

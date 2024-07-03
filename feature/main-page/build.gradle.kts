@@ -32,6 +32,7 @@ dependencies {
     implementation(projects.feature.createtodolist)
     implementation(projects.core.database)
     implementation(projects.core.network)
+    implementation(projects.feature.profile)
 
     implementation(projects.feature.navigator)
 

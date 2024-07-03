@@ -13,13 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +38,6 @@ import com.godlife.designsystem.component.GodLifeTimeInput
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.model.todo.EndTimeData
 import com.godlife.model.todo.NotificationTimeData
 import java.time.LocalDateTime
 
@@ -48,6 +51,8 @@ fun CreateTodoListScreen2(
     Log.e("CreateViewModel2", createViewModel.toString())
 
     val selectedList by createViewModel.selectedList.collectAsState()
+
+    val notificationSwitchState by createViewModel.notificationSwitchState.collectAsState()
 
     //createViewModel.updateSelectedList(selectedList)
 
@@ -69,7 +74,7 @@ fun CreateTodoListScreen2(
             ) {
 
                 Text(
-                    text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
+                    text = "알림을 설정하시면\n잊지 않게 알림을 보내드릴게요.",
                     style = GodLifeTypography.titleMedium
                 )
 
@@ -84,7 +89,7 @@ fun CreateTodoListScreen2(
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
 
-                    Text(text = "목표 종료 시간",
+                    Text(text = "알림 설정",
                         style = TextStyle(
                             color = PurpleMain,
                             fontWeight = FontWeight.Bold,
@@ -95,38 +100,43 @@ fun CreateTodoListScreen2(
                 }
 
                 Box(modifier = Modifier.fillMaxWidth()){
-                    EndTimeInput(modifier = Modifier
-                        .padding(10.dp)
-                        .align(Alignment.Center),
-                        createViewModel)
+                    Switch(
+                        checked = notificationSwitchState, onCheckedChange = { createViewModel.updateNotificationSwitchState() }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
 
-                Row(modifier = Modifier.padding(5.dp)){
+                if(notificationSwitchState){
 
-                    Icon(
-                        imageVector = Icons.Outlined.Notifications,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
+                    Row(modifier = Modifier.padding(5.dp)){
 
-                    Text(text = "알림 시간",
-                        style = TextStyle(
-                            color = PurpleMain,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        ),
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
+                        Icon(
+                            imageVector = Icons.Outlined.Notifications,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+
+                        Text(text = "알림 시간",
+                            style = TextStyle(
+                                color = PurpleMain,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            ),
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
+
+                    Box(modifier = Modifier.fillMaxWidth()){
+                        NotificationTimeInput(modifier = Modifier
+                            .padding(10.dp)
+                            .align(Alignment.Center),
+                            createViewModel)
+                    }
+
                 }
 
-                Box(modifier = Modifier.fillMaxWidth()){
-                    NotificationTimeInput(modifier = Modifier
-                        .padding(10.dp)
-                        .align(Alignment.Center),
-                        createViewModel)
-                }
+
 
                 Spacer(modifier = Modifier.height(100.dp))
 
@@ -153,36 +163,6 @@ fun CreateTodoListScreen2(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EndTimeInput(
-    modifier: Modifier,
-    createViewModel: CreateTodoListViewModel
-){
-    val timePickerState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 0,
-        is24Hour = false
-    )
-
-    GodLifeTimeInput(timePickerState = timePickerState)
-
-
-    createViewModel.updateEndTime(
-        EndTimeData(LocalDateTime.now().year,
-            LocalDateTime.now().monthValue,
-            LocalDateTime.now().dayOfMonth,
-            timePickerState.hour,
-            timePickerState.minute))
-
-    Log.e("EndTimeInput", EndTimeData(LocalDateTime.now().year,
-        LocalDateTime.now().monthValue,
-        LocalDateTime.now().dayOfMonth,
-        timePickerState.hour,
-        timePickerState.minute).toString())
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -234,7 +214,7 @@ fun CreateTodoListScreen2Preview(){
             ) {
 
                 Text(
-                    text = "오늘 목표를 마무리할 시간을 정해주세요.\n잊지 않게 알림을 보내드릴게요.",
+                    text = "알림을 설정하시면\n잊지 않게 알림을 보내드릴게요.",
                     style = GodLifeTypography.titleMedium
                 )
 
@@ -249,7 +229,8 @@ fun CreateTodoListScreen2Preview(){
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
 
-                    Text(text = "목표 종료 시간",
+                    Text(
+                        text = "알림 설정",
                         style = TextStyle(
                             color = PurpleMain,
                             fontWeight = FontWeight.Bold,
@@ -259,8 +240,15 @@ fun CreateTodoListScreen2Preview(){
                     )
                 }
 
-                Box(modifier = Modifier.fillMaxWidth()){
+                val switchState = remember { mutableStateOf(false) }
 
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ){
+                    Switch(
+                        checked = switchState.value, onCheckedChange = {switchState.value = !switchState.value}
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
@@ -283,9 +271,7 @@ fun CreateTodoListScreen2Preview(){
                     )
                 }
 
-                Box(modifier = Modifier.fillMaxWidth()){
-
-                }
+                NotificationTimeInputPreview()
 
                 Spacer(modifier = Modifier.height(100.dp))
 
@@ -310,4 +296,32 @@ fun CreateTodoListScreen2Preview(){
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun NotificationTimeInputPreview(
+    modifier: Modifier = Modifier,
+){
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 0,
+        is24Hour = false
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ){
+
+        GodLifeTimeInput(timePickerState = timePickerState)
+    }
+
+
+
+
+
 }

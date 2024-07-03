@@ -6,7 +6,13 @@ import com.godlife.network.NetworkDataSource
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
+import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.GodScoreQuery
+import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
 import com.godlife.network.model.PostQuery
 import com.godlife.network.model.ReissueQuery
@@ -14,7 +20,12 @@ import com.godlife.network.model.UserExistenceCheckResult
 import com.godlife.network.model.SignUpCheckEmailQuery
 import com.godlife.network.model.SignUpCheckNicknameQuery
 import com.godlife.network.model.SignUpQuery
+import com.godlife.network.model.StimulusPostDetailQuery
+import com.godlife.network.model.StimulusPostQuery
+import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
+import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
 
@@ -51,8 +62,30 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.getUserInfo(authorization)
     }
 
+    override suspend fun getUserProfile(
+        authorization: String,
+        memberId: String
+    ): ApiResponse<UserProfileQuery> {
+        return networkDataSource.getUserProfile(authorization, memberId)
+    }
+
     override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
         return networkDataSource.reissue(authorization)
+    }
+
+    override suspend fun imageUpload(
+        authorization: String,
+        imageType: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+        return networkDataSource.imageUpload(authorization, imageType, image)
+    }
+
+    override suspend fun updateIntroduce(
+        authorization: String,
+        introduce: String
+    ): ApiResponse<UpdateIntroduceQuery> {
+        return networkDataSource.updateIntroduce(authorization, introduce)
     }
 
     override suspend fun createPost(
@@ -65,6 +98,7 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.createPost(authorization, title, content, tags, imagePath)
     }
 
+    /*
     override suspend fun getLatestPost(
         authorization: String,
         page: Int,
@@ -73,6 +107,8 @@ class NetworkRepositoryImpl @Inject constructor(
     ): ApiResponse<LatestPostQuery> {
         return networkDataSource.getLatestPost(authorization, page, keyword, tag)
     }
+
+     */
 
     override suspend fun getWeeklyFamousPost(authorization: String): ApiResponse<LatestPostQuery> {
         return networkDataSource.getWeeklyFamousPost(authorization)
@@ -110,6 +146,52 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
         return networkDataSource.agreeGodLife(authorization, postId)
+    }
+
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+        return networkDataSource.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun postNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkDataSource.postNotificationTime(authorization, notificationTime)
+    }
+
+    override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
+        return networkDataSource.createStimulusPostTemp(authorization)
+    }
+
+    override suspend fun uploadStimulusPostImage(
+        authorization: String,
+        tmpBoardId: Int,
+        image: Uri
+    ): ApiResponse<ImageUploadStimulusQuery> {
+        return networkDataSource.uploadStimulusPostImage(authorization, tmpBoardId, image)
+    }
+
+    override suspend fun createStimulusPost(
+        authorization: String,
+        stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery> {
+        return networkDataSource.createStimulusPost(authorization, stimulusPostBody)
+    }
+
+    override suspend fun getStimulusPostDetail(
+        authorization: String,
+        boardId: String
+    ): ApiResponse<StimulusPostDetailQuery> {
+        return networkDataSource.getStimulusPostDetail(authorization, boardId)
+    }
+
+    override suspend fun searchStimulusPost(
+        authorization: String,
+        title: String,
+        nickname: String,
+        introduction: String
+    ): ApiResponse<LatestStimulusPostQuery> {
+        return networkDataSource.searchStimulusPost(authorization, title, nickname, introduction)
     }
 
 }

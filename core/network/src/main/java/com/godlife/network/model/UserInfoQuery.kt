@@ -13,4 +13,6 @@ data class UserInfoBody(
     val godLifeScore: Int,
     val profileImage: String,
     val backgroundImage: String,
+    val whoAmI: String,
+    val memberId: String,
 )

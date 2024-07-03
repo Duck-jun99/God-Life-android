@@ -1,10 +1,7 @@
-package com.godlife.create_post
+package com.godlife.create_post.post
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

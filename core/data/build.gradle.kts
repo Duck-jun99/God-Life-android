@@ -19,4 +19,5 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)
     implementation(libs.converter.gson)
+    implementation(project(":core:model"))
 }

@@ -17,7 +17,19 @@ import com.godlife.network.model.SignUpQuery
 import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
+import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.ImageUploadQuery
+import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.NotificationQuery
+import com.godlife.network.model.NotificationRequest
+import com.godlife.network.model.StimulusPostDetailQuery
+import com.godlife.network.model.StimulusPostQuery
+import com.godlife.network.model.UpdateIntroduceQuery
+import com.godlife.network.model.UserProfileQuery
+import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -58,8 +70,41 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getUserInfo(authorization)
     }
 
+    override suspend fun getUserProfile(
+        authorization: String,
+        memberId: String
+    ): ApiResponse<UserProfileQuery> {
+        return networkApi.getUserProfile(authorization, memberId)
+    }
+
     override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
         return networkApi.reissue(authorization)
+    }
+
+    override suspend fun imageUpload(
+        authorization: String,
+        imageType: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+
+        val imageType: RequestBody = imageType.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val file = File(image.path!!)
+
+        Log.e("NetworkDataSourceImpl", image.path!!.toString())
+
+        val requestFile = file.asRequestBody("image/*".toMediaType())
+
+        val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        return networkApi.imageUpload(authorization, imageType, imageMultiPart)
+    }
+
+    override suspend fun updateIntroduce(
+        authorization: String,
+        introduce: String
+    ): ApiResponse<UpdateIntroduceQuery> {
+        return networkApi.updateIntroduce(authorization = authorization, whoAmI = introduce)
     }
 
     override suspend fun createPost(
@@ -78,6 +123,8 @@ class NetworkDataSourceImpl @Inject constructor(
         val imageParts = imagePath?.map { it ->
 
             val file = File(it.path)
+            Log.e("NetworkDataSourceImpl", it.path!!.toString())
+
             Log.e("NetworkDataSourceImpl", file.readBytes().toString())
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
 
@@ -136,6 +183,68 @@ class NetworkDataSourceImpl @Inject constructor(
 
     override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
         return networkApi.agreeGodLife(authorization, postId)
+    }
+
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+        return networkApi.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun postNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkApi.postNotificationTime(authorization, notificationTime)
+    }
+
+    override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
+        return networkApi.createStimulusPostTemp(authorization)
+    }
+
+    override suspend fun uploadStimulusPostImage(
+        authorization: String,
+        tmpBoardId: Int,
+        image: Uri
+    ): ApiResponse<ImageUploadStimulusQuery> {
+
+        val file = File(image.path!!)
+
+        Log.e("NetworkDataSourceImpl", image.path!!.toString())
+
+        val requestFile = file.asRequestBody("image/*".toMediaType())
+
+        val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        return networkApi.uploadStimulusPostImage(authorization, tmpBoardId, imageMultiPart)
+    }
+
+    override suspend fun createStimulusPost(
+        authorization: String,
+        stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery> {
+        return networkApi.createStimulusPost(authorization, stimulusPostBody)
+    }
+
+    override suspend fun getStimulusLatestPost(
+        authorization: String,
+        page: Int
+    ): ApiResponse<LatestStimulusPostQuery> {
+        return networkApi.getStimulusLatestPost(authorization, page)
+    }
+
+    override suspend fun getStimulusPostDetail(
+        authorization: String,
+        boardId: String
+    ): ApiResponse<StimulusPostDetailQuery> {
+        return networkApi.getStimulusPostDetail(authorization, boardId)
+    }
+
+    override suspend fun searchStimulusPost(
+        authorization: String,
+        title: String,
+        nickname: String,
+        introduction: String
+    ): ApiResponse<LatestStimulusPostQuery> {
+        return networkApi.searchStimulusPost(authorization, title, nickname, introduction)
     }
 
 

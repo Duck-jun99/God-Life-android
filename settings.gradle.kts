@@ -27,6 +27,7 @@ include(
     ":core:database",
     ":core:model",
     ":core:common",
+    ":core:service",
 
     ":feature:main",
     ":feature:login",

@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LatestPostViewModel @Inject constructor(
-    private val latestPostUseCase: GetLatestPostUseCase
+    //private val latestPostUseCase: GetLatestPostUseCase
 ): ViewModel() {
 
 

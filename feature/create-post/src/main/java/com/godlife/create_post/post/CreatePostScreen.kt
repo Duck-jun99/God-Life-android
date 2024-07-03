@@ -1,4 +1,4 @@
-package com.godlife.create_post
+package com.godlife.create_post.post
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -100,7 +100,7 @@ fun CreatePostScreen(
                 createPostViewModel.saveImg(resizeUri)
 
                 val file = File(resizeUri.path)
-                Log.e("CreatePostScreen", file.length().toString())
+                Log.e("이미지 사이즈", file.length().toString())
             }
         }
 
