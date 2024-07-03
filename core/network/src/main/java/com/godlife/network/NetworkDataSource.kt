@@ -26,6 +26,8 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.WeeklyRankingQuery
 import com.skydoves.sandwich.ApiResponse
+import retrofit2.http.Header
+import retrofit2.http.Query
 
 interface NetworkDataSource {
     suspend fun checkUserExistence(id: String): UserExistenceCheckResult?
@@ -150,5 +152,12 @@ interface NetworkDataSource {
         authorization: String,
         boardId: String
     ): ApiResponse<StimulusPostDetailQuery>
+
+    suspend fun searchStimulusPost(
+        authorization: String,
+        title: Int,
+        nickname: String,
+        introduction: String
+    ): ApiResponse<LatestStimulusPostQuery>
 
 }

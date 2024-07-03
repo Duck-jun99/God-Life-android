@@ -185,4 +185,13 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.getStimulusPostDetail(authorization, boardId)
     }
 
+    override suspend fun searchStimulusPost(
+        authorization: String,
+        title: Int,
+        nickname: String,
+        introduction: String
+    ): ApiResponse<LatestStimulusPostQuery> {
+        return networkDataSource.searchStimulusPost(authorization, title, nickname, introduction)
+    }
+
 }

@@ -6,11 +6,19 @@ import com.godlife.data.repository.SearchPostRepository
 import javax.inject.Inject
 
 class SearchPostUseCase @Inject constructor(
-    private val searchPostRepository: SearchPostRepository
+    private val searchPostRepository: SearchPostRepository,
+    private val networkRepository: NetworkRepository
 ) {
     fun executeSearchPost(
         keyword: String,
         tags: String,
         nickname: String
     ) = searchPostRepository.getSearchedPost(keyword, tags, nickname)
+
+    suspend fun executeSearchStimulusPost(
+        authorization: String,
+        title: Int,
+        nickname: String,
+        introduction: String
+    ) = networkRepository.searchStimulusPost(authorization, title, nickname, introduction)
 }

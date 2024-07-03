@@ -8,6 +8,7 @@ import com.godlife.network.api.RetrofitNetworkApi
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.LatestStimulusPostQuery
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.StimulusPostList
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onSuccess
@@ -18,16 +19,16 @@ import javax.inject.Inject
 class LatestStimulusPostPagingSource @Inject constructor(
     private val localPreferenceUserRepository: LocalPreferenceUserRepository,
     private val networkApi: RetrofitNetworkApi
-): PagingSource<Int, StimulusPost>() {
+): PagingSource<Int, StimulusPostList>() {
 
-    override fun getRefreshKey(state: PagingState<Int, StimulusPost>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, StimulusPostList>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StimulusPost> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StimulusPostList> {
 
         return try {
             // Authorization 토큰을 비동기적으로 가져옴

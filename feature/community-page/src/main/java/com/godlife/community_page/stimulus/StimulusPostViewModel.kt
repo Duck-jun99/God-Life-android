@@ -10,6 +10,7 @@ import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.StimulusPostList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +52,7 @@ class StimulusPostViewModel @Inject constructor(
     private var latestFlag = mutableIntStateOf(0)
 
     //조회된 최신 게시물, 페이징을 이용하기에 지연 초기화
-    lateinit var latestPostList: Flow<PagingData<StimulusPost>>
+    lateinit var latestPostList: Flow<PagingData<StimulusPostList>>
 
 
     /**

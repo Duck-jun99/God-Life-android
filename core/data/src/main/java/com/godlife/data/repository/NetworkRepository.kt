@@ -147,6 +147,13 @@ interface NetworkRepository {
         boardId: String
     ): ApiResponse<StimulusPostDetailQuery>
 
+    suspend fun searchStimulusPost(
+        authorization: String,
+        title: Int,
+        nickname: String,
+        introduction: String
+    ): ApiResponse<LatestStimulusPostQuery>
+
 
 
 }

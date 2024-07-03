@@ -238,5 +238,14 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getStimulusPostDetail(authorization, boardId)
     }
 
+    override suspend fun searchStimulusPost(
+        authorization: String,
+        title: Int,
+        nickname: String,
+        introduction: String
+    ): ApiResponse<LatestStimulusPostQuery> {
+        return networkApi.searchStimulusPost(authorization, title, nickname, introduction)
+    }
+
 
 }

@@ -16,7 +16,21 @@ data class CreatePostRequest(
 
 data class LatestStimulusPostQuery(
     val status: String,
-    val body: List<StimulusPost>,
+    val body: List<StimulusPostList>,
+    val message: String,
+)
+
+data class StimulusPostList(
+    val title: String,
+    val boardId: Int,
+    val thumbnailUrl: String,
+    val introduction: String,
+    val nickname: String
+)
+
+data class StimulusPostDetailQuery(
+    val status: String,
+    val body: StimulusPost,
     val message: String,
 )
 
@@ -30,10 +44,4 @@ data class StimulusPost(
     val owner: Boolean,
     val content: String,
     val writerId: Int,
-)
-
-data class StimulusPostDetailQuery(
-    val status: String,
-    val body: StimulusPost,
-    val message: String,
 )

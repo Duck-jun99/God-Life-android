@@ -3,9 +3,17 @@ package com.godlife.community_page.stimulus
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,23 +26,36 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.rounded.Create
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,6 +66,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -74,7 +96,19 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.StimulusPostList
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+data class FABItem(
+    val icon: ImageVector,
+    val text: String,
+)
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StimulusPostScreen(
@@ -89,16 +123,33 @@ fun StimulusPostScreen(
 
     val fabVisibleState = remember { mutableStateOf(true) }
 
+    val itemList = listOf(
+        FABItem(icon = Icons.Rounded.Create, text = "글 작성"),
+        FABItem(icon = Icons.Rounded.Search, text = "검색"),
+    )
+
 
     GodLifeTheme {
         Scaffold(
             floatingActionButton = {
                 if(fabVisibleState.value){
+                    /*
                     FloatingActionButton(
                         onClick = { navController2.navigate("CreateStimulusPostScreen") }
                     ) {
-                        Icon(imageVector = Icons.Default.Warning, contentDescription = "")
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "")
                     }
+                     */
+
+                    CustomExpandableFAB(
+                        items = itemList,
+                        onItemClick = { item ->
+                            when(item.text){
+                                "글 작성" -> navController2.navigate("CreateStimulusPostScreen")
+                                "검색" -> navController2.navigate("SearchScreen")
+                            }
+                        }
+                    )
                 }
 
             }
@@ -223,7 +274,7 @@ fun LatestStimulusPostList(
 @Composable
 fun LatestStimulusItem(
     modifier: Modifier = Modifier,
-    item: StimulusPost,
+    item: StimulusPostList,
     navController: NavController
 ){
 
@@ -305,6 +356,105 @@ fun LatestStimulusItem(
     }
 }
 
+@SuppressLint("UnrememberedMutableInteractionSource")
+@Composable
+fun CustomExpandableFAB(
+    modifier: Modifier = Modifier,
+    items: List<FABItem>,
+    fabButton: FABItem = FABItem(
+        icon = Icons.Rounded.Menu,
+        text = "    메뉴    "
+    ),
+    onItemClick: (FABItem) -> Unit
+) {
+
+    var buttonClicked by remember {
+        mutableStateOf(false)
+    }
+
+    val interactionSource = MutableInteractionSource()
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.elevatedCardElevation(4.dp)
+    ) {
+
+        // parent layout
+        Column {
+
+//            you can also use the spring() in EnterTransition/ExitTransition provided by Material-3 library for a more smooth animation, but it increases the collapse time of the sheet/FAB
+//            example - spring(dampingRatio = 3f)
+
+            // The Expandable Sheet layout
+            AnimatedVisibility(
+                visible = buttonClicked,
+                enter = expandVertically(tween(1000)) + fadeIn(),
+                exit = shrinkVertically(tween(1000)) + fadeOut(
+                    animationSpec = tween(1000)
+                )
+            ) {
+                // display the items
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 20.dp, horizontal = 20.dp)
+                ) {
+                    items.forEach { item ->
+                        Row(modifier = Modifier
+                            .padding(vertical = 10.dp)
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = {
+                                    onItemClick(item)
+                                    buttonClicked = false
+                                }
+                            )) {
+                            Icon(
+                                imageVector = item.icon, contentDescription = "refresh"
+                            )
+
+                            Spacer(modifier = Modifier.width(15.dp))
+
+                            Text(text = item.text)
+                        }
+                    }
+                }
+            }
+
+            // The FAB main button
+            Card(
+                modifier = Modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = {
+                        buttonClicked = !buttonClicked
+                    }
+                ), colors = CardDefaults.cardColors(Color.White)) {
+                Row(
+                    modifier = Modifier.padding(vertical = 20.dp, horizontal = 30.dp)
+                ) {
+                    Icon(
+                        imageVector = fabButton.icon, contentDescription = "refresh"
+                    )
+                    AnimatedVisibility(
+                        visible = buttonClicked,
+                        enter = expandVertically(animationSpec = tween(1500)) + fadeIn(),
+                        exit = shrinkVertically(tween(1200)) + fadeOut(tween(1200))
+                    ) {
+                        Row {
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Text(text = fabButton.text)
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+}
+
 
 @Preview
 @Composable
@@ -312,12 +462,6 @@ fun StimulusPostContent1Preview(
     modifier: Modifier = Modifier,
     navController: NavController? = null
 ){
-
-    var width by remember {
-        mutableStateOf(0.dp)
-    }
-
-    val localDensity = LocalDensity.current
 
     val item = listOf(
         StimulusPostItem(
@@ -346,85 +490,149 @@ fun StimulusPostContent1Preview(
         )
     )
 
-    LazyRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(400.dp)
-            .onGloballyPositioned {
-                width = with(localDensity) {
-                    it.size.width.toDp()
+    var width by remember {
+        mutableStateOf(0.dp)
+    }
+
+    val localDensity = LocalDensity.current
+
+
+    var initialPage by remember { mutableIntStateOf(0) }
+
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { item.size })
+
+    LaunchedEffect(key1 = Unit) {
+
+        //initialPage = Int.MAX_VALUE / 2
+
+        while (initialPage % item.size != 0) {
+            initialPage++
+        }
+        pagerState.scrollToPage(initialPage)
+    }
+
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        launch {
+            while (true) {
+                delay(2000L)
+
+                withContext(NonCancellable) {
+
+                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+
                 }
             }
-    ){
+        }
+    }
 
-        itemsIndexed(item){index, it ->
+    Box(){
 
-            Box(
-                modifier = modifier
-                    .fillMaxHeight()
-                    .width(width)
-                    .background(Color.Black)
-                    .clickable { navController?.navigate(StimulusPostDetailRoute.route) },
-                contentAlignment = Alignment.Center
-            ){
+        HorizontalPager(
+            state = pagerState,
+            modifier = modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .onGloballyPositioned {
+                    width = with(localDensity) {
+                        it.size.width.toDp()
+                    }
+                }
+        ) {index ->
 
+            item.getOrNull(
+                index% (item.size)
+            )?.let { item ->
 
-                Image(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .blur(
-                            radiusX = 15.dp, radiusY = 15.dp
-                        ),
-                    painter = painterResource(id = it.coverImg),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    alpha = 0.7f
-                )
-
-                Column(
+                Box(
                     modifier = modifier
                         .fillMaxHeight()
-                        .width(220.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                        .width(width)
+                        .background(Color.Black)
+                        .clickable { navController?.navigate(StimulusPostDetailRoute.route) },
+                    contentAlignment = Alignment.Center
+                ){
 
-                    StimulusCoverItemPreview(item = it)
 
-                    Spacer(modifier.size(5.dp))
-
-                    Text(
-                        text = it.introText,
-                        style = TextStyle(
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Center
-                        )
+                    Image(
+                        modifier = modifier
+                            .fillMaxSize()
+                            .blur(
+                                radiusX = 15.dp, radiusY = 15.dp
+                            ),
+                        painter = painterResource(id = item.coverImg),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        alpha = 0.7f
                     )
 
-                    Spacer(modifier.size(5.dp))
+                    Column(
+                        modifier = modifier
+                            .fillMaxHeight()
+                            .width(220.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                    HorizontalDivider()
+                        StimulusCoverItemPreview(item = item)
 
-                    Spacer(modifier.size(5.dp))
+                        Spacer(modifier.size(5.dp))
 
-                    Text(
-                        text = "by.${it.writer}",
-                        style = TextStyle(
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Center
+                        Text(
+                            text = item.introText,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Normal,
+                                textAlign = TextAlign.Center
+                            )
                         )
-                    )
+
+                        Spacer(modifier.size(5.dp))
+
+                        HorizontalDivider()
+
+                        Spacer(modifier.size(5.dp))
+
+                        Text(
+                            text = "by.${item.writer}",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Normal,
+                                textAlign = TextAlign.Center
+                            )
+                        )
+
+                    }
 
                 }
 
+            }
+
+        }
+
+        Row(
+            Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 8.dp, end = 8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(10.dp)
+                )
             }
         }
 
     }
+
+
+
 }
 
 @Preview

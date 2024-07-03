@@ -216,7 +216,7 @@ interface RetrofitNetworkApi {
 
 
     // 갓생 자극 최신 게시물 조회
-    @GET("/board/stimulation")
+    @GET("/boards/stimulation")
     suspend fun getStimulusLatestPost(
         @Header("Authorization") authorization: String,
         @Query("page") page: Int
@@ -228,6 +228,15 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: String,
     ): ApiResponse<StimulusPostDetailQuery>
+
+    //갓생 자극 게시물 검색
+    @GET("/boards/stimulation/filter")
+    suspend fun searchStimulusPost(
+        @Header("Authorization") authorization: String,
+        @Query("title") title: Int,
+        @Query("nickname") nickname: String,
+        @Query("introduction") introduction: String
+    ): ApiResponse<LatestStimulusPostQuery>
 
 }
 
