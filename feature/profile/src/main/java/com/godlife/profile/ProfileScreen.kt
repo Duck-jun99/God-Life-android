@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -27,16 +30,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -45,6 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,8 +67,11 @@ import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
+import com.godlife.network.model.StimulusPostList
 
 
 @Composable
@@ -462,25 +475,80 @@ fun UserPostListBox(
     viewModel: ProfileViewModel,
     navController: NavController
 ){
-    val userPostList = viewModel.userPostList.collectAsLazyPagingItems()
 
+    val selectedIndex = remember { mutableIntStateOf(0) }
+    val category = listOf("굿생 인증 게시물", "굿생 자극 게시물")
+
+    val userPostList = viewModel.userPostList.collectAsLazyPagingItems()
+    val userStimulusPostList = viewModel.userStimulusPostList.collectAsState()
     val nickname = viewModel.userInfo.collectAsState().value.nickname
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp)
     ){
-        Text(text = "${nickname}님의 게시물", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+        ){
+            Text(text = "${nickname}님의 게시물", style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+        }
 
 
-        LazyColumn {
-
-
-            items(userPostList.itemCount){
-                userPostList[it]?.let { it1 -> PostList(item = it1, navController = navController) }
-
+        TabRow(
+            selectedTabIndex = selectedIndex.value,
+            containerColor = Color(0X00000000),
+            contentColor = Color.White,
+            indicator = { tabPositions ->
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex.value]),
+                    color = Color.White
+                )
             }
+        ) {
+            category.forEachIndexed { index, category ->
+                Tab(
+                    selected = selectedIndex.value == index,
+                    onClick = { selectedIndex.value = index },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(text = category, style = TextStyle(color = Color.White))
+                }
+            }
+        }
+        // 굿생 인증 게시물
+        if(selectedIndex.value == 0){
+
+            viewModel.getUserPosts()
+
+            LazyColumn(
+                modifier = Modifier
+                    .background(GrayWhite3)
+            ) {
+
+                items(userPostList.itemCount){
+                    userPostList[it]?.let { it1 -> PostList(item = it1, navController = navController) }
+
+                }
+            }
+
+        }
+
+        //굿생 자극 게시물
+        else{
+            viewModel.getUserStimulusPosts()
+
+            LazyColumn(
+                modifier = Modifier
+                    .background(GrayWhite3)
+            ) {
+                items(userStimulusPostList.value){ item ->
+                    SearchStimulusPostItem(item = item)
+                }
+            }
+
         }
 
 
@@ -560,21 +628,161 @@ fun PostList(
     }
 }
 
+@Composable
+fun SearchStimulusPostItem(
+    modifier: Modifier = Modifier,
+    item: StimulusPostList
+){
+
+    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
+
+    Row(
+        modifier = modifier
+            .padding(5.dp)
+            .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(15.dp))
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .padding(10.dp)
+                .size(width = 120.dp, height = 150.dp)
+                .shadow(10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
+                .error(R.drawable.category3)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxWidth()
+                )   //bitmap이 없다면
+            } ?: Image(
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .fillMaxWidth()
+            )
+
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(15.dp)
+                    .background(color = OpaqueDark)
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
+                contentAlignment = Alignment.Center
+            ){
+
+                Text(text = item.title,
+                    style = TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                )
+
+            }
+
+        }
+
+        Spacer(modifier.width(16.dp))
+
+        Column(
+            modifier = modifier
+                .padding(end = 16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = item.introduction,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
+
+            Spacer(modifier.size(5.dp))
+
+            HorizontalDivider()
+
+            Spacer(modifier.size(5.dp))
+
+            Text(
+                text = "by ${item.nickname}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
+        }
+
+    }
+
+
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun UserPostListBoxPreview(){
+
+    val selectedIndex = remember { mutableIntStateOf(0) }
+    val category = listOf("굿생 인증 게시물", "굿생 자극 게시물")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp)
     ){
-        Text(text = "닉네임님의 게시물", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+        Text(text = "닉네임님의 게시물", style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold))
 
-        LazyColumn {
-
-            items(10){
-                PostListPreview()
+        TabRow(
+            selectedTabIndex = selectedIndex.value,
+            containerColor = Color(0X00000000),
+            contentColor = Color.White,
+            indicator = { tabPositions ->
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex.value]),
+                    color = Color.White
+                )
             }
+        ) {
+            category.forEachIndexed { index, category ->
+                Tab(
+                    selected = selectedIndex.value == index,
+                    onClick = { selectedIndex.value = index },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(text = category, style = TextStyle(color = Color.White))
+                }
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+        ) {
+
+            if(selectedIndex.value == 0){
+                items(10){
+                    PostListPreview()
+                }
+            }
+
         }
     }
 }
@@ -620,6 +828,88 @@ fun PostListPreview(modifier: Modifier = Modifier){
 
 
     }
+}
+
+@Preview
+@Composable
+fun SearchStimulusPostItemPreview(
+    modifier: Modifier = Modifier,
+    item: StimulusPostItem = StimulusPostItem(title = "이것이 제목이다", writer = "치킨 러버", coverImg = R.drawable.category3, introText = "소개글임다")
+){
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .padding(10.dp)
+                .size(width = 120.dp, height = 150.dp)
+                .shadow(10.dp),
+            contentAlignment = Alignment.Center
+        ){
+            Image(
+                modifier = modifier
+                    .fillMaxWidth(),
+                painter = painterResource(id = item.coverImg),
+                contentDescription = "",
+                contentScale = ContentScale.Crop
+            )
+
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(15.dp)
+                    .background(color = OpaqueDark)
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
+                contentAlignment = Alignment.Center
+            ){
+
+                Text(text = item.title,
+                    style = TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                )
+
+            }
+
+        }
+
+        Spacer(modifier.width(16.dp))
+
+        Column(
+            modifier = modifier
+                .padding(end = 16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = item.introText,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
+
+            Spacer(modifier.size(5.dp))
+
+            HorizontalDivider()
+
+            Spacer(modifier.size(5.dp))
+
+            Text(
+                text = "by ${item.writer}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
+        }
+
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -883,3 +1173,10 @@ fun ProfileBoxPreview(
 
     }
 }
+
+data class StimulusPostItem(
+    val title: String,
+    val writer: String,
+    val coverImg: Int,
+    val introText: String
+)

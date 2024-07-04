@@ -13,6 +13,7 @@ import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.network.model.PostDetailBody
+import com.godlife.network.model.StimulusPostList
 import com.godlife.network.model.UserProfileBody
 import com.godlife.network.model.UserProfileQuery
 import com.skydoves.sandwich.message
@@ -71,11 +72,13 @@ class ProfileViewModel @Inject constructor(
     private val _userInfo = MutableStateFlow<UserProfileBody>(UserProfileBody("", "", "", "", 0, 0, true))
     val userInfo: StateFlow<UserProfileBody> = _userInfo
 
-    //조회된 사용자 게시물, 페이징을 이용하기에 지연 초기화
-    //lateinit var userPostList: Flow<PagingData<PostDetailBody>>
+    //조회된 사용자 굿생 인증 게시물
     private val _userPostList = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
     val userPostList: StateFlow<PagingData<PostDetailBody>> = _userPostList
 
+    //조회된 사용자 굿생 자극 게시물
+    private val _userStimulusPostList = MutableStateFlow<List<StimulusPostList>>(emptyList())
+    val userStimulusPostList: StateFlow<List<StimulusPostList>> = _userStimulusPostList
 
     /**
      * Init
@@ -106,7 +109,7 @@ class ProfileViewModel @Inject constructor(
 
                         _userInfo.value = data.body
 
-                        getUserPosts()
+                        //getUserPosts()
 
                         _uiState.value = ProfileUiState.Success("success")
 
@@ -147,12 +150,8 @@ class ProfileViewModel @Inject constructor(
         _fullImageBitmap.value = bitmap
     }
 
-    /**
-     * Private 함수
-     */
-
-    // 조회한 사용자의 게시물 불러오기
-    private fun getUserPosts(){
+    // 조회한 사용자의 굿생 인증 게시물 불러오기
+    fun getUserPosts(){
         if(userInfo.value.nickname != null){
 
             viewModelScope.launch {
@@ -163,6 +162,26 @@ class ProfileViewModel @Inject constructor(
 
         }
     }
+
+    // 조회한 사용자의 굿생 자극 게시물 불러오기
+    fun getUserStimulusPosts(){
+        if(userInfo.value.nickname != null){
+            viewModelScope.launch {
+
+                val result = getSearchPostUseCase.executeSearchStimulusPost(auth.value, nickname = userInfo.value.nickname, title = "", introduction = "")
+
+                result
+                    .onSuccess {
+                        _userStimulusPostList.value = data.body
+                    }
+
+            }
+        }
+    }
+
+    /**
+     * Private 함수
+     */
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){

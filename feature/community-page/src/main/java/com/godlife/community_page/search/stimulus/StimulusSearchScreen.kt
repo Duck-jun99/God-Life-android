@@ -171,7 +171,7 @@ fun SearchStimulusPostItem(
         Box(
             modifier = modifier
                 .padding(10.dp)
-                .size(width = 100.dp, height = 150.dp)
+                .size(width = 120.dp, height = 150.dp)
                 .shadow(10.dp),
             contentAlignment = Alignment.Center
         ){
