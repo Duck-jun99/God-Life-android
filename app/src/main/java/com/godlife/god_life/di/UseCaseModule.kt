@@ -16,7 +16,7 @@ import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetRankingUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.GetUserProfileUseCase
-import com.godlife.domain.GetWeeklyFamousPostUseCase
+import com.godlife.domain.GetFamousPostUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.PostNotificationTimeUseCase
 import com.godlife.domain.ReissueUseCase
@@ -67,7 +67,7 @@ class UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetWeeklyFamousPostUseCase(repository: NetworkRepository) = GetWeeklyFamousPostUseCase(repository)
+    fun provideGetWeeklyFamousPostUseCase(repository: NetworkRepository) = GetFamousPostUseCase(repository)
 
     @Provides
     @Singleton

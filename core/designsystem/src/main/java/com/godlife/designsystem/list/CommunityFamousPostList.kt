@@ -91,7 +91,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
                     Spacer(modifier.size(10.dp))
 
                     //티어 보여줄 부분
-                    Text(text = "마스터", style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                    Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
                 }
 

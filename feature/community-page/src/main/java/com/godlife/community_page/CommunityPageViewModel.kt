@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.godlife.domain.GetLatestPostUseCase
-import com.godlife.domain.GetWeeklyFamousPostUseCase
+import com.godlife.domain.GetFamousPostUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
@@ -36,7 +36,7 @@ sealed class CommunityPageUiState {
 class CommunityPageViewModel @Inject constructor(
     private val getLatestPostUseCase: GetLatestPostUseCase,
     private val searchPostUseCase: SearchPostUseCase,
-    private val getWeeklyFamousPostUseCase: GetWeeklyFamousPostUseCase,
+    private val getWeeklyFamousPostUseCase: GetFamousPostUseCase,
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel(){
@@ -77,6 +77,10 @@ class CommunityPageViewModel @Inject constructor(
     //조회된 일주일 인기 게시물
     private val _weeklyFamousPostList = MutableStateFlow<List<PostDetailBody>>(emptyList())
     val weeklyFamousPostList: StateFlow<List<PostDetailBody>> = _weeklyFamousPostList
+
+    //조회된 전체 인기 게시물
+    private val _allFamousPostList = MutableStateFlow<List<PostDetailBody>>(emptyList())
+    val allFamousPostList: StateFlow<List<PostDetailBody>> = _allFamousPostList
 
     //검색어
     private val _searchText = MutableStateFlow("")

@@ -21,9 +21,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +62,8 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.FamousPostItem
 import com.godlife.model.community.TagItem
 import com.godlife.network.model.PostDetailBody
@@ -106,16 +111,7 @@ fun WeeklyFamousPostListView(
     ){
         Column {
 
-            Row(modifier.fillMaxWidth()){
-                Icon(
-                    modifier = modifier.size(25.dp),
-                    painter = painterResource(R.drawable.star_icons8),
-                    contentDescription = "",
-                    tint = Color.Unspecified)
-                Spacer(modifier.size(5.dp))
-                Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
-            }
-
+            Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
 
             Spacer(modifier.size(10.dp))
 
@@ -128,22 +124,16 @@ fun WeeklyFamousPostListView(
 
             Spacer(modifier.size(10.dp))
 
-            Button(onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color.White),
-                modifier = modifier.size(30.dp)
-            ) {
-                Text(text = "> 더보기", style = GodLifeTypography.titleSmall)
-            }
-
 
         }
     }
 }
 
 @Composable
-fun WeeklyFamousPostList(modifier: Modifier = Modifier,
-                         famousPostItem: PostDetailBody,
-                         navController: NavController
+fun WeeklyFamousPostList(
+    modifier: Modifier = Modifier,
+    famousPostItem: PostDetailBody,
+    navController: NavController
 ){
 
     val postId = famousPostItem.board_id.toString()
@@ -214,17 +204,29 @@ fun WeeklyFamousPostList(modifier: Modifier = Modifier,
                     Spacer(modifier.size(10.dp))
 
                     //티어 보여줄 부분
-                    Text(text = famousPostItem.tier, style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                    Text(text = famousPostItem.tier,
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                    )
 
                 }
 
                 Spacer(modifier.size(15.dp))
 
-                Text(text = famousPostItem.title, style = GodLifeTypography.titleMedium)
+                Text(text = famousPostItem.title,
+                    style = GodLifeTypography.titleMedium,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 Spacer(modifier.size(20.dp))
 
-                Text(text = famousPostItem.body, style = GodLifeTypography.bodyMedium)
+                Text(text = famousPostItem.body,
+                    style = GodLifeTypography.bodyMedium,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 Spacer(modifier.size(20.dp))
 
@@ -245,9 +247,11 @@ fun WeeklyFamousPostList(modifier: Modifier = Modifier,
 
 }
 
-@Preview
 @Composable
-fun WeeklyFamousPostListViewPreview(modifier: Modifier = Modifier){
+fun TotalFamousPostListView(
+    modifier: Modifier = Modifier,
+    viewModel: CommunityPageViewModel
+){
 
     Box(
         modifier
@@ -263,15 +267,114 @@ fun WeeklyFamousPostListViewPreview(modifier: Modifier = Modifier){
     ){
         Column {
 
-            Row(modifier.fillMaxWidth()){
-                Icon(
-                    modifier = modifier.size(25.dp),
-                    painter = painterResource(R.drawable.star_icons8),
-                    contentDescription = "",
-                    tint = Color.Unspecified)
-                Spacer(modifier.size(5.dp))
-                Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+            Text(text = "전체 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+
+            Spacer(modifier.size(10.dp))
+
+            LazyColumn {
+                items(10) { item ->
+                    TotalFamousPostItem()
+                }
             }
+
+
+
+
+        }
+    }
+}
+
+@Composable
+fun TotalFamousPostItem(
+    modifier: Modifier = Modifier
+){
+    Row(
+        modifier = modifier
+            .size(height = 150.dp, width = 300.dp)
+            .background(Color.White)
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(OpaqueDark),
+            contentAlignment = Alignment.Center
+        ){
+            Text(text = "1", style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold))
+        }
+
+        Spacer(modifier.size(10.dp))
+
+        Image(
+            modifier = modifier
+                .size(100.dp),
+            painter = painterResource(id = R.drawable.category3),
+            contentDescription = "",
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Column(
+
+        ) {
+            Text(
+                text = "nickname",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                ),
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier.size(5.dp))
+
+            HorizontalDivider()
+
+            Spacer(modifier.size(5.dp))
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "title",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+        }
+    }
+
+}
+
+
+@Preview
+@Composable
+fun WeeklyFamousPostListViewPreview(
+    modifier: Modifier = Modifier
+){
+
+    Box(
+        modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(
+                start = 10.dp,
+                end = 10.dp,
+                top = 10.dp,
+                bottom = 10.dp
+            ),
+        contentAlignment = Alignment.CenterStart
+    ){
+        Column {
+
+            Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+
 
 
             Spacer(modifier.size(10.dp))
@@ -284,15 +387,115 @@ fun WeeklyFamousPostListViewPreview(modifier: Modifier = Modifier){
 
             Spacer(modifier.size(10.dp))
 
-            Button(onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color.White),
-                modifier = modifier.size(30.dp)
-            ) {
-                Text(text = "> 더보기", style = GodLifeTypography.titleSmall)
-            }
 
 
         }
     }
+}
+
+@Preview
+@Composable
+fun TotalFamousPostListViewPreview(
+    modifier: Modifier = Modifier
+){
+
+    Box(
+        modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(
+                start = 10.dp,
+                end = 10.dp,
+                top = 10.dp,
+                bottom = 10.dp
+            ),
+        contentAlignment = Alignment.CenterStart
+    ){
+        Column {
+
+            Text(text = "전체 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+
+            Spacer(modifier.size(10.dp))
+
+            LazyColumn {
+                items(10) { item ->
+                    TotalFamousPostItemPreview()
+                }
+            }
+
+
+
+
+        }
+    }
+}
+
+@Preview
+@Composable
+fun TotalFamousPostItemPreview(
+    modifier: Modifier = Modifier
+){
+    Row(
+        modifier = modifier
+            .size(height = 150.dp, width = 300.dp)
+            .background(Color.White)
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(OpaqueDark),
+            contentAlignment = Alignment.Center
+        ){
+            Text(text = "1", style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold))
+        }
+
+        Spacer(modifier.size(10.dp))
+
+        Image(
+            modifier = modifier
+                .size(100.dp),
+            painter = painterResource(id = R.drawable.category3),
+            contentDescription = "",
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Column(
+
+        ) {
+            Text(
+                text = "nickname",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                ),
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier.size(5.dp))
+
+            HorizontalDivider()
+
+            Spacer(modifier.size(5.dp))
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "title",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+        }
+    }
+
 }
 

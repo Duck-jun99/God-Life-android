@@ -84,6 +84,10 @@ interface NetworkDataSource {
         authorization: String
     ): ApiResponse<LatestPostQuery>
 
+    suspend fun getAllFamousPost(
+        authorization: String
+    ): ApiResponse<LatestPostQuery>
+
     suspend fun getSearchedPost(
         authorization: String,
         page: Int,
