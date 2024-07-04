@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.godlife.domain.GetLatestPostUseCase
-import com.godlife.domain.GetWeeklyFamousPostUseCase
+import com.godlife.domain.GetFamousPostUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
@@ -36,7 +36,7 @@ sealed class CommunityPageUiState {
 class CommunityPageViewModel @Inject constructor(
     private val getLatestPostUseCase: GetLatestPostUseCase,
     private val searchPostUseCase: SearchPostUseCase,
-    private val getWeeklyFamousPostUseCase: GetWeeklyFamousPostUseCase,
+    private val getWeeklyFamousPostUseCase: GetFamousPostUseCase,
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel(){
@@ -71,12 +71,19 @@ class CommunityPageViewModel @Inject constructor(
     //조회된 최신 게시물, 페이징을 이용하기에 지연 초기화
     lateinit var latestPostList: Flow<PagingData<PostDetailBody>>
 
-    //인기 게시물을 호출한 적이 있는지 플래그
-    private var famousFlag = mutableIntStateOf(0)
+    //주간 인기 게시물을 호출한 적이 있는지 플래그
+    private var weeklyFamousFlag = mutableIntStateOf(0)
+
+    //전체 인기 게시물을 호출한 적이 있는지 플래그
+    private var allFamousFlag = mutableIntStateOf(0)
 
     //조회된 일주일 인기 게시물
     private val _weeklyFamousPostList = MutableStateFlow<List<PostDetailBody>>(emptyList())
     val weeklyFamousPostList: StateFlow<List<PostDetailBody>> = _weeklyFamousPostList
+
+    //조회된 전체 인기 게시물
+    private val _allFamousPostList = MutableStateFlow<List<PostDetailBody>>(emptyList())
+    val allFamousPostList: StateFlow<List<PostDetailBody>> = _allFamousPostList
 
     //검색어
     private val _searchText = MutableStateFlow("")
@@ -182,7 +189,7 @@ class CommunityPageViewModel @Inject constructor(
     fun getWeeklyFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
-        if(famousFlag.value == 0){
+        if(weeklyFamousFlag.value == 0){
 
             _uiState.value = CommunityPageUiState.Loading
 
@@ -196,7 +203,7 @@ class CommunityPageViewModel @Inject constructor(
                         _uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
 
 
-                        famousFlag.value += 1
+                        weeklyFamousFlag.value += 1
 
                     }
                     .onError {
@@ -206,6 +213,46 @@ class CommunityPageViewModel @Inject constructor(
                         if(this.response.code() == 401){
 
                             reIssueRefreshToken(callback = { getWeeklyFamousPost() })
+
+                        }
+                    }
+                    .onException {
+
+                        Log.e("onException", "${this.message}")
+
+                        // UI State Error로 변경
+                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                    }
+
+            }
+
+        }
+
+    }
+
+    //전체 인기 게시물 불러오기
+    fun getAllFamousPost(){
+
+        // 인기 게시물 API를 호출한 적이 없을 때에만 실행
+        if(allFamousFlag.value == 0){
+
+            _uiState.value = CommunityPageUiState.Loading
+
+            viewModelScope.launch {
+                val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost(authorId = auth.value)
+                result
+                    .onSuccess {
+                        _allFamousPostList.value = data.body
+                        _uiState.value = CommunityPageUiState.Success("전체 인기 게시물 조회 완료")
+                        allFamousFlag.value += 1
+                    }
+                    .onError {
+                        Log.e("onError", this.message())
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken(callback = { getAllFamousPost() })
 
                         }
                     }
@@ -248,7 +295,7 @@ class CommunityPageViewModel @Inject constructor(
         }
         else if(selectedRoute.value == "FamousPostScreen"){
             // 인기 게시물 조회 플래그 초기화
-            famousFlag.value = 0
+            weeklyFamousFlag.value = 0
             getWeeklyFamousPost()
         }
 

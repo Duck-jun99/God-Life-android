@@ -1,6 +1,7 @@
 package com.godlife.community_page.post_detail
 
 import android.util.Log
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.domain.CreateCommentUseCase
@@ -72,6 +73,12 @@ class PostDetailViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
+    //게시물 정보 가져왔는지 플래그
+    private var isGetPostDetail = mutableIntStateOf(0)
+
+    //게시물 댓글 가져왔는지 플래그
+    private var isGetComments = mutableIntStateOf(0)
+
 
     //게시물 ID 초기화 및 게시물 정보 불러오기
     fun initPostDetailInfo(postId: String){
@@ -95,71 +102,85 @@ class PostDetailViewModel @Inject constructor(
     //해당 게시물 작성자 프로필 정보, 이미지, 내용 초기화 (성공 시 initComments 호출 -> initComments까지 성공적으로 되면 Ui State Success로 변경)
     private fun initPostDetail() {
 
-        viewModelScope.launch{
+        if(isGetPostDetail.value == 0){
 
-            val result = getPostDetailUseCase.executeGetPostDetail(auth.value, postId.value)
+            viewModelScope.launch{
 
-            result
-                .onSuccess {
-                    _postDetail.value = this.data
+                val result = getPostDetailUseCase.executeGetPostDetail(auth.value, postId.value)
 
-                    initComments()
+                result
+                    .onSuccess {
+                        _postDetail.value = this.data
 
-                }
-                .onError {
-
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 401){
-
-                        reIssueRefreshToken(callback = { initPostDetail() })
+                        initComments()
 
                     }
-                }
-                .onException {
+                    .onError {
 
-                    Log.e("onException", "${this.message}")
+                        Log.e("onError", this.message())
 
-                    // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
 
-                }
+                            reIssueRefreshToken(callback = { initPostDetail() })
+
+                        }
+                    }
+                    .onException {
+
+                        Log.e("onException", "${this.message}")
+
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+
+                    }
 
 
+            }
+
+
+            isGetPostDetail.value += 1
         }
+
+
     }
 
     //댓글 정보 초기화
     private fun initComments(){
-        viewModelScope.launch{
 
-            val result = getCommentsUseCase.executeGetComments(auth.value, postId.value)
+        if(isGetComments.value == 0){
 
-            result
-                .onSuccess {
-                    _comments.value = this.data.body
+            viewModelScope.launch{
 
-                    _uiState.value = PostDetailUiState.Success("성공")
-                }
-                .onError {
-                    Log.e("onError", this.message())
+                val result = getCommentsUseCase.executeGetComments(auth.value, postId.value)
 
-                    // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 401){
+                result
+                    .onSuccess {
+                        _comments.value = this.data.body
 
-                        reIssueRefreshToken(callback = { initComments() })
+                        _uiState.value = PostDetailUiState.Success("성공")
+                    }
+                    .onError {
+                        Log.e("onError", this.message())
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken(callback = { initComments() })
+
+                        }
+                    }
+                    .onException {
+
+                        Log.e("onException", "${this.message}")
+
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
 
                     }
-                }
-                .onException {
+            }
 
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
-
-                }
+            isGetComments.value +=1
         }
 
     }
@@ -184,6 +205,7 @@ class PostDetailViewModel @Inject constructor(
                         _writeComment.value = ""
 
                         //해당 게시물 댓글 초기화
+                        isGetComments.value = 0
                         initComments()
                     }
                 }
@@ -221,6 +243,7 @@ class PostDetailViewModel @Inject constructor(
                     if(data.body == true){
 
                         //해당 게시물 댓글 초기화
+                        isGetComments.value = 0
                         initComments()
                     }
                 }
@@ -259,6 +282,7 @@ class PostDetailViewModel @Inject constructor(
                     //갓생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
 
                     if(data.body == "true"){
+                        isGetPostDetail.value = 0
                         initPostDetail()
                     }
                 }

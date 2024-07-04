@@ -75,6 +75,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -293,41 +294,66 @@ fun LatestStimulusItem(
 
     Row(
         modifier = modifier
-            .height(150.dp)
-            .fillMaxWidth()
+            .size(height = 150.dp, width = 300.dp)
             .background(Color.White)
             .padding(10.dp)
             .clickable { navController.navigate("${StimulusPostDetailRoute.route}/$postId") },
         verticalAlignment = Alignment.CenterVertically
     ){
 
-        Glide.with(LocalContext.current)
-            .asBitmap()
-            .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-            .error(R.drawable.category3)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = modifier
-                    .size(100.dp)
-            )   //bitmap이 없다면
-        } ?: Image(
-            painter = painterResource(id = R.drawable.category3),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
+        Box(
             modifier = modifier
-                .size(100.dp)
-        )
+                .padding(10.dp)
+                .size(width = 100.dp, height = 150.dp)
+                .shadow(10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
+                .error(R.drawable.category3)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxWidth()
+                )   //bitmap이 없다면
+            } ?: Image(
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .fillMaxWidth()
+            )
+
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(15.dp)
+                    .background(color = OpaqueDark)
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
+                contentAlignment = Alignment.Center
+            ){
+
+                Text(text = item.title,
+                    style = TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold),
+                    overflow = TextOverflow.Ellipsis
+                )
+
+            }
+
+        }
 
         Spacer(modifier.size(10.dp))
 
@@ -340,7 +366,8 @@ fun LatestStimulusItem(
                     color = GrayWhite,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
-                )
+                ),
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier.size(5.dp))
@@ -357,7 +384,6 @@ fun LatestStimulusItem(
                     color = GrayWhite,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End
                 )
             )
         }
@@ -866,8 +892,7 @@ fun LatestStimulusItemPreview(
 ){
     Row(
         modifier = modifier
-            .height(150.dp)
-            .fillMaxWidth()
+            .size(height = 150.dp, width = 300.dp)
             .background(Color.White)
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -891,7 +916,8 @@ fun LatestStimulusItemPreview(
                     color = GrayWhite,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
-                )
+                ),
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier.size(5.dp))
@@ -908,7 +934,6 @@ fun LatestStimulusItemPreview(
                     color = GrayWhite,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End
                 )
             )
         }

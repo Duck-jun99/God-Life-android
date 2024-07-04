@@ -1,5 +1,6 @@
 package com.godlife.designsystem.component
 
+import android.graphics.BlurMaskFilter
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,13 +32,19 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -170,18 +177,26 @@ fun GodLifeSearchBar(
 @Preview(showBackground = true)
 @Composable
 fun GodLifeCreateCommentBar(
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .height(40.dp),
+    modifier: Modifier = Modifier,
     comment: String = "",
     hint: String = "댓글을 입력해주세요.",
     onTextChanged: (String) -> Unit = {},
-    containerColor: Color = OpaqueDark,
+    containerColor: Color = Color.White,
     onPostClicked: () -> Unit =  {}
 ) {
 
     Row(
         modifier = modifier
+            .coloredShadow(
+                color = OpaqueDark,
+                borderRadius = 0.dp,
+                blurRadius = 5.dp,
+                offsetY = (-1).dp,
+                offsetX = 0.dp,
+                spread = 0f
+            )
+            .fillMaxWidth()
+            .height(40.dp)
             .background(color = containerColor)
             .padding(5.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -200,7 +215,7 @@ fun GodLifeCreateCommentBar(
 
                 Text(text = if (comment.isEmpty()) hint else comment,
                     style = TextStyle(
-                        color = Color.White,
+                        color = GrayWhite,
                         fontSize = 15.sp
                     )
 
@@ -215,7 +230,7 @@ fun GodLifeCreateCommentBar(
                 .clickable { onPostClicked() },
             imageVector = Icons.AutoMirrored.Filled.Send,
             contentDescription = null,
-            tint = Color.White
+            tint = PurpleMain
         )
 
 
@@ -229,6 +244,7 @@ fun TextFiledPreview(){
     GodLifeTheme {
         Column(modifier = Modifier
             .fillMaxSize()
+            .background(color = Color.White)
             ) {
             var text = "Hi"
 
@@ -245,9 +261,55 @@ fun TextFiledPreview(){
                 GodLifeSearchBar(searchText = "", onTextChanged = {it -> text})
             }
 
+            Spacer(modifier = Modifier.size(20.dp))
+
+            GodLifeCreateCommentBar()
+
 
         }
 
 
     }
 }
+
+internal fun Modifier.coloredShadow(
+    color: Color = Color.Black,
+    borderRadius: Dp = 0.dp,
+    blurRadius: Dp = 0.dp,
+    offsetY: Dp = 0.dp,
+    offsetX: Dp = 0.dp,
+    spread: Float = 0f,
+    modifier: Modifier = Modifier,
+) = this.then(
+    modifier.drawBehind {
+        this.drawIntoCanvas {
+            val paint = Paint()
+            val frameworkPaint = paint.asFrameworkPaint()
+            val spreadPixel = spread.dp.toPx()
+            val leftPixel = (0f - spreadPixel) + offsetX.toPx()
+            val topPixel = (0f - spreadPixel) + offsetY.toPx()
+            val rightPixel = (this.size.width + spreadPixel)
+            val bottomPixel =  (this.size.height + spreadPixel)
+
+            if (blurRadius != 0.dp) {
+                /*
+                    The feature maskFilter used below to apply the blur effect only works
+                    with hardware acceleration disabled.
+                 */
+                frameworkPaint.maskFilter =
+                    (BlurMaskFilter(blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL))
+            }
+
+            frameworkPaint.color = color.toArgb()
+            it.drawRoundRect(
+                left = leftPixel,
+                top = topPixel,
+                right = rightPixel,
+                bottom = bottomPixel,
+                radiusX = borderRadius.toPx(),
+                radiusY = borderRadius.toPx(),
+                paint
+            )
+        }
+    }
+)

@@ -130,6 +130,12 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String
     ): ApiResponse<LatestPostQuery>
 
+    //전체 인기 게시물 조회
+    @GET("/popular/boards/all-time")
+    suspend fun getAllFamousPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<LatestPostQuery>
+
 
     //게시물 검색
     @GET("/boards")

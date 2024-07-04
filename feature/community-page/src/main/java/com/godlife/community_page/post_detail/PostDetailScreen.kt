@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +24,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +50,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,12 +61,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,6 +87,9 @@ import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailBody
@@ -124,8 +137,6 @@ fun PostDetailScreen(
                     },
                 ) {
 
-
-
                     Column {
 
                         Box(
@@ -152,30 +163,9 @@ fun PostDetailScreen(
 
                                 postDetail.body?.let {
 
-                                    //갓생 인정을 안한 게시물이라면
-                                    if(!it.memberLikedBoard){
-
-                                        item {
-
-                                            GodLifeButtonWhite(
-                                                onClick = { postDetailViewModel.agreeGodLife() },
-                                                text = { Text(text = "갓생, 인정하시나요?") }
-                                            )
-                                        }
+                                    item{
+                                        Content2(memberLikedBoard = it.memberLikedBoard, viewModel = postDetailViewModel)
                                     }
-                                    //이미 갓생 인정을 한 게시물이라면
-                                    else{
-
-                                        item {
-
-                                            GodLifeButton(
-                                                onClick = { null },
-                                                text = { Text(text = "이미 갓생 인정하신 글이에요.") }
-                                            )
-                                        }
-
-                                    }
-
 
                                 }
 
@@ -189,7 +179,7 @@ fun PostDetailScreen(
                         GodLifeCreateCommentBar(
                             comment = writeComment,
                             onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
-                            onPostClicked = { postDetailViewModel.createComment() }
+                            onPostClicked = { postDetailViewModel.createComment() },
                         )
 
 
@@ -212,20 +202,57 @@ fun PostDetailScreen(
 @Composable
 fun ImageBox(modifier: Modifier = Modifier, imgUriList: List<String>){
     val imgCount  = imgUriList.size
-    var imgIndex by remember { mutableStateOf(1) }
+    var imgIndex by remember { mutableIntStateOf(1) }
+
+    var width by remember {
+        mutableStateOf(0.dp)
+    }
+
+    val localDensity = LocalDensity.current
+
+    val initialPage by remember { mutableIntStateOf(0) }
+
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { imgUriList.size })
 
     Box(
         modifier
             .fillMaxWidth()
             .height(400.dp)
-            .background(Color.Black)
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
     ){
+
+        /*
 
         LazyRow {
             itemsIndexed(imgUriList) {index, item ->
                 ImageView(modifier, LocalContext.current, item)
                 imgIndex = index+1
             }
+        }
+         */
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    width = with(localDensity) {
+                        it.size.width.toDp()
+                    }
+                }
+        ) {index ->
+
+            imgIndex = index
+
+            imgUriList.getOrNull(
+                index%(imgUriList.size)
+            )?.let{
+                item ->
+                ImageView(modifier, LocalContext.current, item, width)
+
+            }
+
         }
 
         Box(
@@ -238,7 +265,7 @@ fun ImageBox(modifier: Modifier = Modifier, imgUriList: List<String>){
                 .background(color = CheckColor, shape = RoundedCornerShape(20.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "${imgIndex}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
+                Text(text = "${imgIndex+1}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
             }
 
         }
@@ -249,7 +276,12 @@ fun ImageBox(modifier: Modifier = Modifier, imgUriList: List<String>){
 }
 
 @Composable
-fun ImageView(modifier: Modifier = Modifier, context: Context, imgUri: String){
+fun ImageView(
+    modifier: Modifier = Modifier,
+    context: Context,
+    imgUri: String,
+    width: Dp
+){
 
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
@@ -265,24 +297,19 @@ fun ImageView(modifier: Modifier = Modifier, context: Context, imgUri: String){
         })
 
     bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-        
-        Box(
-            modifier
-                .background(Color.Black),
-            contentAlignment = Alignment.Center){
 
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .padding(10.dp)
-            )
-        }
+        Image(
+            modifier = modifier
+                .size(width = width, height = 400.dp),
+            bitmap = fetchedBitmap,
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
 
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Content(
     modifier: Modifier = Modifier,
@@ -340,7 +367,7 @@ fun Content(
             Column {
                 Text(text = postDetailBody.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = postDetailBody.whoAmI, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = postDetailBody.whoAmI, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 12.sp))
             }
 
 
@@ -356,15 +383,14 @@ fun Content(
 
         Spacer(modifier.size(20.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-        ) {
-            items(5) {
-                TagItemPreview()
-            }
+        FlowRow {
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
         }
 
         Spacer(modifier.size(20.dp))
@@ -377,6 +403,62 @@ fun Content(
 
     }
 }
+
+@Composable
+fun Content2(
+    modifier: Modifier = Modifier,
+    memberLikedBoard: Boolean = true,
+    viewModel: PostDetailViewModel
+){
+    Column(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .background(color = GrayWhite3, shape = RoundedCornerShape(15.dp))
+            .padding(10.dp)
+    ) {
+
+        if(!memberLikedBoard){
+            Text(
+                text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
+                style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+            )
+
+            Spacer(modifier.size(20.dp))
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
+                onClick = { viewModel.agreeGodLife() },
+                text = { Text(text = "굿생 인정!") }
+            )
+        }
+
+        else{
+            Icon(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                imageVector = Icons.Default.ThumbUp,
+                contentDescription = "",
+                tint = PurpleMain
+            )
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "유저님께서 굿생을 인정하신 글이에요!",
+                style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                textAlign = TextAlign.Center
+            )
+        }
+
+
+
+
+    }
+}
+
 
 
 @Composable
@@ -405,7 +487,7 @@ fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackba
 @Composable
 fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel){
 
-    var expanded by remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(false) }
 
     Column(
         modifier
@@ -469,17 +551,17 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
                 Text(text = commentBody.writtenAt, style = TextStyle(color = GrayWhite, fontSize = 15.sp))
             }
 
-            IconButton(modifier = modifier.weight(0.1f), onClick = { expanded = !expanded} ){
+            IconButton(modifier = modifier.weight(0.1f), onClick = { expanded.value = !expanded.value} ){
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Comment Menu", tint = GrayWhite)
 
                 DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    expanded = expanded.value,
+                    onDismissRequest = { expanded.value = false },
                     modifier = Modifier.background(Color.White)
                 ) {
 
-                    if(commentBody.commentOwner) DropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody)
-                    else DropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel=  postDetailViewModel, commentBody = commentBody)
+                    if(commentBody.commentOwner) DropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody, expanded = expanded)
+                    else DropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
 
                 }
             }
@@ -499,11 +581,19 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
 
 
 @Composable
-fun DropDownDeclareItem(modifier: Modifier = Modifier, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel, commentBody: CommentBody){
+fun DropDownDeclareItem(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
+    cScope: CoroutineScope,
+    postDetailViewModel: PostDetailViewModel,
+    commentBody: CommentBody,
+    expanded: MutableState<Boolean>
+){
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
+            expanded.value = !expanded.value
             cScope.launch {
                 val result =
                     snackbarHostState.showSnackbar(
@@ -529,11 +619,19 @@ fun DropDownDeclareItem(modifier: Modifier = Modifier, snackbarHostState: Snackb
 }
 
 @Composable
-fun DropDownDeleteItem(modifier: Modifier = Modifier, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel, commentBody: CommentBody){
+fun DropDownDeleteItem(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
+    cScope: CoroutineScope,
+    postDetailViewModel: PostDetailViewModel,
+    commentBody: CommentBody,
+    expanded: MutableState<Boolean>
+){
 
     DropdownMenuItem(
         text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
+            expanded.value = !expanded.value
             cScope.launch {
                 val result =
                     snackbarHostState.showSnackbar(
@@ -643,6 +741,7 @@ fun ImageBoxPreview(modifier: Modifier = Modifier){
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Preview(showBackground = true)
 @Composable
 fun ContentPreview(modifier: Modifier = Modifier){
@@ -666,7 +765,7 @@ fun ContentPreview(modifier: Modifier = Modifier){
             Column {
                 Text(text = "Nickname", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 12.sp))
             }
         }
 
@@ -680,15 +779,14 @@ fun ContentPreview(modifier: Modifier = Modifier){
 
         Spacer(modifier.size(20.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-        ) {
-            items(5) {
-                TagItemPreview()
-            }
+        FlowRow {
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
         }
 
         Spacer(modifier.size(20.dp))
@@ -698,6 +796,61 @@ fun ContentPreview(modifier: Modifier = Modifier){
         Spacer(modifier.size(20.dp))
 
         //RowButton2()
+
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Content2Preview(
+    modifier: Modifier = Modifier,
+    memberLikedBoard: Boolean = true
+){
+    Column(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .background(color = GrayWhite3, shape = RoundedCornerShape(15.dp))
+            .padding(10.dp)
+    ) {
+
+        if(!memberLikedBoard){
+            Text(
+                text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
+                style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+            )
+
+            Spacer(modifier.size(20.dp))
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
+                onClick = { "postDetailViewModel.agreeGodLife()" },
+                text = { Text(text = "굿생 인정!") }
+            )
+        }
+
+        else{
+            Icon(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                imageVector = Icons.Default.ThumbUp,
+                contentDescription = "",
+                tint = PurpleMain
+            )
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "유저님께서 굿생을 인정하신 글이에요!",
+                style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                textAlign = TextAlign.Center
+            )
+        }
+
+
+
 
     }
 }
@@ -784,21 +937,18 @@ fun CommentBoxPreview(modifier: Modifier = Modifier){
 @Preview(showBackground = true)
 @Composable
 fun TagItemPreview(modifier: Modifier = Modifier, text:String = "Tag"){
-    Column(
-        modifier = Modifier.padding(5.dp)
+
+    Box(
+        modifier
+            .padding(vertical = 5.dp, horizontal = 10.dp)
+            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+            .padding(vertical = 5.dp, horizontal = 10.dp)
+        ,
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier
-                .size(70.dp, 30.dp)
-                .background(color = PurpleMain, shape = RoundedCornerShape(7.dp))
-                .padding(2.dp)
-            ,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = text,
-                style = TextStyle(color = Color.White),
-                textAlign = TextAlign.Center,
-            )
-        }
+        Text(text = "#${text}",
+            style = TextStyle(color = Color.Black),
+            textAlign = TextAlign.Center,
+        )
     }
 }
