@@ -23,10 +23,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -64,7 +61,6 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.model.community.FamousPostItem
 import com.godlife.model.community.TagItem
 import com.godlife.network.model.PostDetailBody
 
@@ -83,6 +79,8 @@ fun FamousPostScreen(
         ) {
 
             item{ WeeklyFamousPostListView(viewModel = viewModel, navController = navController) }
+
+            item{TotalFamousPostListView(viewModel = viewModel, navController = navController)}
 
         }
     }
@@ -118,7 +116,7 @@ fun WeeklyFamousPostListView(
             LazyRow {
                 itemsIndexed(weeklyFamousPost) { index, item ->
 
-                    WeeklyFamousPostList(famousPostItem = item, navController = navController)
+                    WeeklyFamousPostItem(famousPostItem = item, navController = navController)
                 }
             }
 
@@ -130,7 +128,7 @@ fun WeeklyFamousPostListView(
 }
 
 @Composable
-fun WeeklyFamousPostList(
+fun WeeklyFamousPostItem(
     modifier: Modifier = Modifier,
     famousPostItem: PostDetailBody,
     navController: NavController
@@ -250,8 +248,11 @@ fun WeeklyFamousPostList(
 @Composable
 fun TotalFamousPostListView(
     modifier: Modifier = Modifier,
-    viewModel: CommunityPageViewModel
+    viewModel: CommunityPageViewModel,
+    navController: NavController
 ){
+
+    val items = viewModel.allFamousPostList.collectAsState()
 
     Box(
         modifier
@@ -271,10 +272,8 @@ fun TotalFamousPostListView(
 
             Spacer(modifier.size(10.dp))
 
-            LazyColumn {
-                items(10) { item ->
-                    TotalFamousPostItem()
-                }
+            for(index in 0 until items.value.size){
+                TotalFamousPostItem(index = index, item = items.value[index], navController = navController)
             }
 
 
@@ -286,13 +285,21 @@ fun TotalFamousPostListView(
 
 @Composable
 fun TotalFamousPostItem(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    index: Int,
+    item: PostDetailBody,
+    navController: NavController
 ){
+    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+    val context = LocalContext.current
     Row(
         modifier = modifier
-            .size(height = 150.dp, width = 300.dp)
+            .height(150.dp)
+            .fillMaxWidth()
             .background(Color.White)
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable { navController.navigate("${PostDetailRoute.route}/${item.board_id}") }
+        ,
         verticalAlignment = Alignment.CenterVertically
     ){
 
@@ -300,54 +307,113 @@ fun TotalFamousPostItem(
             modifier = modifier
                 .size(30.dp)
                 .clip(CircleShape)
-                .background(OpaqueDark),
+                .background(
+                    if(index==0) {
+                        Color(0xFFFFBE3B)
+                    }
+                    else if(index==1) {
+                        Color(0xFFF3E3E3)
+                    }
+                    else if(index==2) {
+                        Color(0xFFFD8F6D)
+                    }
+                    else {
+                        OpaqueDark
+                    }
+                ),
             contentAlignment = Alignment.Center
         ){
-            Text(text = "1", style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold))
+            Text(text = "${index+1}", style = TextStyle(color = if(index==1) Color.Black else Color.White, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(10.dp))
 
-        Image(
-            modifier = modifier
-                .size(100.dp),
-            painter = painterResource(id = R.drawable.category3),
-            contentDescription = "",
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier.size(10.dp))
-
-        Column(
-
-        ) {
-            Text(
-                text = "nickname",
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal,
-                ),
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier.size(5.dp))
-
-            HorizontalDivider()
-
-            Spacer(modifier.size(5.dp))
-
-            Text(
+        if(item.imagesURL?.isEmpty() == true){
+            Image(
                 modifier = modifier
-                    .fillMaxWidth(),
-                text = "title",
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+                    .size(100.dp),
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = "",
+                contentScale = ContentScale.Crop
             )
         }
+        else{
+            Glide.with(context)
+                .asBitmap()
+                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL?.get(0))
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+
+                Image(
+                    modifier = modifier
+                        .size(100.dp),
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+
+            }
+        }
+
+
+
+        Spacer(modifier.size(10.dp))
+
+        Row(
+            modifier = modifier
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column(
+                modifier = modifier
+                    .weight(0.7f)
+            ) {
+                Text(
+                    text = item.nickname,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier.size(5.dp))
+
+                HorizontalDivider()
+
+                Spacer(modifier.size(5.dp))
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = item.title,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+            }
+
+            Box(
+                modifier = modifier
+                    .weight(0.3f),
+                contentAlignment = Alignment.Center
+            ){
+                Text(text = "${item.godScore}점", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold))
+            }
+
+        }
+
+
     }
 
 }
@@ -437,7 +503,8 @@ fun TotalFamousPostItemPreview(
 ){
     Row(
         modifier = modifier
-            .size(height = 150.dp, width = 300.dp)
+            .height(150.dp)
+            .fillMaxWidth()
             .background(Color.White)
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -465,36 +532,56 @@ fun TotalFamousPostItemPreview(
 
         Spacer(modifier.size(10.dp))
 
-        Column(
+        Row(
+            modifier = modifier
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
 
-        ) {
-            Text(
-                text = "nickname",
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal,
-                ),
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier.size(5.dp))
-
-            HorizontalDivider()
-
-            Spacer(modifier.size(5.dp))
-
-            Text(
+            Column(
                 modifier = modifier
-                    .fillMaxWidth(),
-                text = "title",
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
+                    .weight(0.7f)
+            ) {
+                Text(
+                    text = "nickname",
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    overflow = TextOverflow.Ellipsis
                 )
-            )
+
+                Spacer(modifier.size(5.dp))
+
+                HorizontalDivider()
+
+                Spacer(modifier.size(5.dp))
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = "title",
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+            }
+
+            Box(
+                modifier = modifier
+                    .weight(0.3f),
+                contentAlignment = Alignment.Center
+            ){
+                Text(text = "40점", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+            }
+
+
         }
+
+
     }
 
 }

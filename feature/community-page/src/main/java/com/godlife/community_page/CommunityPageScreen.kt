@@ -389,6 +389,7 @@ fun CommunityPageView(
         composable(FamousPostRoute.route){
             viewModel.changeCurrentRoute(route = FamousPostRoute.route)
             viewModel.getWeeklyFamousPost()
+            viewModel.getAllFamousPost()
 
             when(uiState){
 
