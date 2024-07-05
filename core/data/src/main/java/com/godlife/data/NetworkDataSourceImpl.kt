@@ -81,13 +81,10 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.reissue(authorization)
     }
 
-    override suspend fun imageUpload(
+    override suspend fun profileImageUpload(
         authorization: String,
-        imageType: String,
         image: Uri
     ): ApiResponse<ImageUploadQuery> {
-
-        val imageType: RequestBody = imageType.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val file = File(image.path!!)
 
@@ -97,8 +94,27 @@ class NetworkDataSourceImpl @Inject constructor(
 
         val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
 
-        return networkApi.imageUpload(authorization, imageType, imageMultiPart)
+        return networkApi.profileImageUpload(authorization, imageMultiPart)
+
     }
+
+    override suspend fun backgroundImageUpload(
+        authorization: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+
+        val file = File(image.path!!)
+
+        Log.e("NetworkDataSourceImpl", image.path!!.toString())
+
+        val requestFile = file.asRequestBody("image/*".toMediaType())
+
+        val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        return networkApi.backgroundImageUpload(authorization, imageMultiPart)
+    }
+
+
 
     override suspend fun updateIntroduce(
         authorization: String,

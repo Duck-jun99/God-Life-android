@@ -285,9 +285,8 @@ class ProfileEditViewModel @Inject constructor(
         if(profileChangeState.value){
 
             viewModelScope.launch(Dispatchers.IO) {
-                val result = updateUserInfoUseCase.executeImageUpload(
+                val result = updateUserInfoUseCase.executeProfileImageUpload(
                     authorization = auth.value,
-                    imageType = "profile",
                     imagePath = profileImage.value
                 )
 
@@ -331,9 +330,8 @@ class ProfileEditViewModel @Inject constructor(
 
             viewModelScope.launch(Dispatchers.IO) {
 
-                val result = updateUserInfoUseCase.executeImageUpload(
+                val result = updateUserInfoUseCase.executeBackgroundImageUpload(
                     authorization = auth.value,
-                    imageType = "background",
                     imagePath = backgroundImage.value
                 )
                 result

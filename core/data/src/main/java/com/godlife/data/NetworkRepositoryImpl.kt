@@ -73,13 +73,20 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.reissue(authorization)
     }
 
-    override suspend fun imageUpload(
+    override suspend fun profileImageUpload(
         authorization: String,
-        imageType: String,
         image: Uri
     ): ApiResponse<ImageUploadQuery> {
-        return networkDataSource.imageUpload(authorization, imageType, image)
+        return networkDataSource.profileImageUpload(authorization, image)
     }
+
+    override suspend fun backgroundImageUpload(
+        authorization: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+        return networkDataSource.backgroundImageUpload(authorization, image)
+    }
+
 
     override suspend fun updateIntroduce(
         authorization: String,

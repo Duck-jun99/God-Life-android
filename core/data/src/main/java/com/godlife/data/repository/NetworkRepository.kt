@@ -50,11 +50,15 @@ interface NetworkRepository {
 
     suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
 
-    suspend fun imageUpload(
+    suspend fun profileImageUpload(
         authorization: String,
-        imageType: String,
         image: Uri
-    ): ApiResponse<ImageUploadQuery>
+    ):ApiResponse<ImageUploadQuery>
+
+    suspend fun backgroundImageUpload(
+        authorization: String,
+        image: Uri
+    ):ApiResponse<ImageUploadQuery>
 
     suspend fun updateIntroduce(
         authorization: String,

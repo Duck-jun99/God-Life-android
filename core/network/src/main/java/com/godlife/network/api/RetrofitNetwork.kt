@@ -84,12 +84,19 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
     ): ApiResponse<ReissueQuery>
 
-    // 프로필 이미지, 배경사진 변경
+    //프로필 이미지 변경
     @Multipart
-    @POST("/image-upload")
-    suspend fun imageUpload(
+    @POST("/member/profile")
+    suspend fun profileImageUpload(
         @Header("Authorization") authorization: String,
-        @Part("imageType") imageType: RequestBody,
+        @Part image: MultipartBody.Part
+    ): ApiResponse<ImageUploadQuery>
+
+    //프로필 배경사진 변경
+    @Multipart
+    @POST("/member/background")
+    suspend fun backgroundImageUpload(
+        @Header("Authorization") authorization: String,
         @Part image: MultipartBody.Part
     ): ApiResponse<ImageUploadQuery>
 
