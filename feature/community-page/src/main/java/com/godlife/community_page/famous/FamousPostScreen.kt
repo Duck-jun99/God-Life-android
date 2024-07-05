@@ -211,7 +211,6 @@ fun WeeklyFamousPostItem(
                     )
 
                 }
-
                 Spacer(modifier.size(15.dp))
 
                 Text(text = famousPostItem.title,

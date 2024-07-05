@@ -8,9 +8,6 @@ import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
-import com.godlife.model.todo.NotificationTimeData
-import com.godlife.model.todo.TodoList
-import com.godlife.model.todo.TodoTimeData
 import com.godlife.network.model.UserInfoBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -21,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -75,7 +71,7 @@ class MainPageViewModel @Inject constructor(
      */
 
     // 유저 정보 초기화
-    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", ""))
+    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", 0, ""))
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     // 오늘 투두리스트
