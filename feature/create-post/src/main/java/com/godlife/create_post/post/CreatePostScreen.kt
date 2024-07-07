@@ -310,7 +310,11 @@ fun CreatePostScreen(
                         modifier = Modifier
                             .padding(12.dp)
                             .fillMaxWidth()
-                            .clickable { navController.navigate("CreatePostPreviewScreen") },
+                            .clickable {
+                                navController.navigate("CreatePostPreviewScreen"){
+                                    launchSingleTop = true
+                                }
+                                       },
                         shape = RoundedCornerShape(8.dp),
                         elevation = CardDefaults.cardElevation(7.dp),
                         colors = CardDefaults.cardColors(Color.White)
@@ -436,7 +440,8 @@ fun SelectImage(
                 modifier = Modifier
                     .clickable { viewModel.removeImg(imageUri) },
                 imageVector = Icons.Default.Clear,
-                contentDescription = ""
+                contentDescription = "",
+                tint = Color.White
             )
         }
     }

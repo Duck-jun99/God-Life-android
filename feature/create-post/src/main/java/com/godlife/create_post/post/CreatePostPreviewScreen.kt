@@ -9,6 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +23,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -29,23 +33,32 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.PurpleMain
@@ -55,21 +68,24 @@ fun CreatePostPreviewScreen(
     createPostViewModel: CreatePostViewModel,
     navController: NavController,
     modifier: Modifier = Modifier){
+
+    val imgUriList by createPostViewModel.selectedImgUri.collectAsState()
+
     GodLifeTheme {
 
-        Column(modifier.background(Color.White)) {
+        Column(
+            modifier
+                .background(Color.White)
+        ) {
 
-            Surface(shadowElevation = 7.dp) {
-                Box(
-                    modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .padding(10.dp)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "미리 보기", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
-                }
+            Box(
+                modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "미리 보기", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
             }
 
             LazyColumn(
@@ -77,17 +93,9 @@ fun CreatePostPreviewScreen(
             ) {
 
                 
-                item { LazyRow(
-                    modifier
-                        .fillMaxWidth()
-                        .height(400.dp)) {
-                    createPostViewModel.selectedImgUri.value?.let {
-                        itemsIndexed(it){index, item ->
-                            ImageView(imgUri = item, context = LocalContext.current)
-                        }
-                    }
-
-                } }
+                item {
+                    imgUriList?.let { ImageBox(imgUriList = it) }
+                }
 
 
                 item { Content(createPostViewModel, navController) }
@@ -98,6 +106,7 @@ fun CreatePostPreviewScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Content(
     createPostViewModel: CreatePostViewModel,
@@ -137,15 +146,12 @@ fun Content(
 
         Spacer(modifier.size(20.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-        ) {
-            items(5) {
-                TagItemPreview()
-            }
+        FlowRow{
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
+            TagItemPreview()
         }
 
         Spacer(modifier.size(20.dp))
@@ -160,11 +166,83 @@ fun Content(
 }
 
 @Composable
-fun ImageView(imgUri: Uri, context: Context){
+fun ImageBox(
+    modifier: Modifier = Modifier,
+    imgUriList: List<Uri>
+){
+    val imgCount  = imgUriList.size
+    var imgIndex by remember { mutableIntStateOf(1) }
+
+    var width by remember {
+        mutableStateOf(0.dp)
+    }
+
+    val localDensity = LocalDensity.current
+
+    val initialPage by remember { mutableIntStateOf(0) }
+
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { imgUriList.size })
+
+    Box(
+        modifier
+            .fillMaxWidth()
+            .height(400.dp)
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ){
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    width = with(localDensity) {
+                        it.size.width.toDp()
+                    }
+                }
+        ) {index ->
+
+            imgIndex = index
+
+            imgUriList.getOrNull(
+                index%(imgUriList.size)
+            )?.let{
+                    item ->
+                ImageView(modifier, LocalContext.current, item, width)
+
+            }
+
+        }
+
+        Box(
+            modifier
+                .align(Alignment.BottomEnd)
+                .padding(20.dp)){
+
+            Box(modifier = modifier
+                .size(width = 50.dp, height = 30.dp)
+                .background(color = CheckColor, shape = RoundedCornerShape(20.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "${imgIndex+1}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
+            }
+
+        }
+
+
+
+    }
+}
+
+@Composable
+fun ImageView(
+    modifier: Modifier = Modifier,
+    context: Context,
+    imgUri: Uri,
+    width: Dp
+){
+
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    //Image 부분
-    val imageModifier: Modifier = Modifier
-        .fillMaxSize()
 
     Glide.with(context)
         .asBitmap()
@@ -178,18 +256,18 @@ fun ImageView(imgUri: Uri, context: Context){
         })
 
     bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-        Box(Modifier.fillMaxSize().background(Color.Black)){
 
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = imageModifier
-            )
-        }
+        Image(
+            modifier = modifier
+                .size(width = width, height = 400.dp),
+            bitmap = fetchedBitmap,
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
 
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -314,7 +392,11 @@ fun RowButton2(navController: NavController){
                 modifier = Modifier
                     .padding(12.dp)
                     .fillMaxWidth()
-                    .clickable { navController.navigate("CreatePostScreen") },
+                    .clickable {
+                        navController.navigate("CreatePostScreen"){
+                            launchSingleTop = true
+                        }
+                               },
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(7.dp),
                 colors = CardDefaults.cardColors(Color.White)
@@ -359,13 +441,17 @@ fun RowButton2(navController: NavController){
 @Preview(showBackground = true)
 @Composable
 fun EX(){
-    Box(Modifier.size(300.dp)
-        .background(Color.Black)){
+    Box(
+        Modifier
+            .size(300.dp)
+            .background(Color.Black)){
 
-        Box(Modifier.size(300.dp)
-            .padding(10.dp)
-            .background(Color.White)
-            .fillMaxSize()){
+        Box(
+            Modifier
+                .size(300.dp)
+                .padding(10.dp)
+                .background(Color.White)
+                .fillMaxSize()){
 
         }
     }

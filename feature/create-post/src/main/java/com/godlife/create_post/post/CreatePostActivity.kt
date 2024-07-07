@@ -45,12 +45,13 @@ fun CreatePostUI(
 ){
     val navController = rememberNavController()
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    //val navBackStackEntry by navController.currentBackStackEntryAsState()
+    //val currentRoute = navBackStackEntry?.destination?.route
 
 
     Column(
-        modifier = Modifier.fillMaxWidth().statusBarsPadding()
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
         NavHost(navController = navController, startDestination = "CreatePostScreen", modifier = Modifier.fillMaxSize()){
             composable("CreatePostScreen"){
