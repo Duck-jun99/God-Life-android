@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +31,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -68,6 +70,7 @@ import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
 import java.io.ByteArrayOutputStream
@@ -88,8 +91,8 @@ fun CreatePostScreen(
 
     val selectedImgList by createPostViewModel.selectedImgUri.collectAsState()
 
-    var title by remember { createPostViewModel.title }
-    var text by remember { createPostViewModel.text }
+    val title by remember { createPostViewModel.title }
+    val text by remember { createPostViewModel.text }
 
 
     // 갤러리에서 사진 가져오기
@@ -151,12 +154,23 @@ fun CreatePostScreen(
 
                     GodLifeTextFieldGray(
                         text = title,
-                        onTextChanged = { title = it },
+                        onTextChanged = { createPostViewModel.updateTitle(it) },
                         hint = "제목을 입력해주세요.",
                         singleLine = true
                     )
 
                 }
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = "${title.length}/20",
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp
+                    ),
+                    textAlign = TextAlign.End
+                )
 
 
                 Spacer(modifier.padding(10.dp))
@@ -179,17 +193,29 @@ fun CreatePostScreen(
                     modifier
                         .padding(10.dp)
                         .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                        .heightIn(min = 200.dp)
                         .padding(5.dp)
                 ){
 
                     GodLifeTextFieldGray(
                         text = text,
-                        onTextChanged = { text = it },
+                        onTextChanged = { createPostViewModel.updateText(it) },
                         hint = "내용을 입력해주세요.",
                         singleLine = false
                     )
 
                 }
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = "${text.length}/1000",
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp
+                    ),
+                    textAlign = TextAlign.End
+                )
 
 
                 Spacer(modifier.padding(10.dp))
@@ -256,7 +282,7 @@ fun CreatePostScreen(
                     selectedImgList?.let {
                         itemsIndexed(it){ index, item ->
                             Log.e("fbjkkjhsad",index.toString())
-                            SelectImage(index, item, LocalContext.current)
+                            SelectImage(index, item, LocalContext.current, createPostViewModel)
                         }
                     }
 
@@ -353,7 +379,12 @@ fun TagItem(tagItem: TagItem, modifier: Modifier = Modifier){
 }
 
 @Composable
-fun SelectImage(index:Int, imageUri: Uri, context: Context){
+fun SelectImage(
+    index:Int,
+    imageUri: Uri,
+    context: Context,
+    viewModel: CreatePostViewModel
+){
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     val num = index+1
@@ -382,7 +413,7 @@ fun SelectImage(index:Int, imageUri: Uri, context: Context){
             Image(
                 bitmap = fetchedBitmap,
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Crop,
                 modifier = imageModifier
             )
         }
@@ -390,9 +421,23 @@ fun SelectImage(index:Int, imageUri: Uri, context: Context){
 
         Box(modifier = Modifier
             .size(50.dp)
-            .background(PurpleMain, shape = CircleShape)
+            .background(OpaqueDark, shape = CircleShape)
         ){
             Text(text = num.toString(), style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) ,modifier = Modifier.align(Alignment.Center))
+        }
+
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .align(Alignment.TopEnd),
+            contentAlignment = Alignment.Center
+        ){
+            Icon(
+                modifier = Modifier
+                    .clickable { viewModel.removeImg(imageUri) },
+                imageVector = Icons.Default.Clear,
+                contentDescription = ""
+            )
         }
     }
 }
