@@ -15,6 +15,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,8 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -66,6 +67,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
 import java.io.ByteArrayOutputStream
@@ -73,6 +75,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CreatePostScreen(
     createPostViewModel: CreatePostViewModel,
@@ -106,181 +109,223 @@ fun CreatePostScreen(
 
     }
 
-    GodLifeTheme {
-        Column(
+    Column(
+        modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+
+        Box(
             modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(70.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+        }
+
+        LazyColumn(
+            modifier.padding(20.dp)
         ) {
 
-            Surface(shadowElevation = 7.dp) {
+            item{
+                Text(text = "제목", style = GodLifeTypography.titleMedium)
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp),
+                    thickness = 2.dp,
+                    color = GrayWhite2
+                )
+            }
+
+
+            item{
+
                 Box(
                     modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .padding(10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                        .padding(10.dp)
+                        .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                        .padding(5.dp)
+                ){
+
+                    GodLifeTextFieldGray(
+                        text = title,
+                        onTextChanged = { title = it },
+                        hint = "제목을 입력해주세요.",
+                        singleLine = true
+                    )
+
+                }
+
+
+                Spacer(modifier.padding(10.dp))
+            }
+
+            item{
+                Text(text = "내용", style = GodLifeTypography.titleMedium)
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp),
+                    thickness = 2.dp,
+                    color = GrayWhite2
+                )
+            }
+
+            item{
+
+                Box(
+                    modifier
+                        .padding(10.dp)
+                        .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                        .padding(5.dp)
+                ){
+
+                    GodLifeTextFieldGray(
+                        text = text,
+                        onTextChanged = { text = it },
+                        hint = "내용을 입력해주세요.",
+                        singleLine = false
+                    )
+
+                }
+
+
+                Spacer(modifier.padding(10.dp))
+            }
+
+
+            item{
+                Text(text = "투두 목록", style = GodLifeTypography.titleMedium)
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp),
+                    thickness = 2.dp,
+                    color = GrayWhite2
+                )
+            }
+
+
+            item{
+                FlowRow {
+                    TagItemPreview()
+                    TagItemPreview()
+                    TagItemPreview()
+                    TagItemPreview()
+                    TagItemPreview()
                 }
             }
 
-            LazyColumn(
-                modifier.padding(20.dp)
-            ) {
+            item{ Spacer(modifier.padding(10.dp)) }
 
-                item{ Text(text = "제목", style = GodLifeTypography.titleMedium) }
+            //item{ Text(text = "이미지", style = GodLifeTypography.titleMedium) }
 
-                item{ Divider(
-                    color = GrayWhite2,
-                    thickness = 2.dp,
+            item{
+
+                Row(
                     modifier = Modifier
-                        .padding(vertical = 10.dp)
-                ) }
-
-
-                item{ GodLifeTextFieldGray(text = title, onTextChanged = { title = it }) }
-
-                item{ Spacer(modifier.padding(10.dp)) }
-
-                item{ Text(text = "내용", style = GodLifeTypography.titleMedium) }
-
-                item{ Divider(
-                    color = GrayWhite2,
-                    thickness = 2.dp,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                ) }
-
-
-                item{ GodLifeTextFieldGray(text = text, onTextChanged = { text = it }) }
-
-                item{ Spacer(modifier.padding(10.dp)) }
-
-                item{ Text(text = "투두 목록", style = GodLifeTypography.titleMedium) }
-
-                item{ Divider(
-                    color = GrayWhite2,
-                    thickness = 2.dp,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                ) }
-
-                item{
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Box(
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
-                        items(5) {
-                            TagItemPreview()
+                        Text(text = "이미지", style = GodLifeTypography.titleMedium)
+                    }
+
+                    Spacer(modifier = Modifier.size(20.dp))
+
+                    AddButton(
+                        onClick = { launcher.launch("image/*") }
+                    )
+                }
+            }
+
+            item{
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp),
+                    thickness = 2.dp,
+                    color = GrayWhite2
+                )
+            }
+
+            item{
+                LazyRow {
+                    selectedImgList?.let {
+                        itemsIndexed(it){ index, item ->
+                            Log.e("fbjkkjhsad",index.toString())
+                            SelectImage(index, item, LocalContext.current)
                         }
                     }
+
                 }
+            }
 
-                item{ Spacer(modifier.padding(10.dp)) }
+            item{ Spacer(modifier.padding(10.dp)) }
 
-                //item{ Text(text = "이미지", style = GodLifeTypography.titleMedium) }
+            item{ Text(text = "* 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
 
-                item{
+            item{ Spacer(modifier.padding(10.dp)) }
 
-                    Row(
+            item{ Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically){
+                Box(
+                    Modifier
+                        .weight(0.5f)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterVertically)){
+
+                    Card(
                         modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
+                            .padding(12.dp)
+                            .fillMaxWidth()
+                            .clickable { navController.navigate("CreatePostPreviewScreen") },
+                        shape = RoundedCornerShape(8.dp),
+                        elevation = CardDefaults.cardElevation(7.dp),
+                        colors = CardDefaults.cardColors(Color.White)
                     ) {
-                        Box(
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        ) {
-                            Text(text = "이미지", style = GodLifeTypography.titleMedium)
-                        }
-
-                        Spacer(modifier = Modifier.size(20.dp))
-
-                        AddButton(
-                            onClick = { launcher.launch("image/*") }
+                        Text(
+                            text = "미리 보기",
+                            color = PurpleMain,
+                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .padding(20.dp)
+                                .align(Alignment.CenterHorizontally)
                         )
                     }
                 }
 
-                item{ Divider(
-                    color = GrayWhite2,
-                    thickness = 2.dp,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                ) }
+                Box(
+                    Modifier
+                        .weight(0.5f)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterVertically)){
 
-                item{
-                    LazyRow {
-                        selectedImgList?.let {
-                            itemsIndexed(it){ index, item ->
-                                Log.e("fbjkkjhsad",index.toString())
-                                SelectImage(index, item, LocalContext.current)
-                            }
-                        }
-
+                    Card(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth()
+                            .clickable { createPostViewModel.createPost() },
+                        shape = RoundedCornerShape(8.dp),
+                        elevation = CardDefaults.cardElevation(7.dp),
+                        colors = CardDefaults.cardColors(PurpleMain)
+                    ) {
+                        Text(
+                            text = "작성 완료",
+                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
+                            modifier = Modifier
+                                .padding(20.dp)
+                                .align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
+            } }
 
-                item{ Spacer(modifier.padding(10.dp)) }
-
-                item{ Text(text = "* 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
-
-                item{ Spacer(modifier.padding(10.dp)) }
-
-                item{ Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically){
-                    Box(
-                        Modifier
-                            .weight(0.5f)
-                            .fillMaxWidth()
-                            .align(Alignment.CenterVertically)){
-
-                        Card(
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .fillMaxWidth()
-                                .clickable { navController.navigate("CreatePostPreviewScreen") },
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(7.dp),
-                            colors = CardDefaults.cardColors(Color.White)
-                        ) {
-                            Text(
-                                text = "미리 보기",
-                                color = PurpleMain,
-                                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                                modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)
-                            )
-                        }
-                    }
-
-                    Box(
-                        Modifier
-                            .weight(0.5f)
-                            .fillMaxWidth()
-                            .align(Alignment.CenterVertically)){
-
-                        Card(
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .fillMaxWidth()
-                                .clickable { createPostViewModel.createPost() },
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(7.dp),
-                            colors = CardDefaults.cardColors(PurpleMain)
-                        ) {
-                            Text(
-                                text = "작성 완료",
-                                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                                modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)
-                            )
-                        }
-                    }
-                } }
-
-            }
         }
     }
 }
@@ -403,6 +448,7 @@ private fun convertResizeImage(imageUri: Uri, context: Context):Uri? {
     return null
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun CreatePostScreenPreview(modifier: Modifier = Modifier){
@@ -442,7 +488,13 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                 ) }
 
 
-                item{ GodLifeTextFieldGray(text = title, onTextChanged = { title = it }) }
+                item{
+                    GodLifeTextFieldGray(
+                        text = title,
+                        onTextChanged = { title = it },
+                        hint = "제목을 입력해주세요."
+                    )
+                }
 
                 item{ Spacer(modifier.padding(10.dp)) }
 
@@ -470,15 +522,12 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                 ) }
 
                 item{
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    ) {
-                        items(5) {
-                            TagItemPreview()
-                        }
+                    FlowRow {
+                        TagItemPreview()
+                        TagItemPreview()
+                        TagItemPreview()
+                        TagItemPreview()
+                        TagItemPreview()
                     }
                 }
 
@@ -547,7 +596,9 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                                 text = "미리 보기",
                                 color = PurpleMain,
                                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                                modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)
+                                modifier = Modifier
+                                    .padding(20.dp)
+                                    .align(Alignment.CenterHorizontally)
                             )
                         }
                     }
@@ -569,7 +620,9 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                             Text(
                                 text = "작성 완료",
                                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                                modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)
+                                modifier = Modifier
+                                    .padding(20.dp)
+                                    .align(Alignment.CenterHorizontally)
                             )
                         }
                     }
@@ -582,24 +635,20 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
 @Preview(showBackground = true)
 @Composable
 fun TagItemPreview(modifier: Modifier = Modifier, text:String = "Tag"){
-    Column(
-        modifier = Modifier.padding(5.dp)
-    ) {
-        Box(
-            modifier
-                .size(70.dp, 30.dp)
-                .background(color = PurpleMain, shape = RoundedCornerShape(7.dp))
-                .padding(2.dp)
-            ,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = text,
-                style = TextStyle(color = Color.White),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
 
+    Box(
+        modifier
+            .padding(vertical = 5.dp, horizontal = 10.dp)
+            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+            .padding(vertical = 5.dp, horizontal = 10.dp)
+        ,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = "#${text}",
+            style = TextStyle(color = Color.Black),
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Composable
@@ -681,7 +730,9 @@ fun RowButton(){
                     text = "미리 보기",
                     color = PurpleMain,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                    modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
             }
         }
@@ -703,7 +754,9 @@ fun RowButton(){
                 Text(
                     text = "작성 완료",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                    modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
             }
         }

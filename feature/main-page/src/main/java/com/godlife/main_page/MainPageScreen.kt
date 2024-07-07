@@ -32,12 +32,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -129,17 +131,16 @@ fun MainPageScreen(
 
     val userInfo by viewModel.userInfo.collectAsState()
 
+    GodLifeTheme {
 
-    when(uiState){
-        is MainPageUiState.Loading -> {
+        when(uiState){
+            is MainPageUiState.Loading -> {
 
-            LoadingMainPageScreen()
+                LoadingMainPageScreen()
 
-        }
+            }
 
-        is MainPageUiState.Success -> {
-
-            GodLifeTheme {
+            is MainPageUiState.Success -> {
 
                 Column(
                     modifier
@@ -147,7 +148,6 @@ fun MainPageScreen(
                         .background(Color.White)
                         .statusBarsPadding()
                 ){
-
 
                     Box(
                         modifier
@@ -288,20 +288,64 @@ fun MainPageScreen(
                     }
 
                 }
+
+                MainAlertDialog(viewModel)
+
+
             }
+            is MainPageUiState.Error -> {
 
-        }
-        is MainPageUiState.Error -> {
+                Toast.makeText(context, (uiState as MainPageUiState.Error).message.toString(), Toast.LENGTH_SHORT).show()
 
-            Toast.makeText(context, (uiState as MainPageUiState.Error).message.toString(), Toast.LENGTH_SHORT).show()
+                if((uiState as MainPageUiState.Error).message == ErrorType.REFRESH_TOKEN_EXPIRED){
+                    moveLoginActivity(loginNavigator, mainActivity)
+                }
 
-            if((uiState as MainPageUiState.Error).message == ErrorType.REFRESH_TOKEN_EXPIRED){
-                moveLoginActivity(loginNavigator, mainActivity)
             }
-
         }
+
     }
 
+}
+
+@Composable
+fun MainAlertDialog(
+    viewModel: MainPageViewModel
+){
+    val showAlertDialog by viewModel.showAlertDialog.collectAsState()
+    val selectedTodo by viewModel.selectedTodo.collectAsState()
+
+    if(showAlertDialog){
+        AlertDialog(
+            onDismissRequest = { viewModel.setAlertDialogFlag() },
+            title = {
+                Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            },
+            text = {
+                Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+            },
+            confirmButton = {
+                GodLifeButtonWhite(
+                    onClick = {
+
+                        /* TODO */
+
+                        viewModel.setTodoValueCompleted(selectedTodo)
+
+                        viewModel.setAlertDialogFlag()
+
+                    },
+                    text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            },
+            dismissButton = {
+                GodLifeButtonWhite(
+                    onClick = { viewModel.setAlertDialogFlag() },
+                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            }
+        )
+    }
 
 
 }
@@ -546,19 +590,16 @@ fun NoCompletedTodayList(
                 style = TextStyle(fontSize = 20.sp, color = PurpleMain)
             )
 
-            Divider(
-                color = PurpleMain,
-                thickness = 2.dp,
+            HorizontalDivider(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 10.dp),
+                thickness = 2.dp,
+                color = PurpleMain
             )
 
             GodLifeButton(
                 onClick = {
-                    /*
-                    viewModel.setTodoValueCompleted(todo)
-
-                     */
+                          viewModel.setAlertDialogFlag(todo)
                 },
                 modifier = Modifier.align(Alignment.End)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))

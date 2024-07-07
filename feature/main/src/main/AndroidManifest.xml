@@ -5,8 +5,9 @@
 
         </activity>
 
-        <activity android:name="com.godlife.create_post.CreatePostActivity">
+        <activity android:name="com.godlife.create_post.post.CreatePostActivity">
 
         </activity>
+
     </application>
 </manifest>

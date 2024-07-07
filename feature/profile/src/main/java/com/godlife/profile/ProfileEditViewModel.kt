@@ -323,6 +323,7 @@ class ProfileEditViewModel @Inject constructor(
 
     }
 
+
     //배경 이미지에 수정이 있었을 때 서버에 요청
     private fun completeUpdateBackgroundImage(){
 
@@ -339,6 +340,7 @@ class ProfileEditViewModel @Inject constructor(
                         _backgroundUploadState.value = UploadState.Success("success")
 
                     }
+
                     .onError {
 
                         // 토큰 만료시 재발급 요청
