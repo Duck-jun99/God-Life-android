@@ -1,7 +1,6 @@
 package com.godlife.network
 
 import android.net.Uri
-import androidx.room.Update
 import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
@@ -24,10 +23,8 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
-import retrofit2.http.Header
-import retrofit2.http.Query
 
 interface NetworkDataSource {
     suspend fun checkUserExistence(id: String): UserExistenceCheckResult?
@@ -129,7 +126,11 @@ interface NetworkDataSource {
 
     suspend fun getWeeklyFamousMembers(
         authorization: String
-    ): ApiResponse<WeeklyRankingQuery>
+    ): ApiResponse<RankingQuery>
+
+    suspend fun getAllFamousMembers(
+        authorization: String
+    ): ApiResponse<RankingQuery>
 
     suspend fun postNotificationTime(
         authorization: String,

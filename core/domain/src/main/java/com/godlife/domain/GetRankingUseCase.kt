@@ -7,4 +7,6 @@ class GetRankingUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeGetWeeklyRanking(authorId: String) = networkRepository.getWeeklyFamousMembers(authorization = authorId)
+
+    suspend fun executeGetAllRanking(authorId: String) = networkRepository.getAllFamousMembers(authorization = authorId)
 }

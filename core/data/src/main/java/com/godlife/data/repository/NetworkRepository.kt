@@ -23,7 +23,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 
 interface NetworkRepository {
@@ -128,7 +128,11 @@ interface NetworkRepository {
 
     suspend fun getWeeklyFamousMembers(
         authorization: String
-    ): ApiResponse<WeeklyRankingQuery>
+    ): ApiResponse<RankingQuery>
+
+    suspend fun getAllFamousMembers(
+        authorization: String
+    ): ApiResponse<RankingQuery>
 
     suspend fun postNotificationTime(
         authorization: String,

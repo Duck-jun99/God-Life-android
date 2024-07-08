@@ -1,12 +1,12 @@
 package com.godlife.network.model
 
-data class WeeklyRankingQuery(
+data class RankingQuery(
     val status: String,
-    val body: WeeklyRankingBody,
+    val body: RankingBody,
     val message: String
 )
 
-data class WeeklyRankingBody(
+data class RankingBody(
     val memberId: Int,
     val nickname: String,
     val godLifeScore: Int,

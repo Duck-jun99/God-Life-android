@@ -23,7 +23,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -195,7 +195,13 @@ interface RetrofitNetworkApi {
     @GET("/popular/members/weekly")
     suspend fun getWeeklyFamousMembers(
         @Header("Authorization") authorization: String
-    ): ApiResponse<WeeklyRankingQuery>
+    ): ApiResponse<RankingQuery>
+
+    //전체 명예의 전당
+    @GET("/popular/members/all-time")
+    suspend fun getAllFamousMembers(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<RankingQuery>
 
     //알림 시간 전송
     @POST("/fcm/alarm")

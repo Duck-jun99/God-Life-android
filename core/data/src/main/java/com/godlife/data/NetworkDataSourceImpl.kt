@@ -27,7 +27,7 @@ import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -205,8 +205,12 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.agreeGodLife(authorization, postId)
     }
 
-    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<RankingQuery> {
         return networkApi.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun getAllFamousMembers(authorization: String): ApiResponse<RankingQuery> {
+        return networkApi.getAllFamousMembers(authorization)
     }
 
     override suspend fun postNotificationTime(
