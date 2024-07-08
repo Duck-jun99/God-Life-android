@@ -76,6 +76,7 @@ import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.post_detail.StimulusDetailScreen
+import com.godlife.community_page.ranking.RankingPageScreenPreview
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
@@ -445,6 +446,7 @@ fun CommunityPageView(
             viewModel.getWeeklyRanking()
             viewModel.getAllRanking()
             RankingScreen(navController = navController, viewModel = viewModel)
+
         }
 
         //PostDeatil Screen

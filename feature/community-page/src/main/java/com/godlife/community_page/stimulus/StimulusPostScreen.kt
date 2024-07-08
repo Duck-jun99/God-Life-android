@@ -945,11 +945,6 @@ fun LatestStimulusItemPreview(
 fun RecommendUserContentPreview(
     modifier: Modifier = Modifier
 ){
-    var width by remember {
-        mutableStateOf(0.dp)
-    }
-
-    val localDensity = LocalDensity.current
 
     val user = RecommendUserItem(
         nickname = "치킨 러버",

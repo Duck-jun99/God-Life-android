@@ -75,7 +75,7 @@ fun FamousPostScreen(
         LazyColumn(
             modifier
                 .fillMaxSize()
-                .background(GrayWhite3)
+                .background(Color.White)
         ) {
 
             item{ WeeklyFamousPostListView(viewModel = viewModel, navController = navController) }
