@@ -109,7 +109,7 @@ fun WeeklyFamousPostListView(
     ){
         Column {
 
-            Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+            Text(text = "이번주 굿생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
 
             Spacer(modifier.size(10.dp))
 
@@ -267,7 +267,7 @@ fun TotalFamousPostListView(
     ){
         Column {
 
-            Text(text = "전체 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+            Text(text = "전체 Top10 굿생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
 
             Spacer(modifier.size(10.dp))
 
@@ -438,7 +438,7 @@ fun WeeklyFamousPostListViewPreview(
     ){
         Column {
 
-            Text(text = "이번주 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+            Text(text = "이번주 굿생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
 
 
 
@@ -478,7 +478,7 @@ fun TotalFamousPostListViewPreview(
     ){
         Column {
 
-            Text(text = "전체 갓생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+            Text(text = "전체 Top10 굿생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
 
             Spacer(modifier.size(10.dp))
 

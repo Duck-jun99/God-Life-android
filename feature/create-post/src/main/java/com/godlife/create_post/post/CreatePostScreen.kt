@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -164,7 +165,7 @@ fun CreatePostScreen(
                 Text(
                     modifier = modifier
                         .fillMaxWidth(),
-                    text = "${title.length}/20",
+                    text = "${title.length}/30",
                     style = TextStyle(
                         color = GrayWhite,
                         fontSize = 12.sp
@@ -200,7 +201,7 @@ fun CreatePostScreen(
                     GodLifeTextFieldGray(
                         text = text,
                         onTextChanged = { createPostViewModel.updateText(it) },
-                        hint = "내용을 입력해주세요.",
+                        hint = "내용을 입력해주세요.\n달성한 투두리스트에 대해 설명해주시면 좋아요.",
                         singleLine = false
                     )
 
@@ -291,7 +292,8 @@ fun CreatePostScreen(
 
             item{ Spacer(modifier.padding(10.dp)) }
 
-            item{ Text(text = "* 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
+            item{ Text(text = "- 첫 번째 이미지는 대표 이미지로 설정돼요.", style = GodLifeTypography.bodySmall) }
+            item{ Text(text = "- 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
 
             item{ Spacer(modifier.padding(10.dp)) }
 
@@ -391,11 +393,11 @@ fun SelectImage(
 ){
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
-    val num = index+1
-
     Box(modifier = Modifier
         .padding(end = 10.dp)
-        .size(150.dp)) {
+        .size(150.dp)
+        .border(width = 5.dp, color = if(index == 0) Color.Yellow else Color.White)
+    ) {
 
         //Image 부분
         val imageModifier: Modifier = Modifier
@@ -422,17 +424,11 @@ fun SelectImage(
             )
         }
 
-
-        Box(modifier = Modifier
-            .size(50.dp)
-            .background(OpaqueDark, shape = CircleShape)
-        ){
-            Text(text = num.toString(), style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) ,modifier = Modifier.align(Alignment.Center))
-        }
-
         Box(
             modifier = Modifier
-                .size(50.dp)
+                .padding(7.dp)
+                .size(30.dp)
+                .background(color = OpaqueDark, shape = CircleShape)
                 .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center
         ){
@@ -619,6 +615,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
 
                 item{ Spacer(modifier.padding(10.dp)) }
 
+                item{ Text(text = "- 첫 번째 이미지는 대표 이미지로 설정돼요.", style = GodLifeTypography.bodySmall) }
                 item{ Text(text = "* 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
 
                 item{ Spacer(modifier.padding(10.dp)) }
@@ -742,7 +739,8 @@ fun SelectImagePreview(){
         //Image 부분
         Box(modifier = Modifier
             .size(150.dp)
-            .background(GrayWhite)){
+            .background(GrayWhite)
+        ){
 
         }
         Box(modifier = Modifier

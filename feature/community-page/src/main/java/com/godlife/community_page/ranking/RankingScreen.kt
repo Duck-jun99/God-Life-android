@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.designsystem.list.TagItemPreview
 import com.godlife.designsystem.theme.GodLifeTypography
+import com.godlife.designsystem.theme.PurpleMain
 
 @Composable
 fun RankingScreen(
@@ -53,6 +54,22 @@ fun RankingPageScreenPreview(
 fun WeeklyRankingListPreview(
     modifier: Modifier = Modifier
 ){
+
+    Box(
+        modifier
+            .padding(
+                vertical = 10.dp, horizontal = 10.dp
+            )
+            .width(250.dp)
+            .height(400.dp)
+            .shadow(7.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(10.dp)
+            )
+    ){
+
+    }
 
 }
 
@@ -99,7 +116,7 @@ fun CommunityFamousPostListPreview(
             Spacer(modifier.size(5.dp))
 
             //티어 보여줄 부분
-            Text(text = "마스터", style = TextStyle(color = Color.Magenta, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+            Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
 
             Spacer(modifier.size(10.dp))

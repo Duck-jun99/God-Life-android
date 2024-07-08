@@ -33,7 +33,7 @@ class CreatePostViewModel @Inject constructor(
     val tags = mutableListOf("tag1","tag2","tag3")
 
     fun updateTitle(newTitle: String) {
-        _title.value = newTitle.take(20)
+        _title.value = newTitle.take(30)
     }
 
     fun updateText(newText: String) {
