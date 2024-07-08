@@ -442,6 +442,8 @@ fun CommunityPageView(
 
         composable(RankingRoute.route) {
             viewModel.changeCurrentRoute(route = RankingRoute.route)
+            viewModel.getWeeklyRanking()
+            viewModel.getAllRanking()
             RankingScreen(navController = navController, viewModel = viewModel)
         }
 
