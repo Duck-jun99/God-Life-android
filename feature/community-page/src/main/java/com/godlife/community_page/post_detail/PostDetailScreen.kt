@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -439,7 +440,7 @@ fun Content2(
             Icon(
                 modifier = modifier
                     .align(Alignment.CenterHorizontally),
-                imageVector = Icons.Default.ThumbUp,
+                imageVector = Icons.Outlined.ThumbUp,
                 contentDescription = "",
                 tint = PurpleMain
             )
@@ -465,7 +466,7 @@ fun Content2(
 fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel){
 
     Column(
-        modifier = Modifier.padding(20.dp)
+        modifier = Modifier.padding(10.dp)
     ) {
         Text(text = "댓글 ${comments.size}개", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
@@ -475,11 +476,17 @@ fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackba
 
         Spacer(modifier = modifier.size(10.dp))
 
-        comments.forEach {
+        if(comments.isNotEmpty()){
 
-            CommentBox(commentBody = it, snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel)
+            comments.forEach {
+
+                CommentBox(commentBody = it, snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel)
+
+            }
 
         }
+
+
 
     }
 }
@@ -493,7 +500,7 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
         modifier
             .padding(bottom = 10.dp)
             .fillMaxWidth()
-            .background(Color.White, shape = RoundedCornerShape(15.dp))
+            .background(GrayWhite3, shape = RoundedCornerShape(15.dp))
             .padding(10.dp)
     ){
 
@@ -835,7 +842,7 @@ fun Content2Preview(
             Icon(
                 modifier = modifier
                     .align(Alignment.CenterHorizontally),
-                imageVector = Icons.Default.ThumbUp,
+                imageVector = Icons.Outlined.ThumbUp,
                 contentDescription = "",
                 tint = PurpleMain
             )
