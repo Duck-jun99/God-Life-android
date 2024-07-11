@@ -376,11 +376,12 @@ fun MainTodoListBox(
 
     //var todoPercent = 360 * (todayTodoListSize.toFloat() / completedTodoListSize.toFloat())
 
-    val todoPercent = if (completedTodoListSize > 0) {
-        360 * (todayTodoListSize.toFloat() / completedTodoListSize.toFloat())
-    } else {
-        0f
-    }
+    val todoPercent =
+        if (completedTodoListSize > 0) {
+            360 * ( completedTodoListSize.toFloat() / todayTodoListSize.toFloat() )
+        }
+        else { 0f }
+    Log.e("MainTodoListBox", "todoPercent: $todoPercent")
 
     val animatedValue = remember { Animatable(0f) }
 
