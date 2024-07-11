@@ -33,12 +33,12 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -76,7 +76,6 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.profile.navigation.ProfileScreenRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -129,9 +128,19 @@ fun ProfileEditScreen(
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
             when (val state = uiState) {
+
                 is ProfileEditUiState.Loading -> {
+
+                }
+
+                is ProfileEditUiState.Init -> {
                     /* TODO */
                 }
+
+                is ProfileEditUiState.SendLoading -> {
+
+                }
+
                 is ProfileEditUiState.Success -> {
                     ProfileEditBox(innerPadding = innerPadding, viewModel = viewModel, launcher = launcher)
                 }
@@ -924,5 +933,41 @@ fun EditIntroduceBoxPreview(modifier: Modifier = Modifier){
             }
         }
 
+    }
+}
+
+@Preview
+@Composable
+fun ProfileEditLoadingScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "유저님의 정보를 받아오고 있어요.", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
+
+@Preview
+@Composable
+fun ProfileEditSendLoadingScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "변경사항을 적용중이에요.\n잠시만 기다려주세요!", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
     }
 }

@@ -96,9 +96,12 @@ fun CreatePostPreviewScreen(
                 modifier.fillMaxSize()
             ) {
 
-                
-                item {
-                    imgUriList?.let { ImageBox(imgUriList = it) }
+                if(imgUriList?.isNotEmpty() == true){
+
+                    item {
+                        imgUriList?.let { ImageBox(imgUriList = it) }
+                    }
+
                 }
 
 
@@ -196,7 +199,7 @@ fun ImageBox(
     imgUriList: List<Uri>
 ){
     val imgCount  = imgUriList.size
-    var imgIndex by remember { mutableIntStateOf(1) }
+    val imgIndex  =  remember { mutableIntStateOf(1) }
 
     var width by remember {
         mutableStateOf(0.dp)
@@ -227,7 +230,7 @@ fun ImageBox(
                 }
         ) {index ->
 
-            imgIndex = index
+            imgIndex.value = index + 1
 
             imgUriList.getOrNull(
                 index%(imgUriList.size)
@@ -249,7 +252,7 @@ fun ImageBox(
                 .background(color = CheckColor, shape = RoundedCornerShape(20.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "${imgIndex+1}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
+                Text(text = "${imgIndex.value}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
             }
 
         }
@@ -418,6 +421,7 @@ fun RowButton2(navController: NavController){
                     .fillMaxWidth()
                     .clickable {
                         navController.navigate("CreatePostScreen"){
+                            popUpTo("CreatePostScreen")
                             launchSingleTop = true
                         }
                                },

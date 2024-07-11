@@ -398,6 +398,7 @@ fun CreatePostScreen(
 
             if(isDialogVisble){
                 AlertDialog(
+                    containerColor = Color.White,
                     onDismissRequest = { isDialogVisble = !isDialogVisble },
                     title = {
                         Text(text = "게시물 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))

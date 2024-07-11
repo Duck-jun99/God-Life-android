@@ -24,10 +24,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class ProfileEditUiState {
+
+    //사용자 정보 로드 중 상태
     object Loading : ProfileEditUiState()
+
+    //사용자 정보 불러온 상태
+    object Init : ProfileEditUiState()
+
+    //변경 사항 전송 중 상태
+    object SendLoading : ProfileEditUiState()
+
+    // 변경 사항 전송 성공 상태
     data class Success(val data: String) : ProfileEditUiState()
+
+    // 변경 사항 전송 실패 상태
     data class Error(val message: String) : ProfileEditUiState()
 
+    //변경 완료 상태
     data class Result(val success: Boolean, val message: String) : ProfileEditUiState()
 }
 
@@ -51,7 +64,7 @@ class ProfileEditViewModel @Inject constructor(
      */
 
     // 전체 UI 상태
-    private val _uiState = MutableStateFlow<ProfileEditUiState>(ProfileEditUiState.Loading)
+    private val _uiState = MutableStateFlow<ProfileEditUiState>(ProfileEditUiState.Init)
     val uiState: StateFlow<ProfileEditUiState> = _uiState
 
     //프로필 이미지 수정 상태 (false면 수정 안함, true이면 수정함)
@@ -133,7 +146,7 @@ class ProfileEditViewModel @Inject constructor(
                     profileUpload is UploadState.Loading ||
                             backgroundUpload is UploadState.Loading ||
                             introduceUpload is UploadState.Loading -> {
-                        _uiState.value = ProfileEditUiState.Loading
+                        _uiState.value = ProfileEditUiState.Init
                     }
                     profileUpload is UploadState.Error ||
                             backgroundUpload is UploadState.Error ||
@@ -170,7 +183,6 @@ class ProfileEditViewModel @Inject constructor(
 
     //프로필 이미지 수정
     fun updataProfileImage(uri: Uri){
-
         _profileChangeState.value = true
         _profileImage.value = uri
     }
@@ -221,7 +233,7 @@ class ProfileEditViewModel @Inject constructor(
     private fun initUserInfo(){
         if(auth.value != ""){
 
-            _uiState.value = ProfileEditUiState.Loading
+            _uiState.value = ProfileEditUiState.Init
 
             _profileChangeState.value = false
             _backgroundChangeState.value = false

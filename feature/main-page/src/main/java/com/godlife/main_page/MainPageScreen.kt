@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +52,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +90,9 @@ import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
 import com.godlife.profile.navigation.ProfileScreenRoute
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -220,9 +224,9 @@ fun MainPageScreen(
 
                                 Spacer(modifier.size(10.dp))
 
-                                Icon(imageVector = Icons.Filled.Notifications,
+                                Icon(imageVector = Icons.Outlined.Notifications,
                                     contentDescription = "Notification",
-                                    tint = GrayWhite,
+                                    tint = PurpleMain,
                                     modifier = modifier
                                         .size(30.dp)
                                 )
@@ -249,26 +253,32 @@ fun MainPageScreen(
                         item { TestCreatePost(createPostNavigator, mainActivity) }
 
 
-                        item { TextToday(viewModel) }
-
-                        item { Spacer(modifier = modifier.size(10.dp)) }
+                        item {
+                            TextToday(viewModel)
+                            Spacer(modifier = modifier.size(10.dp))
+                        }
 
                         when(todayTodoListExists){
                             //오늘 설정한 투두리스트가 있을 경우
                             true -> {
 
-                                item{ MainTodoListBox(viewModel)}
-
-                                item { Row(
-                                    modifier
-                                        .fillMaxWidth()
-                                        .height(25.dp)){
-                                    Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
-                                    Spacer(modifier.size(5.dp))
-                                    Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center) }
+                                item{
+                                    MainTodoListBox(viewModel)
+                                    Spacer(modifier = modifier.size(10.dp))
                                 }
 
-                                item { Spacer(modifier = modifier.size(10.dp)) }
+                                item {
+                                    Row(
+                                        modifier
+                                            .fillMaxWidth()
+                                            .height(25.dp)
+                                    ){
+                                        Icon(painter = painterResource(R.drawable.note_icons8), contentDescription = "", tint = Color.Unspecified)
+                                        Spacer(modifier.size(5.dp))
+                                        Text(text = "오늘의 투두리스트", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+                                    }
+                                    Spacer(modifier = modifier.size(10.dp))
+                                }
 
                                 item{ TodoListBox(viewModel)}
 
@@ -315,8 +325,11 @@ fun MainAlertDialog(
     val showAlertDialog by viewModel.showAlertDialog.collectAsState()
     val selectedTodo by viewModel.selectedTodo.collectAsState()
 
+    val cScope = rememberCoroutineScope()
+
     if(showAlertDialog){
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { viewModel.setAlertDialogFlag() },
             title = {
                 Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
@@ -328,9 +341,9 @@ fun MainAlertDialog(
                 GodLifeButtonWhite(
                     onClick = {
 
-                        /* TODO */
-
-                        viewModel.setTodoValueCompleted(selectedTodo)
+                        cScope.launch(Dispatchers.IO) {
+                            viewModel.setTodoValueCompleted(selectedTodo)
+                        }
 
                         viewModel.setAlertDialogFlag()
 
@@ -562,10 +575,11 @@ fun TodoListBox(
 
          */
 
-        todayTodoList?.todoList?.forEachIndexed { index, item ->
+        todayTodoList?.todoList?.forEach { item ->
             if (item.iscompleted) {
                 CompletedTodayList(item, viewModel)
-            } else {
+            }
+            else {
                 NoCompletedTodayList(item, viewModel)
             }
         }
@@ -625,18 +639,18 @@ fun CompletedTodayList(
                 style = TextStyle(fontSize = 20.sp, color = GrayWhite)
             )
 
-            Divider(
-                color = GrayWhite,
-                thickness = 2.dp,
+            HorizontalDivider(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 10.dp),
+                thickness = 2.dp,
+                color = GrayWhite
             )
 
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(GrayWhite)) {
-                Text(text = "달성하기", style = TextStyle(color = Color.White))
+                Text(text = "달성 완료", style = TextStyle(color = Color.White))
             }
 
         }
@@ -881,7 +895,7 @@ fun TextTodayPreview(modifier: Modifier = Modifier){
 private fun moveCreateTodoListActivity(createNavigator: CreatetodolistNavigator, mainActivity: Activity){
     createNavigator.navigateFrom(
         activity = mainActivity,
-        withFinish = false
+        withFinish = true
     )
 
 }
@@ -889,7 +903,7 @@ private fun moveCreateTodoListActivity(createNavigator: CreatetodolistNavigator,
 private fun moveCreatePostActivity(createPostNavigator: CreatePostNavigator, mainActivity: Activity){
     createPostNavigator.navigateFrom(
         activity = mainActivity,
-        withFinish = false
+        withFinish = true
     )
 
 }

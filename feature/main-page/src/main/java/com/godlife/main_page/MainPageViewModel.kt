@@ -63,6 +63,9 @@ class MainPageViewModel @Inject constructor(
     private val _todayTodoListExists = MutableStateFlow<Boolean>(false)
     val todayTodoListExists: StateFlow<Boolean> = _todayTodoListExists
 
+    // 오늘 투두리스트 불러온 플래그
+    val getTodayTodoListFlag = MutableStateFlow<Boolean>(false)
+
     // 유저 정보 불러온 상태
     private val _userInfoExists = MutableStateFlow<Boolean>(false)
     val userInfoExists: StateFlow<Boolean> = _userInfoExists
@@ -134,24 +137,33 @@ class MainPageViewModel @Inject constructor(
     //오늘 설정한 투두 리스트를 로컬 데이터베이스에서 가져오기
     private fun getTodayTodoList(){
 
-        viewModelScope.launch(Dispatchers.IO) {
-            _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
+        _completedTodoListSize.value = 0
 
-            if(todayTodoList.value!=null){
-                _todayTodoListExists.value = true
+        if(!getTodayTodoListFlag.value){
 
-                _todayTodoListSize.value = todayTodoList.value!!.todoList.size
+            viewModelScope.launch(Dispatchers.IO) {
+                _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
 
-                todayTodoList.value!!.todoList.forEach {
-                    if(it.iscompleted){
-                        _completedTodoListSize.value += 1
+                if(todayTodoList.value!=null){
+                    _todayTodoListExists.value = true
+
+                    _todayTodoListSize.value = todayTodoList.value!!.todoList.size
+
+                    todayTodoList.value!!.todoList.forEach {
+                        if(it.iscompleted){
+                            _completedTodoListSize.value += 1
+                        }
+
                     }
 
                 }
 
             }
+            getTodayTodoListFlag.value = true
 
         }
+
+
 
     }
 
@@ -290,22 +302,15 @@ class MainPageViewModel @Inject constructor(
      */
 
 
-    fun setTodoValueCompleted(todo: TodoList){
-        viewModelScope.launch(Dispatchers.IO) {
-            val newList = _todayTodoList.value
-            if (newList != null) {
-                newList.todoList = newList.todoList.map { if(it == todo) it.copy(iscompleted = true) else it }
+    suspend fun setTodoValueCompleted(todo: TodoList){
+        val updatedList = _todayTodoList.value
+        if (updatedList != null) {
+            updatedList.todoList = updatedList.todoList.map { if(it == todo) it.copy(iscompleted = true) else it }
 
-                localDatabaseUseCase.updateTodoList(newList)
+            localDatabaseUseCase.updateTodoList(updatedList)
 
-                getTodayTodoList()
-            }
-
-
-
-            //_todayTodoList.value = newList
-
-
+            getTodayTodoListFlag.value = false
+            getTodayTodoList()
         }
     }
 

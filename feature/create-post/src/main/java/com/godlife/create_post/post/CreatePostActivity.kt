@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +64,7 @@ class CreatePostActivity: ComponentActivity() {
 
             if (showExitDialog) {
                 AlertDialog(
+                    containerColor = Color.White,
                     onDismissRequest = { showExitDialog = false },
                     title = {
                         Text(text = "작성을 종료할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
