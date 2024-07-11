@@ -373,9 +373,6 @@ fun MainTodoListBox(
     val completedTodoListSize = viewModel.completedTodoListSize.collectAsState().value
     Log.e("MainTodoListBox", "todayTodoListSize: $todayTodoListSize, completedTodoListSize: $completedTodoListSize")
 
-
-    //var todoPercent = 360 * (todayTodoListSize.toFloat() / completedTodoListSize.toFloat())
-
     val todoPercent =
         if (completedTodoListSize > 0) {
             360 * ( completedTodoListSize.toFloat() / todayTodoListSize.toFloat() )
