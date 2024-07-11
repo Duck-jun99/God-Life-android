@@ -14,6 +14,7 @@ androidxComposeRuntimeTracing = "1.0.0-beta01"
 androidxTracing = "1.2.0"
 
 androidxActivity = "1.7.2"
+composeBom = "2023.01.00"
 gradleDependencyGraphGeneratorPlugin = "0.8.0"
 room = "2.5.2"
 hilt = "2.46.1"
@@ -73,6 +74,7 @@ firebaseBom = "32.3.1"
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
+androidx-compose-bom-v20230100 = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 gradle-dependency-graph-generator-plugin = { module = "com.vanniktech:gradle-dependency-graph-generator-plugin", version.ref = "gradleDependencyGraphGeneratorPlugin" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 

@@ -34,6 +34,12 @@ sealed class CommunityPageUiState {
     data class Error(val message: String) : CommunityPageUiState()
 }
 
+sealed class RankingPageUiState {
+    object Loading : RankingPageUiState()
+    data class Success(val data: String) : RankingPageUiState()
+    data class Error(val message: String) : RankingPageUiState()
+}
+
 @HiltViewModel
 class CommunityPageViewModel @Inject constructor(
     private val getLatestPostUseCase: GetLatestPostUseCase,
@@ -52,6 +58,10 @@ class CommunityPageViewModel @Inject constructor(
     // 전체 UI 상태
     private val _uiState = MutableStateFlow<CommunityPageUiState>(CommunityPageUiState.Loading)
     val uiState: StateFlow<CommunityPageUiState> = _uiState
+
+    // 명예의 전당 UI 상태
+    private val _rankingUiState = MutableStateFlow<RankingPageUiState>(RankingPageUiState.Loading)
+    val rankingUiState: StateFlow<RankingPageUiState> = _rankingUiState
 
     // 새로고침 상태
     private val _isRefreshing = MutableStateFlow(false)
@@ -98,10 +108,14 @@ class CommunityPageViewModel @Inject constructor(
     private val _weeklyRankingList = MutableStateFlow<List<RankingBody>>(emptyList())
     val weeklyRankingList: StateFlow<List<RankingBody>> = _weeklyRankingList
 
-
     //조회된 전체 명예의 전당
     private val _allRankingList = MutableStateFlow<List<RankingBody>>(emptyList())
     val allRankingList: StateFlow<List<RankingBody>> = _allRankingList
+
+    //전체 명예의 전당에서 해당 유저의 게시물
+    private val _rankingUserPostList = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
+    val rankingUserPostList: StateFlow<PagingData<PostDetailBody>> = _rankingUserPostList
+    //lateinit var rankingUserPostList: Flow<PagingData<PostDetailBody>>
 
     //검색어
     private val _searchText = MutableStateFlow("")
@@ -292,15 +306,18 @@ class CommunityPageViewModel @Inject constructor(
     fun getWeeklyRanking(){
         if(weeklyRankingFlag.value == 0){
 
-            _uiState.value = CommunityPageUiState.Loading
+            _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
                 val result = getRankingUseCase.executeGetWeeklyRanking(authorId = auth.value)
                 result
                     .onSuccess {
                         _weeklyRankingList.value = data.body
-                        _uiState.value = CommunityPageUiState.Success("주간 명예의 전당 조회 완료")
+                        //_rankingUiState.value = RankingPageUiState.Success("주간 명예의 전당 조회 완료")
                         weeklyRankingFlag.value +=1
+
+                        getAllRanking()
+
                     }
                     .onError {
                         Log.e("onError", this.message())
@@ -317,7 +334,7 @@ class CommunityPageViewModel @Inject constructor(
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                        _rankingUiState.value = RankingPageUiState.Error("오류가 발생했습니다.")
                     }
             }
 
@@ -330,14 +347,14 @@ class CommunityPageViewModel @Inject constructor(
 
         if(allRankingFlag.value == 0){
 
-            _uiState.value = CommunityPageUiState.Loading
+            _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
                 val result = getRankingUseCase.executeGetAllRanking(authorId = auth.value)
                 result
                     .onSuccess {
                         _allRankingList.value = data.body
-                        _uiState.value = CommunityPageUiState.Success("전체 명예의 전당 조회 완료")
+                        _rankingUiState.value = RankingPageUiState.Success("명예의 전당 조회 완료")
                         allRankingFlag.value +=1
                     }
                     .onError {
@@ -355,10 +372,28 @@ class CommunityPageViewModel @Inject constructor(
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                        _rankingUiState.value = RankingPageUiState.Error("오류가 발생했습니다.")
                     }
             }
 
+
+        }
+
+    }
+
+    //명예의 전당 유저의 게시물 불러오기
+    fun getRankingUserPost(
+        keyword: String = "",
+        tags: String = "",
+        nickname: String
+    ) {
+        viewModelScope.launch {
+
+            searchPostUseCase.executeSearchPost(keyword, tags, nickname)
+                .collectLatest {
+                    _rankingUserPostList.value = it
+                }
+            Log.e("getRankingUserPost", "nickname : $nickname")
 
         }
 

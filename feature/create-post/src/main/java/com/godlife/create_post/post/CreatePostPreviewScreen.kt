@@ -18,11 +18,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -41,12 +40,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,18 +59,20 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.godlife.create_post.R
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.network.BuildConfig
 
 @Composable
 fun CreatePostPreviewScreen(
-    createPostViewModel: CreatePostViewModel,
+    viewModel: CreatePostViewModel,
     navController: NavController,
     modifier: Modifier = Modifier){
 
-    val imgUriList by createPostViewModel.selectedImgUri.collectAsState()
+    val imgUriList by viewModel.selectedImgUri.collectAsState()
 
     GodLifeTheme {
 
@@ -82,7 +85,8 @@ fun CreatePostPreviewScreen(
                 modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color.White),
+                    .background(Color.White)
+                    .statusBarsPadding(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "미리 보기", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
@@ -98,7 +102,7 @@ fun CreatePostPreviewScreen(
                 }
 
 
-                item { Content(createPostViewModel, navController) }
+                item { Content(viewModel, navController) }
 
             }
         }
@@ -109,9 +113,12 @@ fun CreatePostPreviewScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Content(
-    createPostViewModel: CreatePostViewModel,
+    viewModel: CreatePostViewModel,
     navController: NavController,
     modifier: Modifier = Modifier){
+    val userInfo by viewModel.userInfo.collectAsState()
+    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
     Column(
         modifier
             .fillMaxWidth()
@@ -122,27 +129,45 @@ fun Content(
                 .height(100.dp),
             verticalAlignment = Alignment.CenterVertically){
 
-            Box(
-                modifier
-                    .background(PurpleMain, shape = CircleShape)
-                    .size(70.dp))
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load(if(userInfo?.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo?.profileImage else R.drawable.category3)
+                .error(R.drawable.category3)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = modifier
+                        .clip(CircleShape)
+                        .size(50.dp)
+                )
+            }
 
             Spacer(modifier.size(10.dp))
 
             Column {
-                Text(text = "Nickname", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                Text(text = userInfo!!.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
-                Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
+                Text(text = userInfo!!.whoAmI, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp))
             }
         }
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = createPostViewModel.title.value, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
+        Text(text = viewModel.title.value, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = createPostViewModel.text.value, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Text(text = viewModel.text.value, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
         Spacer(modifier.size(20.dp))
 
@@ -156,9 +181,9 @@ fun Content(
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = "yyyy-mm-dd(게시물 올린 날짜,시간)", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        //Text(text = "yyyy-mm-dd(게시물 올린 날짜,시간)", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
 
-        Spacer(modifier.size(20.dp))
+        //Spacer(modifier.size(20.dp))
 
         RowButton2(navController)
 
@@ -384,7 +409,6 @@ fun RowButton2(navController: NavController){
         verticalAlignment = Alignment.CenterVertically){
         Box(
             Modifier
-                .weight(0.5f)
                 .fillMaxWidth()
                 .align(Alignment.CenterVertically)){
 
@@ -412,29 +436,7 @@ fun RowButton2(navController: NavController){
             }
         }
 
-        Box(
-            Modifier
-                .weight(0.5f)
-                .fillMaxWidth()
-                .align(Alignment.CenterVertically)){
 
-            Card(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                elevation = CardDefaults.cardElevation(7.dp),
-                colors = CardDefaults.cardColors(PurpleMain)
-            ) {
-                Text(
-                    text = "작성 완료",
-                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-        }
     }
 }
 

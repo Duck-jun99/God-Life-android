@@ -8,12 +8,17 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -26,6 +31,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -34,14 +40,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -74,6 +85,8 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
+import com.godlife.navigator.MainNavigator
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -82,18 +95,25 @@ import java.io.IOException
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CreatePostScreen(
-    createPostViewModel: CreatePostViewModel,
+    viewModel: CreatePostViewModel,
     createPostActivity: CreatePostActivity,
     navController: NavController,
+    mainNavigator: MainNavigator,
     modifier: Modifier = Modifier
 ){
+    val uiState by viewModel.uiState.collectAsState()
+    Log.e("CreatePostScreen", uiState.toString())
+
+    viewModel.getUserInfo()
 
     val context = LocalContext.current
 
-    val selectedImgList by createPostViewModel.selectedImgUri.collectAsState()
+    val selectedImgList by viewModel.selectedImgUri.collectAsState()
 
-    val title by remember { createPostViewModel.title }
-    val text by remember { createPostViewModel.text }
+    val title by remember { viewModel.title }
+    val text by remember { viewModel.text }
+
+    var isDialogVisble by remember { mutableStateOf(false) }
 
 
     // 갤러리에서 사진 가져오기
@@ -104,7 +124,7 @@ fun CreatePostScreen(
             var resizeUri = convertResizeImage(uri, context)
 
             if (resizeUri != null) {
-                createPostViewModel.saveImg(resizeUri)
+                viewModel.saveImg(resizeUri)
 
                 val file = File(resizeUri.path)
                 Log.e("이미지 사이즈", file.length().toString())
@@ -113,253 +133,334 @@ fun CreatePostScreen(
 
     }
 
-    Column(
-        modifier
+    Box(
+        modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
-    ) {
+    ){
 
-        Box(
-            modifier
-                .fillMaxWidth()
-                .height(70.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
-        }
+        if(uiState == CreatePostUiState.Loading ||
+            uiState == CreatePostUiState.Init ||
+            uiState == CreatePostUiState.SendLoading){
 
-        LazyColumn(
-            modifier.padding(20.dp)
-        ) {
-
-            item{
-                Text(text = "제목", style = GodLifeTypography.titleMedium)
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(vertical = 10.dp),
-                    thickness = 2.dp,
-                    color = GrayWhite2
-                )
-            }
-
-
-            item{
+            Column(
+                modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+            ) {
 
                 Box(
                     modifier
-                        .padding(10.dp)
-                        .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
-                        .padding(5.dp)
-                ){
-
-                    GodLifeTextFieldGray(
-                        text = title,
-                        onTextChanged = { createPostViewModel.updateTitle(it) },
-                        hint = "제목을 입력해주세요.",
-                        singleLine = true
-                    )
-
-                }
-
-                Text(
-                    modifier = modifier
-                        .fillMaxWidth(),
-                    text = "${title.length}/30",
-                    style = TextStyle(
-                        color = GrayWhite,
-                        fontSize = 12.sp
-                    ),
-                    textAlign = TextAlign.End
-                )
-
-
-                Spacer(modifier.padding(10.dp))
-            }
-
-            item{
-                Text(text = "내용", style = GodLifeTypography.titleMedium)
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(vertical = 10.dp),
-                    thickness = 2.dp,
-                    color = GrayWhite2
-                )
-            }
-
-            item{
-
-                Box(
-                    modifier
-                        .padding(10.dp)
-                        .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
-                        .heightIn(min = 200.dp)
-                        .padding(5.dp)
-                ){
-
-                    GodLifeTextFieldGray(
-                        text = text,
-                        onTextChanged = { createPostViewModel.updateText(it) },
-                        hint = "내용을 입력해주세요.\n달성한 투두리스트에 대해 설명해주시면 좋아요.",
-                        singleLine = false
-                    )
-
-                }
-
-                Text(
-                    modifier = modifier
-                        .fillMaxWidth(),
-                    text = "${text.length}/1000",
-                    style = TextStyle(
-                        color = GrayWhite,
-                        fontSize = 12.sp
-                    ),
-                    textAlign = TextAlign.End
-                )
-
-
-                Spacer(modifier.padding(10.dp))
-            }
-
-
-            item{
-                Text(text = "투두 목록", style = GodLifeTypography.titleMedium)
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(vertical = 10.dp),
-                    thickness = 2.dp,
-                    color = GrayWhite2
-                )
-            }
-
-
-            item{
-                FlowRow {
-                    TagItemPreview()
-                    TagItemPreview()
-                    TagItemPreview()
-                    TagItemPreview()
-                    TagItemPreview()
-                }
-            }
-
-            item{ Spacer(modifier.padding(10.dp)) }
-
-            //item{ Text(text = "이미지", style = GodLifeTypography.titleMedium) }
-
-            item{
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .height(70.dp)
+                        .statusBarsPadding(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Text(text = "이미지", style = GodLifeTypography.titleMedium)
+                    Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                }
+
+                LazyColumn(
+                    modifier.padding(20.dp)
+                ) {
+
+                    item{
+                        Text(text = "제목", style = GodLifeTypography.titleMedium)
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .padding(vertical = 10.dp),
+                            thickness = 2.dp,
+                            color = GrayWhite2
+                        )
                     }
 
-                    Spacer(modifier = Modifier.size(20.dp))
 
-                    AddButton(
-                        onClick = { launcher.launch("image/*") }
-                    )
-                }
-            }
+                    item{
 
-            item{
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(vertical = 10.dp),
-                    thickness = 2.dp,
-                    color = GrayWhite2
-                )
-            }
+                        Box(
+                            modifier
+                                .padding(10.dp)
+                                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                                .padding(5.dp)
+                        ){
 
-            item{
-                LazyRow {
-                    selectedImgList?.let {
-                        itemsIndexed(it){ index, item ->
-                            Log.e("fbjkkjhsad",index.toString())
-                            SelectImage(index, item, LocalContext.current, createPostViewModel)
+                            GodLifeTextFieldGray(
+                                text = title,
+                                onTextChanged = { viewModel.updateTitle(it) },
+                                hint = "제목을 입력해주세요.",
+                                singleLine = true
+                            )
+
+                        }
+
+                        Text(
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            text = "${title.length}/30",
+                            style = TextStyle(
+                                color = GrayWhite,
+                                fontSize = 12.sp
+                            ),
+                            textAlign = TextAlign.End
+                        )
+
+
+                        Spacer(modifier.padding(10.dp))
+                    }
+
+                    item{
+                        Text(text = "내용", style = GodLifeTypography.titleMedium)
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .padding(vertical = 10.dp),
+                            thickness = 2.dp,
+                            color = GrayWhite2
+                        )
+                    }
+
+                    item{
+
+                        Box(
+                            modifier
+                                .padding(10.dp)
+                                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                                .heightIn(min = 200.dp)
+                                .padding(5.dp)
+                        ){
+
+                            GodLifeTextFieldGray(
+                                text = text,
+                                onTextChanged = { viewModel.updateText(it) },
+                                hint = "내용을 입력해주세요.\n달성한 투두리스트에 대해 설명해주시면 좋아요.",
+                                singleLine = false
+                            )
+
+                        }
+
+                        Text(
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            text = "${text.length}/1000",
+                            style = TextStyle(
+                                color = GrayWhite,
+                                fontSize = 12.sp
+                            ),
+                            textAlign = TextAlign.End
+                        )
+
+
+                        Spacer(modifier.padding(10.dp))
+                    }
+
+
+                    item{
+                        Text(text = "투두 목록", style = GodLifeTypography.titleMedium)
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .padding(vertical = 10.dp),
+                            thickness = 2.dp,
+                            color = GrayWhite2
+                        )
+                    }
+
+
+                    item{
+                        FlowRow {
+                            TagItemPreview()
+                            TagItemPreview()
+                            TagItemPreview()
+                            TagItemPreview()
+                            TagItemPreview()
                         }
                     }
 
+                    item{ Spacer(modifier.padding(10.dp)) }
+
+                    //item{ Text(text = "이미지", style = GodLifeTypography.titleMedium) }
+
+                    item{
+
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                        ) {
+                            Box(
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            ) {
+                                Text(text = "이미지", style = GodLifeTypography.titleMedium)
+                            }
+
+                            Spacer(modifier = Modifier.size(20.dp))
+
+                            AddButton(
+                                onClick = { launcher.launch("image/*") }
+                            )
+                        }
+                    }
+
+                    item{
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .padding(vertical = 10.dp),
+                            thickness = 2.dp,
+                            color = GrayWhite2
+                        )
+                    }
+
+                    item{
+                        LazyRow {
+                            selectedImgList?.let {
+                                itemsIndexed(it){ index, item ->
+                                    Log.e("fbjkkjhsad",index.toString())
+                                    SelectImage(index, item, LocalContext.current, viewModel)
+                                }
+                            }
+
+                        }
+                    }
+
+                    item{ Spacer(modifier.padding(10.dp)) }
+
+                    item{ Text(text = "- 첫 번째 이미지는 대표 이미지로 설정돼요.", style = GodLifeTypography.bodySmall) }
+                    item{ Text(text = "- 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
+
+                    item{ Spacer(modifier.padding(10.dp)) }
+
+                    item{ Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically){
+                        Box(
+                            Modifier
+                                .weight(0.5f)
+                                .fillMaxWidth()
+                                .align(Alignment.CenterVertically)){
+
+                            Card(
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        navController.navigate("CreatePostPreviewScreen") {
+                                            launchSingleTop = true
+                                        }
+                                    },
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = CardDefaults.cardElevation(7.dp),
+                                colors = CardDefaults.cardColors(Color.White)
+                            ) {
+                                Text(
+                                    text = "미리 보기",
+                                    color = PurpleMain,
+                                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                                    modifier = Modifier
+                                        .padding(20.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+                        }
+
+                        Box(
+                            Modifier
+                                .weight(0.5f)
+                                .fillMaxWidth()
+                                .align(Alignment.CenterVertically)){
+
+                            Card(
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        if( title == "" || text == "") Toast.makeText(context, "제목과 내용을 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+                                        else isDialogVisble = !isDialogVisble
+                                    },
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = CardDefaults.cardElevation(7.dp),
+                                colors = CardDefaults.cardColors(PurpleMain)
+                            ) {
+                                Text(
+                                    text = "작성 완료",
+                                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
+                                    modifier = Modifier
+                                        .padding(20.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+                        }
+                    } }
+
                 }
+
+
             }
 
-            item{ Spacer(modifier.padding(10.dp)) }
+            if(isDialogVisble){
+                AlertDialog(
+                    onDismissRequest = { isDialogVisble = !isDialogVisble },
+                    title = {
+                        Text(text = "게시물 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                    },
+                    text = {
+                        Text(text = "굿생 인증 게시물을 올리시면 모든 사용자가 확인 가능해요!", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+                    },
+                    confirmButton = {
+                        GodLifeButtonWhite(
+                            onClick = {
 
-            item{ Text(text = "- 첫 번째 이미지는 대표 이미지로 설정돼요.", style = GodLifeTypography.bodySmall) }
-            item{ Text(text = "- 이미지는 최대 5장까지 올릴 수 있어요.", style = GodLifeTypography.bodySmall) }
+                                viewModel.createPost()
 
-            item{ Spacer(modifier.padding(10.dp)) }
+                                isDialogVisble = !isDialogVisble
 
-            item{ Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically){
-                Box(
-                    Modifier
-                        .weight(0.5f)
-                        .fillMaxWidth()
-                        .align(Alignment.CenterVertically)){
-
-                    Card(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth()
-                            .clickable {
-                                navController.navigate("CreatePostPreviewScreen"){
-                                    launchSingleTop = true
-                                }
-                                       },
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = CardDefaults.cardElevation(7.dp),
-                        colors = CardDefaults.cardColors(Color.White)
-                    ) {
-                        Text(
-                            text = "미리 보기",
-                            color = PurpleMain,
-                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                            modifier = Modifier
-                                .padding(20.dp)
-                                .align(Alignment.CenterHorizontally)
+                            },
+                            text = { Text(text = "게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                        )
+                    },
+                    dismissButton = {
+                        GodLifeButtonWhite(
+                            onClick = { isDialogVisble = !isDialogVisble },
+                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
-                }
-
-                Box(
-                    Modifier
-                        .weight(0.5f)
-                        .fillMaxWidth()
-                        .align(Alignment.CenterVertically)){
-
-                    Card(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth()
-                            .clickable { createPostViewModel.createPost() },
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = CardDefaults.cardElevation(7.dp),
-                        colors = CardDefaults.cardColors(PurpleMain)
-                    ) {
-                        Text(
-                            text = "작성 완료",
-                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                            modifier = Modifier
-                                .padding(20.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-            } }
+                )
+            }
 
         }
+
+        
+
+        when(uiState){
+            is CreatePostUiState.Loading -> {
+                CreatePostLoadingScreen()
+            }
+            is CreatePostUiState.Init -> {
+
+            }
+            is CreatePostUiState.SendLoading -> {
+                CreatePostSendLoadingScreen()
+            }
+            is CreatePostUiState.Success -> {
+
+                CreatePostSuccessScreen(
+                    createPostActivity = createPostActivity,
+                    viewModel = viewModel,
+                    mainNavigator = mainNavigator
+                )
+            }
+            is CreatePostUiState.Error -> {
+                CreatePostErrorScreen(
+                    createPostActivity = createPostActivity,
+                    viewModel = viewModel,
+                    mainNavigator = mainNavigator
+                )
+            }
+
+        }
+
     }
+
+
 }
 
 @Composable
@@ -396,7 +497,7 @@ fun SelectImage(
     Box(modifier = Modifier
         .padding(end = 10.dp)
         .size(150.dp)
-        .border(width = 5.dp, color = if(index == 0) Color.Yellow else Color.White)
+        .border(width = 5.dp, color = if (index == 0) Color.Yellow else Color.White)
     ) {
 
         //Image 부분
@@ -440,6 +541,137 @@ fun SelectImage(
                 tint = Color.White
             )
         }
+    }
+}
+
+@Composable
+fun CreatePostSuccessScreen(
+    modifier: Modifier = Modifier,
+    viewModel: CreatePostViewModel,
+    createPostActivity: CreatePostActivity,
+    mainNavigator: MainNavigator
+){
+    val userInfo = viewModel.userInfo.collectAsState()
+    val godLifeScore = userInfo.value!!.godLifeScore
+
+    // 애니메이션을 위한 상태 변수
+    var animationPlayed by remember { mutableStateOf(false) }
+    val score by animateIntAsState(
+        targetValue = if (animationPlayed) godLifeScore+2 else 0,
+        animationSpec = tween(
+            durationMillis = 2000, // 애니메이션 지속 시간 (2초)
+            easing = LinearEasing
+        )
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.ThumbUp,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "${score}점",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "굿생 인증이 완료되었어요.\n오늘도 고생하셨어요!",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { mainNavigator.navigateFrom(activity = createPostActivity, withFinish = true) },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
+    }
+}
+
+@Composable
+fun CreatePostErrorScreen(
+    modifier: Modifier = Modifier,
+    viewModel: CreatePostViewModel,
+    createPostActivity: CreatePostActivity,
+    mainNavigator: MainNavigator
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.Warning,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "에러 메시지: ",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { mainNavigator.navigateFrom(activity = createPostActivity, withFinish = true) },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
     }
 }
 
@@ -808,5 +1040,171 @@ fun RowButton(){
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun CreatePostLoadingScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "유저님의 정보를 받아오고 있어요.", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
+
+@Preview
+@Composable
+fun CreatePostSendLoadingScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "게시물을 등록하는 중이에요.\n잠시만 기다려주세요!", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
+
+@Preview
+@Composable
+fun CreatePostErrorScreenPreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.Warning,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "에러 메시지: ",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
+    }
+}
+
+@Preview
+@Composable
+fun CreatePostSuccessScreenPreview(
+    modifier: Modifier = Modifier
+){
+
+    // 애니메이션을 위한 상태 변수
+    var animationPlayed by remember { mutableStateOf(false) }
+    val score by animateIntAsState(
+        targetValue = if (animationPlayed) 502 else 500,
+        animationSpec = tween(
+            durationMillis = 1000, // 애니메이션 지속 시간 (2초)
+            easing = LinearEasing
+        )
+    )
+
+    // 컴포지션이 완료되면 애니메이션 시작
+    LaunchedEffect(key1 = true) {
+        animationPlayed = true
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.ThumbUp,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "${score}점",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "굿생 인증이 완료되었어요.\n오늘도 고생하셨어요!",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
     }
 }

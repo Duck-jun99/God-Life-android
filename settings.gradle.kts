@@ -40,3 +40,6 @@ include(
 
     ":feature:navigator"
 )
+
+// If the project has build-logic module.
+gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:testClasses"))

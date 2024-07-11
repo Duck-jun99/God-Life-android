@@ -445,7 +445,10 @@ fun CommunityPageView(
             viewModel.changeCurrentRoute(route = RankingRoute.route)
             viewModel.getWeeklyRanking()
             viewModel.getAllRanking()
-            RankingScreen(navController = navController, viewModel = viewModel)
+            RankingScreen(
+                navController = navController,
+                parentNavController = parentNavController,
+                viewModel = viewModel)
 
         }
 
