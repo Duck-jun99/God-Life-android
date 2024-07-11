@@ -155,7 +155,7 @@ fun CreatePostScreen(
                         .statusBarsPadding(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "게시물 작성", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                    Text(text = "굿생 인증하기", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold))
                 }
 
                 LazyColumn(
@@ -401,10 +401,17 @@ fun CreatePostScreen(
                     containerColor = Color.White,
                     onDismissRequest = { isDialogVisble = !isDialogVisble },
                     title = {
-                        Text(text = "게시물 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "게시물을 게시할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
-                        Text(text = "굿생 인증 게시물을 올리시면 모든 사용자가 확인 가능해요!", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+                        Text(text = "아래의 내용을 꼭 확인해주세요!\n\n" +
+                                "  굿생 점수 2점을 획득하실 수 있어요.\n" +
+                                "  추후 해당 게시물 삭제 시 1점이 차감됩니다.\n" +
+                                "  해당 게시물은 굿생 서비스를 이용하는 누구나 볼 수 있어요.\n" +
+                                "  모니터링 또는 신고를 당하실 경우 서비스 이용에 제한이 있을 수 있어요.\n\n" +
+                                "위 내용을 모두 확인하셨으면 '게시하기' 버튼을 눌러주세요."
+                                ,
+                            style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
                     },
                     confirmButton = {
                         GodLifeButtonWhite(
@@ -564,6 +571,11 @@ fun CreatePostSuccessScreen(
             easing = LinearEasing
         )
     )
+
+    // 컴포지션이 완료되면 애니메이션 시작
+    LaunchedEffect(key1 = true) {
+        animationPlayed = true
+    }
 
     Column(
         modifier = modifier
