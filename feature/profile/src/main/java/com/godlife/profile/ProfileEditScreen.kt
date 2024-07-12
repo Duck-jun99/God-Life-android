@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
@@ -73,8 +74,11 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextField
+import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.profile.navigation.ProfileScreenRoute
@@ -434,6 +438,7 @@ fun ProfileEditBox(
         //소개글 수정 뷰
         if(showIntroduceChangeViewState){
             EditIntroduceBox(viewModel = viewModel)
+
         }
 
     }
@@ -534,62 +539,43 @@ fun EditIntroduceBox(
 
     var text by remember { mutableStateOf(introduce) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xCB000000))
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "소개글 수정하기", style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-
-        Spacer(modifier = modifier.size(20.dp))
-
-        GodLifeTextField(
-            text = text,
-            onTextChanged = { text = it }
-        )
-
-        Spacer(modifier = modifier.size(20.dp))
-
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-        ) {
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { viewModel.updateShowIntroduceChangeViewState() },
+        title = {
+            Text(text = "소개글 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        },
+        text = {
+            Box(
+                modifier
+                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                    .padding(5.dp)
             ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = {
-                        viewModel.updateIntroduce(text)
-                        viewModel.updateShowIntroduceChangeViewState()
-                              },
-                    text = {
-                        Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
+                GodLifeTextFieldGray(
+                    text = text,
+                    hint = "소개글을 입력해주세요.",
+                    onTextChanged = { text = it }
                 )
             }
 
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
-            ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = { viewModel.updateShowIntroduceChangeViewState() },
-                    text = {
-                        Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
-                )
-            }
+        },
+        confirmButton = {
+            GodLifeButtonWhite(
+                onClick = {
+                    viewModel.updateIntroduce(text)
+                    viewModel.updateShowIntroduceChangeViewState()
+                          },
+                text = { Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        },
+        dismissButton = {
+            GodLifeButtonWhite(
+                onClick = { viewModel.updateShowIntroduceChangeViewState() },
+                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
         }
-    }
+    )
+
 }
 
 @Composable
@@ -994,58 +980,42 @@ fun EditOptionBoxPreview(modifier: Modifier = Modifier){
 @Preview
 @Composable
 fun EditIntroduceBoxPreview(modifier: Modifier = Modifier){
-    val text = "Hello World!"
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(OpaqueDark)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "소개글 수정하기", style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+    val text = ""
 
-        Spacer(modifier = modifier.size(20.dp))
-
-        GodLifeTextField(text = text, onTextChanged = { it -> text } )
-
-        Spacer(modifier = modifier.size(20.dp))
-
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-        ) {
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = {  },
+        title = {
+            Text(text = "소개글 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        },
+        text = {
+            Box(
+                modifier
+                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                    .padding(5.dp)
             ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = { /*TODO*/ },
-                    text = {
-                        Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
+                GodLifeTextFieldGray(
+                    text = text,
+                    hint = "소개글을 입력해주세요.",
+                    onTextChanged = {  }
                 )
             }
 
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
-            ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = { /*TODO*/ },
-                    text = {
-                        Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
-                )
-            }
+        },
+        confirmButton = {
+            GodLifeButtonWhite(
+                onClick = {
+                },
+                text = { Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        },
+        dismissButton = {
+            GodLifeButtonWhite(
+                onClick = {  },
+                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
         }
-
-    }
+    )
 }
 
 @Preview
