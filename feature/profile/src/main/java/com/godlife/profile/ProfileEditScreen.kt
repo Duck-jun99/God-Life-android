@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,26 +77,30 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.profile.navigation.ProfileScreenRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-
 @Composable
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    snackbarHostState: SnackbarHostState,
     viewModel: ProfileEditViewModel = hiltViewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
     val selectedImageType by viewModel.selectedImageType.collectAsState()
+    val userId by viewModel.userId.collectAsState()
 
     val context = LocalContext.current
 
-    Log.e("ProfileEditScreen", "uiState : ${uiState.toString()}")
+    Log.e("ProfileEditScreen", "uiState : $uiState")
+    val workList by viewModel.workList.collectAsState()
+    Log.e("ProfileEditBox", "workList : $workList")
 
     //갤러리에서 사진 가져오기
     val launcher = rememberLauncherForActivityResult(contract =
@@ -120,6 +125,58 @@ fun ProfileEditScreen(
 
     }
 
+    Box(
+
+    ){
+
+        if(uiState !is ProfileEditUiState.Error)
+        {
+            ProfileEditBox(
+                viewModel = viewModel,
+                launcher = launcher
+            )
+        }
+
+        when(uiState){
+            is ProfileEditUiState.Loading -> {
+                ProfileEditLoadingScreen()
+            }
+            is ProfileEditUiState.Init -> {
+
+            }
+            is ProfileEditUiState.SendLoading -> {
+                ProfileEditSendLoadingScreen()
+            }
+            is ProfileEditUiState.Success -> {
+
+                ProfileEditSuccessScreen()
+
+                LaunchedEffect(true) {
+                    snackbarHostState.showSnackbar(message = (uiState as ProfileEditUiState.Success).data)
+                    delay(1000L)
+
+                    navController.popBackStack()
+
+                    /*
+                    navController.navigate("${ProfileScreenRoute.route}/${userId}"){
+                        popUpTo(ProfileScreenRoute.route)
+                        launchSingleTop = true
+                    }
+
+                     */
+
+                }
+
+            }
+            is ProfileEditUiState.Error -> {
+                ProfileEditErrorScreen(viewModel = viewModel, navController = navController)
+            }
+        }
+
+    }
+
+    /*
+
     GodLifeTheme {
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
@@ -142,7 +199,7 @@ fun ProfileEditScreen(
                 }
 
                 is ProfileEditUiState.Success -> {
-                    ProfileEditBox(innerPadding = innerPadding, viewModel = viewModel, launcher = launcher)
+                    ProfileEditBox(viewModel = viewModel, launcher = launcher)
                 }
                 is ProfileEditUiState.Error -> {
                     /* TODO */
@@ -164,6 +221,7 @@ fun ProfileEditScreen(
             }
         }
     }
+    */
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -172,21 +230,11 @@ fun ProfileEditBox(
     modifier: Modifier = Modifier,
     viewModel: ProfileEditViewModel,
     launcher: ManagedActivityResultLauncher<String, Uri?>,
-    innerPadding: PaddingValues = PaddingValues(10.dp),
-    navController: NavController? = null
 ){
 
     LaunchedEffect(Unit) {
         
     }
-
-    val profileChangeState by viewModel.profileChangeState.collectAsState()
-    val backgroundChangeState by viewModel.backgroundChangeState.collectAsState()
-    val introduceChangeState by viewModel.introduceChangeState.collectAsState()
-
-    Log.e("ProfileEditBox", "profileChangeState : $profileChangeState")
-    Log.e("ProfileEditBox", "backgroundChangeState : $backgroundChangeState")
-    Log.e("ProfileEditBox", "introduceChangeState : $introduceChangeState")
 
     val profileImg by viewModel.profileImage.collectAsState()
     val backgroundImg by viewModel.backgroundImage.collectAsState()
@@ -497,7 +545,10 @@ fun EditIntroduceBox(
 
         Spacer(modifier = modifier.size(20.dp))
 
-        GodLifeTextField(text = text, onTextChanged = { text = it } )
+        GodLifeTextField(
+            text = text,
+            onTextChanged = { text = it }
+        )
 
         Spacer(modifier = modifier.size(20.dp))
 
@@ -538,6 +589,67 @@ fun EditIntroduceBox(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ProfileEditErrorScreen(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileEditViewModel,
+    navController: NavController
+){
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.Warning,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "에러 메시지: ${(uiState as ProfileEditUiState.Error).message}",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { navController.popBackStack() },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
     }
 }
 
@@ -969,5 +1081,80 @@ fun ProfileEditSendLoadingScreen(
         CircularProgressIndicator(color = Color.White)
         Spacer(modifier.size(10.dp))
         Text(text = "변경사항을 적용중이에요.\n잠시만 기다려주세요!", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
+
+@Preview
+@Composable
+fun ProfileEditSuccessScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "프로필 변경이 완료되었어요!\n잠시뒤 이전 화면으로 이동합니다.", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
+
+@Preview
+@Composable
+fun ProfileEditErrorScreenPreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.Warning,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "에러 메시지: ",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
     }
 }

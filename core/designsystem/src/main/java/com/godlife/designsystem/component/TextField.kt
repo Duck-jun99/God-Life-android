@@ -51,25 +51,45 @@ fun GodLifeTextField(
     onTextChanged: (String) -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    hint: String = "",
+    singleLine: Boolean = false,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     BasicTextField(
         value = text,
-        onValueChange = onTextChanged,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        decorationBox = {
-
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp)) {
-                Text(text = text, style = TextStyle(
-                    color = Color.White,
-                    fontSize = 20.sp
-                )
-                )
-                Divider(modifier = Modifier.fillMaxWidth(), color = Color.White)
+        onValueChange = { newText ->
+            if(singleLine){
+                // 줄바꿈 문자를 제거하고 한 줄로 제한합니다.
+                val singleLineText = newText.replace("\n", "")
+                onTextChanged(singleLineText)
+            }
+            else{
+                onTextChanged(newText)
             }
 
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = if(singleLine) KeyboardActions(onDone = { keyboardController?.hide() }) else KeyboardActions.Default,
+        cursorBrush = SolidColor(Color.White),
+        singleLine = singleLine,
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ) {
+                innerTextField()
+                if (text.isEmpty()) {
+                    Text(
+                        text = hint,
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = 15.sp
+                        )
+                    )
+                }
+            }
         }
     )
 }
@@ -97,8 +117,8 @@ fun GodLifeTextFieldGray(
             }
 
         },
-        keyboardOptions = keyboardOptions,
-        keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+        keyboardOptions = if(singleLine)keyboardOptions else KeyboardOptions.Default,
+        keyboardActions = if(singleLine) KeyboardActions(onDone = { keyboardController?.hide() }) else KeyboardActions.Default,
         cursorBrush = SolidColor(Color.Black),
         singleLine = singleLine,
         decorationBox = { innerTextField ->

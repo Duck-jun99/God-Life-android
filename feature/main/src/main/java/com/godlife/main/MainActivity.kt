@@ -209,7 +209,10 @@ fun MainUiTheme(
 
                     //프로필 수정 화면
                     composable(ProfileEditScreenRoute.route){
-                        ProfileEditScreen(navController = navController)
+                        ProfileEditScreen(
+                            navController = navController,
+                            snackbarHostState = snackBarHostState
+                        )
                         currentRoute.value = ProfileEditScreenRoute.route
                         bottomBarVisibleState.value = false
                     }
