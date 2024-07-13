@@ -2,15 +2,18 @@ package com.godlife.community_page.post_detail
 
 import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.DeleteCommentUseCase
+import com.godlife.domain.DeletePostUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.UpdatePostUseCase
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailQuery
 import com.skydoves.sandwich.message
@@ -26,14 +29,28 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class PostDetailUiState {
-    object Loading : PostDetailUiState()
+
+    //게시물 정보 불러오는 중 or API 통신 결과 기다리는 중
+    data class Loading(val type: LoadingType) : PostDetailUiState()
+
+    //게시물 정보 불러오기 성공 or API 통신 성공 (Delete 제외)
     data class Success(val data: String) : PostDetailUiState()
+
+    // 게시물 삭제 성공
+    object DeleteSuccess: PostDetailUiState()
+
+    //게시물 정보 불러오기 실패 or API 통신 실패
     data class Error(val message: String) : PostDetailUiState()
+}
+
+enum class LoadingType {
+    POST, DELETE
 }
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
+    private val deletePostUseCase: DeletePostUseCase,
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
@@ -48,7 +65,7 @@ class PostDetailViewModel @Inject constructor(
      */
 
     // 전체 UI 상태
-    private val _uiState = MutableStateFlow<PostDetailUiState>(PostDetailUiState.Loading)
+    private val _uiState = MutableStateFlow<PostDetailUiState>(PostDetailUiState.Loading(type = LoadingType.POST))
     val uiState: StateFlow<PostDetailUiState> = _uiState
 
     /**
@@ -73,11 +90,15 @@ class PostDetailViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
+
     //게시물 정보 가져왔는지 플래그
     private var isGetPostDetail = mutableIntStateOf(0)
 
     //게시물 댓글 가져왔는지 플래그
     private var isGetComments = mutableIntStateOf(0)
+
+    //게시물 삭제 성공 플래그
+    private var isDeletePost = mutableStateOf(false)
 
 
     //게시물 ID 초기화 및 게시물 정보 불러오기
@@ -97,6 +118,25 @@ class PostDetailViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun deletePost(){
+        if(!isDeletePost.value){
+            viewModelScope.launch {
+                val result = deletePostUseCase.executeDeletePost(auth.value, postId.value)
+                result
+                    .onSuccess {
+                        _uiState.value = PostDetailUiState.DeleteSuccess
+                        isDeletePost.value = true
+                    }
+                    .onError {
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
+                    .onException {
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
+            }
+        }
     }
 
     //해당 게시물 작성자 프로필 정보, 이미지, 내용 초기화 (성공 시 initComments 호출 -> initComments까지 성공적으로 되면 Ui State Success로 변경)
@@ -125,13 +165,17 @@ class PostDetailViewModel @Inject constructor(
                             reIssueRefreshToken(callback = { initPostDetail() })
 
                         }
+                        else {
+                            // UI State Error로 변경
+                            _uiState.value = PostDetailUiState.Error(this.message())
+                        }
                     }
                     .onException {
 
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = PostDetailUiState.Error(this.message())
 
                     }
 
@@ -169,13 +213,17 @@ class PostDetailViewModel @Inject constructor(
                             reIssueRefreshToken(callback = { initComments() })
 
                         }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = PostDetailUiState.Error(this.message())
+                        }
                     }
                     .onException {
 
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = PostDetailUiState.Error(this.message())
 
                     }
             }
@@ -218,13 +266,17 @@ class PostDetailViewModel @Inject constructor(
                         reIssueRefreshToken(callback = { createComment() })
 
                     }
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
                 }
                 .onException {
 
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
                 }
 
         }
@@ -256,13 +308,17 @@ class PostDetailViewModel @Inject constructor(
                         reIssueRefreshToken(callback = { deleteComment(commentId) })
 
                     }
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
                 }
                 .onException {
 
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
                 }
 
         }
@@ -295,18 +351,23 @@ class PostDetailViewModel @Inject constructor(
                         reIssueRefreshToken(callback = { agreeGodLife() })
 
                     }
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
                 }
                 .onException {
 
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
                 }
 
         }
 
     }
+
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){
@@ -345,7 +406,7 @@ class PostDetailViewModel @Inject constructor(
                     else{
 
                         // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = PostDetailUiState.Error(this.message())
                     }
 
                 }
@@ -353,7 +414,7 @@ class PostDetailViewModel @Inject constructor(
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
 
                 }
 

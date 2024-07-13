@@ -15,7 +15,7 @@ class NetworkRepositoryModule {
 
     @Provides
     @Singleton
-    fun provideNotionRepository(
+    fun provideNetworkRepository(
         networkDataSourceImpl: NetworkDataSourceImpl
     ): NetworkRepository {
         return NetworkRepositoryImpl(

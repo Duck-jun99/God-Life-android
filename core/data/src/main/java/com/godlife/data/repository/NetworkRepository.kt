@@ -5,6 +5,7 @@ import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
@@ -23,7 +24,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 
 interface NetworkRepository {
@@ -50,11 +51,15 @@ interface NetworkRepository {
 
     suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
 
-    suspend fun imageUpload(
+    suspend fun profileImageUpload(
         authorization: String,
-        imageType: String,
         image: Uri
-    ): ApiResponse<ImageUploadQuery>
+    ):ApiResponse<ImageUploadQuery>
+
+    suspend fun backgroundImageUpload(
+        authorization: String,
+        image: Uri
+    ):ApiResponse<ImageUploadQuery>
 
     suspend fun updateIntroduce(
         authorization: String,
@@ -68,6 +73,28 @@ interface NetworkRepository {
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery>
+
+    suspend fun updatePost(
+        authorization: String,
+        postId: String,
+        title: String,
+        content: String,
+        categoryType: String,
+        tags: List<String>,
+        imagePath: List<Uri>?
+    ): ApiResponse<PostQuery>
+
+    suspend fun deletePost(
+        authorization: String,
+        postId: String
+    ): ApiResponse<DeletePostQuery>
+
+    suspend fun getLatestPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String
+    ): ApiResponse<LatestPostQuery>
 
     /*
     suspend fun getLatestPost(
@@ -124,7 +151,11 @@ interface NetworkRepository {
 
     suspend fun getWeeklyFamousMembers(
         authorization: String
-    ): ApiResponse<WeeklyRankingQuery>
+    ): ApiResponse<RankingQuery>
+
+    suspend fun getAllFamousMembers(
+        authorization: String
+    ): ApiResponse<RankingQuery>
 
     suspend fun postNotificationTime(
         authorization: String,

@@ -263,6 +263,7 @@ fun CreateStimulusPostContent(
 
         if(dialogVisible.value){
             AlertDialog(
+                containerColor = Color.White,
                 onDismissRequest = { dialogVisible.value = !dialogVisible.value },
                 title = {
                     Text(text = "글을 게시할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))

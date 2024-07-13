@@ -8,9 +8,7 @@ import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
-import com.godlife.model.todo.NotificationTimeData
 import com.godlife.model.todo.TodoList
-import com.godlife.model.todo.TodoTimeData
 import com.godlife.network.model.UserInfoBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -21,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -66,16 +63,22 @@ class MainPageViewModel @Inject constructor(
     private val _todayTodoListExists = MutableStateFlow<Boolean>(false)
     val todayTodoListExists: StateFlow<Boolean> = _todayTodoListExists
 
+    // 오늘 투두리스트 불러온 플래그
+    val getTodayTodoListFlag = MutableStateFlow<Boolean>(false)
+
     // 유저 정보 불러온 상태
     private val _userInfoExists = MutableStateFlow<Boolean>(false)
     val userInfoExists: StateFlow<Boolean> = _userInfoExists
+
+    //AlertDialog 상태
+    val showAlertDialog = MutableStateFlow<Boolean>(false)
 
     /**
      * 변수 관련
      */
 
     // 유저 정보 초기화
-    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", ""))
+    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", 0, ""))
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     // 오늘 투두리스트
@@ -90,10 +93,13 @@ class MainPageViewModel @Inject constructor(
     private val _todayTodoListSize = MutableStateFlow<Int>(0)
     val todayTodoListSize: StateFlow<Int> = _todayTodoListSize
 
-
     //완료한 투두리스트 사이즈
     private val _completedTodoListSize = MutableStateFlow<Int>(0)
     val completedTodoListSize: StateFlow<Int> = _completedTodoListSize
+
+    //현재 선택한 투두 리스트 이름
+    private val _selectedTodo = MutableStateFlow<TodoList>(TodoList(""))
+    val selectedTodo: StateFlow<TodoList> = _selectedTodo
 
 
 
@@ -131,49 +137,33 @@ class MainPageViewModel @Inject constructor(
     //오늘 설정한 투두 리스트를 로컬 데이터베이스에서 가져오기
     private fun getTodayTodoList(){
 
-        viewModelScope.launch(Dispatchers.IO) {
-            _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
+        _completedTodoListSize.value = 0
 
-            if(todayTodoList.value!=null){
-                _todayTodoListExists.value = true
+        if(!getTodayTodoListFlag.value){
 
-                _todayTodoListSize.value = todayTodoList.value!!.todoList.size
+            viewModelScope.launch(Dispatchers.IO) {
+                _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
 
-                todayTodoList.value!!.todoList.forEach {
-                    if(it.iscompleted){
-                        _completedTodoListSize.value += 1
+                if(todayTodoList.value!=null){
+                    _todayTodoListExists.value = true
+
+                    _todayTodoListSize.value = todayTodoList.value!!.todoList.size
+
+                    todayTodoList.value!!.todoList.forEach {
+                        if(it.iscompleted){
+                            _completedTodoListSize.value += 1
+                        }
+
                     }
 
                 }
 
             }
+            getTodayTodoListFlag.value = true
 
         }
 
-        /*
-        viewModelScope.launch(Dispatchers.IO) {
 
-            val allTodoList = localDatabaseUseCase.getAllTodoList()
-
-            allTodoList.forEach {
-
-                if(it.endTime.y == LocalDateTime.now().year
-                    && it.endTime.m == LocalDateTime.now().monthValue
-                    && it.endTime.d == LocalDateTime.now().dayOfMonth){
-
-                    Log.e("allTodoList", "${it.endTime.y}, ${it.endTime.m}, ${it.endTime.d}," +
-                            " ${LocalDateTime.now().year}, ${LocalDateTime.now().monthValue},${LocalDateTime.now().dayOfMonth}")
-
-                    _todayTodoList.value = it
-                    _todayTodoListExists.value = true
-
-                }
-
-            }
-
-        }
-
-         */
 
     }
 
@@ -311,18 +301,20 @@ class MainPageViewModel @Inject constructor(
 
      */
 
-    /*
-    fun setTodoValueCompleted(todo: TodoList){
-        viewModelScope.launch(Dispatchers.IO) {
-            val newList = _todayTodoList.value
-            newList.todoList = newList.todoList.map { if(it == todo) it.copy(iscompleted = true) else it }
-            _todayTodoList.value = newList
 
+    suspend fun setTodoValueCompleted(todo: TodoList){
+        val updatedList = _todayTodoList.value
+        if (updatedList != null) {
+            updatedList.todoList = updatedList.todoList.map { if(it == todo) it.copy(iscompleted = true) else it }
 
+            localDatabaseUseCase.updateTodoList(updatedList)
+
+            getTodayTodoListFlag.value = false
+            getTodayTodoList()
         }
     }
 
-     */
+
 
     // 현재 시간대에 따른 인사말
     fun setTodayTimeText(): List<Any> {
@@ -337,6 +329,19 @@ class MainPageViewModel @Inject constructor(
             else -> listOf("화이팅이에요 항상!", R.drawable.sun_icons8) // 예외 상황 처리
         }
     }
+
+    //투두 리스트 달성하기 버튼 클릭시 호출
+    fun setAlertDialogFlag(
+        todo: TodoList? = null
+    ){
+        //AlertDialog 플래그 변경
+        showAlertDialog.value = !showAlertDialog.value
+
+        if(todo != null){
+            _selectedTodo.value = todo
+        }
+    }
+
 
 
 

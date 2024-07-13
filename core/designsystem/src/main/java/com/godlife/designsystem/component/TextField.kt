@@ -1,7 +1,6 @@
 package com.godlife.designsystem.component
 
 import android.graphics.BlurMaskFilter
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,41 +19,31 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OpaqueLight
 import com.godlife.designsystem.theme.PurpleMain
+import kotlin.math.sin
 
 @Composable
 fun GodLifeTextField(
@@ -62,25 +51,45 @@ fun GodLifeTextField(
     onTextChanged: (String) -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    hint: String = "",
+    singleLine: Boolean = false,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     BasicTextField(
         value = text,
-        onValueChange = onTextChanged,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        decorationBox = {
-
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp)) {
-                Text(text = text, style = TextStyle(
-                    color = Color.White,
-                    fontSize = 20.sp
-                )
-                )
-                Divider(modifier = Modifier.fillMaxWidth(), color = Color.White)
+        onValueChange = { newText ->
+            if(singleLine){
+                // 줄바꿈 문자를 제거하고 한 줄로 제한합니다.
+                val singleLineText = newText.replace("\n", "")
+                onTextChanged(singleLineText)
+            }
+            else{
+                onTextChanged(newText)
             }
 
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = if(singleLine) KeyboardActions(onDone = { keyboardController?.hide() }) else KeyboardActions.Default,
+        cursorBrush = SolidColor(Color.White),
+        singleLine = singleLine,
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ) {
+                innerTextField()
+                if (text.isEmpty()) {
+                    Text(
+                        text = hint,
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = 15.sp
+                        )
+                    )
+                }
+            }
         }
     )
 }
@@ -89,31 +98,46 @@ fun GodLifeTextField(
 fun GodLifeTextFieldGray(
     text: String,
     onTextChanged: (String) -> Unit,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
     hint: String = "",
+    singleLine: Boolean = false,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     BasicTextField(
         value = text,
-        onValueChange = onTextChanged,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        cursorBrush = SolidColor(Color.Black),
-        decorationBox = {
-
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp)) {
-
-                Text(text = if (text.isEmpty()) hint else text, style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 15.sp
-                )
-                )
-                //Divider(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), color = GrayWhite2)
+        onValueChange = { newText ->
+            if(singleLine){
+                // 줄바꿈 문자를 제거하고 한 줄로 제한합니다.
+                val singleLineText = newText.replace("\n", "")
+                onTextChanged(singleLineText)
+            }
+            else{
+                onTextChanged(newText)
             }
 
+        },
+        keyboardOptions = if(singleLine)keyboardOptions else KeyboardOptions.Default,
+        keyboardActions = if(singleLine) KeyboardActions(onDone = { keyboardController?.hide() }) else KeyboardActions.Default,
+        cursorBrush = SolidColor(Color.Black),
+        singleLine = singleLine,
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ) {
+                innerTextField()
+                if (text.isEmpty()) {
+                    Text(
+                        text = hint,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontSize = 15.sp
+                        )
+                    )
+                }
+            }
         }
     )
 }
@@ -253,6 +277,14 @@ fun TextFiledPreview(){
                 GodLifeTextField(text = text, onTextChanged = { it -> text })
             }
             
+            Spacer(modifier = Modifier.size(20.dp))
+
+            GodLifeTextFieldGray(
+                text = text,
+                onTextChanged = {it -> text},
+                hint = "제목을 입력해주세요."
+            )
+
             Spacer(modifier = Modifier.size(20.dp))
 
             Box(modifier = Modifier.background(Color.White)){

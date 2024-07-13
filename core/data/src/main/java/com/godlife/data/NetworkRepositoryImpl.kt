@@ -7,6 +7,7 @@ import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
@@ -25,7 +26,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
 
@@ -73,13 +74,20 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.reissue(authorization)
     }
 
-    override suspend fun imageUpload(
+    override suspend fun profileImageUpload(
         authorization: String,
-        imageType: String,
         image: Uri
     ): ApiResponse<ImageUploadQuery> {
-        return networkDataSource.imageUpload(authorization, imageType, image)
+        return networkDataSource.profileImageUpload(authorization, image)
     }
+
+    override suspend fun backgroundImageUpload(
+        authorization: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+        return networkDataSource.backgroundImageUpload(authorization, image)
+    }
+
 
     override suspend fun updateIntroduce(
         authorization: String,
@@ -96,6 +104,35 @@ class NetworkRepositoryImpl @Inject constructor(
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
         return networkDataSource.createPost(authorization, title, content, tags, imagePath)
+    }
+
+    override suspend fun updatePost(
+        authorization: String,
+        postId: String,
+        title: String,
+        content: String,
+        categoryType: String,
+        tags: List<String>,
+        imagePath: List<Uri>?
+    ): ApiResponse<PostQuery> {
+        return networkDataSource.updatePost(authorization, postId, title, content, categoryType, tags, imagePath)
+    }
+
+    override suspend fun deletePost(
+        authorization: String,
+        postId: String
+    ): ApiResponse<DeletePostQuery> {
+        return networkDataSource.deletePost(authorization, postId)
+    }
+
+
+    override suspend fun getLatestPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String
+    ): ApiResponse<LatestPostQuery> {
+        TODO("Not yet implemented")
     }
 
     /*
@@ -152,8 +189,12 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.agreeGodLife(authorization, postId)
     }
 
-    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<RankingQuery> {
         return networkDataSource.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun getAllFamousMembers(authorization: String): ApiResponse<RankingQuery> {
+        return networkDataSource.getAllFamousMembers(authorization)
     }
 
     override suspend fun postNotificationTime(

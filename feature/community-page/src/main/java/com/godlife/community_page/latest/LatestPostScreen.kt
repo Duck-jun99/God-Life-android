@@ -132,7 +132,12 @@ fun LatestPostListView(
             .padding(start = 10.dp, end = 10.dp, bottom = 5.dp, top = 5.dp)
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(15.dp))
-            .clickable { navController.navigate("${PostDetailRoute.route}/$postId") }
+            .clickable {
+                navController.navigate("${PostDetailRoute.route}/$postId") {
+                    popUpTo(PostDetailRoute.route)
+                    launchSingleTop = true
+                }
+            }
     ){
         Row(
             modifier

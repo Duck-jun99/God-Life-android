@@ -97,7 +97,7 @@ fun SettingPageScreen(
         Column(
             modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(GrayWhite3)
                 .statusBarsPadding()
         ){
 

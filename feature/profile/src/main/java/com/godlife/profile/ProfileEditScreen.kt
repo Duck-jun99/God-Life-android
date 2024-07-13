@@ -31,14 +31,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -72,8 +74,11 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextField
+import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.profile.navigation.ProfileScreenRoute
@@ -83,20 +88,23 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-
 @Composable
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    snackbarHostState: SnackbarHostState,
     viewModel: ProfileEditViewModel = hiltViewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
     val selectedImageType by viewModel.selectedImageType.collectAsState()
+    val userId by viewModel.userId.collectAsState()
 
     val context = LocalContext.current
 
-    Log.e("ProfileEditScreen", "uiState : ${uiState.toString()}")
+    Log.e("ProfileEditScreen", "uiState : $uiState")
+    val workList by viewModel.workList.collectAsState()
+    Log.e("ProfileEditBox", "workList : $workList")
 
     //갤러리에서 사진 가져오기
     val launcher = rememberLauncherForActivityResult(contract =
@@ -121,6 +129,58 @@ fun ProfileEditScreen(
 
     }
 
+    Box(
+
+    ){
+
+        if(uiState !is ProfileEditUiState.Error)
+        {
+            ProfileEditBox(
+                viewModel = viewModel,
+                launcher = launcher
+            )
+        }
+
+        when(uiState){
+            is ProfileEditUiState.Loading -> {
+                ProfileEditLoadingScreen()
+            }
+            is ProfileEditUiState.Init -> {
+
+            }
+            is ProfileEditUiState.SendLoading -> {
+                ProfileEditSendLoadingScreen()
+            }
+            is ProfileEditUiState.Success -> {
+
+                ProfileEditSuccessScreen()
+
+                LaunchedEffect(true) {
+                    snackbarHostState.showSnackbar(message = (uiState as ProfileEditUiState.Success).data)
+                    delay(1000L)
+
+                    navController.popBackStack()
+
+                    /*
+                    navController.navigate("${ProfileScreenRoute.route}/${userId}"){
+                        popUpTo(ProfileScreenRoute.route)
+                        launchSingleTop = true
+                    }
+
+                     */
+
+                }
+
+            }
+            is ProfileEditUiState.Error -> {
+                ProfileEditErrorScreen(viewModel = viewModel, navController = navController)
+            }
+        }
+
+    }
+
+    /*
+
     GodLifeTheme {
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
@@ -129,11 +189,21 @@ fun ProfileEditScreen(
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
             when (val state = uiState) {
+
                 is ProfileEditUiState.Loading -> {
+
+                }
+
+                is ProfileEditUiState.Init -> {
                     /* TODO */
                 }
+
+                is ProfileEditUiState.SendLoading -> {
+
+                }
+
                 is ProfileEditUiState.Success -> {
-                    ProfileEditBox(innerPadding = innerPadding, viewModel = viewModel, launcher = launcher)
+                    ProfileEditBox(viewModel = viewModel, launcher = launcher)
                 }
                 is ProfileEditUiState.Error -> {
                     /* TODO */
@@ -155,6 +225,7 @@ fun ProfileEditScreen(
             }
         }
     }
+    */
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,21 +234,11 @@ fun ProfileEditBox(
     modifier: Modifier = Modifier,
     viewModel: ProfileEditViewModel,
     launcher: ManagedActivityResultLauncher<String, Uri?>,
-    innerPadding: PaddingValues = PaddingValues(10.dp),
-    navController: NavController? = null
 ){
 
     LaunchedEffect(Unit) {
         
     }
-
-    val profileChangeState by viewModel.profileChangeState.collectAsState()
-    val backgroundChangeState by viewModel.backgroundChangeState.collectAsState()
-    val introduceChangeState by viewModel.introduceChangeState.collectAsState()
-
-    Log.e("ProfileEditBox", "profileChangeState : $profileChangeState")
-    Log.e("ProfileEditBox", "backgroundChangeState : $backgroundChangeState")
-    Log.e("ProfileEditBox", "introduceChangeState : $introduceChangeState")
 
     val profileImg by viewModel.profileImage.collectAsState()
     val backgroundImg by viewModel.backgroundImage.collectAsState()
@@ -377,6 +438,7 @@ fun ProfileEditBox(
         //소개글 수정 뷰
         if(showIntroduceChangeViewState){
             EditIntroduceBox(viewModel = viewModel)
+
         }
 
     }
@@ -477,58 +539,103 @@ fun EditIntroduceBox(
 
     var text by remember { mutableStateOf(introduce) }
 
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { viewModel.updateShowIntroduceChangeViewState() },
+        title = {
+            Text(text = "소개글 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        },
+        text = {
+            Box(
+                modifier
+                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                    .padding(5.dp)
+            ){
+                GodLifeTextFieldGray(
+                    text = text,
+                    hint = "소개글을 입력해주세요.",
+                    onTextChanged = { text = it }
+                )
+            }
+
+        },
+        confirmButton = {
+            GodLifeButtonWhite(
+                onClick = {
+                    viewModel.updateIntroduce(text)
+                    viewModel.updateShowIntroduceChangeViewState()
+                          },
+                text = { Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        },
+        dismissButton = {
+            GodLifeButtonWhite(
+                onClick = { viewModel.updateShowIntroduceChangeViewState() },
+                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        }
+    )
+
+}
+
+@Composable
+fun ProfileEditErrorScreen(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileEditViewModel,
+    navController: NavController
+){
+
+    val uiState by viewModel.uiState.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xCB000000))
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "소개글 수정하기", style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold))
 
-        Spacer(modifier = modifier.size(20.dp))
-
-        GodLifeTextField(text = text, onTextChanged = { text = it } )
-
-        Spacer(modifier = modifier.size(20.dp))
-
-        Row(
+        Icon(
             modifier = modifier
-                .fillMaxWidth()
-        ) {
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
-            ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = {
-                        viewModel.updateIntroduce(text)
-                        viewModel.updateShowIntroduceChangeViewState()
-                              },
-                    text = {
-                        Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
-                )
-            }
+                .size(40.dp),
+            imageVector = Icons.Outlined.Warning,
+            contentDescription = "",
+            tint = PurpleMain
+        )
 
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
-            ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = { viewModel.updateShowIntroduceChangeViewState() },
-                    text = {
-                        Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
-                )
-            }
-        }
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "에러 메시지: ${(uiState as ProfileEditUiState.Error).message}",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { navController.popBackStack() },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
+
     }
 }
 
@@ -873,56 +980,151 @@ fun EditOptionBoxPreview(modifier: Modifier = Modifier){
 @Preview
 @Composable
 fun EditIntroduceBoxPreview(modifier: Modifier = Modifier){
-    val text = "Hello World!"
+    val text = ""
+
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = {  },
+        title = {
+            Text(text = "소개글 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        },
+        text = {
+            Box(
+                modifier
+                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                    .padding(5.dp)
+            ){
+                GodLifeTextFieldGray(
+                    text = text,
+                    hint = "소개글을 입력해주세요.",
+                    onTextChanged = {  }
+                )
+            }
+
+        },
+        confirmButton = {
+            GodLifeButtonWhite(
+                onClick = {
+                },
+                text = { Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        },
+        dismissButton = {
+            GodLifeButtonWhite(
+                onClick = {  },
+                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        }
+    )
+}
+
+@Preview
+@Composable
+fun ProfileEditLoadingScreen(
+    modifier: Modifier = Modifier
+){
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(OpaqueDark)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "소개글 수정하기", style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "유저님의 정보를 받아오고 있어요.", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
 
-        Spacer(modifier = modifier.size(20.dp))
+@Preview
+@Composable
+fun ProfileEditSendLoadingScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "변경사항을 적용중이에요.\n잠시만 기다려주세요!", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
 
-        GodLifeTextField(text = text, onTextChanged = { it -> text } )
+@Preview
+@Composable
+fun ProfileEditSuccessScreen(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(OpaqueDark),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(modifier.size(10.dp))
+        Text(text = "프로필 변경이 완료되었어요!\n잠시뒤 이전 화면으로 이동합니다.", style = TextStyle(color = Color.White), textAlign = TextAlign.Center)
+    }
+}
 
-        Spacer(modifier = modifier.size(20.dp))
+@Preview
+@Composable
+fun ProfileEditErrorScreenPreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Row(
+        Icon(
             modifier = modifier
-                .fillMaxWidth()
-        ) {
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
-            ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = { /*TODO*/ },
-                    text = {
-                        Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
-                )
-            }
+                .size(40.dp),
+            imageVector = Icons.Outlined.Warning,
+            contentDescription = "",
+            tint = PurpleMain
+        )
 
-            Box(modifier = modifier
-                .weight(0.5f)
-                .padding(start = 10.dp, end = 10.dp),
-                contentAlignment = Alignment.Center
-            ){
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .width(130.dp),
-                    onClick = { /*TODO*/ },
-                    text = {
-                        Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                    }
-                )
-            }
-        }
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "에러 메시지: ",
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+
 
     }
 }

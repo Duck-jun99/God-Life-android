@@ -14,5 +14,6 @@ data class UserInfoBody(
     val profileImage: String,
     val backgroundImage: String,
     val whoAmI: String,
-    val memberId: String,
+    val memberId: Int,
+    val fcm: String,
 )

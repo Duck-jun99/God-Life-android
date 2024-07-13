@@ -7,7 +7,6 @@ import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.UserInfoBody
-import com.godlife.profile.ProfileUiState
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -37,7 +36,7 @@ class SettingPageViewModel @Inject constructor(
     val uiState: StateFlow<SettingPageUiState> = _uiState
 
     // 유저 정보 초기화
-    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", ""))
+    private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", 0, ""))
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
     private val _logoutResult = MutableStateFlow<Boolean?>(null)

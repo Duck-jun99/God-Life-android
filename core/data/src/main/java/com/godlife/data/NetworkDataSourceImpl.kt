@@ -18,6 +18,7 @@ import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
 import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LatestStimulusPostQuery
@@ -27,7 +28,7 @@ import com.godlife.network.model.StimulusPostDetailQuery
 import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -81,13 +82,10 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.reissue(authorization)
     }
 
-    override suspend fun imageUpload(
+    override suspend fun profileImageUpload(
         authorization: String,
-        imageType: String,
         image: Uri
     ): ApiResponse<ImageUploadQuery> {
-
-        val imageType: RequestBody = imageType.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val file = File(image.path!!)
 
@@ -97,8 +95,27 @@ class NetworkDataSourceImpl @Inject constructor(
 
         val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
 
-        return networkApi.imageUpload(authorization, imageType, imageMultiPart)
+        return networkApi.profileImageUpload(authorization, imageMultiPart)
+
     }
+
+    override suspend fun backgroundImageUpload(
+        authorization: String,
+        image: Uri
+    ): ApiResponse<ImageUploadQuery> {
+
+        val file = File(image.path!!)
+
+        Log.e("NetworkDataSourceImpl", image.path!!.toString())
+
+        val requestFile = file.asRequestBody("image/*".toMediaType())
+
+        val imageMultiPart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        return networkApi.backgroundImageUpload(authorization, imageMultiPart)
+    }
+
+
 
     override suspend fun updateIntroduce(
         authorization: String,
@@ -135,6 +152,41 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.createPost(authorization, title, content, tags, imageParts)
     }
 
+    override suspend fun updatePost(
+        authorization: String,
+        postId: String,
+        title: String,
+        content: String,
+        categoryType: String,
+        tags: List<String>,
+        imagePath: List<Uri>?
+    ): ApiResponse<PostQuery> {
+        val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+        val categoryType: RequestBody = categoryType.toRequestBody("text/plain".toMediaTypeOrNull())
+        val tags = tags.map { it -> it.toRequestBody("text/plain".toMediaTypeOrNull()) }
+
+        val imageParts = imagePath?.map { it ->
+
+            val file = File(it.path)
+            Log.e("NetworkDataSourceImpl", it.path!!.toString())
+
+            Log.e("NetworkDataSourceImpl", file.readBytes().toString())
+            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+
+            MultipartBody.Part.createFormData("images", file.name, requestFile)
+
+        }
+
+        return networkApi.updatePost(authorization, postId, title, content, categoryType, tags, imageParts)
+    }
+
+    override suspend fun deletePost(
+        authorization: String,
+        postId: String
+    ): ApiResponse<DeletePostQuery> {
+        return networkApi.deletePost(authorization, postId)
+    }
 
 
     override suspend fun getLatestPost(
@@ -189,8 +241,12 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.agreeGodLife(authorization, postId)
     }
 
-    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<WeeklyRankingQuery> {
+    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<RankingQuery> {
         return networkApi.getWeeklyFamousMembers(authorization)
+    }
+
+    override suspend fun getAllFamousMembers(authorization: String): ApiResponse<RankingQuery> {
+        return networkApi.getAllFamousMembers(authorization)
     }
 
     override suspend fun postNotificationTime(

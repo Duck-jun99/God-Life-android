@@ -104,7 +104,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.hilt.android.testing)
 
-    
-
+    androidTestImplementation( platform(libs.androidx.compose.bom))
 }
 

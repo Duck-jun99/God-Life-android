@@ -4,6 +4,7 @@ import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
@@ -23,7 +24,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
-import com.godlife.network.model.WeeklyRankingQuery
+import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -84,12 +85,19 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
     ): ApiResponse<ReissueQuery>
 
-    // 프로필 이미지, 배경사진 변경
+    //프로필 이미지 변경
     @Multipart
-    @POST("/image-upload")
-    suspend fun imageUpload(
+    @POST("/member/profile")
+    suspend fun profileImageUpload(
         @Header("Authorization") authorization: String,
-        @Part("imageType") imageType: RequestBody,
+        @Part image: MultipartBody.Part
+    ): ApiResponse<ImageUploadQuery>
+
+    //프로필 배경사진 변경
+    @Multipart
+    @POST("/member/background")
+    suspend fun backgroundImageUpload(
+        @Header("Authorization") authorization: String,
         @Part image: MultipartBody.Part
     ): ApiResponse<ImageUploadQuery>
 
@@ -101,7 +109,7 @@ interface RetrofitNetworkApi {
     ): ApiResponse<UpdateIntroduceQuery>
 
 
-    // 게시물 생성
+    // 굿생 인증 게시물 생성
     @JvmSuppressWildcards
     @Multipart
     @POST("/board")
@@ -112,6 +120,27 @@ interface RetrofitNetworkApi {
         @Part("tags") tags: List<RequestBody>,
         @Part images: List<MultipartBody.Part>?,
     ): ApiResponse<PostQuery>
+
+    // 굿생 인증 게시물 수정
+    @JvmSuppressWildcards
+    @Multipart
+    @PATCH("/board/{id}")
+    suspend fun updatePost(
+        @Header("Authorization") authorization: String,
+        @Path("id") boardId: String,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("categoryType") categoryType: RequestBody,
+        @Part("tags") tags: List<RequestBody>,
+        @Part images: List<MultipartBody.Part>?,
+    ): ApiResponse<PostQuery>
+
+    // 굿생 인증 게시물 삭제
+    @DELETE("/board/{id}")
+    suspend fun deletePost(
+        @Header("Authorization") authorization: String,
+        @Path("id") boardId: String,
+    ): ApiResponse<DeletePostQuery>
 
 
     // 최신 게시물 조회
@@ -188,7 +217,13 @@ interface RetrofitNetworkApi {
     @GET("/popular/members/weekly")
     suspend fun getWeeklyFamousMembers(
         @Header("Authorization") authorization: String
-    ): ApiResponse<WeeklyRankingQuery>
+    ): ApiResponse<RankingQuery>
+
+    //전체 명예의 전당
+    @GET("/popular/members/all-time")
+    suspend fun getAllFamousMembers(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<RankingQuery>
 
     //알림 시간 전송
     @POST("/fcm/alarm")
