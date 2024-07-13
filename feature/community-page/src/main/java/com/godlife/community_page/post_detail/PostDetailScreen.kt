@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
@@ -101,6 +102,8 @@ fun PostDetailScreen(
     postDetailViewModel: PostDetailViewModel = hiltViewModel()
 ) {
 
+    postDetailViewModel.initPostDetailInfo(postId = postId)
+
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
 
@@ -118,119 +121,115 @@ fun PostDetailScreen(
         mutableStateOf(false)
     }
 
-    when(uiState){
-        is PostDetailUiState.Loading -> {
+    if(uiState !is PostDetailUiState.Error){
 
-            LoadingPostDetailScreen()
+        GodLifeTheme {
 
-            postDetailViewModel.initPostDetailInfo(postId = postId)
+            Scaffold(
+                snackbarHost = {
+                    SnackbarHost(hostState = snackBarHostState)
+                },
+            ) {
 
-        }
+                Column {
 
-        is PostDetailUiState.Success -> {
+                    Box(
+                        modifier = modifier.weight(0.8f)
+                    ) {
+                        LazyColumn(
+                            modifier
+                                .background(Color.White)
+                                .fillMaxSize()) {
 
-            GodLifeTheme {
+                            if (postDetail.body?.imagesURL?.isNotEmpty() == true){
+                                item{ ImageBox(imgUriList = postDetail.body?.imagesURL!!) }
+                            }
 
-                Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackBarHostState)
-                    },
-                ) {
-
-                    Column {
-
-                        Box(
-                            modifier = modifier.weight(0.8f)
-                        ) {
-                            LazyColumn(
-                                modifier
-                                    .background(Color.White)
-                                    .fillMaxSize()) {
-
-                                if (postDetail.body?.imagesURL?.isNotEmpty() == true){
-                                    item{ ImageBox(imgUriList = postDetail.body?.imagesURL!!) }
+                            postDetail.body?.let {
+                                Log.e("postDetail", it.toString())
+                                item{
+                                    Content(
+                                        postDetailBody = it,
+                                        parentNavController = parentNavController,
+                                        viewModel = postDetailViewModel,
+                                        isShowDialog = isShowDialog
+                                    )
                                 }
+                            }
 
-                                postDetail.body?.let {
-                                    Log.e("postDetail", it.toString())
-                                    item{
-                                        Content(
-                                            postDetailBody = it,
-                                            parentNavController = parentNavController,
-                                            viewModel = postDetailViewModel,
-                                            isShowDialog = isShowDialog
-                                        )
-                                    }
+                            postDetail.body?.let {
+
+                                item{
+                                    Content2(memberLikedBoard = it.memberLikedBoard, viewModel = postDetailViewModel)
                                 }
-
-                                postDetail.body?.let {
-
-                                    item{
-                                        Content2(memberLikedBoard = it.memberLikedBoard, viewModel = postDetailViewModel)
-                                    }
-
-                                }
-
-                                item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
-
 
                             }
 
+                            item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
+
+
                         }
-
-                        GodLifeCreateCommentBar(
-                            comment = writeComment,
-                            onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
-                            onPostClicked = { postDetailViewModel.createComment() },
-                        )
-
 
                     }
 
-                }
-
-                if(isShowDialog.value){
-
-                    AlertDialog(
-                        containerColor = Color.White,
-                        onDismissRequest = { isShowDialog.value = !isShowDialog.value },
-                        title = {
-                            Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                        },
-                        text = {
-                            Text(text = "사용자님의 굿생 인증 게시물을 삭제하시면 굿생 점수 2점이 차감됩니다.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
-                        },
-                        confirmButton = {
-                            GodLifeButtonWhite(
-                                onClick = {
-                                    postDetailViewModel.deletePost()
-                                    navController.popBackStack()
-                                          },
-                                text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
-                            )
-                        },
-                        dismissButton = {
-                            GodLifeButtonWhite(
-                                onClick = { isShowDialog.value= !isShowDialog.value },
-                                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
-                            )
-                        }
+                    GodLifeCreateCommentBar(
+                        comment = writeComment,
+                        onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
+                        onPostClicked = { postDetailViewModel.createComment() },
                     )
-                }
 
+
+                }
 
 
 
             }
 
+            if(isShowDialog.value){
+
+                AlertDialog(
+                    containerColor = Color.White,
+                    onDismissRequest = { isShowDialog.value = !isShowDialog.value },
+                    title = {
+                        Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                    },
+                    text = {
+                        Text(text = "사용자님의 굿생 인증 게시물을 삭제하시면 굿생 점수 2점이 차감됩니다.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+                    },
+                    confirmButton = {
+                        GodLifeButtonWhite(
+                            onClick = {
+                                postDetailViewModel.deletePost()
+                                navController.popBackStack()
+                            },
+                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                        )
+                    },
+                    dismissButton = {
+                        GodLifeButtonWhite(
+                            onClick = { isShowDialog.value= !isShowDialog.value },
+                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                        )
+                    }
+                )
+            }
+
+            if(uiState is PostDetailUiState.Loading){
+                LoadingPostDetailScreen()
+            }
+
         }
-        is PostDetailUiState.Error -> {
-            GodLifeErrorScreen(
-                errorMessage = (uiState as PostDetailUiState.Error).message,
-                buttonEnabled = false
-            )
-        }
+
     }
+
+    else{
+
+        GodLifeErrorScreen(
+            errorMessage = (uiState as PostDetailUiState.Error).message,
+            buttonEnabled = false
+        )
+    }
+
 
 
 }
@@ -453,12 +452,12 @@ fun Content(
 
                         when(postDetailBody.boardOwner){
                             true ->
-                                ContentDropDownDeleteItem(
+                                ContentDropDownBoardOwnerItem(
                                     expanded = expanded,
                                     isShowDialog = isShowDialog
                                 )
                             false ->
-                                ContentDropDownDeclareItem(
+                                ContentDropDownNotBoardOwnerItem(
                                     postDetailViewModel= viewModel,
                                     expanded = expanded
                                 )
@@ -688,7 +687,7 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
 }
 
 @Composable
-fun ContentDropDownDeclareItem(
+fun ContentDropDownNotBoardOwnerItem(
     modifier: Modifier = Modifier,
     postDetailViewModel: PostDetailViewModel,
     expanded: MutableState<Boolean>
@@ -708,23 +707,41 @@ fun ContentDropDownDeclareItem(
 }
 
 @Composable
-fun ContentDropDownDeleteItem(
+fun ContentDropDownBoardOwnerItem(
     modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
     isShowDialog: MutableState<Boolean>
 ){
 
-    DropdownMenuItem(
-        text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
-        onClick = {
-            expanded.value = !expanded.value
-            isShowDialog.value = !isShowDialog.value
-        },
-        leadingIcon = {
-            Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
-        },
-        colors = MenuDefaults.itemColors(Color.White)
-    )
+    Column {
+
+        DropdownMenuItem(
+            text = { Text(text = "수정하기", style = TextStyle(color = GrayWhite)) },
+            onClick = {
+                expanded.value = !expanded.value
+                isShowDialog.value = !isShowDialog.value
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = GrayWhite)
+            },
+            colors = MenuDefaults.itemColors(Color.White)
+        )
+
+        DropdownMenuItem(
+            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
+            onClick = {
+                expanded.value = !expanded.value
+                isShowDialog.value = !isShowDialog.value
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
+            },
+            colors = MenuDefaults.itemColors(Color.White)
+        )
+
+    }
+
+
 }
 
 
@@ -1118,4 +1135,35 @@ fun TagItemPreview(modifier: Modifier = Modifier, text:String = "Tag"){
             textAlign = TextAlign.Center,
         )
     }
+}
+
+@Preview
+@Composable
+fun ContentDropDownBoardOwnerItemPreview(
+    modifier: Modifier = Modifier,
+){
+
+    Column {
+        DropdownMenuItem(
+            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
+            onClick = {
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
+            },
+            colors = MenuDefaults.itemColors(Color.White)
+        )
+
+        DropdownMenuItem(
+            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
+            onClick = {
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
+            },
+            colors = MenuDefaults.itemColors(Color.White)
+        )
+    }
+
+
 }

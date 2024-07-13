@@ -29,8 +29,17 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class PostDetailUiState {
+
+    //게시물 정보 불러오는 중 or API 통신 결과 기다리는 중
     object Loading : PostDetailUiState()
+
+    //게시물 정보 불러오기 성공 or API 통신 성공 (Delete 제외)
     data class Success(val data: String) : PostDetailUiState()
+
+    // 게시물 삭제 성공
+    object DeleteSuccess: PostDetailUiState()
+
+    //게시물 정보 불러오기 실패 or API 통신 실패
     data class Error(val message: String) : PostDetailUiState()
 }
 
