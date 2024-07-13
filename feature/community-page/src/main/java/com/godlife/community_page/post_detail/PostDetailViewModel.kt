@@ -2,15 +2,18 @@ package com.godlife.community_page.post_detail
 
 import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.DeleteCommentUseCase
+import com.godlife.domain.DeletePostUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.UpdatePostUseCase
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailQuery
 import com.skydoves.sandwich.message
@@ -34,6 +37,7 @@ sealed class PostDetailUiState {
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
+    private val deletePostUseCase: DeletePostUseCase,
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
@@ -80,6 +84,9 @@ class PostDetailViewModel @Inject constructor(
     //게시물 댓글 가져왔는지 플래그
     private var isGetComments = mutableIntStateOf(0)
 
+    //게시물 삭제 성공 플래그
+    private var isDeletePost = mutableStateOf(false)
+
 
     //게시물 ID 초기화 및 게시물 정보 불러오기
     fun initPostDetailInfo(postId: String){
@@ -98,6 +105,24 @@ class PostDetailViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun deletePost(){
+        if(!isDeletePost.value){
+            viewModelScope.launch {
+                val result = deletePostUseCase.executeDeletePost(auth.value, postId.value)
+                result
+                    .onSuccess {
+                        isDeletePost.value = true
+                    }
+                    .onError {
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
+                    .onException {
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
+            }
+        }
     }
 
     //해당 게시물 작성자 프로필 정보, 이미지, 내용 초기화 (성공 시 initComments 호출 -> initComments까지 성공적으로 되면 Ui State Success로 변경)

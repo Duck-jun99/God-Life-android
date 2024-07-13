@@ -85,6 +85,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailBody
 import kotlinx.coroutines.CoroutineScope
@@ -95,6 +96,7 @@ import kotlinx.coroutines.launch
 fun PostDetailScreen(
     modifier: Modifier = Modifier,
     postId: String,
+    navController: NavController,
     parentNavController: NavController,
     postDetailViewModel: PostDetailViewModel = hiltViewModel()
 ) {
@@ -200,7 +202,10 @@ fun PostDetailScreen(
                         },
                         confirmButton = {
                             GodLifeButtonWhite(
-                                onClick = {  },
+                                onClick = {
+                                    postDetailViewModel.deletePost()
+                                    navController.popBackStack()
+                                          },
                                 text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                             )
                         },
@@ -220,7 +225,10 @@ fun PostDetailScreen(
 
         }
         is PostDetailUiState.Error -> {
-
+            GodLifeErrorScreen(
+                errorMessage = (uiState as PostDetailUiState.Error).message,
+                buttonEnabled = false
+            )
         }
     }
 
