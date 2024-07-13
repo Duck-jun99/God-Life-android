@@ -6,6 +6,12 @@ data class PostQuery(
     val message: String
 )
 
+data class DeletePostQuery(
+    val status: String,
+    val body: Boolean,
+    val message: String
+)
+
 data class GodScoreQuery(
     val status: String,
     val body: String,

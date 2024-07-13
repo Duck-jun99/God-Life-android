@@ -7,6 +7,7 @@ import com.godlife.network.model.GetCommentsQuery
 import com.godlife.network.model.LatestPostQuery
 import com.godlife.network.model.CommentQuery
 import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
@@ -103,6 +104,35 @@ class NetworkRepositoryImpl @Inject constructor(
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
         return networkDataSource.createPost(authorization, title, content, tags, imagePath)
+    }
+
+    override suspend fun updatePost(
+        authorization: String,
+        postId: String,
+        title: String,
+        content: String,
+        categoryType: String,
+        tags: List<String>,
+        imagePath: List<Uri>?
+    ): ApiResponse<PostQuery> {
+        return networkDataSource.updatePost(authorization, postId, title, content, categoryType, tags, imagePath)
+    }
+
+    override suspend fun deletePost(
+        authorization: String,
+        postId: String
+    ): ApiResponse<DeletePostQuery> {
+        return networkDataSource.deletePost(authorization, postId)
+    }
+
+
+    override suspend fun getLatestPost(
+        authorization: String,
+        page: Int,
+        keyword: String,
+        tag: String
+    ): ApiResponse<LatestPostQuery> {
+        TODO("Not yet implemented")
     }
 
     /*

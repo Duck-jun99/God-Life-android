@@ -18,6 +18,7 @@ import com.godlife.network.model.SignUpRequest
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.api.RetrofitNetworkApi
 import com.godlife.network.model.CreatePostRequest
+import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LatestStimulusPostQuery
@@ -151,6 +152,41 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.createPost(authorization, title, content, tags, imageParts)
     }
 
+    override suspend fun updatePost(
+        authorization: String,
+        postId: String,
+        title: String,
+        content: String,
+        categoryType: String,
+        tags: List<String>,
+        imagePath: List<Uri>?
+    ): ApiResponse<PostQuery> {
+        val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+        val categoryType: RequestBody = categoryType.toRequestBody("text/plain".toMediaTypeOrNull())
+        val tags = tags.map { it -> it.toRequestBody("text/plain".toMediaTypeOrNull()) }
+
+        val imageParts = imagePath?.map { it ->
+
+            val file = File(it.path)
+            Log.e("NetworkDataSourceImpl", it.path!!.toString())
+
+            Log.e("NetworkDataSourceImpl", file.readBytes().toString())
+            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+
+            MultipartBody.Part.createFormData("images", file.name, requestFile)
+
+        }
+
+        return networkApi.updatePost(authorization, postId, title, content, categoryType, tags, imageParts)
+    }
+
+    override suspend fun deletePost(
+        authorization: String,
+        postId: String
+    ): ApiResponse<DeletePostQuery> {
+        return networkApi.deletePost(authorization, postId)
+    }
 
 
     override suspend fun getLatestPost(
