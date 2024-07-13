@@ -31,7 +31,7 @@ import javax.inject.Inject
 sealed class PostDetailUiState {
 
     //게시물 정보 불러오는 중 or API 통신 결과 기다리는 중
-    object Loading : PostDetailUiState()
+    data class Loading(val type: LoadingType) : PostDetailUiState()
 
     //게시물 정보 불러오기 성공 or API 통신 성공 (Delete 제외)
     data class Success(val data: String) : PostDetailUiState()
@@ -41,6 +41,10 @@ sealed class PostDetailUiState {
 
     //게시물 정보 불러오기 실패 or API 통신 실패
     data class Error(val message: String) : PostDetailUiState()
+}
+
+enum class LoadingType {
+    POST, DELETE
 }
 
 @HiltViewModel
@@ -61,7 +65,7 @@ class PostDetailViewModel @Inject constructor(
      */
 
     // 전체 UI 상태
-    private val _uiState = MutableStateFlow<PostDetailUiState>(PostDetailUiState.Loading)
+    private val _uiState = MutableStateFlow<PostDetailUiState>(PostDetailUiState.Loading(type = LoadingType.POST))
     val uiState: StateFlow<PostDetailUiState> = _uiState
 
     /**
@@ -122,6 +126,7 @@ class PostDetailViewModel @Inject constructor(
                 val result = deletePostUseCase.executeDeletePost(auth.value, postId.value)
                 result
                     .onSuccess {
+                        _uiState.value = PostDetailUiState.DeleteSuccess
                         isDeletePost.value = true
                     }
                     .onError {
@@ -160,13 +165,17 @@ class PostDetailViewModel @Inject constructor(
                             reIssueRefreshToken(callback = { initPostDetail() })
 
                         }
+                        else {
+                            // UI State Error로 변경
+                            _uiState.value = PostDetailUiState.Error(this.message())
+                        }
                     }
                     .onException {
 
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = PostDetailUiState.Error(this.message())
 
                     }
 
@@ -204,13 +213,17 @@ class PostDetailViewModel @Inject constructor(
                             reIssueRefreshToken(callback = { initComments() })
 
                         }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = PostDetailUiState.Error(this.message())
+                        }
                     }
                     .onException {
 
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = PostDetailUiState.Error(this.message())
 
                     }
             }
@@ -253,13 +266,17 @@ class PostDetailViewModel @Inject constructor(
                         reIssueRefreshToken(callback = { createComment() })
 
                     }
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
                 }
                 .onException {
 
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
                 }
 
         }
@@ -291,13 +308,17 @@ class PostDetailViewModel @Inject constructor(
                         reIssueRefreshToken(callback = { deleteComment(commentId) })
 
                     }
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
                 }
                 .onException {
 
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
                 }
 
         }
@@ -330,13 +351,17 @@ class PostDetailViewModel @Inject constructor(
                         reIssueRefreshToken(callback = { agreeGodLife() })
 
                     }
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error(this.message())
+                    }
                 }
                 .onException {
 
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
                 }
 
         }
@@ -381,7 +406,7 @@ class PostDetailViewModel @Inject constructor(
                     else{
 
                         // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = PostDetailUiState.Error(this.message())
                     }
 
                 }
@@ -389,7 +414,7 @@ class PostDetailViewModel @Inject constructor(
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = PostDetailUiState.Error(this.message())
 
                 }
 

@@ -5,9 +5,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -46,6 +50,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -87,6 +92,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailBody
 import kotlinx.coroutines.CoroutineScope
@@ -112,6 +118,8 @@ fun PostDetailScreen(
     //Ui State 관찰
     val uiState by postDetailViewModel.uiState.collectAsState()
 
+    Log.e("uiState", uiState.toString())
+
     val postDetail by postDetailViewModel.postDetail.collectAsState()
     val comments by postDetailViewModel.comments.collectAsState()
 
@@ -121,7 +129,9 @@ fun PostDetailScreen(
         mutableStateOf(false)
     }
 
-    if(uiState !is PostDetailUiState.Error){
+    if(uiState is PostDetailUiState.Loading ||
+        uiState is PostDetailUiState.Success)
+    {
 
         GodLifeTheme {
 
@@ -200,7 +210,6 @@ fun PostDetailScreen(
                         GodLifeButtonWhite(
                             onClick = {
                                 postDetailViewModel.deletePost()
-                                navController.popBackStack()
                             },
                             text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
@@ -215,21 +224,36 @@ fun PostDetailScreen(
             }
 
             if(uiState is PostDetailUiState.Loading){
-                LoadingPostDetailScreen()
+
+                when((uiState as PostDetailUiState.Loading).type) {
+
+                    LoadingType.POST ->
+                        GodLifeLoadingScreen(
+                            text = "게시물을 불러오고 있어요.\n잠시만 기다려주세요."
+                        )
+
+                    LoadingType.DELETE ->
+                        GodLifeLoadingScreen(
+                            text = "게시물을 삭제하고 있어요."
+                        )
+                }
+
             }
 
         }
 
     }
 
-    else{
+    else if(uiState is PostDetailUiState.DeleteSuccess){
+        DeleteSuccessScreen(navController = navController)
+    }
 
+    else if(uiState is PostDetailUiState.Error){
         GodLifeErrorScreen(
             errorMessage = (uiState as PostDetailUiState.Error).message,
             buttonEnabled = false
         )
     }
-
 
 
 }
@@ -687,6 +711,51 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
 }
 
 @Composable
+fun DeleteSuccessScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+){
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.Delete,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "게시물 삭제가 완료되었어요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = {
+                navController.popBackStack()
+                      },
+            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+    }
+}
+
+@Composable
 fun ContentDropDownNotBoardOwnerItem(
     modifier: Modifier = Modifier,
     postDetailViewModel: PostDetailViewModel,
@@ -820,16 +889,6 @@ fun CommentDropDownDeleteItem(
         },
         colors = MenuDefaults.itemColors(Color.White)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoadingPostDetailScreen(modifier: Modifier = Modifier){
-    GodLifeTheme {
-        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-            CircularProgressIndicator()
-        }
-    }
 }
 
 @Preview(showBackground = true)
@@ -1139,31 +1198,58 @@ fun TagItemPreview(modifier: Modifier = Modifier, text:String = "Tag"){
 
 @Preview
 @Composable
-fun ContentDropDownBoardOwnerItemPreview(
-    modifier: Modifier = Modifier,
+fun DeleteSuccessScreenPreview(
+    modifier: Modifier = Modifier
 ){
 
-    Column {
-        DropdownMenuItem(
-            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
-            onClick = {
-            },
-            leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
-            },
-            colors = MenuDefaults.itemColors(Color.White)
+    // 애니메이션을 위한 상태 변수
+    var animationPlayed by remember { mutableStateOf(false) }
+    val score by animateIntAsState(
+        targetValue = if (animationPlayed) 500 else 502,
+        animationSpec = tween(
+            durationMillis = 1000, // 애니메이션 지속 시간 (2초)
+            easing = LinearEasing
         )
+    )
 
-        DropdownMenuItem(
-            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
-            onClick = {
-            },
-            leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
-            },
-            colors = MenuDefaults.itemColors(Color.White)
-        )
+    // 컴포지션이 완료되면 애니메이션 시작
+    LaunchedEffect(key1 = true) {
+        animationPlayed = true
     }
 
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
+        Icon(
+            modifier = modifier
+                .size(40.dp),
+            imageVector = Icons.Outlined.Delete,
+            contentDescription = "",
+            tint = PurpleMain
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "게시물 삭제가 완료되었어요.",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier.size(20.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+        )
+
+    }
 }

@@ -223,7 +223,8 @@ fun MainUiTheme(
                         if (postId != null) {
                             PostDetailScreen(
                                 postId = postId,
-                                parentNavController = navController
+                                parentNavController = navController,
+                                navController = navController
                             )
                             bottomBarVisibleState.value = false
                         }
