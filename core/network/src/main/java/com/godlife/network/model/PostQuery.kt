@@ -41,7 +41,7 @@ data class PostDetailBody(
     val views: Int,
     val godScore: Int,
     val body: String,
-    val isBoardOwner: Boolean,
+    val boardOwner: Boolean,
     val tags: List<String>,
     val title: String,
     val commentCount: Int,

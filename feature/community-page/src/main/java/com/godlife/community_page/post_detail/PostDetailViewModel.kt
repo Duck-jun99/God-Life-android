@@ -73,6 +73,7 @@ class PostDetailViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
+
     //게시물 정보 가져왔는지 플래그
     private var isGetPostDetail = mutableIntStateOf(0)
 
@@ -307,6 +308,7 @@ class PostDetailViewModel @Inject constructor(
         }
 
     }
+
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){

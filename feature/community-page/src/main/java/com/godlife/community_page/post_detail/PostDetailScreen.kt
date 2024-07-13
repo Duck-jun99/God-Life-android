@@ -20,10 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -34,6 +30,7 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -68,8 +65,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -81,16 +78,12 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
-import com.godlife.community_page.navigation.PostDetailRoute
-import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailBody
@@ -118,6 +111,10 @@ fun PostDetailScreen(
     val comments by postDetailViewModel.comments.collectAsState()
 
     val writeComment by postDetailViewModel.writeComment.collectAsState()
+
+    val isShowDialog = remember {
+        mutableStateOf(false)
+    }
 
     when(uiState){
         is PostDetailUiState.Loading -> {
@@ -157,7 +154,9 @@ fun PostDetailScreen(
                                     item{
                                         Content(
                                             postDetailBody = it,
-                                            parentNavController = parentNavController
+                                            parentNavController = parentNavController,
+                                            viewModel = postDetailViewModel,
+                                            isShowDialog = isShowDialog
                                         )
                                     }
                                 }
@@ -187,6 +186,34 @@ fun PostDetailScreen(
                     }
 
                 }
+
+                if(isShowDialog.value){
+
+                    AlertDialog(
+                        containerColor = Color.White,
+                        onDismissRequest = { isShowDialog.value = !isShowDialog.value },
+                        title = {
+                            Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        },
+                        text = {
+                            Text(text = "사용자님의 굿생 인증 게시물을 삭제하시면 굿생 점수 2점이 차감됩니다.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+                        },
+                        confirmButton = {
+                            GodLifeButtonWhite(
+                                onClick = {  },
+                                text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            )
+                        },
+                        dismissButton = {
+                            GodLifeButtonWhite(
+                                onClick = { isShowDialog.value= !isShowDialog.value },
+                                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            )
+                        }
+                    )
+                }
+
+
 
 
             }
@@ -315,8 +342,12 @@ fun ImageView(
 fun Content(
     modifier: Modifier = Modifier,
     postDetailBody: PostDetailBody,
-    parentNavController: NavController
+    parentNavController: NavController,
+    viewModel: PostDetailViewModel,
+    isShowDialog: MutableState<Boolean>
 ){
+
+    val expanded = remember { mutableStateOf(false) }
 
     Column(
         modifier
@@ -365,10 +396,72 @@ fun Content(
 
             Spacer(modifier.size(10.dp))
 
-            Column {
-                Text(text = postDetailBody.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+            Column(
+                modifier = modifier
+                    .weight(0.8f)
+            ) {
+                Text(
+                    text = postDetailBody.nickname,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    overflow = TextOverflow.Ellipsis
+                )
 
-                Text(text = postDetailBody.whoAmI, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 12.sp))
+                Text(
+                    text = postDetailBody.whoAmI,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp
+                    ),
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Box(
+                modifier = modifier
+                    .weight(0.2f),
+                contentAlignment = Alignment.CenterEnd
+            ){
+
+                IconButton(
+                    onClick = { expanded.value = !expanded.value }
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Content Menu",
+                        tint = GrayWhite
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded.value,
+                        onDismissRequest = { expanded.value = false },
+                        modifier = Modifier.background(Color.White)
+                    ) {
+
+                        when(postDetailBody.boardOwner){
+                            true ->
+                                ContentDropDownDeleteItem(
+                                    expanded = expanded,
+                                    isShowDialog = isShowDialog
+                                )
+                            false ->
+                                ContentDropDownDeclareItem(
+                                    postDetailViewModel= viewModel,
+                                    expanded = expanded
+                                )
+                        }
+
+                    }
+                    
+                }
+
+
+
             }
 
 
@@ -567,8 +660,8 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
                     modifier = Modifier.background(Color.White)
                 ) {
 
-                    if(commentBody.commentOwner) DropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody, expanded = expanded)
-                    else DropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
+                    if(commentBody.commentOwner) CommentDropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody, expanded = expanded)
+                    else CommentDropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
 
                 }
             }
@@ -586,9 +679,50 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
 
 }
 
+@Composable
+fun ContentDropDownDeclareItem(
+    modifier: Modifier = Modifier,
+    postDetailViewModel: PostDetailViewModel,
+    expanded: MutableState<Boolean>
+){
+
+    DropdownMenuItem(
+        text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
+        onClick = {
+            expanded.value = !expanded.value
+
+        },
+        leadingIcon = {
+            Icon(imageVector = Icons.Outlined.Warning, contentDescription = "신고하기", tint = GrayWhite)
+        },
+        colors = MenuDefaults.itemColors(Color.White)
+    )
+}
 
 @Composable
-fun DropDownDeclareItem(
+fun ContentDropDownDeleteItem(
+    modifier: Modifier = Modifier,
+    expanded: MutableState<Boolean>,
+    isShowDialog: MutableState<Boolean>
+){
+
+    DropdownMenuItem(
+        text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
+        onClick = {
+            expanded.value = !expanded.value
+            isShowDialog.value = !isShowDialog.value
+        },
+        leadingIcon = {
+            Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = GrayWhite)
+        },
+        colors = MenuDefaults.itemColors(Color.White)
+    )
+}
+
+
+
+@Composable
+fun CommentDropDownDeclareItem(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     cScope: CoroutineScope,
@@ -626,7 +760,7 @@ fun DropDownDeclareItem(
 }
 
 @Composable
-fun DropDownDeleteItem(
+fun CommentDropDownDeleteItem(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     cScope: CoroutineScope,
@@ -765,14 +899,32 @@ fun ContentPreview(modifier: Modifier = Modifier){
             Box(
                 modifier
                     .background(PurpleMain, shape = CircleShape)
-                    .size(70.dp))
+                    .size(70.dp)
+            )
 
             Spacer(modifier.size(10.dp))
 
-            Column {
+            Column(
+                modifier = modifier
+                    .weight(0.8f)
+            ) {
                 Text(text = "Nickname", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
                 Text(text = "Introduce", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 12.sp))
+            }
+
+            Box(
+                modifier = modifier
+                    .weight(0.2f),
+                contentAlignment = Alignment.CenterEnd
+            ){
+
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "",
+                    tint = GrayWhite
+                )
+
             }
         }
 
