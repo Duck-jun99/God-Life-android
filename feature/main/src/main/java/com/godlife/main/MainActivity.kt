@@ -13,10 +13,7 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -50,6 +47,8 @@ import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
+import com.godlife.community_page.report.ReportScreen
+import com.godlife.community_page.report.navigation.ReportScreenRoute
 import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
@@ -228,6 +227,31 @@ fun MainUiTheme(
                             )
                             bottomBarVisibleState.value = false
                         }
+                    }
+
+                    //신고화면
+                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}",
+                        arguments = listOf(
+                            navArgument("postId"){type = NavType.StringType},
+                            navArgument("userNickname"){type = NavType.StringType},
+                            navArgument("userId"){type = NavType.StringType},
+                            navArgument("category"){type = NavType.StringType},
+                        )
+                    ){
+                        val postId = it.arguments?.getString("postId")
+                        val userNickname = it.arguments?.getString("userNickname")
+                        val userId = it.arguments?.getString("userId")
+                        val category = it.arguments?.getString("category")
+                        if (postId != null && userNickname != null && userId != null && category != null) {
+                            ReportScreen(
+                                postId = postId,
+                                userNickname = userNickname,
+                                userId = userId,
+                                category = category,
+                                navController = navController
+                            )
+                        }
+                        bottomBarVisibleState.value = false
                     }
 
 

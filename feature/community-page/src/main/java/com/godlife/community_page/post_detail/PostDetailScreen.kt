@@ -483,6 +483,7 @@ fun Content(
                             false ->
                                 ContentDropDownNotBoardOwnerItem(
                                     postDetailViewModel= viewModel,
+                                    parentNavController = parentNavController,
                                     expanded = expanded
                                 )
                         }
@@ -759,13 +760,22 @@ fun DeleteSuccessScreen(
 fun ContentDropDownNotBoardOwnerItem(
     modifier: Modifier = Modifier,
     postDetailViewModel: PostDetailViewModel,
+    parentNavController: NavController,
     expanded: MutableState<Boolean>
 ){
+    val postId = postDetailViewModel.postId.collectAsState().value
+    val postDetail by postDetailViewModel.postDetail.collectAsState()
+    val writerNickname = postDetail.body?.nickname
+    val writerId = postDetail.body?.writerId
+    val category = "post"
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
             expanded.value = !expanded.value
+            parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}"){
+                launchSingleTop = true
+            }
 
         },
         leadingIcon = {
