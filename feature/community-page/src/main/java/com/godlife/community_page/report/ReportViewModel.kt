@@ -75,6 +75,10 @@ class ReportViewModel @Inject constructor(
     private val _reportedId = MutableStateFlow("")
     val reportedId: StateFlow<String> = _reportedId
 
+    //신고 사유
+    private val _reportReason = MutableStateFlow("신고 사유를 선택해주세요.")
+    val reportReason: StateFlow<String> = _reportReason
+
     // 신고내용
     private val _reportContent = mutableStateOf("")
     val reportContent: State<String> = _reportContent
@@ -129,7 +133,7 @@ class ReportViewModel @Inject constructor(
 
         Log.e("ReportViewModel", "category : ${category.value}, postId : ${articleId.value}, writerNickname : ${reportedNickname.value}, writerId : ${reportedId.value}")
 
-        if(category.value == "post"){
+        if(category.value == "board"){
             getPost()
 
         }
@@ -200,9 +204,14 @@ class ReportViewModel @Inject constructor(
     }
 
 
-    // 신고 사유 Text 변경
+    // 신고 내용 Text 변경
     fun updateText(newText: String) {
         _reportContent.value = newText.take(500)
+    }
+
+    // 신고 사유 변경
+    fun updateReason(newReason: String) {
+        _reportReason.value = newReason
     }
 
     // refresh token 갱신 후 Callback 실행

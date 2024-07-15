@@ -767,7 +767,7 @@ fun ContentDropDownNotBoardOwnerItem(
     val postDetail by postDetailViewModel.postDetail.collectAsState()
     val writerNickname = postDetail.body?.nickname
     val writerId = postDetail.body?.writerId
-    val category = "post"
+    val category = "board"
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },

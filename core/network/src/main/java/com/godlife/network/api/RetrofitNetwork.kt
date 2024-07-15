@@ -279,6 +279,21 @@ interface RetrofitNetworkApi {
         @Query("introduction") introduction: String
     ): ApiResponse<LatestStimulusPostQuery>
 
+    //신고하기
+    @POST("/report")
+    suspend fun report(
+        @Header("Authorization") authorization: String,
+        @Body reporterNickname: String,
+        @Body reporterId: Int,
+        @Body receivedNickname: String,
+        @Body receivedId: Int,
+        @Body reason: String,
+        @Body reportContent: String,
+        @Body reportId: Int,
+        @Body reportTime: String,
+        @Body reportType: String
+    ): ApiResponse<CommentQuery>
+
 }
 
 

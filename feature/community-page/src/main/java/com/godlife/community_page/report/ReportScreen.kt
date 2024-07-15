@@ -20,9 +20,16 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,6 +58,7 @@ import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(
     modifier: Modifier = Modifier,
@@ -75,6 +83,15 @@ fun ReportScreen(
     val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsState()
+
+    val reportOptions = listOf(
+        "비속어, 폭언, 비하, 음란 등의 내용",
+        "갈등 조장 및 허위 사실 유포",
+        "광고성 내용",
+        "기타(내용을 상세히 적어주세요.)"
+    )
+    var expanded by remember { mutableStateOf(false) }
+    val reason  = viewModel.reportReason.collectAsState()
 
     Box(){
 
@@ -160,8 +177,8 @@ fun ReportScreen(
                             )
 
                             Text(
-                                text = "4. 허위 신고로 판단이 되면 신고자님께 불이익이\n" +
-                                        "     생길 수 있어요.",
+                                text = "4. 부적절한 신고 및 허위 신고의 경우 운영원칙에 따라\n" +
+                                        "     제재를 받을 수 있어요.",
                                 style = TextStyle(
                                     color = GrayWhite,
                                     fontSize = 14.sp,
@@ -235,12 +252,66 @@ fun ReportScreen(
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
+
                         Spacer(modifier.size(10.dp))
                         HorizontalDivider()
                         Spacer(modifier.size(10.dp))
 
                         Text(
                             text = "신고 사유",
+                            style = TextStyle(
+                                color = PurpleMain,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                        Spacer(modifier.size(10.dp))
+
+                        ExposedDropdownMenuBox(
+                            expanded = expanded,
+                            onExpandedChange = { expanded = it },
+                        ) {
+                            TextField(
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                value = reason.value,
+                                onValueChange = {},
+                                readOnly = true,
+                                singleLine = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                colors = ExposedDropdownMenuDefaults.textFieldColors(
+                                    focusedContainerColor = GrayWhite3,
+                                    unfocusedContainerColor = GrayWhite3,
+                                    focusedIndicatorColor = PurpleMain,
+                                    unfocusedIndicatorColor = PurpleMain
+                                ),
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                            ) {
+                                reportOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                                        onClick = {
+                                            viewModel.updateReason(option)
+                                            expanded = false
+                                        },
+                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                    )
+                                }
+                            }
+                        }
+
+
+                        Spacer(modifier.size(10.dp))
+                        HorizontalDivider()
+                        Spacer(modifier.size(10.dp))
+
+
+
+                        Text(
+                            text = "신고 내용",
                             style = TextStyle(
                                 color = PurpleMain,
                                 fontSize = 16.sp,
@@ -260,7 +331,7 @@ fun ReportScreen(
                             GodLifeTextFieldGray(
                                 text = reportContent,
                                 onTextChanged = { viewModel.updateText(it) },
-                                hint = "신고 사유를 상세하게 작성해주세요.",
+                                hint = "신고 내용을 상세하게 작성해주세요.",
                                 singleLine = false
                             )
 
@@ -401,6 +472,7 @@ fun ReportScreen(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ReportPageScreenPreview(
@@ -408,6 +480,17 @@ fun ReportPageScreenPreview(
 ){
     var text by remember { mutableStateOf("") }
     var isCheck by remember { mutableStateOf(false) }
+
+    val options = listOf(
+        "비속어, 폭언, 비하, 음란 등의 내용",
+        "갈등 조장 및 허위 사실 유포",
+        "광고성 게시물",
+        "보상 목적 게시물(무성의한 게시물)",
+        "기타(내용을 상세히 적어주세요.)"
+    )
+    var expanded by remember { mutableStateOf(false) }
+    var reason by remember { mutableStateOf("") }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -487,8 +570,8 @@ fun ReportPageScreenPreview(
                     )
 
                     Text(
-                        text = "4. 허위 신고로 판단이 되면 신고자님께 불이익이\n" +
-                                "     생길 수 있어요.",
+                        text = "4. 부적절한 신고 및 허위 신고의 경우 운영원칙에 따라\n" +
+                                "     제재를 받을 수 있어요.",
                         style = TextStyle(
                             color = GrayWhite,
                             fontSize = 14.sp,
@@ -566,8 +649,59 @@ fun ReportPageScreenPreview(
                 HorizontalDivider()
                 Spacer(modifier.size(10.dp))
 
+
                 Text(
                     text = "신고 사유",
+                    style = TextStyle(
+                        color = PurpleMain,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+
+                Spacer(modifier.size(10.dp))
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                ) {
+                    TextField(
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        value = reason,
+                        onValueChange = {},
+                        readOnly = true,
+                        singleLine = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(
+                            focusedContainerColor = GrayWhite3,
+                            unfocusedContainerColor = GrayWhite3,
+                            focusedIndicatorColor = PurpleMain,
+                            unfocusedIndicatorColor = PurpleMain
+                        ),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        options.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                                onClick = {
+                                    reason = option
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier.size(10.dp))
+                HorizontalDivider()
+                Spacer(modifier.size(10.dp))
+
+                Text(
+                    text = "신고 내용",
                     style = TextStyle(
                         color = PurpleMain,
                         fontSize = 16.sp,
@@ -587,7 +721,7 @@ fun ReportPageScreenPreview(
                     GodLifeTextFieldGray(
                         text = text,
                         onTextChanged = {  },
-                        hint = "신고 사유를 상세하게 작성해주세요.",
+                        hint = "신고 내용을 상세하게 작성해주세요.",
                         singleLine = false
                     )
 
@@ -744,4 +878,56 @@ fun ErrorReportPageScreen(
         errorMessage = errorMsg,
         buttonEvent = {navController?.popBackStack()}
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun ReportCategoryPreview() {
+    val options = listOf(
+        "비속어, 폭언, 비하, 음란 등의 내용",
+        "갈등 조장 및 허위 사실 유포",
+        "광고성 게시물",
+        "보상 목적 게시물(무성의한 게시물)",
+        "기타(내용을 상세히 적어주세요.)"
+    )
+    var expanded by remember { mutableStateOf(false) }
+    var reason by remember { mutableStateOf(options[0]) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            TextField(
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                value = reason,
+                onValueChange = {},
+                readOnly = true,
+                singleLine = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                        onClick = {
+                            reason = option
+                            expanded = false
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    )
+                }
+            }
+        }
+    }
+
+
 }
