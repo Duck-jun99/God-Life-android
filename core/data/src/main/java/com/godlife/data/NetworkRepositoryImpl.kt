@@ -28,6 +28,7 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(
@@ -242,13 +243,13 @@ class NetworkRepositoryImpl @Inject constructor(
     override suspend fun report(
         authorization: String,
         reporterNickname: String,
-        reporterId: Int,
+        reporterId: Long,
         receivedNickname: String,
-        receivedId: Int,
+        receivedId: Long,
         reason: String,
         reportContent: String,
-        reportId: Int,
-        reportTime: String,
+        reportId: Long,
+        reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery> {
         return networkDataSource.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType)

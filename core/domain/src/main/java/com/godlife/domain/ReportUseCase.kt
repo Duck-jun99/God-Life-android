@@ -1,6 +1,7 @@
 package com.godlife.domain
 
 import com.godlife.data.repository.NetworkRepository
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class ReportUseCase @Inject constructor(
@@ -8,13 +9,13 @@ class ReportUseCase @Inject constructor(
 ) {
     suspend fun executeReport(authorization: String,
                               reporterNickname: String,
-                              reporterId: Int,
+                              reporterId: Long,
                               receivedNickname: String,
-                              receivedId: Int,
+                              receivedId: Long,
                               reason: String,
                               reportContent: String,
-                              reportId: Int,
-                              reportTime: String,
+                              reportId: Long,
+                              reportTime: LocalDateTime,
                               reportType: String
     ) = networkRepository.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType)
 

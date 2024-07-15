@@ -26,8 +26,7 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
-import retrofit2.http.Body
-import retrofit2.http.Header
+import java.time.LocalDateTime
 
 interface NetworkDataSource {
     suspend fun checkUserExistence(id: String): UserExistenceCheckResult?
@@ -190,13 +189,13 @@ interface NetworkDataSource {
     suspend fun report(
         authorization: String,
         reporterNickname: String,
-        reporterId: Int,
+        reporterId: Long,
         receivedNickname: String,
-        receivedId: Int,
+        receivedId: Long,
         reason: String,
         reportContent: String,
-        reportId: Int,
-        reportTime: String,
+        reportId: Long,
+        reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery>
 

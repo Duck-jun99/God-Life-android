@@ -26,6 +26,7 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
+import java.time.LocalDateTime
 
 interface NetworkRepository {
     suspend fun checkUserExistence(id : String) : UserExistenceCheckResult?
@@ -192,13 +193,13 @@ interface NetworkRepository {
     suspend fun report(
         authorization: String,
         reporterNickname: String,
-        reporterId: Int,
+        reporterId: Long,
         receivedNickname: String,
-        receivedId: Int,
+        receivedId: Long,
         reason: String,
         reportContent: String,
-        reportId: Int,
-        reportTime: String,
+        reportId: Long,
+        reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery>
 

@@ -25,6 +25,7 @@ import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.ReportRequest
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -283,15 +284,7 @@ interface RetrofitNetworkApi {
     @POST("/report")
     suspend fun report(
         @Header("Authorization") authorization: String,
-        @Body reporterNickname: String,
-        @Body reporterId: Int,
-        @Body receivedNickname: String,
-        @Body receivedId: Int,
-        @Body reason: String,
-        @Body reportContent: String,
-        @Body reportId: Int,
-        @Body reportTime: String,
-        @Body reportType: String
+        @Body requestBody: ReportRequest
     ): ApiResponse<CommentQuery>
 
 }

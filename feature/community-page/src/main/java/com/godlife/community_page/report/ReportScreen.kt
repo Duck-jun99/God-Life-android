@@ -1,5 +1,6 @@
 package com.godlife.community_page.report
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,9 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +73,10 @@ fun ReportScreen(
     navController: NavController,
     viewModel: ReportViewModel = hiltViewModel()
 ){
+
+    Log.e("asdf", LocalDateTime.now().toString())
+    Log.e("asdf", LocalTime.now().toString())
+    Log.e("asdf", LocalDate.now().toString())
 
     viewModel.init(postId, userNickname, userId, category)
 
@@ -234,7 +242,7 @@ fun ReportScreen(
 
                             //게시물 신고면 "신고 게시물 제목", 댓글 신고면 "신고 댓글 내용"
                             Text(
-                                text = "신고 게시물 제목 :  ",
+                                text = if(category.value == "board") "신고 게시물 제목 :  " else "신고 댓글 내용 :  ",
                                 style = TextStyle(
                                     color = PurpleMain,
                                     fontSize = 16.sp,
@@ -389,8 +397,11 @@ fun ReportScreen(
                             GodLifeButtonWhite(
                                 enabled = isCheck,
                                 onClick = {
-                                    if(reportContent.length ==0 || reportContent == " "){
-                                        Toast.makeText(context, "신고 사유를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                                    if(reason.value == "신고 사유를 선택해주세요."){
+                                        Toast.makeText(context, "신고 사유를 선택해주세요.", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else if(reportContent.isEmpty() || reportContent == " "){
+                                        Toast.makeText(context, "신고 내용을 입력해주세요.", Toast.LENGTH_SHORT).show()
                                     }
                                     else{
                                         isDialogVisble = !isDialogVisble
@@ -424,11 +435,14 @@ fun ReportScreen(
 
             }
             is ReportUiState.SendSuccess -> {
-                SendSuccessReportPageScreen(navController = navController)
+                SendSuccessReportPageScreen(
+                    navController = navController
+                )
             }
             is ReportUiState.Error -> {
                 ErrorReportPageScreen(
-                    errorMsg = (uiState as ReportUiState.Error).error
+                    errorMsg = (uiState as ReportUiState.Error).error,
+                    navController = navController
                 )
             }
         }
@@ -449,7 +463,7 @@ fun ReportScreen(
                     GodLifeButtonWhite(
                         onClick = {
 
-                            /* TODO */
+                            viewModel.sendReport()
 
                             isDialogVisble = !isDialogVisble
 

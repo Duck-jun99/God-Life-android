@@ -9,6 +9,7 @@ import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.ReportUseCase
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 
 sealed class ReportUiState{
@@ -41,6 +44,7 @@ class ReportViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getPostDetailUseCase: GetPostDetailUseCase,
+    private val reportUseCase: ReportUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel(){
 
@@ -64,16 +68,16 @@ class ReportViewModel @Inject constructor(
     val reporterNickname: StateFlow<String> = _reporterNickname
 
     // 신고자 아이디
-    private val _reporterId = MutableStateFlow("")
-    val reporterId: StateFlow<String> = _reporterId
+    private val _reporterId = MutableStateFlow(0)
+    val reporterId: StateFlow<Int> = _reporterId
 
     // 신고받은 사람 닉네임
     private val _reportedNickname = MutableStateFlow("")
     val reportedNickname: StateFlow<String> = _reportedNickname
 
     // 신고받은 사람 아이디
-    private val _reportedId = MutableStateFlow("")
-    val reportedId: StateFlow<String> = _reportedId
+    private val _reportedId = MutableStateFlow(0)
+    val reportedId: StateFlow<Int> = _reportedId
 
     //신고 사유
     private val _reportReason = MutableStateFlow("신고 사유를 선택해주세요.")
@@ -92,8 +96,8 @@ class ReportViewModel @Inject constructor(
     val articleTitle: StateFlow<String> = _articleTitle
 
     // 게시물(댓글)아이디
-    private val _articleId = MutableStateFlow("")
-    val articleId: StateFlow<String> = _articleId
+    private val _articleId = MutableStateFlow(0)
+    val articleId: StateFlow<Int> = _articleId
 
     // 신고자(해당 신고를 이용하는 유저)의 정보를 가져왔는지 플래그
     private val isGetUserInfo = mutableStateOf(false)
@@ -101,6 +105,8 @@ class ReportViewModel @Inject constructor(
     // 게시물(또는 댓글)을 가져왔는지 플래그
     private val isGetArticle = mutableStateOf(false)
 
+    // 신고 접수 플래그
+    private val isSendReport = mutableStateOf(false)
 
     /*
     * Init
@@ -127,9 +133,9 @@ class ReportViewModel @Inject constructor(
 
 
         _category.value = categoryType
-        _articleId.value = postId
+        _articleId.value = postId.toInt()
         _reportedNickname.value = writerNickname
-        _reportedId.value = writerId
+        _reportedId.value = writerId.toInt()
 
         Log.e("ReportViewModel", "category : ${category.value}, postId : ${articleId.value}, writerNickname : ${reportedNickname.value}, writerId : ${reportedId.value}")
 
@@ -151,7 +157,9 @@ class ReportViewModel @Inject constructor(
         if(!isGetArticle.value){
             viewModelScope.launch {
 
-                val result = getPostDetailUseCase.executeGetPostDetail(auth.value, articleId.value)
+                val result = getPostDetailUseCase.executeGetPostDetail(auth.value,
+                    articleId.value.toString()
+                )
                 result
                     .onSuccess {
                         _articleTitle.value = data.body!!.title
@@ -188,7 +196,7 @@ class ReportViewModel @Inject constructor(
                 result
                     .onSuccess {
                         _reporterNickname.value = data.body.nickname
-                        _reporterId.value = data.body.memberId.toString()
+                        _reporterId.value = data.body.memberId
 
                         isGetUserInfo.value = true
                         _uiState.value = ReportUiState.Success("성공")
@@ -213,6 +221,50 @@ class ReportViewModel @Inject constructor(
     fun updateReason(newReason: String) {
         _reportReason.value = newReason
     }
+
+    // 신고 접수
+    fun sendReport(){
+        if(!isSendReport.value){
+            _uiState.value = ReportUiState.Loading
+            viewModelScope.launch {
+                val result = reportUseCase.executeReport(
+                    authorization= auth.value,
+                    reporterNickname= reporterNickname.value,
+                    reporterId= reporterId.value.toLong(),
+                    receivedNickname= reportedNickname.value,
+                    receivedId= reportedId.value.toLong(),
+                    reason= reportReason.value,
+                    reportContent= reportContent.value,
+                    reportId= articleId.value.toLong(),
+                    reportTime= LocalDateTime.now(),
+                    reportType= category.value
+                    )
+
+                result
+                    .onSuccess {
+                        _uiState.value = ReportUiState.SendSuccess
+                        isSendReport.value = true
+                    }
+                    .onError {
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            reIssueRefreshToken(callback = { sendReport()})
+
+                        }
+                        else{
+                            _uiState.value = ReportUiState.Error(this.response.message())
+                        }
+                    }
+                    .onException {
+                        _uiState.value = ReportUiState.Error(this.message())
+                    }
+
+            }
+        }
+    }
+
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){

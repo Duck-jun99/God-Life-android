@@ -29,6 +29,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.ReportRequest
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -37,6 +38,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class NetworkDataSourceImpl @Inject constructor(
@@ -310,16 +312,16 @@ class NetworkDataSourceImpl @Inject constructor(
     override suspend fun report(
         authorization: String,
         reporterNickname: String,
-        reporterId: Int,
+        reporterId: Long,
         receivedNickname: String,
-        receivedId: Int,
+        receivedId: Long,
         reason: String,
         reportContent: String,
-        reportId: Int,
-        reportTime: String,
+        reportId: Long,
+        reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery> {
-        return networkApi.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType)
+        return networkApi.report(authorization, ReportRequest(reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType) )
     }
 
 
