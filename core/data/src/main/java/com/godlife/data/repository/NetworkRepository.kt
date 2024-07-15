@@ -189,6 +189,19 @@ interface NetworkRepository {
         introduction: String
     ): ApiResponse<LatestStimulusPostQuery>
 
+    suspend fun report(
+        authorization: String,
+        reporterNickname: String,
+        reporterId: Int,
+        receivedNickname: String,
+        receivedId: Int,
+        reason: String,
+        reportContent: String,
+        reportId: Int,
+        reportTime: String,
+        reportType: String
+    ): ApiResponse<CommentQuery>
+
 
 
 }

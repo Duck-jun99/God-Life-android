@@ -26,6 +26,8 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
+import retrofit2.http.Body
+import retrofit2.http.Header
 
 interface NetworkDataSource {
     suspend fun checkUserExistence(id: String): UserExistenceCheckResult?
@@ -184,5 +186,18 @@ interface NetworkDataSource {
         nickname: String,
         introduction: String
     ): ApiResponse<LatestStimulusPostQuery>
+
+    suspend fun report(
+        authorization: String,
+        reporterNickname: String,
+        reporterId: Int,
+        receivedNickname: String,
+        receivedId: Int,
+        reason: String,
+        reportContent: String,
+        reportId: Int,
+        reportTime: String,
+        reportType: String
+    ): ApiResponse<CommentQuery>
 
 }

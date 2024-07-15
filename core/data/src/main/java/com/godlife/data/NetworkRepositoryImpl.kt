@@ -239,4 +239,19 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.searchStimulusPost(authorization, title, nickname, introduction)
     }
 
+    override suspend fun report(
+        authorization: String,
+        reporterNickname: String,
+        reporterId: Int,
+        receivedNickname: String,
+        receivedId: Int,
+        reason: String,
+        reportContent: String,
+        reportId: Int,
+        reportTime: String,
+        reportType: String
+    ): ApiResponse<CommentQuery> {
+        return networkDataSource.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType)
+    }
+
 }
