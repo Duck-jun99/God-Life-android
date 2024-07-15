@@ -199,7 +199,7 @@ interface NetworkRepository {
         reason: String,
         reportContent: String,
         reportId: Long,
-        reportTime: LocalDateTime,
+        //reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery>
 

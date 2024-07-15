@@ -108,6 +108,9 @@ class ReportViewModel @Inject constructor(
     // 신고 접수 플래그
     private val isSendReport = mutableStateOf(false)
 
+    // 초기화 플래그
+    private val isInit = mutableStateOf(false)
+
     /*
     * Init
      */
@@ -131,21 +134,27 @@ class ReportViewModel @Inject constructor(
         categoryType:String,
     ){
 
+        if(!isInit.value){
 
-        _category.value = categoryType
-        _articleId.value = postId.toInt()
-        _reportedNickname.value = writerNickname
-        _reportedId.value = writerId.toInt()
+            _category.value = categoryType
+            _articleId.value = postId.toInt()
+            _reportedNickname.value = writerNickname
+            _reportedId.value = writerId.toInt()
 
-        Log.e("ReportViewModel", "category : ${category.value}, postId : ${articleId.value}, writerNickname : ${reportedNickname.value}, writerId : ${reportedId.value}")
+            Log.e("ReportViewModel", "category : ${category.value}, postId : ${articleId.value}, writerNickname : ${reportedNickname.value}, writerId : ${reportedId.value}")
 
-        if(category.value == "board"){
-            getPost()
+            if(category.value == "board"){
+                getPost()
+
+            }
+            else if (category.value == "comment"){
+                getUserInfo()
+            }
+
+            isInit.value = true
 
         }
-        else if (category.value == "comment"){
-            /* TODO */
-        }
+
 
 
     }
@@ -236,7 +245,7 @@ class ReportViewModel @Inject constructor(
                     reason= reportReason.value,
                     reportContent= reportContent.value,
                     reportId= articleId.value.toLong(),
-                    reportTime= LocalDateTime.now(),
+                    //reportTime= LocalDateTime.now(),
                     reportType= category.value
                     )
 
@@ -254,7 +263,8 @@ class ReportViewModel @Inject constructor(
 
                         }
                         else{
-                            _uiState.value = ReportUiState.Error(this.response.message())
+                            Log.e("onError", this.message())
+                            _uiState.value = ReportUiState.Error("${this.response.code()} Error")
                         }
                     }
                     .onException {

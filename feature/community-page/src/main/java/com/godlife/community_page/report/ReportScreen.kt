@@ -70,6 +70,7 @@ fun ReportScreen(
     userNickname: String,
     userId:String,
     category:String,
+    title: String,
     navController: NavController,
     viewModel: ReportViewModel = hiltViewModel()
 ){
@@ -251,7 +252,7 @@ fun ReportScreen(
                             )
                             //신고 대상 게시물 제목 or 댓글 내용
                             Text(
-                                text = articleTitle.value,
+                                text = if(category.value == "board") articleTitle.value else title,
                                 style = TextStyle(
                                     color = GrayWhite,
                                     fontSize = 16.sp,

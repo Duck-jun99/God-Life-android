@@ -318,10 +318,10 @@ class NetworkDataSourceImpl @Inject constructor(
         reason: String,
         reportContent: String,
         reportId: Long,
-        reportTime: LocalDateTime,
+        //reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery> {
-        return networkApi.report(authorization, ReportRequest(reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType) )
+        return networkApi.report(authorization, ReportRequest(reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType) )
     }
 
 

@@ -15,8 +15,8 @@ class ReportUseCase @Inject constructor(
                               reason: String,
                               reportContent: String,
                               reportId: Long,
-                              reportTime: LocalDateTime,
+                              //reportTime: LocalDateTime,
                               reportType: String
-    ) = networkRepository.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType)
+    ) = networkRepository.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType)
 
 }

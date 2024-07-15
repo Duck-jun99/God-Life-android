@@ -249,10 +249,10 @@ class NetworkRepositoryImpl @Inject constructor(
         reason: String,
         reportContent: String,
         reportId: Long,
-        reportTime: LocalDateTime,
+        //reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery> {
-        return networkDataSource.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportTime, reportType)
+        return networkDataSource.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType)
     }
 
 }

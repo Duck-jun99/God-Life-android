@@ -11,6 +11,6 @@ data class ReportRequest(
     val reason: String,
     val reportContent: String,
     val reportId: Long,
-    val reportTime: LocalDateTime,
+    //val reportTime: LocalDateTime,
     val reportType: String
 )

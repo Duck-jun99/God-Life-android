@@ -230,24 +230,27 @@ fun MainUiTheme(
                     }
 
                     //신고화면
-                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}",
+                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}/{title}",
                         arguments = listOf(
                             navArgument("postId"){type = NavType.StringType},
                             navArgument("userNickname"){type = NavType.StringType},
                             navArgument("userId"){type = NavType.StringType},
                             navArgument("category"){type = NavType.StringType},
+                            navArgument("title"){type = NavType.StringType},
                         )
                     ){
                         val postId = it.arguments?.getString("postId")
                         val userNickname = it.arguments?.getString("userNickname")
                         val userId = it.arguments?.getString("userId")
                         val category = it.arguments?.getString("category")
-                        if (postId != null && userNickname != null && userId != null && category != null) {
+                        val title = it.arguments?.getString("title")
+                        if (postId != null && userNickname != null && userId != null && category != null && title != null) {
                             ReportScreen(
                                 postId = postId,
                                 userNickname = userNickname,
                                 userId = userId,
                                 category = category,
+                                title = title,
                                 navController = navController
                             )
                         }

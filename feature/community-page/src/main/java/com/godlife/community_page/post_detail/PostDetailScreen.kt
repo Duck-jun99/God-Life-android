@@ -175,7 +175,15 @@ fun PostDetailScreen(
 
                             }
 
-                            item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
+                            item {
+                                Comments(
+                                    comments = comments,
+                                    snackbarHostState = snackBarHostState,
+                                    cScope = cScope,
+                                    parentNavController = parentNavController,
+                                    postDetailViewModel =  postDetailViewModel
+                                )
+                            }
 
 
                         }
@@ -588,7 +596,14 @@ fun Content2(
 
 
 @Composable
-fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel){
+fun Comments(
+    modifier: Modifier = Modifier,
+    comments: List<CommentBody>,
+    snackbarHostState: SnackbarHostState,
+    cScope: CoroutineScope,
+    parentNavController: NavController,
+    postDetailViewModel: PostDetailViewModel
+){
 
     Column(
         modifier = Modifier.padding(10.dp)
@@ -605,7 +620,7 @@ fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackba
 
             comments.forEach {
 
-                CommentBox(commentBody = it, snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel)
+                CommentBox(commentBody = it, snackbarHostState = snackbarHostState, cScope = cScope, parentNavController = parentNavController, postDetailViewModel =  postDetailViewModel)
 
             }
 
@@ -617,7 +632,13 @@ fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackba
 }
 
 @Composable
-fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel){
+fun CommentBox(
+    modifier: Modifier = Modifier,
+    commentBody: CommentBody,
+    snackbarHostState: SnackbarHostState,
+    cScope: CoroutineScope,
+    parentNavController: NavController,
+    postDetailViewModel: PostDetailViewModel){
 
     val expanded = remember { mutableStateOf(false) }
 
@@ -693,7 +714,7 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
                 ) {
 
                     if(commentBody.commentOwner) CommentDropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody, expanded = expanded)
-                    else CommentDropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
+                    else CommentDropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, parentNavController = parentNavController, viewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
 
                 }
             }
@@ -768,12 +789,13 @@ fun ContentDropDownNotBoardOwnerItem(
     val writerNickname = postDetail.body?.nickname
     val writerId = postDetail.body?.writerId
     val category = "board"
+    val comment = "no"
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
             expanded.value = !expanded.value
-            parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}"){
+            parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}/${comment}"){
                 launchSingleTop = true
             }
 
@@ -830,15 +852,28 @@ fun CommentDropDownDeclareItem(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     cScope: CoroutineScope,
-    postDetailViewModel: PostDetailViewModel,
+    viewModel: PostDetailViewModel,
+    parentNavController: NavController,
     commentBody: CommentBody,
     expanded: MutableState<Boolean>
 ){
+
+    val postId = commentBody.comment_id
+    val writerNickname = commentBody.nickname
+    val writerId = commentBody.writer_id
+    val category = "comment"
+    val comment = if(commentBody.comment.length>15) commentBody.comment.substring(0,15) + "..." else commentBody.comment
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
             expanded.value = !expanded.value
+
+            expanded.value = !expanded.value
+            parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}/${comment}"){
+                launchSingleTop = true
+            }
+            /*
             cScope.launch {
                 val result =
                     snackbarHostState.showSnackbar(
@@ -855,6 +890,8 @@ fun CommentDropDownDeclareItem(
                     }
                 }
             }
+
+             */
         },
         leadingIcon = {
             Icon(imageVector = Icons.Outlined.Warning, contentDescription = "신고하기", tint = GrayWhite)
