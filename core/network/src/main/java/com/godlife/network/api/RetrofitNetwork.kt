@@ -227,11 +227,24 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String
     ): ApiResponse<RankingQuery>
 
-    //알림 시간 전송
+    //알람 시간 전송
     @POST("/fcm/alarm")
     suspend fun postNotificationTime(
         @Header("Authorization") authorization: String,
         @Body notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
+
+    //알람 시간 수정
+    @PUT("/fcm/alarm")
+    suspend fun patchNotificationTime(
+        @Header("Authorization") authorization: String,
+        @Body notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
+
+    //알람 시간 삭제
+    @DELETE("/fcm/alarm")
+    suspend fun deleteNotificationTime(
+        @Header("Authorization") authorization: String
     ): ApiResponse<NotificationQuery>
 
 

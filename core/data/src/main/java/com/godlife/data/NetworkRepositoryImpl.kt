@@ -205,6 +205,17 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.postNotificationTime(authorization, notificationTime)
     }
 
+    override suspend fun patchNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkDataSource.patchNotificationTime(authorization, notificationTime)
+    }
+
+    override suspend fun deleteNotificationTime(authorization: String): ApiResponse<NotificationQuery> {
+        return networkDataSource.deleteNotificationTime(authorization)
+    }
+
     override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
         return networkDataSource.createStimulusPostTemp(authorization)
     }

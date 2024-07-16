@@ -154,6 +154,15 @@ interface NetworkDataSource {
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery>
 
+    suspend fun patchNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
+
+    suspend fun deleteNotificationTime(
+        authorization: String
+    ): ApiResponse<NotificationQuery>
+
     suspend fun createStimulusPostTemp(
         authorization: String
     ): ApiResponse<StimulusPostQuery>
