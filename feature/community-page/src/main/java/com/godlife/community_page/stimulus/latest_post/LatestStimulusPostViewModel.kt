@@ -1,10 +1,13 @@
-package com.godlife.community_page.stimulus.recommended_post
+package com.godlife.community_page.stimulus.latest_post
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.godlife.community_page.stimulus.StimulusPostUiState
-import com.godlife.domain.GetRecommendedStimulusPostUseCase
+import com.godlife.domain.GetLatestStimulusPostUseCase
+import com.godlife.domain.GetMostViewStimulusPostUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.StimulusPostList
@@ -13,15 +16,16 @@ import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RecommendedStimulusPostViewModel @Inject constructor(
+class LatestStimulusPostViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getRecommendedStimulusPostUseCase: GetRecommendedStimulusPostUseCase,
+    private val getLatestStimulusPostUseCase: GetLatestStimulusPostUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 
@@ -40,9 +44,14 @@ class RecommendedStimulusPostViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
+    /*
     //게시물
     private val _postList = MutableStateFlow<List<StimulusPostList?>>(emptyList())
     val postList: StateFlow<List<StimulusPostList?>> = _postList
+
+     */
+    //조회된 최신 게시물, 페이징을 이용하기에 지연 초기화
+    lateinit var latestPostList: Flow<PagingData<StimulusPostList>>
 
     //게시물을 호출했는지 플래그
     private var isGetPost = mutableStateOf(false)
@@ -58,8 +67,8 @@ class RecommendedStimulusPostViewModel @Inject constructor(
             _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
         }
 
-        //추천 게시물 호출
-        getRecommendedStimulusPost()
+        //최신 게시물 호출
+        getLatestStimulusPost()
 
     }
 
@@ -67,25 +76,13 @@ class RecommendedStimulusPostViewModel @Inject constructor(
      * Functions
      */
 
-    private fun getRecommendedStimulusPost(){
+    private fun getLatestStimulusPost(){
 
         if(!isGetPost.value){
 
-            viewModelScope.launch {
-                val result = getRecommendedStimulusPostUseCase.executeGetRecommendedStimulusPost(auth.value)
+            latestPostList = getLatestStimulusPostUseCase.executeGetLatestStimulusPost().cachedIn(viewModelScope)
+            _uiState.value = StimulusPostUiState.Success("성공")
 
-                result
-                    .onSuccess {
-                        _postList.value = data.body
-                        _uiState.value = StimulusPostUiState.Success("성공")
-                    }
-                    .onError {
-                        _uiState.value = StimulusPostUiState.Error("${this.response.code()} Error")
-                    }
-                    .onException {
-                        _uiState.value = StimulusPostUiState.Error(this.message())
-                    }
-            }
             isGetPost.value = true
         }
     }

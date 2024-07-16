@@ -30,12 +30,6 @@ sealed class StimulusPostUiState {
 @HiltViewModel
 class StimulusPostViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getLatestStimulusPostUseCase: GetLatestStimulusPostUseCase,
-    private val getRecommendedStimulusPostUseCase: GetRecommendedStimulusPostUseCase,
-    private val getFamousPostUseCase: GetFamousPostUseCase,
-    private val getMostViewStimulusPostUseCase: GetMostViewStimulusPostUseCase,
-    private val getFamousAuthorStimulusPostUseCase: GetFamousAuthorStimulusPostUseCase,
-    private val getPostDetailUseCase: GetPostDetailUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 
@@ -54,13 +48,6 @@ class StimulusPostViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
-    //최신 게시물을 호출한 적이 있는지 플래그
-    private var latestFlag = mutableStateOf(false)
-
-    //조회된 최신 게시물, 페이징을 이용하기에 지연 초기화
-    lateinit var latestPostList: Flow<PagingData<StimulusPostList>>
-
-
     /**
      * Init
      */
@@ -72,7 +59,6 @@ class StimulusPostViewModel @Inject constructor(
             _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
         }
 
-        getLatestStimulusPost()
 
     }
 
@@ -80,15 +66,6 @@ class StimulusPostViewModel @Inject constructor(
      * Functions
      */
 
-    private fun getLatestStimulusPost() {
 
-        if(!latestFlag.value) {
-            viewModelScope.launch {
-                latestPostList = getLatestStimulusPostUseCase.executeGetLatestStimulusPost()
-            }
-            latestFlag.value = true
-        }
-
-    }
 
 }

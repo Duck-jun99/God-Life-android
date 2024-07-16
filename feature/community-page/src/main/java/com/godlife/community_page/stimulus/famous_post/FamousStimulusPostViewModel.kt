@@ -1,10 +1,10 @@
-package com.godlife.community_page.stimulus.recommended_post
+package com.godlife.community_page.stimulus.famous_post
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.community_page.stimulus.StimulusPostUiState
-import com.godlife.domain.GetRecommendedStimulusPostUseCase
+import com.godlife.domain.GetFamousStimulusPostUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.StimulusPostList
@@ -19,9 +19,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RecommendedStimulusPostViewModel @Inject constructor(
+class FamousStimulusPostViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getRecommendedStimulusPostUseCase: GetRecommendedStimulusPostUseCase,
+    private val getFamousStimulusPostUseCase: GetFamousStimulusPostUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 
@@ -58,8 +58,8 @@ class RecommendedStimulusPostViewModel @Inject constructor(
             _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
         }
 
-        //추천 게시물 호출
-        getRecommendedStimulusPost()
+        //인기 게시물 호출
+        getFamousStimulusPost()
 
     }
 
@@ -67,12 +67,12 @@ class RecommendedStimulusPostViewModel @Inject constructor(
      * Functions
      */
 
-    private fun getRecommendedStimulusPost(){
+    private fun getFamousStimulusPost(){
 
         if(!isGetPost.value){
 
             viewModelScope.launch {
-                val result = getRecommendedStimulusPostUseCase.executeGetRecommendedStimulusPost(auth.value)
+                val result = getFamousStimulusPostUseCase.executeGetFamousStimulusPost(auth.value)
 
                 result
                     .onSuccess {

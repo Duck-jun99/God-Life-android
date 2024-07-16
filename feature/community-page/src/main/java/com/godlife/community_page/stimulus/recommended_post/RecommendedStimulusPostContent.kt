@@ -76,7 +76,7 @@ fun RecommendedStimulusPostContent(
     viewModel: RecommendedStimulusPostViewModel = hiltViewModel()
 ){
 
-    val item = viewModel.recommendedPost.collectAsState().value
+    val item = viewModel.postList.collectAsState().value
 
     val uiState = viewModel.uiState.collectAsState().value
 
@@ -145,7 +145,7 @@ fun RecommendedStimulusPostContent(
                                 .fillMaxHeight()
                                 .width(width)
                                 .background(Color.Black)
-                                .clickable { navController?.navigate(StimulusPostDetailRoute.route) },
+                                .clickable { navController.navigate("${StimulusPostDetailRoute.route}/${item.boardId}") },
                             contentAlignment = Alignment.Center
                         ){
 
