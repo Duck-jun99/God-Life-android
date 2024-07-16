@@ -176,7 +176,11 @@ fun PostDetailScreen(
                             postDetail.body?.let {
 
                                 item{
-                                    Content2(memberLikedBoard = it.memberLikedBoard, viewModel = postDetailViewModel)
+                                    Content2(
+                                        memberLikedBoard = it.memberLikedBoard,
+                                        owner = it.boardOwner,
+                                        viewModel = postDetailViewModel
+                                    )
                                 }
 
                             }
@@ -557,6 +561,7 @@ fun Content(
 fun Content2(
     modifier: Modifier = Modifier,
     memberLikedBoard: Boolean = true,
+    owner: Boolean,
     viewModel: PostDetailViewModel
 ){
     Column(
@@ -567,42 +572,44 @@ fun Content2(
             .padding(10.dp)
     ) {
 
-        if(!memberLikedBoard){
-            Text(
-                text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
-                style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
-            )
+        if(!owner){
 
-            Spacer(modifier.size(20.dp))
+            if(!memberLikedBoard){
+                Text(
+                    text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+                )
 
-            GodLifeButtonWhite(
-                modifier = modifier
-                    .align(Alignment.CenterHorizontally),
-                leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
-                onClick = { viewModel.agreeGodLife() },
-                text = { Text(text = "굿생 인정!") }
-            )
+                Spacer(modifier.size(20.dp))
+
+                GodLifeButtonWhite(
+                    modifier = modifier
+                        .align(Alignment.CenterHorizontally),
+                    leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
+                    onClick = { viewModel.agreeGodLife() },
+                    text = { Text(text = "굿생 인정!") }
+                )
+            }
+
+            else{
+                Icon(
+                    modifier = modifier
+                        .align(Alignment.CenterHorizontally),
+                    imageVector = Icons.Outlined.ThumbUp,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = "유저님께서 굿생을 인정하신 글이에요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                    textAlign = TextAlign.Center
+                )
+            }
+
         }
-
-        else{
-            Icon(
-                modifier = modifier
-                    .align(Alignment.CenterHorizontally),
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = "",
-                tint = PurpleMain
-            )
-
-            Text(
-                modifier = modifier
-                    .fillMaxWidth(),
-                text = "유저님께서 굿생을 인정하신 글이에요!",
-                style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
-                textAlign = TextAlign.Center
-            )
-        }
-
-
 
 
     }
