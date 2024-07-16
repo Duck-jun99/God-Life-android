@@ -34,4 +34,6 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
 
     implementation(projects.feature.createPost)
+
+    implementation ("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 }

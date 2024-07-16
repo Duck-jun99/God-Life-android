@@ -178,6 +178,12 @@ class UpdatePostViewModel @Inject constructor(
         }
     }
 
+    fun onMove(from: Int, to: Int) {
+        _selectedImgUri.value = _selectedImgUri.value.toMutableList().apply {
+            add(to, removeAt(from))
+        }
+    }
+
     override fun onCleared() {
         Log.e("UpdatePostViewModel", "onCleared")
         super.onCleared()
