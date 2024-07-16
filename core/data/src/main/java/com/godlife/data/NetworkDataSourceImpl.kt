@@ -21,7 +21,7 @@ import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
-import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.StimulusPostDetailQuery
@@ -38,7 +38,6 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class NetworkDataSourceImpl @Inject constructor(
@@ -300,8 +299,24 @@ class NetworkDataSourceImpl @Inject constructor(
     override suspend fun getStimulusLatestPost(
         authorization: String,
         page: Int
-    ): ApiResponse<LatestStimulusPostQuery> {
+    ): ApiResponse<StimulusPostListQuery> {
         return networkApi.getStimulusLatestPost(authorization, page)
+    }
+
+    override suspend fun getStimulusFamousPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusFamousPost(authorization)
+    }
+
+    override suspend fun getStimulusMostViewPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusMostViewPost(authorization)
+    }
+
+    override suspend fun getStimulusFamousAuthorPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusFamousAuthorPost(authorization)
+    }
+
+    override suspend fun getStimulusRecommendPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusRecommendPost(authorization)
     }
 
     override suspend fun getStimulusPostDetail(
@@ -316,7 +331,7 @@ class NetworkDataSourceImpl @Inject constructor(
         title: String,
         nickname: String,
         introduction: String
-    ): ApiResponse<LatestStimulusPostQuery> {
+    ): ApiResponse<StimulusPostListQuery> {
         return networkApi.searchStimulusPost(authorization, title, nickname, introduction)
     }
 

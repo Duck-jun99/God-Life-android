@@ -8,7 +8,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
-import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -208,7 +208,7 @@ interface RetrofitNetworkApi {
         @Path("commentId") commentId: String,
     ): ApiResponse<CommentQuery>
 
-    //갓생 인정
+    //굿생 인정
     @POST("/like/board/{boardId}")
     suspend fun agreeGodLife(
         @Header("Authorization") authorization: String,
@@ -248,13 +248,13 @@ interface RetrofitNetworkApi {
     ): ApiResponse<NotificationQuery>
 
 
-    //갓생 자극 게시물 임시 생성
+    //굿생 자극 게시물 임시 생성
     @POST("/board/tmp")
     suspend fun createStimulusPostTemp(
         @Header("Authorization") authorization: String
     ): ApiResponse<StimulusPostQuery>
 
-    //갓생 자극 게시물 이미지 업로드
+    //굿생 자극 게시물 이미지 업로드
     @Multipart
     @POST("/board/image-upload")
     suspend fun uploadStimulusPostImage(
@@ -263,7 +263,7 @@ interface RetrofitNetworkApi {
         @Part image: MultipartBody.Part
     ): ApiResponse<ImageUploadStimulusQuery>
 
-    //갓생 자극 게시물 최종 생성
+    //굿생 자극 게시물 최종 생성
     @POST("/board/stimulation")
     suspend fun createStimulusPost(
         @Header("Authorization") authorization: String,
@@ -271,28 +271,52 @@ interface RetrofitNetworkApi {
     ): ApiResponse<StimulusPostQuery>
 
 
-    // 갓생 자극 최신 게시물 조회
+    // 굿생 자극 최신 게시물 리스트 조회
     @GET("/boards/stimulation")
     suspend fun getStimulusLatestPost(
         @Header("Authorization") authorization: String,
         @Query("page") page: Int
-    ): ApiResponse<LatestStimulusPostQuery>
+    ): ApiResponse<StimulusPostListQuery>
 
-    // 갓생 자극 게시물 상세 조회
+    // 굿생 자극 인기 게시물 리스트 조회
+    @GET("/popular/stimulus/boards/all-time")
+    suspend fun getStimulusFamousPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    // 굿생 자극 조회 수 많은 게시물 리스트 조회
+    @GET("/popular/stimulus/boards/view")
+    suspend fun getStimulusMostViewPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    // 굿생 자극 추천 작가의 게시물 리스트 조회 (관리자 선정)
+    @GET("/recommend/author")
+    suspend fun getStimulusFamousAuthorPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    // 굿생 자극 추천 게시물 리스트 조회 (관리자 선정)
+    @GET("/recommend/board")
+    suspend fun getStimulusRecommendPost(
+        @Header("Authorization") authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    // 굿생 자극 게시물 상세 조회
     @GET("/board/stimulation/{boardId}")
     suspend fun getStimulusPostDetail(
         @Header("Authorization") authorization: String,
         @Path("boardId") boardId: String,
     ): ApiResponse<StimulusPostDetailQuery>
 
-    //갓생 자극 게시물 검색
+    //굿생 자극 게시물 검색
     @GET("/boards/stimulation/filter")
     suspend fun searchStimulusPost(
         @Header("Authorization") authorization: String,
         @Query("title") title: String,
         @Query("nickname") nickname: String,
         @Query("introduction") introduction: String
-    ): ApiResponse<LatestStimulusPostQuery>
+    ): ApiResponse<StimulusPostListQuery>
 
     //신고하기
     @POST("/report")

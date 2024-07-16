@@ -9,7 +9,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
-import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -26,7 +26,6 @@ import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
 import com.skydoves.sandwich.ApiResponse
-import java.time.LocalDateTime
 
 interface NetworkRepository {
     suspend fun checkUserExistence(id : String) : UserExistenceCheckResult?
@@ -187,6 +186,22 @@ interface NetworkRepository {
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>
 
+    suspend fun getStimulusFamousPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusMostViewPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusFamousAuthorPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusRecommendPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
     suspend fun getStimulusPostDetail(
         authorization: String,
         boardId: String
@@ -197,7 +212,7 @@ interface NetworkRepository {
         title: String,
         nickname: String,
         introduction: String
-    ): ApiResponse<LatestStimulusPostQuery>
+    ): ApiResponse<StimulusPostListQuery>
 
     suspend fun report(
         authorization: String,
