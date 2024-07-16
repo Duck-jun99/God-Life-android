@@ -21,7 +21,7 @@ import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
-import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.StimulusPostDetailQuery
@@ -29,6 +29,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.ReportRequest
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -157,13 +158,13 @@ class NetworkDataSourceImpl @Inject constructor(
         postId: String,
         title: String,
         content: String,
-        categoryType: String,
+        categoryType: String?,
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
         val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
         val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
-        val categoryType: RequestBody = categoryType.toRequestBody("text/plain".toMediaTypeOrNull())
+        val categoryType: RequestBody? = categoryType?.toRequestBody("text/plain".toMediaTypeOrNull())
         val tags = tags.map { it -> it.toRequestBody("text/plain".toMediaTypeOrNull()) }
 
         val imageParts = imagePath?.map { it ->
@@ -256,6 +257,17 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.postNotificationTime(authorization, notificationTime)
     }
 
+    override suspend fun patchNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkApi.patchNotificationTime(authorization, notificationTime)
+    }
+
+    override suspend fun deleteNotificationTime(authorization: String): ApiResponse<NotificationQuery> {
+        return networkApi.deleteNotificationTime(authorization)
+    }
+
     override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
         return networkApi.createStimulusPostTemp(authorization)
     }
@@ -287,8 +299,24 @@ class NetworkDataSourceImpl @Inject constructor(
     override suspend fun getStimulusLatestPost(
         authorization: String,
         page: Int
-    ): ApiResponse<LatestStimulusPostQuery> {
+    ): ApiResponse<StimulusPostListQuery> {
         return networkApi.getStimulusLatestPost(authorization, page)
+    }
+
+    override suspend fun getStimulusFamousPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusFamousPost(authorization)
+    }
+
+    override suspend fun getStimulusMostViewPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusMostViewPost(authorization)
+    }
+
+    override suspend fun getStimulusFamousAuthorPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusFamousAuthorPost(authorization)
+    }
+
+    override suspend fun getStimulusRecommendPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkApi.getStimulusRecommendPost(authorization)
     }
 
     override suspend fun getStimulusPostDetail(
@@ -303,8 +331,23 @@ class NetworkDataSourceImpl @Inject constructor(
         title: String,
         nickname: String,
         introduction: String
-    ): ApiResponse<LatestStimulusPostQuery> {
+    ): ApiResponse<StimulusPostListQuery> {
         return networkApi.searchStimulusPost(authorization, title, nickname, introduction)
+    }
+
+    override suspend fun report(
+        authorization: String,
+        reporterNickname: String,
+        reporterId: Long,
+        receivedNickname: String,
+        receivedId: Long,
+        reason: String,
+        reportContent: String,
+        reportId: Long,
+        //reportTime: LocalDateTime,
+        reportType: String
+    ): ApiResponse<CommentQuery> {
+        return networkApi.report(authorization, ReportRequest(reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType) )
     }
 
 

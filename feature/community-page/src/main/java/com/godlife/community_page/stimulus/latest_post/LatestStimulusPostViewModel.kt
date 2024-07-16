@@ -1,19 +1,20 @@
-package com.godlife.community_page.stimulus
+package com.godlife.community_page.stimulus.latest_post
 
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.godlife.domain.GetFamousAuthorStimulusPostUseCase
-import com.godlife.domain.GetFamousPostUseCase
+import androidx.paging.cachedIn
+import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.domain.GetLatestStimulusPostUseCase
 import com.godlife.domain.GetMostViewStimulusPostUseCase
-import com.godlife.domain.GetPostDetailUseCase
-import com.godlife.domain.GetRecommendedStimulusPostUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.StimulusPostList
+import com.skydoves.sandwich.message
+import com.skydoves.sandwich.onError
+import com.skydoves.sandwich.onException
+import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,15 +22,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class StimulusPostUiState {
-    object Loading : StimulusPostUiState()
-    data class Success(val data: String) : StimulusPostUiState()
-    data class Error(val message: String) : StimulusPostUiState()
-}
-
 @HiltViewModel
-class StimulusPostViewModel @Inject constructor(
+class LatestStimulusPostViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
+    private val getLatestStimulusPostUseCase: GetLatestStimulusPostUseCase,
     private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 
@@ -48,6 +44,18 @@ class StimulusPostViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
+    /*
+    //게시물
+    private val _postList = MutableStateFlow<List<StimulusPostList?>>(emptyList())
+    val postList: StateFlow<List<StimulusPostList?>> = _postList
+
+     */
+    //조회된 최신 게시물, 페이징을 이용하기에 지연 초기화
+    lateinit var latestPostList: Flow<PagingData<StimulusPostList>>
+
+    //게시물을 호출했는지 플래그
+    private var isGetPost = mutableStateOf(false)
+
     /**
      * Init
      */
@@ -59,6 +67,8 @@ class StimulusPostViewModel @Inject constructor(
             _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
         }
 
+        //최신 게시물 호출
+        getLatestStimulusPost()
 
     }
 
@@ -66,6 +76,16 @@ class StimulusPostViewModel @Inject constructor(
      * Functions
      */
 
+    private fun getLatestStimulusPost(){
+
+        if(!isGetPost.value){
+
+            latestPostList = getLatestStimulusPostUseCase.executeGetLatestStimulusPost().cachedIn(viewModelScope)
+            _uiState.value = StimulusPostUiState.Success("성공")
+
+            isGetPost.value = true
+        }
+    }
 
 
 }

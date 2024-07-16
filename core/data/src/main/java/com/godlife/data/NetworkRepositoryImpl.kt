@@ -11,7 +11,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
-import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -111,7 +111,7 @@ class NetworkRepositoryImpl @Inject constructor(
         postId: String,
         title: String,
         content: String,
-        categoryType: String,
+        categoryType: String?,
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
@@ -204,6 +204,17 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.postNotificationTime(authorization, notificationTime)
     }
 
+    override suspend fun patchNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery> {
+        return networkDataSource.patchNotificationTime(authorization, notificationTime)
+    }
+
+    override suspend fun deleteNotificationTime(authorization: String): ApiResponse<NotificationQuery> {
+        return networkDataSource.deleteNotificationTime(authorization)
+    }
+
     override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
         return networkDataSource.createStimulusPostTemp(authorization)
     }
@@ -223,6 +234,22 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.createStimulusPost(authorization, stimulusPostBody)
     }
 
+    override suspend fun getStimulusFamousPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusFamousPost(authorization)
+    }
+
+    override suspend fun getStimulusMostViewPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusMostViewPost(authorization)
+    }
+
+    override suspend fun getStimulusFamousAuthorPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusFamousAuthorPost(authorization)
+    }
+
+    override suspend fun getStimulusRecommendPost(authorization: String): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusRecommendPost(authorization)
+    }
+
     override suspend fun getStimulusPostDetail(
         authorization: String,
         boardId: String
@@ -235,8 +262,23 @@ class NetworkRepositoryImpl @Inject constructor(
         title: String,
         nickname: String,
         introduction: String
-    ): ApiResponse<LatestStimulusPostQuery> {
+    ): ApiResponse<StimulusPostListQuery> {
         return networkDataSource.searchStimulusPost(authorization, title, nickname, introduction)
+    }
+
+    override suspend fun report(
+        authorization: String,
+        reporterNickname: String,
+        reporterId: Long,
+        receivedNickname: String,
+        receivedId: Long,
+        reason: String,
+        reportContent: String,
+        reportId: Long,
+        //reportTime: LocalDateTime,
+        reportType: String
+    ): ApiResponse<CommentQuery> {
+        return networkDataSource.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType)
     }
 
 }

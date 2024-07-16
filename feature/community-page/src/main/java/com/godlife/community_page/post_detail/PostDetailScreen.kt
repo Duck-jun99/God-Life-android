@@ -84,6 +84,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.post_detail.post_update.UpdatePostScreen
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.theme.CheckColor
@@ -108,12 +109,17 @@ fun PostDetailScreen(
     postDetailViewModel: PostDetailViewModel = hiltViewModel()
 ) {
 
-    postDetailViewModel.initPostDetailInfo(postId = postId)
+    LaunchedEffect(key1 = postId) {
+        postDetailViewModel.initPostDetailInfo(postId = postId)
+    }
+
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
 
     val cScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     //Ui State 관찰
     val uiState by postDetailViewModel.uiState.collectAsState()
@@ -170,12 +176,24 @@ fun PostDetailScreen(
                             postDetail.body?.let {
 
                                 item{
-                                    Content2(memberLikedBoard = it.memberLikedBoard, viewModel = postDetailViewModel)
+                                    Content2(
+                                        memberLikedBoard = it.memberLikedBoard,
+                                        owner = it.boardOwner,
+                                        viewModel = postDetailViewModel
+                                    )
                                 }
 
                             }
 
-                            item { Comments(comments = comments, snackbarHostState = snackBarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel) }
+                            item {
+                                Comments(
+                                    comments = comments,
+                                    snackbarHostState = snackBarHostState,
+                                    cScope = cScope,
+                                    parentNavController = parentNavController,
+                                    postDetailViewModel =  postDetailViewModel
+                                )
+                            }
 
 
                         }
@@ -252,6 +270,14 @@ fun PostDetailScreen(
         GodLifeErrorScreen(
             errorMessage = (uiState as PostDetailUiState.Error).message,
             buttonEnabled = false
+        )
+    }
+
+    else if(uiState is PostDetailUiState.Update){
+        UpdatePostScreen(
+            postDetail  = postDetail.body!!,
+            postDetailViewModel = postDetailViewModel,
+            postDetailContext = context
         )
     }
 
@@ -478,11 +504,13 @@ fun Content(
                             true ->
                                 ContentDropDownBoardOwnerItem(
                                     expanded = expanded,
-                                    isShowDialog = isShowDialog
+                                    isShowDialog = isShowDialog,
+                                    viewModel = viewModel
                                 )
                             false ->
                                 ContentDropDownNotBoardOwnerItem(
                                     postDetailViewModel= viewModel,
+                                    parentNavController = parentNavController,
                                     expanded = expanded
                                 )
                         }
@@ -533,6 +561,7 @@ fun Content(
 fun Content2(
     modifier: Modifier = Modifier,
     memberLikedBoard: Boolean = true,
+    owner: Boolean,
     viewModel: PostDetailViewModel
 ){
     Column(
@@ -543,42 +572,44 @@ fun Content2(
             .padding(10.dp)
     ) {
 
-        if(!memberLikedBoard){
-            Text(
-                text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
-                style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
-            )
+        if(!owner){
 
-            Spacer(modifier.size(20.dp))
+            if(!memberLikedBoard){
+                Text(
+                    text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+                )
 
-            GodLifeButtonWhite(
-                modifier = modifier
-                    .align(Alignment.CenterHorizontally),
-                leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
-                onClick = { viewModel.agreeGodLife() },
-                text = { Text(text = "굿생 인정!") }
-            )
+                Spacer(modifier.size(20.dp))
+
+                GodLifeButtonWhite(
+                    modifier = modifier
+                        .align(Alignment.CenterHorizontally),
+                    leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
+                    onClick = { viewModel.agreeGodLife() },
+                    text = { Text(text = "굿생 인정!") }
+                )
+            }
+
+            else{
+                Icon(
+                    modifier = modifier
+                        .align(Alignment.CenterHorizontally),
+                    imageVector = Icons.Outlined.ThumbUp,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = "유저님께서 굿생을 인정하신 글이에요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                    textAlign = TextAlign.Center
+                )
+            }
+
         }
-
-        else{
-            Icon(
-                modifier = modifier
-                    .align(Alignment.CenterHorizontally),
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = "",
-                tint = PurpleMain
-            )
-
-            Text(
-                modifier = modifier
-                    .fillMaxWidth(),
-                text = "유저님께서 굿생을 인정하신 글이에요!",
-                style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
-                textAlign = TextAlign.Center
-            )
-        }
-
-
 
 
     }
@@ -587,7 +618,14 @@ fun Content2(
 
 
 @Composable
-fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel){
+fun Comments(
+    modifier: Modifier = Modifier,
+    comments: List<CommentBody>,
+    snackbarHostState: SnackbarHostState,
+    cScope: CoroutineScope,
+    parentNavController: NavController,
+    postDetailViewModel: PostDetailViewModel
+){
 
     Column(
         modifier = Modifier.padding(10.dp)
@@ -604,7 +642,7 @@ fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackba
 
             comments.forEach {
 
-                CommentBox(commentBody = it, snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel)
+                CommentBox(commentBody = it, snackbarHostState = snackbarHostState, cScope = cScope, parentNavController = parentNavController, postDetailViewModel =  postDetailViewModel)
 
             }
 
@@ -616,7 +654,13 @@ fun Comments(modifier: Modifier = Modifier, comments: List<CommentBody>, snackba
 }
 
 @Composable
-fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbarHostState: SnackbarHostState, cScope: CoroutineScope, postDetailViewModel: PostDetailViewModel){
+fun CommentBox(
+    modifier: Modifier = Modifier,
+    commentBody: CommentBody,
+    snackbarHostState: SnackbarHostState,
+    cScope: CoroutineScope,
+    parentNavController: NavController,
+    postDetailViewModel: PostDetailViewModel){
 
     val expanded = remember { mutableStateOf(false) }
 
@@ -692,7 +736,7 @@ fun CommentBox(modifier: Modifier = Modifier, commentBody: CommentBody, snackbar
                 ) {
 
                     if(commentBody.commentOwner) CommentDropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody, expanded = expanded)
-                    else CommentDropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
+                    else CommentDropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, parentNavController = parentNavController, viewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
 
                 }
             }
@@ -759,13 +803,23 @@ fun DeleteSuccessScreen(
 fun ContentDropDownNotBoardOwnerItem(
     modifier: Modifier = Modifier,
     postDetailViewModel: PostDetailViewModel,
+    parentNavController: NavController,
     expanded: MutableState<Boolean>
 ){
+    val postId = postDetailViewModel.postId.collectAsState().value
+    val postDetail by postDetailViewModel.postDetail.collectAsState()
+    val writerNickname = postDetail.body?.nickname
+    val writerId = postDetail.body?.writerId
+    val category = "board"
+    val comment = "no"
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
             expanded.value = !expanded.value
+            parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}/${comment}"){
+                launchSingleTop = true
+            }
 
         },
         leadingIcon = {
@@ -779,7 +833,8 @@ fun ContentDropDownNotBoardOwnerItem(
 fun ContentDropDownBoardOwnerItem(
     modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
-    isShowDialog: MutableState<Boolean>
+    isShowDialog: MutableState<Boolean>,
+    viewModel: PostDetailViewModel
 ){
 
     Column {
@@ -788,7 +843,7 @@ fun ContentDropDownBoardOwnerItem(
             text = { Text(text = "수정하기", style = TextStyle(color = GrayWhite)) },
             onClick = {
                 expanded.value = !expanded.value
-                isShowDialog.value = !isShowDialog.value
+                viewModel.updateUIState(PostDetailUiState.Update)
             },
             leadingIcon = {
                 Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = GrayWhite)
@@ -820,15 +875,28 @@ fun CommentDropDownDeclareItem(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     cScope: CoroutineScope,
-    postDetailViewModel: PostDetailViewModel,
+    viewModel: PostDetailViewModel,
+    parentNavController: NavController,
     commentBody: CommentBody,
     expanded: MutableState<Boolean>
 ){
+
+    val postId = commentBody.comment_id
+    val writerNickname = commentBody.nickname
+    val writerId = commentBody.writer_id
+    val category = "comment"
+    val comment = if(commentBody.comment.length>15) commentBody.comment.substring(0,15) + "..." else commentBody.comment
 
     DropdownMenuItem(
         text = { Text(text = "신고하기", style = TextStyle(color = GrayWhite)) },
         onClick = {
             expanded.value = !expanded.value
+
+            expanded.value = !expanded.value
+            parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}/${comment}"){
+                launchSingleTop = true
+            }
+            /*
             cScope.launch {
                 val result =
                     snackbarHostState.showSnackbar(
@@ -845,6 +913,8 @@ fun CommentDropDownDeclareItem(
                     }
                 }
             }
+
+             */
         },
         leadingIcon = {
             Icon(imageVector = Icons.Outlined.Warning, contentDescription = "신고하기", tint = GrayWhite)

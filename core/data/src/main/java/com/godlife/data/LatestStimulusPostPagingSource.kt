@@ -3,11 +3,8 @@ package com.godlife.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.godlife.data.repository.LocalPreferenceUserRepository
-import com.godlife.network.model.PostDetailBody
 import com.godlife.network.api.RetrofitNetworkApi
-import com.godlife.network.model.LatestPostQuery
-import com.godlife.network.model.LatestStimulusPostQuery
-import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -38,7 +35,7 @@ class LatestStimulusPostPagingSource @Inject constructor(
 
             val page = params.key ?: 0
             var response = networkApi.getStimulusLatestPost(authorization = authorization, page = page)
-            lateinit var data: LatestStimulusPostQuery
+            lateinit var data: StimulusPostListQuery
 
             response
                 .onSuccess {

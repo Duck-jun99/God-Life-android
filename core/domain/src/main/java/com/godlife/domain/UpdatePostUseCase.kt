@@ -12,7 +12,7 @@ class UpdatePostUseCase @Inject constructor(
         postId: String,
         title: String,
         content: String,
-        categoryType: String,
+        categoryType: String?,
         tags: List<String>,
         imagePath: List<Uri>?
     ) = networkRepository.updatePost(authorization, postId, title, content, categoryType, tags, imagePath)

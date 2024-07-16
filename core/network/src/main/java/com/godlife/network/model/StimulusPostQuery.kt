@@ -14,7 +14,7 @@ data class CreatePostRequest(
     val introduction: String
 )
 
-data class LatestStimulusPostQuery(
+data class StimulusPostListQuery(
     val status: String,
     val body: List<StimulusPostList>,
     val message: String,

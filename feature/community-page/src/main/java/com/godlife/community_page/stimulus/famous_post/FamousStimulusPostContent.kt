@@ -1,0 +1,325 @@
+package com.godlife.community_page.stimulus.famous_post
+
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.godlife.community_page.BuildConfig
+import com.godlife.community_page.R
+import com.godlife.community_page.navigation.StimulusPostDetailRoute
+import com.godlife.community_page.stimulus.StimulusLoadingScreen
+import com.godlife.community_page.stimulus.StimulusPostItem
+import com.godlife.community_page.stimulus.StimulusPostUiState
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.network.model.StimulusPostList
+
+@Composable
+fun FamousStimulusPostContent(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: FamousStimulusPostViewModel = hiltViewModel()
+){
+
+    val item = viewModel.postList.collectAsState().value
+
+    val uiState = viewModel.uiState.collectAsState().value
+
+    when(uiState){
+        is StimulusPostUiState.Loading -> {
+            StimulusLoadingScreen()
+        }
+        is StimulusPostUiState.Success -> {
+
+            LazyRow {
+                itemsIndexed(item){index, it ->
+
+                    if (it != null) {
+                        FamousStimulusItem(
+                            item = it,
+                            navController = navController
+                        )
+                    }
+
+                }
+            }
+
+        }
+        is StimulusPostUiState.Error -> {
+
+        }
+    }
+
+}
+
+@Composable
+fun FamousStimulusItem(
+    modifier: Modifier = Modifier,
+    item: StimulusPostList,
+    navController: NavController
+){
+    Column(
+        modifier = modifier
+            .size(width = 300.dp, height = 350.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Box(
+            modifier = modifier
+                .padding(10.dp)
+                .size(width = 200.dp, height = 250.dp)
+                .shadow(10.dp)
+                .clickable { navController.navigate("${StimulusPostDetailRoute.route}/${item.boardId}") },
+            contentAlignment = Alignment.Center
+        ){
+
+            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
+            Glide.with(LocalContext.current)
+                .asBitmap()
+                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
+                .error(R.drawable.category3)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        bitmap.value = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+
+            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                Image(
+                    bitmap = fetchedBitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = modifier
+                        .fillMaxWidth()
+                )   //bitmap이 없다면
+            } ?: Image(
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = modifier
+                    .fillMaxWidth()
+            )
+
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(30.dp)
+                    .background(color = OpaqueDark)
+                    .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 10.dp),
+                contentAlignment = Alignment.Center
+            ){
+
+                Text(text = item.title,
+                    style = TextStyle(color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                )
+
+            }
+
+        }
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = item.introduction,
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center
+            )
+        )
+
+        Spacer(modifier.size(5.dp))
+
+        HorizontalDivider(modifier.padding(start = 20.dp, end = 20.dp))
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = "by ${item.nickname}",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center
+            )
+        )
+
+    }
+
+}
+
+@Preview
+@Composable
+fun FamousStimulusPostContentPreview(
+    modifier: Modifier = Modifier,
+    navController: NavController? = null
+){
+    val item = listOf(
+        StimulusPostItem(
+            title = "이것은 제목!",
+            writer = "치킨 러버",
+            coverImg = R.drawable.category3,
+            introText = "대충 이러이러한 내용이라고 소개하는 내용"
+        ),
+        StimulusPostItem(
+            title = "나도 제목!",
+            writer = "초코 러버",
+            coverImg = R.drawable.category4,
+            introText = "대충 이러이러한 내용이라고 소개하는 내용"
+        ),
+        StimulusPostItem(
+            title = "제목 등장",
+            writer = "라면 좋아",
+            coverImg = R.drawable.category3,
+            introText = "대충 이러이러한 내용이라고 소개하는 내용"
+        ),
+        StimulusPostItem(
+            title = "제모오오오옥",
+            writer = "헬로우",
+            coverImg = R.drawable.category4,
+            introText = "대충 이러이러한 내용이라고 소개하는 내용"
+        )
+    )
+
+    LazyRow {
+        itemsIndexed(item){index, it ->
+
+            FamousStimulusItemPreview(item = it)
+
+        }
+    }
+}
+
+@Preview
+@Composable
+fun FamousStimulusItemPreview(
+    modifier: Modifier = Modifier,
+    item: StimulusPostItem = StimulusPostItem(title = "이것이 제목이다", writer = "치킨 러버", coverImg = R.drawable.category3, introText = "갓생을 살고 싶어하는 당신을 위해 작성한 글!")
+){
+    Column(
+        modifier = modifier
+            .size(width = 300.dp, height = 350.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Box(
+            modifier = modifier
+                .padding(10.dp)
+                .size(width = 200.dp, height = 250.dp)
+                .shadow(10.dp),
+            contentAlignment = Alignment.Center
+        ){
+            Image(
+                modifier = modifier
+                    .fillMaxWidth(),
+                painter = painterResource(id = item.coverImg),
+                contentDescription = "",
+                contentScale = ContentScale.Crop
+            )
+
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(30.dp)
+                    .background(color = OpaqueDark)
+                    .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 10.dp),
+                contentAlignment = Alignment.Center
+            ){
+
+                Text(text = item.title,
+                    style = TextStyle(color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                )
+
+            }
+
+        }
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = item.introText,
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center
+            )
+        )
+
+        Spacer(modifier.size(5.dp))
+
+        HorizontalDivider(modifier.padding(start = 20.dp, end = 20.dp))
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = "by ${item.writer}",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center
+            )
+        )
+
+    }
+
+}

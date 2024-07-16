@@ -9,7 +9,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
-import com.godlife.network.model.LatestStimulusPostQuery
+import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
 import com.godlife.network.model.PostDetailQuery
@@ -80,7 +80,7 @@ interface NetworkDataSource {
         postId: String,
         title: String,
         content: String,
-        categoryType: String,
+        categoryType: String?,
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery>
@@ -153,6 +153,15 @@ interface NetworkDataSource {
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery>
 
+    suspend fun patchNotificationTime(
+        authorization: String,
+        notificationTime: NotificationRequest
+    ): ApiResponse<NotificationQuery>
+
+    suspend fun deleteNotificationTime(
+        authorization: String
+    ): ApiResponse<NotificationQuery>
+
     suspend fun createStimulusPostTemp(
         authorization: String
     ): ApiResponse<StimulusPostQuery>
@@ -171,7 +180,23 @@ interface NetworkDataSource {
     suspend fun getStimulusLatestPost(
         authorization: String,
         page: Int
-    ): ApiResponse<LatestStimulusPostQuery>
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusFamousPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusMostViewPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusFamousAuthorPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun getStimulusRecommendPost(
+        authorization: String
+    ): ApiResponse<StimulusPostListQuery>
 
     suspend fun getStimulusPostDetail(
         authorization: String,
@@ -183,6 +208,19 @@ interface NetworkDataSource {
         title: String,
         nickname: String,
         introduction: String
-    ): ApiResponse<LatestStimulusPostQuery>
+    ): ApiResponse<StimulusPostListQuery>
+
+    suspend fun report(
+        authorization: String,
+        reporterNickname: String,
+        reporterId: Long,
+        receivedNickname: String,
+        receivedId: Long,
+        reason: String,
+        reportContent: String,
+        reportId: Long,
+        //reportTime: LocalDateTime,
+        reportType: String
+    ): ApiResponse<CommentQuery>
 
 }

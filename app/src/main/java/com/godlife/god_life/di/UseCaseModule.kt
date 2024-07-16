@@ -11,6 +11,7 @@ import com.godlife.domain.CreateStimulusPostUseCase
 import com.godlife.domain.DeleteCommentUseCase
 import com.godlife.domain.DeletePostUseCase
 import com.godlife.domain.GetCommentsUseCase
+import com.godlife.domain.GetFamousAuthorStimulusPostUseCase
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetLatestStimulusPostUseCase
 import com.godlife.domain.GetPostDetailUseCase
@@ -18,6 +19,9 @@ import com.godlife.domain.GetRankingUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.GetFamousPostUseCase
+import com.godlife.domain.GetFamousStimulusPostUseCase
+import com.godlife.domain.GetMostViewStimulusPostUseCase
+import com.godlife.domain.GetRecommendedStimulusPostUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.PostNotificationTimeUseCase
 import com.godlife.domain.ReissueUseCase
@@ -118,4 +122,20 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideGetLatestStimulusPostUseCase(repository: LatestStimulusPostRepository) = GetLatestStimulusPostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetFamousStimulusPostUseCase(repository: NetworkRepository) = GetFamousStimulusPostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetMostViewStimulusPostUseCase(repository: NetworkRepository) = GetMostViewStimulusPostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetFamousAuthorStimulusPostUseCase(repository: NetworkRepository) = GetFamousAuthorStimulusPostUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetRecommendedStimulusPostUseCase(repository: NetworkRepository) = GetRecommendedStimulusPostUseCase(repository)
 }

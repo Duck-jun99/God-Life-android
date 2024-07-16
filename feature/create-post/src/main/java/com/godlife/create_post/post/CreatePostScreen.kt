@@ -688,7 +688,7 @@ fun CreatePostErrorScreen(
     }
 }
 
-private fun convertResizeImage(imageUri: Uri, context: Context):Uri? {
+fun convertResizeImage(imageUri: Uri, context: Context):Uri? {
 
     val bitmap: Bitmap
 
