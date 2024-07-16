@@ -499,5 +499,10 @@ class CommunityPageViewModel @Inject constructor(
 
     }
 
+    override fun onCleared() {
+        Log.e("CommunityPageViewModel", "onCleared")
+        super.onCleared()
+    }
+
 
 }

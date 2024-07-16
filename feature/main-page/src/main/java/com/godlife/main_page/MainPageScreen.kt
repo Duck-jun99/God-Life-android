@@ -104,7 +104,6 @@ fun MainPageScreen(
     loginNavigator: LoginNavigator,
     navController: NavController,
     viewModel: MainPageViewModel = hiltViewModel()
-
 ) {
 
 

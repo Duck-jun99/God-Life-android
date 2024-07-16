@@ -159,13 +159,13 @@ class NetworkDataSourceImpl @Inject constructor(
         postId: String,
         title: String,
         content: String,
-        categoryType: String,
+        categoryType: String?,
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
         val title: RequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
         val content: RequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
-        val categoryType: RequestBody = categoryType.toRequestBody("text/plain".toMediaTypeOrNull())
+        val categoryType: RequestBody? = categoryType?.toRequestBody("text/plain".toMediaTypeOrNull())
         val tags = tags.map { it -> it.toRequestBody("text/plain".toMediaTypeOrNull()) }
 
         val imageParts = imagePath?.map { it ->

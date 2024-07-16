@@ -36,6 +36,7 @@ import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -125,13 +126,13 @@ interface RetrofitNetworkApi {
     // 굿생 인증 게시물 수정
     @JvmSuppressWildcards
     @Multipart
-    @PATCH("/board/{id}")
+    @PUT("/board/{id}")
     suspend fun updatePost(
         @Header("Authorization") authorization: String,
         @Path("id") boardId: String,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody,
-        @Part("categoryType") categoryType: RequestBody,
+        @Part("categoryType") categoryType: RequestBody?,
         @Part("tags") tags: List<RequestBody>,
         @Part images: List<MultipartBody.Part>?,
     ): ApiResponse<PostQuery>

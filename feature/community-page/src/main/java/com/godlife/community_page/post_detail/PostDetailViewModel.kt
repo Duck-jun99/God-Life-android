@@ -15,6 +15,7 @@ import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.UpdatePostUseCase
 import com.godlife.network.model.CommentBody
+import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.PostDetailQuery
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -35,6 +36,9 @@ sealed class PostDetailUiState {
 
     //게시물 정보 불러오기 성공 or API 통신 성공 (Delete 제외)
     data class Success(val data: String) : PostDetailUiState()
+
+    //게시물 수정 상태
+    object Update : PostDetailUiState()
 
     // 게시물 삭제 성공
     object DeleteSuccess: PostDetailUiState()
@@ -57,7 +61,6 @@ class PostDetailViewModel @Inject constructor(
     private val deleteCommentUseCase: DeleteCommentUseCase,
     private val plusGodScoreUseCase: PlusGodScoreUseCase,
     private val reissueUseCase: ReissueUseCase
-
 ): ViewModel() {
 
     /**
@@ -92,10 +95,10 @@ class PostDetailViewModel @Inject constructor(
 
 
     //게시물 정보 가져왔는지 플래그
-    private var isGetPostDetail = mutableIntStateOf(0)
+    private var isGetPostDetail = mutableStateOf(false)
 
     //게시물 댓글 가져왔는지 플래그
-    private var isGetComments = mutableIntStateOf(0)
+    private var isGetComments = mutableStateOf(false)
 
     //게시물 삭제 성공 플래그
     private var isDeletePost = mutableStateOf(false)
@@ -116,7 +119,6 @@ class PostDetailViewModel @Inject constructor(
             initPostDetail()
 
         }
-
 
     }
 
@@ -142,7 +144,7 @@ class PostDetailViewModel @Inject constructor(
     //해당 게시물 작성자 프로필 정보, 이미지, 내용 초기화 (성공 시 initComments 호출 -> initComments까지 성공적으로 되면 Ui State Success로 변경)
     private fun initPostDetail() {
 
-        if(isGetPostDetail.value == 0){
+        if(!isGetPostDetail.value){
 
             viewModelScope.launch{
 
@@ -183,7 +185,7 @@ class PostDetailViewModel @Inject constructor(
             }
 
 
-            isGetPostDetail.value += 1
+            isGetPostDetail.value = true
         }
 
 
@@ -192,7 +194,7 @@ class PostDetailViewModel @Inject constructor(
     //댓글 정보 초기화
     private fun initComments(){
 
-        if(isGetComments.value == 0){
+        if(!isGetComments.value){
 
             viewModelScope.launch{
 
@@ -228,7 +230,7 @@ class PostDetailViewModel @Inject constructor(
                     }
             }
 
-            isGetComments.value +=1
+            isGetComments.value = true
         }
 
     }
@@ -253,7 +255,7 @@ class PostDetailViewModel @Inject constructor(
                         _writeComment.value = ""
 
                         //해당 게시물 댓글 초기화
-                        isGetComments.value = 0
+                        isGetComments.value = false
                         initComments()
                     }
                 }
@@ -295,7 +297,7 @@ class PostDetailViewModel @Inject constructor(
                     if(data.body == true){
 
                         //해당 게시물 댓글 초기화
-                        isGetComments.value = 0
+                        isGetComments.value = false
                         initComments()
                     }
                 }
@@ -338,7 +340,7 @@ class PostDetailViewModel @Inject constructor(
                     //갓생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
 
                     if(data.body == "true"){
-                        isGetPostDetail.value = 0
+                        isGetPostDetail.value = false
                         initPostDetail()
                     }
                 }
@@ -366,6 +368,18 @@ class PostDetailViewModel @Inject constructor(
 
         }
 
+    }
+
+    fun updateUIState(uiState: PostDetailUiState){
+        _uiState.value = uiState
+    }
+
+    //게시판 수정 후 다시 게시물 불러오기
+    fun refreshPostDetail(){
+        _uiState.value = PostDetailUiState.Loading(type = LoadingType.POST)
+        isGetPostDetail.value = false
+        isGetComments.value = false
+        initPostDetail()
     }
 
 
@@ -434,6 +448,11 @@ class PostDetailViewModel @Inject constructor(
 
         }
 
+    }
+
+    override fun onCleared() {
+        Log.e("PostDetailViewModel", "onCleared")
+        super.onCleared()
     }
 
 

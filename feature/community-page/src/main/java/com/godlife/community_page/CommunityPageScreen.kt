@@ -404,7 +404,10 @@ fun CommunityPageView(
                 }
 
                 is CommunityPageUiState.Success -> {
-                    FamousPostScreen(navController = navController, viewModel = viewModel)
+                    FamousPostScreen(
+                        navController = parentNavController,
+                        viewModel = viewModel
+                    )
                 }
 
                 is CommunityPageUiState.Error -> {
@@ -425,7 +428,7 @@ fun CommunityPageView(
 
                 is CommunityPageUiState.Success -> {
                     LatestPostScreen(
-                        navController = navController,
+                        navController = parentNavController,
                         viewModel = viewModel
                     )
                 }
@@ -457,6 +460,7 @@ fun CommunityPageView(
 
         }
 
+        /*
         //PostDeatil Screen
         composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
             val postId = it.arguments?.getString("postId")
@@ -468,6 +472,8 @@ fun CommunityPageView(
                 )
             }
         }
+
+         */
         /*
         //Stimulus Post Detail Screen
         composable(StimulusPostDetailRoute.route){

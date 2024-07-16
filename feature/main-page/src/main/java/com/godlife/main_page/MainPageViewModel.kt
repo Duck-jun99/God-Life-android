@@ -342,6 +342,11 @@ class MainPageViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        Log.e("MainPageViewModel", "onCleared")
+        super.onCleared()
+    }
+
 
 
 

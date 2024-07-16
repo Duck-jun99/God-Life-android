@@ -84,6 +84,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.post_detail.post_update.UpdatePostScreen
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.theme.CheckColor
@@ -108,12 +109,17 @@ fun PostDetailScreen(
     postDetailViewModel: PostDetailViewModel = hiltViewModel()
 ) {
 
-    postDetailViewModel.initPostDetailInfo(postId = postId)
+    LaunchedEffect(key1 = postId) {
+        postDetailViewModel.initPostDetailInfo(postId = postId)
+    }
+
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
 
     val cScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     //Ui State 관찰
     val uiState by postDetailViewModel.uiState.collectAsState()
@@ -260,6 +266,14 @@ fun PostDetailScreen(
         GodLifeErrorScreen(
             errorMessage = (uiState as PostDetailUiState.Error).message,
             buttonEnabled = false
+        )
+    }
+
+    else if(uiState is PostDetailUiState.Update){
+        UpdatePostScreen(
+            postDetail  = postDetail.body!!,
+            postDetailViewModel = postDetailViewModel,
+            postDetailContext = context
         )
     }
 
@@ -486,7 +500,8 @@ fun Content(
                             true ->
                                 ContentDropDownBoardOwnerItem(
                                     expanded = expanded,
-                                    isShowDialog = isShowDialog
+                                    isShowDialog = isShowDialog,
+                                    viewModel = viewModel
                                 )
                             false ->
                                 ContentDropDownNotBoardOwnerItem(
@@ -811,7 +826,8 @@ fun ContentDropDownNotBoardOwnerItem(
 fun ContentDropDownBoardOwnerItem(
     modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
-    isShowDialog: MutableState<Boolean>
+    isShowDialog: MutableState<Boolean>,
+    viewModel: PostDetailViewModel
 ){
 
     Column {
@@ -820,7 +836,7 @@ fun ContentDropDownBoardOwnerItem(
             text = { Text(text = "수정하기", style = TextStyle(color = GrayWhite)) },
             onClick = {
                 expanded.value = !expanded.value
-                isShowDialog.value = !isShowDialog.value
+                viewModel.updateUIState(PostDetailUiState.Update)
             },
             leadingIcon = {
                 Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = GrayWhite)

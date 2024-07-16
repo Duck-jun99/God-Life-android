@@ -80,7 +80,7 @@ interface NetworkRepository {
         postId: String,
         title: String,
         content: String,
-        categoryType: String,
+        categoryType: String?,
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery>

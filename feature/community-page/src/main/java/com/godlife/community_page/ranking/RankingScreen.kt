@@ -230,7 +230,7 @@ fun RankingScreen(
                         for(i in 0 until rankingUserPostList.itemCount){
                             RankingUserPostListItem(
                                 rankingUserPostListItem = rankingUserPostList[i],
-                                navController = navController
+                                navController = parentNavController
                             )
                         }
 
