@@ -233,6 +233,10 @@ class CreateStimulusPostViewModel @Inject constructor(
                     // UI State Error로 변경
                     _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
                 }
+                else{
+                    // UI State Error로 변경
+                    _uiState.value = CreateStimulusUiState.Error("${this.response.code()} Error")
+                }
 
             }
             .onException {
@@ -240,7 +244,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                 Log.e("onException", "${this.message}")
 
                 // UI State Error로 변경
-                _uiState.value = CreateStimulusUiState.Error("오류가 발생했습니다.")
+                _uiState.value = CreateStimulusUiState.Error(this.message())
             }
     }
 

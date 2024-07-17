@@ -260,7 +260,9 @@ fun CreateStimulusPostCover(
                 GodLifeButton(
                     onClick = {
                         navController.navigate(
-                            route = CreateStimulusPostLoading.route)
+                            route = CreateStimulusPostLoading.route){
+                            launchSingleTop = true
+                        }
                               },
                     modifier = Modifier
                         .fillMaxWidth(0.5f),

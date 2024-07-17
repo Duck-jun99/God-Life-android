@@ -77,7 +77,9 @@ fun CreateStimulusPostLoading(
         guideVisible.value = true
 
         delay(5000L)
-        navController.navigate(CreateStimulusPostContent.route)
+        navController.navigate(CreateStimulusPostContent.route){
+            launchSingleTop = true
+        }
     }
 
 

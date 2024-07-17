@@ -13,6 +13,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -92,13 +93,18 @@ fun CreateStimulusPostContent(
     val title = viewModel.title.collectAsState()
     val description = viewModel.description.collectAsState()
 
-    val dialogVisible = remember{ mutableStateOf(false) }
+    val completeDialogVisible = remember{ mutableStateOf(false) }
+    val backDialogVisible = remember{ mutableStateOf(false) }
 
     val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     val context = LocalContext.current
 
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
+
+    BackHandler {
+        backDialogVisible.value = !backDialogVisible.value
+    }
 
     // 갤러리에서 사진 가져오기
     val launcher = rememberLauncherForActivityResult(contract =
@@ -253,7 +259,7 @@ fun CreateStimulusPostContent(
                 GodLifeButtonWhite(
                     onClick = {
                         webViewRef.value?.let { getHtmlFromWebView(it, viewModel) }
-                        dialogVisible.value = !dialogVisible.value
+                        completeDialogVisible.value = !completeDialogVisible.value
                               },
                     text = { Text(text = "글 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
@@ -261,10 +267,10 @@ fun CreateStimulusPostContent(
 
         }
 
-        if(dialogVisible.value){
+        if(completeDialogVisible.value){
             AlertDialog(
                 containerColor = Color.White,
-                onDismissRequest = { dialogVisible.value = !dialogVisible.value },
+                onDismissRequest = { completeDialogVisible.value = !completeDialogVisible.value },
                 title = {
                     Text(text = "글을 게시할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                 },
@@ -279,7 +285,7 @@ fun CreateStimulusPostContent(
                                 viewModel.completeCreateStimulusPost()
                             }
 
-                            dialogVisible.value = !dialogVisible.value
+                            completeDialogVisible.value = !completeDialogVisible.value
 
                                   },
                         text = { Text(text = "글 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
@@ -287,7 +293,41 @@ fun CreateStimulusPostContent(
                 },
                 dismissButton = {
                     GodLifeButtonWhite(
-                        onClick = { dialogVisible.value = !dialogVisible.value },
+                        onClick = { completeDialogVisible.value = !completeDialogVisible.value },
+                        text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    )
+                }
+            )
+        }
+
+        if(backDialogVisible.value){
+            AlertDialog(
+                containerColor = Color.White,
+                onDismissRequest = { completeDialogVisible.value = !completeDialogVisible.value },
+                title = {
+                    Text(text = "이전 단계로 돌아가시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                },
+                text = {
+                    Text(text = "지금 작성하신 내용은 저장되지 않아요.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+                },
+                confirmButton = {
+                    GodLifeButtonWhite(
+                        onClick = {
+
+                            navController.popBackStack(
+                                route = CreateStimulusPostCoverRoute.route,
+                                inclusive = false
+                            )
+
+                            backDialogVisible.value = !backDialogVisible.value
+
+                        },
+                        text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    )
+                },
+                dismissButton = {
+                    GodLifeButtonWhite(
+                        onClick = { backDialogVisible.value = !backDialogVisible.value },
                         text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                     )
                 }
