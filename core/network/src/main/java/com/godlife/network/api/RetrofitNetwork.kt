@@ -87,6 +87,13 @@ interface RetrofitNetworkApi {
         @Header("Authorization") authorization: String,
     ): ApiResponse<ReissueQuery>
 
+    // fcm 토큰 등록 or 갱신
+    @POST("/member/fcm")
+    suspend fun registerFcmToken(
+        @Header("Authorization") authorization: String,
+        @Body fcmToken: String
+    ): ApiResponse<SignUpCheckNicknameQuery>
+
     //프로필 이미지 변경
     @Multipart
     @POST("/member/profile")

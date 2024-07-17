@@ -51,6 +51,11 @@ interface NetworkDataSource {
 
     suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
 
+    suspend fun registerFcmToken(
+        authorization: String,
+        fcmToken: String
+    ): ApiResponse<SignUpCheckNicknameQuery>
+
     suspend fun profileImageUpload(
         authorization: String,
         image: Uri

@@ -83,6 +83,13 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.reissue(authorization)
     }
 
+    override suspend fun registerFcmToken(
+        authorization: String,
+        fcmToken: String
+    ): ApiResponse<SignUpCheckNicknameQuery> {
+        return networkApi.registerFcmToken(authorization, fcmToken)
+    }
+
     override suspend fun profileImageUpload(
         authorization: String,
         image: Uri

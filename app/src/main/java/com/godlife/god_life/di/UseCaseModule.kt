@@ -24,6 +24,7 @@ import com.godlife.domain.GetMostViewStimulusPostUseCase
 import com.godlife.domain.GetRecommendedStimulusPostUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.PostNotificationTimeUseCase
+import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.domain.SignUpUseCase
@@ -50,6 +51,10 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideReissueUseCase(repository: NetworkRepository) = ReissueUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideRegisterFCMTokenUseCase(repository: NetworkRepository) = RegisterFCMTokenUseCase(repository)
 
     @Provides
     @Singleton
