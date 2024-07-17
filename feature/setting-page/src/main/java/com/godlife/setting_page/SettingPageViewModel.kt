@@ -108,6 +108,7 @@ class SettingPageViewModel @Inject constructor(
                 localPreferenceUserUseCase.removeUserId()
                 localPreferenceUserUseCase.removeRefreshToken()
 
+                //로그아웃 시 FCM 토큰 삭제 (빈 문자열로 처리)
                 registerFCMTokenUseCase.executeRegisterFCMToken(auth.value, "")
 
                 Log.e("SettingPageViewModel", "${localPreferenceUserUseCase.getAccessToken()}")
