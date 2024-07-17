@@ -7,10 +7,13 @@ import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.DeleteCommentUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetPostDetailUseCase
+import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.UserProfileBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -32,6 +35,7 @@ sealed class StimulusPostDetailUiState {
 class StimulusPostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
+    private val getUserProfileUseCase: GetUserProfileUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
@@ -60,12 +64,22 @@ class StimulusPostDetailViewModel @Inject constructor(
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
 
-    //게시물 정보 받아왔는지 플래그
-    val isGetPostDetail = MutableStateFlow(false)
 
     //게시물 정보
     private val _postDetail = MutableStateFlow<StimulusPost?>(null)
     val postDetail: StateFlow<StimulusPost?> = _postDetail
+
+    //작성자 정보
+    private val _writerInfo = MutableStateFlow<UserProfileBody?>(null)
+    val writerInfo: StateFlow<UserProfileBody?> = _writerInfo
+
+
+    //게시물 정보 받아왔는지 플래그
+    val isGetPostDetail = MutableStateFlow(false)
+
+    //작성자 정보 받아왔는지 플래그
+    val isGetWriterInfo = MutableStateFlow(false)
+
 
     /**
      * Init
@@ -96,13 +110,16 @@ class StimulusPostDetailViewModel @Inject constructor(
     fun getPostDetail(){
 
         if(!isGetPostDetail.value){
-
+            isGetPostDetail.value = true
             viewModelScope.launch {
                 val result = getPostDetailUseCase.executeGetStimulusPostDetail(auth.value, postId.value)
 
                 result
                     .onSuccess {
                         _postDetail.value = data.body
+
+                        //작성자 정보 불러오기
+                        getWriterInfo(postDetail.value?.writerId.toString())
                     }
                     .onError {
 
@@ -126,46 +143,34 @@ class StimulusPostDetailViewModel @Inject constructor(
                     }
             }
 
-            isGetPostDetail.value = true
         }
 
     }
 
-    //해당 게시물 작성자 프로필 정보, 이미지, 내용 초기화 (성공 시 initComments 호출 -> initComments까지 성공적으로 되면 Ui State Success로 변경)
-    private fun initPostDetail() {
+    //해당 게시물 작성자 프로필 정보, 이미지, 내용 초기화
+    private fun getWriterInfo(writerId: String) {
+        if(!isGetWriterInfo.value){
+            isGetWriterInfo.value = true
+            viewModelScope.launch {
+                val result = getUserProfileUseCase.executeGetUserProfile(auth.value, writerId)
 
-
-    }
-
-    //댓글 정보 초기화
-    private fun initComments(){
-
-
-    }
-
-    //작성 중인 댓글 변화
-    fun onWriteCommentChange(text: String) {
-
-    }
-
-    //댓글 작성 -> 성공 시 댓글 정보 다시 불러오기
-    fun createComment(){
-
-
-    }
-
-    //댓글 삭제
-    fun deleteComment(commentId: String){
-
+                result
+                    .onSuccess {
+                        _writerInfo.value = data.body
+                        _uiState.value = StimulusPostDetailUiState.Success("성공")
+                    }
+                    .onError {
+                        _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
+                    }
+                    .onException {
+                        _uiState.value = StimulusPostDetailUiState.Error(this.message())
+                    }
+            }
+        }
 
     }
 
-    //갓생 인정 버튼 클릭
-    fun agreeGodLife(){
 
-
-
-    }
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){

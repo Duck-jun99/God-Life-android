@@ -1,9 +1,10 @@
 package com.godlife.community_page.post_detail
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.view.View
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedVisibility
@@ -20,7 +21,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -43,7 +48,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -65,9 +69,10 @@ import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OpaqueLight
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.UserProfileBody
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -87,14 +92,22 @@ fun StimulusDetailScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    var height by remember {
-        mutableStateOf(0.dp)
-    }
     val localDensity = LocalDensity.current
     val context = LocalContext.current
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
+    val coverBitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+    val writerBitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
+
+
+    val height = remember {
+        mutableStateOf(0.dp)
+    }
+
 
     val postDetail = viewModel.postDetail.collectAsState()
+    val writerInfo = viewModel.writerInfo.collectAsState()
 
 
     GodLifeTheme {
@@ -104,73 +117,69 @@ fun StimulusDetailScreen(
                 SnackbarHost(hostState = snackBarHostState)
             }
         ) {
-            Box(modifier = modifier
-                .fillMaxSize()
-                .onGloballyPositioned {
-                    height = with(localDensity) {
-                        it.size.height.toDp()
-                    }
-                }
-            ){
 
-                Glide.with(context)
-                    .asBitmap()
-                    .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.value?.thumbnailUrl)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmap.value = resource
+            VerticalPager(
+                state = pagerState,
+                modifier = modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned {
+                        height.value = with(localDensity) {
+                            it.size.height.toDp()
                         }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
-
-                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = modifier
-                            .fillMaxSize()
-                            .blur(
-                                radiusX = 15.dp, radiusY = 15.dp
-                            )
-                    )
-
-                }
-
-                LazyColumn{
-
-
-                    item {
+                    }
+            ) {index ->
+                when(index){
+                    0 -> {
                         postDetail.value?.let { it1 ->
                             StimulusPostCover(
-                                height = height,
-                                postDetail = it1
+                                height = height.value,
+                                postDetail = it1,
+                                context = context,
+                                bitmap = coverBitmap
                             )
                         }
                     }
+                    1 -> {
 
-                    item {
-                        postDetail.value?.let { it1 ->
-                            PostContent(
-                                height = height,
-                                postDetail = it1
-                            )
+                        LazyColumn(
+                            modifier = modifier
+                                .fillMaxSize()
+                                .background(color = Color.White)
+                        ) {
+
+                            item {
+                                postDetail.value?.let { post ->
+                                    writerInfo.value?.let { writer ->
+                                        PostContent(
+                                            height = height.value,
+                                            postDetail = post,
+                                            writerInfo = writer,
+                                            bitmap = writerBitmap,
+                                            context = context
+                                        )
+                                    }
+                                }
+                            }
+
+                            item{
+                                writerInfo.value?.nickname?.let { it1 ->
+                                    WriterAnotherPostPreview(
+                                        nickname = it1
+                                    )
+                                }
+                            }
                         }
+
+
                     }
 
 
-                    item {
-                        AnotherPostPreview()
-                    }
 
                 }
+                
             }
+
         }
-
-
-
 
     }
 }
@@ -179,96 +188,23 @@ fun StimulusDetailScreen(
 fun StimulusPostCover(
     modifier: Modifier = Modifier,
     height: Dp,
-    postDetail: StimulusPost
+    bitmap: MutableState<Bitmap?>,
+    postDetail: StimulusPost,
+    context: Context
 ) {
 
+
     val coverVisible = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(true) {
         delay(1500L)
         coverVisible.value = true
     }
 
-    Box(
-        modifier = modifier
-            .height(height)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-
-        AnimatedVisibility(
-            visible = coverVisible.value ,
-            enter = fadeIn(initialAlpha = 0.4f)
-        ) {
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-
-                StimulusCoverItem(
-                    postDetail = postDetail
-                )
-
-                Spacer(modifier.size(5.dp))
-
-                Text(
-                    text = postDetail.introduction,
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Center
-                    )
-                )
-
-
-
-                Spacer(modifier.size(5.dp))
-
-                HorizontalDivider()
-
-                Spacer(modifier.size(5.dp))
-
-                //User 이름 들어갈 부분
-
-                Text(
-                    text = "by ${postDetail.nickname}",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Center
-                    )
-                )
-
-
-                Spacer(modifier.size(50.dp))
-
-            }
-
-        }
-
-
-
-    }
-
-}
-
-
-@Composable
-fun StimulusCoverItem(
-    modifier: Modifier = Modifier,
-    postDetail: StimulusPost
-){
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val context = LocalContext.current
-
-    Box(
-        modifier = modifier
-            .padding(10.dp)
-            .size(width = 200.dp, height = 250.dp)
-            .shadow(10.dp),
-        contentAlignment = Alignment.Center
+    Box(modifier = modifier
+        .fillMaxSize()
+        .height(height)
     ){
 
         Glide.with(context)
@@ -281,6 +217,110 @@ fun StimulusCoverItem(
 
                 override fun onLoadCleared(placeholder: Drawable?) {}
             })
+
+        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+
+            Image(
+                bitmap = fetchedBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .fillMaxSize()
+                    .blur(
+                        radiusX = 15.dp, radiusY = 15.dp
+                    )
+            )
+
+        }
+
+        Box(
+            modifier = modifier
+                .height(height)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+
+            AnimatedVisibility(
+                visible = coverVisible.value ,
+                enter = fadeIn(initialAlpha = 0.4f)
+            ) {
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+
+                    StimulusCoverItem(
+                        postDetail = postDetail,
+                        bitmap = bitmap
+                    )
+
+                    Spacer(modifier.size(5.dp))
+
+                    Text(
+                        text = postDetail.introduction,
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+
+
+
+                    Spacer(modifier.size(5.dp))
+
+                    HorizontalDivider(modifier.width(200.dp))
+
+                    Spacer(modifier.size(5.dp))
+
+                    //User 이름 들어갈 부분
+
+                    Text(
+                        text = "by ${postDetail.nickname}",
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+
+
+                    Spacer(modifier.size(50.dp))
+
+                }
+
+            }
+
+
+
+        }
+
+
+    }
+
+
+
+}
+
+
+@Composable
+fun StimulusCoverItem(
+    modifier: Modifier = Modifier,
+    postDetail: StimulusPost,
+    bitmap: MutableState<Bitmap?>
+){
+    //val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+    val context = LocalContext.current
+
+    Box(
+        modifier = modifier
+            .padding(10.dp)
+            .size(width = 200.dp, height = 250.dp)
+            .shadow(10.dp),
+        contentAlignment = Alignment.Center
+    ){
 
         bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
 
@@ -316,116 +356,138 @@ fun StimulusCoverItem(
 @Composable
 fun PostContent(
     modifier: Modifier = Modifier,
-    height: Dp = 800.dp,
-    postDetail: StimulusPost
+    height: Dp,
+    postDetail: StimulusPost,
+    writerInfo: UserProfileBody,
+    bitmap: MutableState<Bitmap?>,
+    context: Context
 ){
 
-    LazyColumn(
+    Column(
         modifier = modifier
-            .height(height)
             .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(18.dp))
+            .background(color = Color.White)
+            .statusBarsPadding()
+            .padding(horizontal = 15.dp, vertical = 10.dp)
     ){
 
-        item {
-            AndroidView(
-                modifier = modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(18.dp)),
-                factory = { context ->
-                    WebView(context).apply {
-                        webViewClient = object : WebViewClient() {
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
-                                view?.evaluateJavascript(
-                                    """
+        AndroidView(
+            modifier = modifier
+                .fillMaxSize(),
+            factory = { context ->
+
+                WebView(context).apply {
+                    loadUrl("file:///android_asset/content_template.html")
+
+
+                    settings.javaScriptEnabled = true
+                    settings.loadWithOverviewMode = true
+                    settings.useWideViewPort = true
+
+                    // 웹뷰 크기에 맞게 컨텐츠 크기 조정
+                    settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
+
+
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
+                            view?.evaluateJavascript(
+                                """
                         document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
                         document.body.style.backgroundColor = 'transparent';
                         document.documentElement.style.backgroundColor = 'transparent';
                         """.trimIndent(),
-                                    null
-                                )
-                            }
-
+                                null
+                            )
                         }
-                        settings.javaScriptEnabled = true
-                        settings.loadWithOverviewMode = true
-                        settings.useWideViewPort = true
-
-
-                        loadUrl("file:///android_asset/content_template.html")
-
-                    }
-                }
-            )
-        }
-
-        item {
-            Spacer(modifier.size(20.dp))
-        }
-
-        item {
-            Row {
-
-                Text(
-                    text = "조회수: 100",
-                    style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-                )
-
-                Spacer(modifier.size(20.dp))
-
-                Text(
-                    text = "댓글: 33",
-                    style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-                )
-            }
-
-            Spacer(modifier.size(20.dp))
-        }
-
-
-        item {
-            Column(modifier = modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.End){
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-
-                        Text(text = "작성자 닉네임",
-                            style = TextStyle(
-                                color = Color.Black
-                            )
-                        )
-
-                        Text(text = "대충 나를 이렇게 소개한다는 내용",
-                            style = TextStyle(
-                                color = Color.Black
-                            )
-                        )
 
                     }
 
+                }
+            }
+        )
 
-                    Spacer(modifier.size(30.dp))
+        Spacer(modifier.size(20.dp))
 
-                    Image(painter = painterResource(id = R.drawable.ic_person), contentDescription ="",
-                        modifier
-                            .background(color = GrayWhite, shape = CircleShape)
-                            .size(50.dp))
+        Text(
+            text = postDetail.createDate,
+            style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "조회수: ${postDetail.view}",
+            style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+        )
+
+        Spacer(modifier.size(20.dp))
+
+
+        Column(modifier = modifier
+            .fillMaxWidth()
+            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+            .padding(10.dp),
+            verticalArrangement = Arrangement.Center
+        ){
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                Glide.with(context)
+                    .asBitmap()
+                    .load(BuildConfig.SERVER_IMAGE_DOMAIN + writerInfo.profileImageURL)
+                    .error(R.drawable.ic_person)
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            bitmap.value = resource
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
+
+                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+
+                    Image(
+                        bitmap = fetchedBitmap,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = modifier
+                            .clip(CircleShape)
+                            .size(70.dp)
+                    )
 
                 }
+
+                Spacer(modifier.size(10.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Text(text = writerInfo.nickname,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    )
+
+                    Spacer(modifier.size(5.dp))
+
+                    Text(text = writerInfo.whoAmI,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 12.sp
+                        )
+                    )
+
+                }
+
 
             }
 
         }
-
 
 
     }
@@ -487,7 +549,7 @@ fun StimulusDetailScreenPreview(
 
                 item { PostContentPreview(height = height) }
 
-                item { AnotherPostPreview() }
+                item { WriterAnotherPostPreview() }
 
             }
         }
@@ -742,22 +804,23 @@ fun PostContentPreview(
 
 @Preview
 @Composable
-fun AnotherPostPreview(
-    modifier: Modifier = Modifier
+fun WriterAnotherPostPreview(
+    modifier: Modifier = Modifier,
+    nickname: String = "작성자"
 ){
     Column(
         modifier = modifier
-            .padding(10.dp)
             .fillMaxWidth()
-            .background(color = OpaqueLight, shape = RoundedCornerShape(18.dp))
             .padding(10.dp),
         horizontalAlignment = Alignment.Start
     ){
 
         Text(
-            text = "닉네임 님, 이런 글은 어때요?",
-            style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+            text = "${nickname}님의 다른 글도 읽어보세요.",
+            style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         )
+
+        Spacer(modifier.size(10.dp))
 
         HorizontalDivider()
 

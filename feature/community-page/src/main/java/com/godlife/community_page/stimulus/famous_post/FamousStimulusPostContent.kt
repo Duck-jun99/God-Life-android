@@ -144,16 +144,16 @@ fun FamousStimulusItem(
                 Image(
                     bitmap = fetchedBitmap,
                     contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
+                    contentScale = ContentScale.Crop,
                     modifier = modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                 )   //bitmap이 없다면
             } ?: Image(
                 painter = painterResource(id = R.drawable.category3),
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Crop,
                 modifier = modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
             )
 
             Box(
@@ -187,7 +187,7 @@ fun FamousStimulusItem(
 
         Spacer(modifier.size(5.dp))
 
-        HorizontalDivider(modifier.padding(start = 20.dp, end = 20.dp))
+        HorizontalDivider(modifier.width(200.dp))
 
         Spacer(modifier.size(5.dp))
 
@@ -306,7 +306,7 @@ fun FamousStimulusItemPreview(
 
         Spacer(modifier.size(5.dp))
 
-        HorizontalDivider(modifier.padding(start = 20.dp, end = 20.dp))
+        HorizontalDivider(modifier.width(200.dp))
 
         Spacer(modifier.size(5.dp))
 
