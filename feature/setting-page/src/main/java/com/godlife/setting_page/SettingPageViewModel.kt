@@ -1,10 +1,13 @@
 package com.godlife.setting_page
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
+import com.godlife.domain.LogoutUseCase
 import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.UserInfoBody
@@ -31,7 +34,8 @@ class SettingPageViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val reissueUseCase: ReissueUseCase,
-    private val registerFCMTokenUseCase: RegisterFCMTokenUseCase
+    private val registerFCMTokenUseCase: RegisterFCMTokenUseCase,
+    private val logoutUseCase: LogoutUseCase
 ): ViewModel(){
 
     private val _uiState = MutableStateFlow<SettingPageUiState>(SettingPageUiState.Loading)
@@ -47,6 +51,9 @@ class SettingPageViewModel @Inject constructor(
     //엑세스 토큰 저장 변수
     private val _auth = MutableStateFlow("")
     val auth: StateFlow<String> = _auth
+
+    // 로그아웃 플래그
+    private val logoutFlag = mutableStateOf(false)
 
     init {
 
@@ -99,9 +106,41 @@ class SettingPageViewModel @Inject constructor(
 
     }
 
+    fun logout(){
+        if(!logoutFlag.value){
+            logoutFlag.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+
+                val result = withContext(Dispatchers.IO) {
+
+                    Log.e("로그아웃 전", "${localPreferenceUserUseCase.getAccessToken()}")
+                    Log.e("로그아웃 전", "${localPreferenceUserUseCase.getUserId()}")
+                    Log.e("로그아웃 전", "${localPreferenceUserUseCase.getRefreshToken()}")
+
+                    logoutUseCase.executeLogout(auth.value)
+
+                    localPreferenceUserUseCase.removeAccessToken()
+                    localPreferenceUserUseCase.removeUserId()
+                    localPreferenceUserUseCase.removeRefreshToken()
+
+                    //로그아웃 시 FCM 토큰 삭제 (빈 문자열로 처리)
+                    //registerFCMTokenUseCase.executeRegisterFCMToken(auth.value, "")
+
+                    Log.e("로그아웃 후", "${localPreferenceUserUseCase.getAccessToken()}")
+                    Log.e("로그아웃 후", "${localPreferenceUserUseCase.getUserId()}")
+                    Log.e("로그아웃 후", "${localPreferenceUserUseCase.getRefreshToken()}")
+                    // 로그아웃이 완료되면 true를 반환
+                    true
+                }
+                _logoutResult.value = result
+            }
+        }
+    }
 
 
+/*
     fun logout() {
+
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 localPreferenceUserUseCase.removeAccessToken()
@@ -121,6 +160,10 @@ class SettingPageViewModel @Inject constructor(
         }
 
     }
+
+
+ */
+
 
     // refresh token 갱신 후 Callback 실행
     private fun reIssueRefreshToken(callback: () -> Unit){
@@ -177,7 +220,7 @@ class SettingPageViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
+            // 로컬 데이터베이스에서 사용자 정보 삭제
             localPreferenceUserUseCase.removeAccessToken()
             localPreferenceUserUseCase.removeUserId()
             localPreferenceUserUseCase.removeRefreshToken()
