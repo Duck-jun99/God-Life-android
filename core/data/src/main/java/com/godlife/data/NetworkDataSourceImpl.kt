@@ -21,6 +21,7 @@ import com.godlife.network.model.CreatePostRequest
 import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LogoutQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -70,6 +71,10 @@ class NetworkDataSourceImpl @Inject constructor(
 
     override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
         return networkApi.getUserInfo(authorization)
+    }
+
+    override suspend fun logout(authorization: String): ApiResponse<LogoutQuery> {
+        return networkApi.logout(authorization)
     }
 
     override suspend fun getUserProfile(

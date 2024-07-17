@@ -9,6 +9,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LogoutQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -43,6 +44,9 @@ interface NetworkRepository {
                        ): SignUpQuery
 
     suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery>
+
+    suspend fun logout(authorization: String): ApiResponse<LogoutQuery>
+
 
     suspend fun getUserProfile(
         authorization: String,

@@ -8,6 +8,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LogoutQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -73,6 +74,12 @@ interface RetrofitNetworkApi {
     suspend fun getUserInfo(
         @Header("Authorization") authorization: String,
     ): ApiResponse<UserInfoQuery>
+
+    // 로그아웃
+    @POST("/member")
+    suspend fun logout(
+        @Header("Authorization") authorization: String,
+    ): ApiResponse<LogoutQuery>
 
     // 회원 정보 조회 (프로필)
     @GET("/member/{memberId}")

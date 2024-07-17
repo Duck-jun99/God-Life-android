@@ -22,6 +22,7 @@ import com.godlife.domain.GetFamousPostUseCase
 import com.godlife.domain.GetFamousStimulusPostUseCase
 import com.godlife.domain.GetMostViewStimulusPostUseCase
 import com.godlife.domain.GetRecommendedStimulusPostUseCase
+import com.godlife.domain.LogoutUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.PostNotificationTimeUseCase
 import com.godlife.domain.RegisterFCMTokenUseCase
@@ -43,6 +44,10 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideGetUserInfoUseCase(repository: NetworkRepository) = GetUserInfoUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideLogoutUseCase(repository: NetworkRepository) = LogoutUseCase(repository)
 
     @Provides
     @Singleton
