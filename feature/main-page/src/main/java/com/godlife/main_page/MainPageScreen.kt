@@ -145,6 +145,8 @@ fun MainPageScreen(
 
             is MainPageUiState.Success -> {
 
+                viewModel.setFcmToken()
+
                 Column(
                     modifier
                         .fillMaxSize()

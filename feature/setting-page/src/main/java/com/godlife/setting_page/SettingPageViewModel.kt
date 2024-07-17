@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
+import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.network.model.UserInfoBody
 import com.skydoves.sandwich.message
@@ -29,7 +30,8 @@ sealed class SettingPageUiState {
 class SettingPageViewModel @Inject constructor(
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
-    private val reissueUseCase: ReissueUseCase
+    private val reissueUseCase: ReissueUseCase,
+    private val registerFCMTokenUseCase: RegisterFCMTokenUseCase
 ): ViewModel(){
 
     private val _uiState = MutableStateFlow<SettingPageUiState>(SettingPageUiState.Loading)
@@ -105,6 +107,8 @@ class SettingPageViewModel @Inject constructor(
                 localPreferenceUserUseCase.removeAccessToken()
                 localPreferenceUserUseCase.removeUserId()
                 localPreferenceUserUseCase.removeRefreshToken()
+
+                registerFCMTokenUseCase.executeRegisterFCMToken(auth.value, "")
 
                 Log.e("SettingPageViewModel", "${localPreferenceUserUseCase.getAccessToken()}")
                 Log.e("SettingPageViewModel", "${localPreferenceUserUseCase.getUserId()}")

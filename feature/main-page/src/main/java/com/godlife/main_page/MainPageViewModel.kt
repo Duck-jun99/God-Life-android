@@ -7,9 +7,11 @@ import com.godlife.database.model.TodoEntity
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
+import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.model.todo.TodoList
 import com.godlife.network.model.UserInfoBody
+import com.godlife.service.MyFirebaseMessagingService
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -19,8 +21,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 sealed class MainPageUiState {
     object Loading : MainPageUiState()
@@ -48,7 +52,8 @@ class MainPageViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val reissueUseCase: ReissueUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase
+    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
+    private val registerFCMTokenUseCase: RegisterFCMTokenUseCase
 ): ViewModel(){
 
     /**
@@ -73,9 +78,16 @@ class MainPageViewModel @Inject constructor(
     //AlertDialog 상태
     val showAlertDialog = MutableStateFlow<Boolean>(false)
 
+    // FCM 토큰 등록 상태
+    val fcmTokenRegistered = MutableStateFlow<Boolean>(false)
+
     /**
      * 변수 관련
      */
+
+    //엑세스 토큰 저장 변수
+    private val _auth = MutableStateFlow("")
+    val auth: StateFlow<String> = _auth
 
     // 유저 정보 초기화
     private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", 0, ""))
@@ -108,6 +120,12 @@ class MainPageViewModel @Inject constructor(
      */
 
     init {
+
+        viewModelScope.launch {
+            //엑세스 토큰 저장
+            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
+        }
+
         // 유저 정보 가져오기
         getUserInfo()
 
@@ -172,13 +190,7 @@ class MainPageViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            var auth = ""
-            launch {
-                auth = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-
-            }.join()
-
-            val response = getUserInfoUseCase.executeGetUserInfo(auth)
+            val response = getUserInfoUseCase.executeGetUserInfo(auth.value)
 
             response
                 //성공적으로 넘어오면 유저 정보를 저장
@@ -212,6 +224,38 @@ class MainPageViewModel @Inject constructor(
 
         }
 
+    }
+
+    // 로그인 시 FCM 토큰 등록
+    fun setFcmToken() {
+        if (!fcmTokenRegistered.value) {
+            fcmTokenRegistered.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val token = suspendCancellableCoroutine<String> { continuation ->
+                        MyFirebaseMessagingService().getFirebaseToken { token ->
+                            continuation.resume(token)
+                        }
+                    }
+
+                    val result = registerFCMTokenUseCase.executeRegisterFCMToken(auth.value, token)
+
+                    result
+                        .onSuccess {
+                            fcmTokenRegistered.value = true
+                        }
+                        .onError {
+                            _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                        }
+                        .onException {
+                            _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                        }
+                } catch (e: Exception) {
+                    _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                }
+
+            }
+        }
     }
 
     // refresh token 갱신 후 getUserInfo 다시 실행

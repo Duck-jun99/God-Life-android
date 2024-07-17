@@ -3,6 +3,7 @@ package com.godlife.main
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -102,8 +103,11 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        /** FCM설정, Token값 가져오기 */
-        MyFirebaseMessagingService().getFirebaseToken()
+
+        /** FCM Token값 가져오기 */
+        MyFirebaseMessagingService().getFirebaseToken{
+            Log.e("MainActivity", "FCM Token: $it")
+        }
 
         /*
         /** PostNotification 대응 */
@@ -230,7 +234,7 @@ fun MainUiTheme(
                     }
 
                     //신고화면
-                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}/{title}",
+                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}/ {title}",
                         arguments = listOf(
                             navArgument("postId"){type = NavType.StringType},
                             navArgument("userNickname"){type = NavType.StringType},

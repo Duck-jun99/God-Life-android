@@ -29,6 +29,8 @@ android {
 
 dependencies {
 
+    implementation(projects.core.service)
+
     implementation(projects.feature.createtodolist)
     implementation(projects.core.database)
     implementation(projects.core.network)
