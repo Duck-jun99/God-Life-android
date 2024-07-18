@@ -139,11 +139,11 @@ class CreateStimulusPostViewModel @Inject constructor(
     }
 
     fun setTitle(title: String) {
-        _title.value = title
+        _title.value = title.take(15)
     }
 
     fun setDescription(description: String) {
-        _description.value = description
+        _description.value = description.take(30)
     }
 
     fun setContent(content: String){

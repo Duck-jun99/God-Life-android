@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -203,7 +204,6 @@ fun CreateStimulusPostCover(
                             .fillMaxWidth()
                             .padding(10.dp)
                     ) {
-                        //Text(text = "커버 이미지를 추가해주세요!", style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Normal))
 
                         Spacer(modifier.size(10.dp))
 
@@ -234,15 +234,28 @@ fun CreateStimulusPostCover(
                                 .fillMaxWidth()
                                 .height(70.dp)
                                 .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+                                .padding(5.dp)
                         ){
 
                             GodLifeTextFieldGray(
                                 text = title.value,
                                 onTextChanged = { viewModel.setTitle(it) },
-                                hint = "이곳에 제목을 작성해주세요."
+                                hint = "제목을 작성해주세요.",
+                                singleLine = true
                             )
 
                         }
+
+                        Text(
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            text = "${title.value.length}/15",
+                            style = TextStyle(
+                                color = GrayWhite,
+                                fontSize = 12.sp
+                            ),
+                            textAlign = TextAlign.End
+                        )
 
 
                     }
@@ -263,15 +276,28 @@ fun CreateStimulusPostCover(
                                 .fillMaxWidth()
                                 .height(100.dp)
                                 .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+                                .padding(5.dp)
                         ){
 
                             GodLifeTextFieldGray(
                                 text = description.value,
                                 onTextChanged = { viewModel.setDescription(it) },
-                                hint = "굿생러분들이 관심을 가질 수 있도록 소개글을 작성해주세요."
+                                hint = "굿생러분들이 관심을 가질 수 있도록 소개글을 작성해주세요.",
+                                singleLine = false
                             )
 
                         }
+
+                        Text(
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            text = "${description.value.length}/30",
+                            style = TextStyle(
+                                color = GrayWhite,
+                                fontSize = 12.sp
+                            ),
+                            textAlign = TextAlign.End
+                        )
 
 
                     }
