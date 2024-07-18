@@ -81,16 +81,19 @@ class CommunityPageViewModel @Inject constructor(
     lateinit var latestPostList: Flow<PagingData<PostDetailBody>>
 
     //주간 인기 게시물을 호출한 적이 있는지 플래그
-    private var weeklyFamousFlag = mutableIntStateOf(0)
+    private var weeklyFamousFlag = mutableStateOf(false)
 
     //전체 인기 게시물을 호출한 적이 있는지 플래그
-    private var allFamousFlag = mutableIntStateOf(0)
+    private var allFamousFlag = mutableStateOf(false)
 
     //주간 명예의 전당을 호출한 적이 있는지 플래그
-    private var weeklyRankingFlag = mutableIntStateOf(0)
+    private var weeklyRankingFlag = mutableStateOf(false)
 
     //전체 명예의 전당을 호출한 적이 있는지 플래그
-    private var allRankingFlag = mutableIntStateOf(0)
+    private var allRankingFlag = mutableStateOf(false)
+
+    //전체 명예의 전당에서 해당하는 유저의 게시물 호출한 적이 있는지 플래그
+    private var rankingUserPostFlag = mutableStateOf(false)
 
     //조회된 일주일 인기 게시물
     private val _weeklyFamousPostList = MutableStateFlow<List<PostDetailBody>>(emptyList())
@@ -217,8 +220,8 @@ class CommunityPageViewModel @Inject constructor(
     fun getWeeklyFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
-        if(weeklyFamousFlag.value == 0){
-
+        if(!weeklyFamousFlag.value){
+            weeklyFamousFlag.value = true
             _uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
@@ -230,26 +233,26 @@ class CommunityPageViewModel @Inject constructor(
 
                         _uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
 
-
-                        weeklyFamousFlag.value += 1
-
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getWeeklyFamousPost", this.message())
 
                         // 토큰 만료시 재발급 요청
                         if(this.response.code() == 401){
-
+                            weeklyFamousFlag.value = false
                             reIssueRefreshToken(callback = { getWeeklyFamousPost() })
-
+                        }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = CommunityPageUiState.Error("${this.response.code()} Error")
                         }
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getWeeklyFamousPost", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = CommunityPageUiState.Error(this.message())
                     }
 
             }
@@ -262,7 +265,8 @@ class CommunityPageViewModel @Inject constructor(
     fun getAllFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
-        if(allFamousFlag.value == 0){
+        if(!allFamousFlag.value){
+            allFamousFlag.value = true
 
             _uiState.value = CommunityPageUiState.Loading
 
@@ -272,24 +276,26 @@ class CommunityPageViewModel @Inject constructor(
                     .onSuccess {
                         _allFamousPostList.value = data.body
                         _uiState.value = CommunityPageUiState.Success("전체 인기 게시물 조회 완료")
-                        allFamousFlag.value += 1
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getAllFamousPost", this.message())
 
                         // 토큰 만료시 재발급 요청
                         if(this.response.code() == 401){
-
+                            allFamousFlag.value = false
                             reIssueRefreshToken(callback = { getAllFamousPost() })
-
+                        }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = CommunityPageUiState.Error("${this.response.code()} Error")
                         }
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getAllFamousPost", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = CommunityPageUiState.Error(this.message())
                     }
 
             }
@@ -300,8 +306,8 @@ class CommunityPageViewModel @Inject constructor(
 
     //주간 명예의 전당 불러오기
     fun getWeeklyRanking(){
-        if(weeklyRankingFlag.value == 0){
-
+        if(!weeklyRankingFlag.value){
+            weeklyRankingFlag.value = true
             _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
@@ -310,27 +316,29 @@ class CommunityPageViewModel @Inject constructor(
                     .onSuccess {
                         _weeklyRankingList.value = data.body
                         //_rankingUiState.value = RankingPageUiState.Success("주간 명예의 전당 조회 완료")
-                        weeklyRankingFlag.value +=1
 
                         getAllRanking()
 
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getWeeklyRanking", this.message())
 
                         // 토큰 만료시 재발급 요청
                         if(this.response.code() == 401){
-
+                            weeklyRankingFlag.value = false
                             reIssueRefreshToken(callback = { getWeeklyRanking() })
-
+                        }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = CommunityPageUiState.Error("${this.response.code()} Error")
                         }
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getWeeklyRanking", "${this.message}")
 
                         // UI State Error로 변경
-                        _rankingUiState.value = RankingPageUiState.Error("오류가 발생했습니다.")
+                        _rankingUiState.value = RankingPageUiState.Error(this.message())
                     }
             }
 
@@ -341,8 +349,8 @@ class CommunityPageViewModel @Inject constructor(
     //전체 명예의 전당 불러오기
     fun getAllRanking(){
 
-        if(allRankingFlag.value == 0){
-
+        if(!allRankingFlag.value){
+            allRankingFlag.value = true
             _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
@@ -351,24 +359,24 @@ class CommunityPageViewModel @Inject constructor(
                     .onSuccess {
                         _allRankingList.value = data.body
                         _rankingUiState.value = RankingPageUiState.Success("명예의 전당 조회 완료")
-                        allRankingFlag.value +=1
+
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getAllRanking", this.message())
 
                         // 토큰 만료시 재발급 요청
                         if(this.response.code() == 401){
-
+                            allRankingFlag.value = false
                             reIssueRefreshToken(callback = { getAllRanking() })
 
                         }
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getAllRanking", "${this.message}")
 
                         // UI State Error로 변경
-                        _rankingUiState.value = RankingPageUiState.Error("오류가 발생했습니다.")
+                        _rankingUiState.value = RankingPageUiState.Error(this.message())
                     }
             }
 
@@ -383,15 +391,20 @@ class CommunityPageViewModel @Inject constructor(
         tags: String = "",
         nickname: String
     ) {
-        viewModelScope.launch {
+        if(!rankingUserPostFlag.value){
+            rankingUserPostFlag.value = true
 
-            searchPostUseCase.executeSearchPost(keyword, tags, nickname)
-                .collectLatest {
-                    _rankingUserPostList.value = it
-                }
-            Log.e("getRankingUserPost", "nickname : $nickname")
+            viewModelScope.launch {
 
+                searchPostUseCase.executeSearchPost(keyword, tags, nickname)
+                    .collectLatest {
+                        _rankingUserPostList.value = it
+                    }
+                Log.e("getRankingUserPost", "nickname : $nickname")
+
+            }
         }
+
 
     }
 
