@@ -80,6 +80,15 @@ class ProfileViewModel @Inject constructor(
     private val _userStimulusPostList = MutableStateFlow<List<StimulusPostList>>(emptyList())
     val userStimulusPostList: StateFlow<List<StimulusPostList>> = _userStimulusPostList
 
+    //사용자 정보 불러왔는지 플래그
+    private var _userInfoLoaded = MutableStateFlow(false)
+
+    //사용자 굿생 인증 게시물 불러왔는지 플래그
+    private var _userPostLoaded = MutableStateFlow(false)
+
+    //사용자 굿생 자극 게시물 불러왔는지 플래그
+    private var _userStimulusPostLoaded = MutableStateFlow(false)
+
     /**
      * Init
      */
@@ -96,47 +105,51 @@ class ProfileViewModel @Inject constructor(
 
     // 사용자 정보 가져오기
     fun getUserProfile(memberId: String){
+        if(!_userInfoLoaded.value){
+            _userInfoLoaded.value = true
+            _uiState.value = ProfileUiState.Loading
+            if(auth.value != ""){
 
-        if(auth.value != ""){
+                val memberId = memberId
 
-            val memberId = memberId
+                viewModelScope.launch(Dispatchers.IO) {
+                    val result = getUserProfileUseCase.executeGetUserProfile(auth.value, memberId)
 
-            viewModelScope.launch(Dispatchers.IO) {
-                val result = getUserProfileUseCase.executeGetUserProfile(auth.value, memberId)
+                    result
+                        .onSuccess {
 
-                result
-                    .onSuccess {
+                            _userInfo.value = data.body
 
-                        _userInfo.value = data.body
+                            //getUserPosts()
 
-                        //getUserPosts()
+                            _uiState.value = ProfileUiState.Success("success")
 
-                        _uiState.value = ProfileUiState.Success("success")
-
-
-                    }
-                    .onError {
-
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken { getUserProfile(memberId) }
 
                         }
-                        else {
-                            _uiState.value = ProfileUiState.Error("오류가 발생했습니다.")
+                        .onError {
+
+                            // 토큰 만료시 재발급 요청
+                            if(this.response.code() == 401){
+                                _userInfoLoaded.value = false
+                                reIssueRefreshToken { getUserProfile(memberId) }
+
+                            }
+                            else {
+                                _uiState.value = ProfileUiState.Error("${this.response.code()} Error")
+                            }
+
+                        }
+                        .onException {
+
+                            _uiState.value = ProfileUiState.Error(this.message())
+
                         }
 
-                    }
-                    .onException {
-
-                        _uiState.value = ProfileUiState.Error("오류가 발생했습니다.")
-
-                    }
+                }
 
             }
-
         }
+
 
     }
 
@@ -152,11 +165,13 @@ class ProfileViewModel @Inject constructor(
 
     // 조회한 사용자의 굿생 인증 게시물 불러오기
     fun getUserPosts(){
-        if(userInfo.value.nickname != null){
-
+        if(!_userPostLoaded.value){
+            _userPostLoaded.value = true
+            _uiState.value = ProfileUiState.Loading
             viewModelScope.launch {
                 getSearchPostUseCase.executeSearchPost(keyword = "", tags = "", nickname = userInfo.value.nickname).cachedIn(viewModelScope).collect {
                     _userPostList.value = it
+                    _uiState.value = ProfileUiState.Success("success")
                 }
             }
 
@@ -165,7 +180,9 @@ class ProfileViewModel @Inject constructor(
 
     // 조회한 사용자의 굿생 자극 게시물 불러오기
     fun getUserStimulusPosts(){
-        if(userInfo.value.nickname != null){
+        if(!_userStimulusPostLoaded.value){
+            _userStimulusPostLoaded.value = true
+            _uiState.value = ProfileUiState.Loading
             viewModelScope.launch {
 
                 val result = getSearchPostUseCase.executeSearchStimulusPost(auth.value, nickname = userInfo.value.nickname, title = "", introduction = "")
@@ -173,6 +190,25 @@ class ProfileViewModel @Inject constructor(
                 result
                     .onSuccess {
                         _userStimulusPostList.value = data.body
+                        _uiState.value = ProfileUiState.Success("success")
+                    }
+                    .onError {
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+                            _userStimulusPostLoaded.value = false
+                            reIssueRefreshToken { getUserStimulusPosts() }
+
+                        }
+                        else {
+                            _uiState.value = ProfileUiState.Error("${this.response.code()} Error")
+                        }
+
+                    }
+                    .onException {
+
+                        _uiState.value = ProfileUiState.Error(this.message())
+
                     }
 
             }

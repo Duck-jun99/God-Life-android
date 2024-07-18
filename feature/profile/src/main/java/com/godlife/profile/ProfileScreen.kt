@@ -71,6 +71,8 @@ import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.landscapist.ImageOptions
@@ -91,28 +93,22 @@ fun ProfileScreen(
 
     GodLifeTheme {
 
-        Scaffold(
+        Scaffold { innerPadding ->
 
-        ) { innerPadding ->
+            if(uiState !is ProfileUiState.Error){
+                ProfileBox(innerPadding = innerPadding, navController = navController, viewModel = viewModel)
+            }
 
-            when(uiState){
-                is ProfileUiState.Loading -> {
+            //오류 발생 시
+            else{
+                GodLifeErrorScreen(
+                    errorMessage = (uiState as ProfileUiState.Error).message,
+                    buttonEnabled = false
+                )
+            }
 
-                    /* TODO */
-
-                }
-
-                is ProfileUiState.Success -> {
-
-                    ProfileBox(innerPadding = innerPadding, navController = navController, viewModel = viewModel)
-
-                }
-
-                is ProfileUiState.Error -> {
-
-                    /* TODO */
-
-                }
+            if(uiState is ProfileUiState.Loading){
+                GodLifeLoadingScreen()
             }
 
         }
