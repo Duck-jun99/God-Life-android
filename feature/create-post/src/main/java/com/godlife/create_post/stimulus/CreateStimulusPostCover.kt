@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,9 +59,12 @@ import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.BuildConfig
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -88,7 +92,6 @@ fun CreateStimulusPostCover(
 
     val context = LocalContext.current
 
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     val launcher = rememberLauncherForActivityResult(contract =
     ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -133,29 +136,42 @@ fun CreateStimulusPostCover(
 
                         if(coverImg!= Uri.EMPTY){
 
-                            Glide.with(context)
-                                .asBitmap()
-                                .load(BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value)
-                                .into(object : CustomTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        bitmap.value = resource
+                            GlideImage(
+                                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value },
+                                imageOptions = ImageOptions(
+                                    contentScale = ContentScale.Crop,
+                                    alignment = Alignment.Center
+                                ),
+                                modifier = modifier
+                                    .fillMaxSize()
+                                    .blur(
+                                        radiusX = 15.dp, radiusY = 15.dp
+                                    ),
+                                loading = {
+                                    Box(
+                                        modifier = modifier
+                                            .background(GrayWhite3)
+                                            .fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ){
+
+                                        CircularProgressIndicator(
+                                            color = PurpleMain
+                                        )
+
                                     }
 
-                                    override fun onLoadCleared(placeholder: Drawable?) {}
-                                })
+                                },
+                                failure = {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.category3),
+                                        contentDescription = "",
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            )
 
-                            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                                Image(
-                                    bitmap = fetchedBitmap,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.FillWidth,
-                                    modifier = modifier
-                                        .fillMaxSize()
-                                        .blur(
-                                            radiusX = 15.dp, radiusY = 15.dp
-                                        )
-                                )
-                            }
+
                         }
 
                         else{
@@ -175,7 +191,7 @@ fun CreateStimulusPostCover(
                         }
 
 
-                        StimulusCoverItem(title = title.value, coverImg = bitmap.value)
+                        StimulusCoverItem(title = title.value, coverImg = coverImg.value)
 
 
                     }
@@ -252,7 +268,7 @@ fun CreateStimulusPostCover(
                             GodLifeTextFieldGray(
                                 text = description.value,
                                 onTextChanged = { viewModel.setDescription(it) },
-                                hint = "소개글을 통해 사용자분들께서 관심을 가질 수 있도록 소개글을 작성해주세요."
+                                hint = "굿생러분들이 관심을 가질 수 있도록 소개글을 작성해주세요."
                             )
 
                         }
@@ -326,7 +342,7 @@ fun CreateStimulusPostCover(
 fun StimulusCoverItem(
     modifier: Modifier = Modifier,
     title: String,
-    coverImg: Bitmap?
+    coverImg: String
 ){
     Box(
         modifier = modifier
@@ -336,25 +352,37 @@ fun StimulusCoverItem(
         contentAlignment = Alignment.Center
     ){
 
-        if(coverImg!=null){
-
-            Image(
-                bitmap = coverImg.asImageBitmap(),
-                contentDescription = null,
+        GlideImage(
+            imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + coverImg },
+            imageOptions = ImageOptions(
                 contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-            )
-        }
-        else{
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
 
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(GrayWhite)
-            )
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
 
-        }
+                }
+
+            },
+            failure = {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .background(GrayWhite3)
+                )
+            }
+        )
 
         Box(
             modifier = modifier

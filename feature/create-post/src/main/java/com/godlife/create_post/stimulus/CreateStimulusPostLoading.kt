@@ -131,7 +131,7 @@ fun CreateStimulusPostLoading(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
 
-                        StimulusCoverItem(title = title.value, coverImg = bitmap.value)
+                        StimulusCoverItem(title = title.value, coverImg = coverImg.value)
 
                         Spacer(modifier.size(5.dp))
 

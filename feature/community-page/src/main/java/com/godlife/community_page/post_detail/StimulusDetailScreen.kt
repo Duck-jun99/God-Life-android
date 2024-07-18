@@ -28,6 +28,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -71,8 +72,11 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPost
 import com.godlife.network.model.UserProfileBody
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -93,10 +97,6 @@ fun StimulusDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val localDensity = LocalDensity.current
-    val context = LocalContext.current
-
-    val coverBitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val writerBitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
 
@@ -133,9 +133,7 @@ fun StimulusDetailScreen(
                         postDetail.value?.let { it1 ->
                             StimulusPostCover(
                                 height = height.value,
-                                postDetail = it1,
-                                context = context,
-                                bitmap = coverBitmap
+                                postDetail = it1
                             )
                         }
                     }
@@ -153,9 +151,7 @@ fun StimulusDetailScreen(
                                         PostContent(
                                             height = height.value,
                                             postDetail = post,
-                                            writerInfo = writer,
-                                            bitmap = writerBitmap,
-                                            context = context
+                                            writerInfo = writer
                                         )
                                     }
                                 }
@@ -188,9 +184,7 @@ fun StimulusDetailScreen(
 fun StimulusPostCover(
     modifier: Modifier = Modifier,
     height: Dp,
-    bitmap: MutableState<Bitmap?>,
-    postDetail: StimulusPost,
-    context: Context
+    postDetail: StimulusPost
 ) {
 
 
@@ -207,32 +201,41 @@ fun StimulusPostCover(
         .height(height)
     ){
 
-        Glide.with(context)
-            .asBitmap()
-            .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
+        GlideImage(
+            imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize()
+                .blur(
+                    radiusX = 15.dp, radiusY = 15.dp
+                ),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-                    .blur(
-                        radiusX = 15.dp, radiusY = 15.dp
-                    )
-            )
-
-        }
-
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
+        
         Box(
             modifier = modifier
                 .height(height)
@@ -250,8 +253,7 @@ fun StimulusPostCover(
                 ){
 
                     StimulusCoverItem(
-                        postDetail = postDetail,
-                        bitmap = bitmap
+                        postDetail = postDetail
                     )
 
                     Spacer(modifier.size(5.dp))
@@ -308,11 +310,8 @@ fun StimulusPostCover(
 @Composable
 fun StimulusCoverItem(
     modifier: Modifier = Modifier,
-    postDetail: StimulusPost,
-    bitmap: MutableState<Bitmap?>
+    postDetail: StimulusPost
 ){
-    //val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -322,17 +321,37 @@ fun StimulusCoverItem(
         contentAlignment = Alignment.Center
     ){
 
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
+        GlideImage(
+            imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl },
+            imageOptions = ImageOptions(
                 contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-            )
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
 
-        }
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
+                }
+
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
 
         Box(
             modifier = modifier
@@ -358,9 +377,7 @@ fun PostContent(
     modifier: Modifier = Modifier,
     height: Dp,
     postDetail: StimulusPost,
-    writerInfo: UserProfileBody,
-    bitmap: MutableState<Bitmap?>,
-    context: Context
+    writerInfo: UserProfileBody
 ){
 
     Column(
@@ -431,32 +448,42 @@ fun PostContent(
             verticalArrangement = Arrangement.Center
         ){
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-                Glide.with(context)
-                    .asBitmap()
-                    .load(BuildConfig.SERVER_IMAGE_DOMAIN + writerInfo.profileImageURL)
-                    .error(R.drawable.ic_person)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmap.value = resource
+                GlideImage(
+                    imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + writerInfo.profileImageURL },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .clip(CircleShape)
+                        .size(70.dp),
+                    loading = {
+                        Box(
+                            modifier = modifier
+                                .background(GrayWhite3)
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+
+                            CircularProgressIndicator(
+                                color = PurpleMain
+                            )
+
                         }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
-
-                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = modifier
-                            .clip(CircleShape)
-                            .size(70.dp)
-                    )
-
-                }
+                    },
+                    failure = {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                )
 
                 Spacer(modifier.size(10.dp))
 

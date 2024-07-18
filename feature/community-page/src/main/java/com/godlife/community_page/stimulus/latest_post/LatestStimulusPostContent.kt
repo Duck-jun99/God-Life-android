@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,8 +69,12 @@ import com.godlife.community_page.stimulus.StimulusLoadingScreen
 import com.godlife.community_page.stimulus.StimulusPostItem
 import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -122,9 +127,6 @@ fun LatestStimulusItem(
 
     val postId = item.boardId.toString()
 
-
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-
     Row(
         modifier = modifier
             .size(height = 150.dp, width = 300.dp)
@@ -142,33 +144,38 @@ fun LatestStimulusItem(
             contentAlignment = Alignment.Center
         ){
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
+            GlideImage(
+                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .fillMaxSize(),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .fillMaxWidth()
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.category3),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxWidth()
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
+
 
             Box(
                 modifier = modifier

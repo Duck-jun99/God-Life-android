@@ -49,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -85,9 +86,12 @@ import com.godlife.community_page.stimulus.recommended_post.RecommendedStimulusP
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 data class FABItem(
     val icon: ImageVector,
@@ -282,35 +286,39 @@ fun StimulusCoverItem(
             .shadow(10.dp),
         contentAlignment = Alignment.Center
     ){
-        val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
-        Glide.with(LocalContext.current)
-            .asBitmap()
-            .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-            .error(R.drawable.category3)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
+        GlideImage(
+            imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxWidth(),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = modifier
-                    .fillMaxWidth()
-            )   //bitmap이 없다면
-        } ?: Image(
-            painter = painterResource(id = R.drawable.category3),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = modifier
-                .fillMaxWidth()
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
         )
+
 
         Box(
             modifier = modifier

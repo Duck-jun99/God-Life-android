@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,7 +64,9 @@ import com.godlife.community_page.stimulus.StimulusLoadingScreen
 import com.godlife.community_page.stimulus.StimulusPostItem
 import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -135,7 +138,29 @@ fun FamousStimulusItem(
                     alignment = Alignment.Center
                 ),
                 modifier = modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
+                    }
+
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
 
 
