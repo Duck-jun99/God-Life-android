@@ -2,7 +2,7 @@ package com.godlife.create_post.stimulus
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.create_post.BuildConfig
@@ -22,9 +22,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class CreateStimulusUiState {
-    object Loading: CreateStimulusUiState()
-    data class Success(val data: String) : CreateStimulusUiState()
+    data class Loading(val type: UiType): CreateStimulusUiState()
+    data class Success(val type: UiType) : CreateStimulusUiState()
+    object SendSuccess : CreateStimulusUiState()
     data class Error(val message: String) : CreateStimulusUiState()
+}
+
+enum class UiType {
+    GET_BOARD_ID,
+    SET_COVER_IMG,
+    CREATE_POST
 }
 
 @HiltViewModel
@@ -39,7 +46,7 @@ class CreateStimulusPostViewModel @Inject constructor(
      */
 
     // 전체 UI 상태
-    private val _uiState = MutableStateFlow<CreateStimulusUiState>(CreateStimulusUiState.Loading)
+    private val _uiState = MutableStateFlow<CreateStimulusUiState>(CreateStimulusUiState.Loading(UiType.GET_BOARD_ID))
     val uiState: StateFlow<CreateStimulusUiState> = _uiState
 
     /**
@@ -54,8 +61,11 @@ class CreateStimulusPostViewModel @Inject constructor(
     private val _boardId = MutableStateFlow<Int>(0)
     val boardId: StateFlow<Int> = _boardId
 
-    //boardId를 호출한 적이 있는지 플래그
-    private var boardIdFlag = mutableIntStateOf(0)
+    //임시 boardId를 호출한 적이 있는지 플래그
+    private var isGetBoardId = mutableStateOf(false)
+
+    //게시물 전송 플래그
+    private var isCreatePost = mutableStateOf(false)
 
     //커버 이미지
     private val _coverImg = MutableStateFlow<String>("")
@@ -90,24 +100,29 @@ class CreateStimulusPostViewModel @Inject constructor(
 
     suspend fun setCoverImg(uri: Uri) {
 
+        _uiState.value = CreateStimulusUiState.Loading(UiType.SET_COVER_IMG)
+
         createStimulusPostUseCase.executeUploadStimulusPostImage(
             authorization = auth.value,
             tmpBoardId = boardId.value,
             image = uri
         )
             .onSuccess {
-
                 _coverImg.value = data.body
+                _uiState.value = CreateStimulusUiState.Success(UiType.SET_COVER_IMG)
                 Log.e("CreateStimulusPostViewModel", "setCoverImg: ${coverImg.value}")
             }
             .onError {
                 Log.e("onError", this.message())
 
-                // 토큰 만료시 재발급 요청
                 if(this.response.code() == 401){
 
                     // UI State Error로 변경
                     _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
+                }
+                else{
+                    // UI State Error로 변경
+                    _uiState.value = CreateStimulusUiState.Error("${this.response.code()} Error")
                 }
 
             }
@@ -116,7 +131,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                 Log.e("onException", "${this.message}")
 
                 // UI State Error로 변경
-                _uiState.value = CreateStimulusUiState.Error("오류가 발생했습니다.")
+                _uiState.value = CreateStimulusUiState.Error(this.message())
             }
 
         //_coverImg.value = uri
@@ -137,7 +152,9 @@ class CreateStimulusPostViewModel @Inject constructor(
 
     fun getTempBoardId(){
 
-        if(boardIdFlag.value == 0){
+        if(!isGetBoardId.value){
+            isGetBoardId.value = true
+            _uiState.value = CreateStimulusUiState.Loading(UiType.GET_BOARD_ID)
 
             viewModelScope.launch {
                 createStimulusPostUseCase.executeCreateStimulusPostTemp(
@@ -147,7 +164,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                     .onSuccess {
                         _boardId.value = data.body.toInt()
 
-                        _uiState.value = CreateStimulusUiState.Success("임시 게시믈 번호 받아오기 성공")
+                        _uiState.value = CreateStimulusUiState.Success(UiType.GET_BOARD_ID)
                     }
                     .onError {
                         Log.e("onError", this.message())
@@ -155,8 +172,13 @@ class CreateStimulusPostViewModel @Inject constructor(
                         // 토큰 만료시 재발급 요청
                         if(this.response.code() == 401){
 
+                            isGetBoardId.value = false
                             reIssueRefreshToken(callback = { getTempBoardId() })
 
+                        }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = CreateStimulusUiState.Error("${this.response.code()} Error")
                         }
                     }
                     .onException {
@@ -164,11 +186,9 @@ class CreateStimulusPostViewModel @Inject constructor(
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CreateStimulusUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = CreateStimulusUiState.Error(this.message())
                     }
             }
-
-            boardIdFlag.value += 1
 
         }
 
@@ -189,53 +209,10 @@ class CreateStimulusPostViewModel @Inject constructor(
             .onError {
                 Log.e("onError", this.message())
 
-                // 토큰 만료시 재발급 요청
                 if(this.response.code() == 401){
 
                     // UI State Error로 변경
                     _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
-                }
-
-            }
-            .onException {
-
-                Log.e("onException", "${this.message}")
-
-                // UI State Error로 변경
-                _uiState.value = CreateStimulusUiState.Error("오류가 발생했습니다.")
-            }
-
-        return imgUrl
-    }
-
-    suspend fun completeCreateStimulusPost(){
-        createStimulusPostUseCase.executeCreateStimulusPost(
-            authorization = auth.value,
-            CreatePostRequest(
-                boardId = boardId.value.toLong(),
-                title = title.value,
-                content = content.value,
-                thumbnailUrl = coverImg.value,
-                introduction = description.value
-            )
-        )
-            .onSuccess {
-
-                Log.e("CreateStimulusPostViewModel", "completeCreateStimulusPost: $data")
-
-            }
-            .onError {
-                Log.e("onError", this.message())
-
-                // 토큰 만료시 재발급 요청
-                if(this.response.code() == 401){
-
-                    // UI State Error로 변경
-                    _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
-                }
-                else{
-                    // UI State Error로 변경
-                    _uiState.value = CreateStimulusUiState.Error("${this.response.code()} Error")
                 }
 
             }
@@ -246,6 +223,64 @@ class CreateStimulusPostViewModel @Inject constructor(
                 // UI State Error로 변경
                 _uiState.value = CreateStimulusUiState.Error(this.message())
             }
+
+        return imgUrl
+    }
+
+    fun completeCreateStimulusPost(){
+
+        if(!isCreatePost.value){
+            isCreatePost.value = true
+            _uiState.value = CreateStimulusUiState.Loading(UiType.CREATE_POST)
+
+            viewModelScope.launch {
+
+                createStimulusPostUseCase.executeCreateStimulusPost(
+                    authorization = auth.value,
+                    CreatePostRequest(
+                        boardId = boardId.value.toLong(),
+                        title = title.value,
+                        content = content.value,
+                        thumbnailUrl = coverImg.value,
+                        introduction = description.value
+                    )
+                )
+                    .onSuccess {
+
+                        _uiState.value = CreateStimulusUiState.SendSuccess
+                        Log.e("CreateStimulusPostViewModel", "completeCreateStimulusPost: $data")
+
+                    }
+                    .onError {
+                        Log.e("onError", this.message())
+
+                        // 토큰 만료시 재발급 요청
+                        if(this.response.code() == 401){
+
+                            isCreatePost.value = false
+                            reIssueRefreshToken(callback = { completeCreateStimulusPost() })
+
+                        }
+                        else{
+                            // UI State Error로 변경
+                            _uiState.value = CreateStimulusUiState.Error("${this.response.code()} Error")
+                        }
+
+                    }
+                    .onException {
+
+                        Log.e("onException", "${this.message}")
+
+                        // UI State Error로 변경
+                        _uiState.value = CreateStimulusUiState.Error(this.message())
+                    }
+
+            }
+
+
+
+        }
+
     }
 
 
@@ -254,10 +289,7 @@ class CreateStimulusPostViewModel @Inject constructor(
     private fun reIssueRefreshToken(callback: () -> Unit){
         viewModelScope.launch(Dispatchers.IO) {
 
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
+            val response = reissueUseCase.executeReissue(auth.value)
 
             response
                 //성공적으로 넘어오면 유저 정보의 토큰을 갱신
@@ -279,7 +311,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                         deleteLocalToken()
 
                         // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = CreateStimulusUiState.Error("재로그인 해주세요.")
+                        _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
 
                     }
 
@@ -287,7 +319,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                     else{
 
                         // UI State Error로 변경
-                        _uiState.value = CreateStimulusUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = CreateStimulusUiState.Error("${this.response.code()} Error")
                     }
 
                 }
@@ -295,7 +327,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                     Log.e("onException", "${this.message}")
 
                     // UI State Error로 변경
-                    _uiState.value = CreateStimulusUiState.Error("오류가 발생했습니다.")
+                    _uiState.value = CreateStimulusUiState.Error(this.message())
 
                 }
 
@@ -308,7 +340,7 @@ class CreateStimulusPostViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
+            // 로컬 데이터베이스에서 사용자 정보 삭제
             localPreferenceUserUseCase.removeAccessToken()
             localPreferenceUserUseCase.removeUserId()
             localPreferenceUserUseCase.removeRefreshToken()

@@ -246,7 +246,11 @@ fun StimulusPostScreen(
 
                 composable("CreateStimulusPostScreen"){
                     fabVisibleState.value = false
-                    CreateStimulusPostScreen(bottomBarVisibleState = bottomBarVisibleState, fabVisibleState = fabVisibleState)
+                    CreateStimulusPostScreen(
+                        bottomBarVisibleState = bottomBarVisibleState,
+                        fabVisibleState = fabVisibleState,
+                        parentNavController = navController
+                    )
 
                 }
 

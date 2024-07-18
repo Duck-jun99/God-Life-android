@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.create_post.R
@@ -55,6 +58,8 @@ import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -71,6 +76,8 @@ fun CreateStimulusPostCover(
     viewModel: CreateStimulusPostViewModel
 ){
     //val cScope = rememberCoroutineScope()
+    val uiState = viewModel.uiState.collectAsState()
+    Log.d("CreateStimulusPostCover", "Current uiState: ${uiState.value}")
 
     val coverImg = viewModel.coverImg.collectAsState()
     val title = viewModel.title.collectAsState()
@@ -102,187 +109,216 @@ fun CreateStimulusPostCover(
 
     }
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
+    if(uiState.value !is CreateStimulusUiState.Error){
 
-        item {
-            Box(
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color.White)
+        ) {
+            LazyColumn(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .background(GrayWhite)
-                    .height(400.dp),
-                contentAlignment = Alignment.Center
-            ){
+                    .fillMaxSize()
+                    .background(Color.White)
+            ) {
 
-                if(coverImg!= Uri.EMPTY){
+                item {
+                    Box(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .background(GrayWhite)
+                            .height(400.dp),
+                        contentAlignment = Alignment.Center
+                    ){
 
-                    Glide.with(context)
-                        .asBitmap()
-                        .load(BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value)
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                bitmap.value = resource
-                            }
+                        if(coverImg!= Uri.EMPTY){
 
-                            override fun onLoadCleared(placeholder: Drawable?) {}
-                        })
+                            Glide.with(context)
+                                .asBitmap()
+                                .load(BuildConfig.SERVER_IMAGE_DOMAIN + coverImg.value)
+                                .into(object : CustomTarget<Bitmap>() {
+                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                        bitmap.value = resource
+                                    }
 
-                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                        Image(
-                            bitmap = fetchedBitmap,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = modifier
-                                .fillMaxSize()
-                                .blur(
-                                    radiusX = 15.dp, radiusY = 15.dp
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+
+                            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                                Image(
+                                    bitmap = fetchedBitmap,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.FillWidth,
+                                    modifier = modifier
+                                        .fillMaxSize()
+                                        .blur(
+                                            radiusX = 15.dp, radiusY = 15.dp
+                                        )
                                 )
+                            }
+                        }
+
+                        else{
+
+                            Image(
+                                modifier = modifier
+                                    .fillMaxSize()
+                                    .blur(
+                                        radiusX = 15.dp, radiusY = 15.dp
+                                    ),
+                                painter = painterResource(id = R.drawable.category3),
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop,
+                                alpha = 0.7f
+                            )
+
+                        }
+
+
+                        StimulusCoverItem(title = title.value, coverImg = bitmap.value)
+
+
+                    }
+                }
+
+                item{
+                    Column(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    ) {
+                        //Text(text = "커버 이미지를 추가해주세요!", style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Normal))
+
+                        Spacer(modifier.size(10.dp))
+
+                        GodLifeButtonWhite(
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            leadingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = "") },
+                            onClick = {
+                                launcher.launch("image/*")
+                            },
+                            text = { Text(text = "커버 이미지 선택", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 }
 
-                else{
-
-                    Image(
+                item {
+                    Column(
                         modifier = modifier
-                            .fillMaxSize()
-                            .blur(
-                                radiusX = 15.dp, radiusY = 15.dp
-                            ),
-                        painter = painterResource(id = R.drawable.category3),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        alpha = 0.7f
-                    )
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    ) {
+                        Text(text = "제목", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
+
+                        Spacer(modifier.size(10.dp))
+
+                        Box(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(70.dp)
+                                .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+                        ){
+
+                            GodLifeTextFieldGray(
+                                text = title.value,
+                                onTextChanged = { viewModel.setTitle(it) },
+                                hint = "이곳에 제목을 작성해주세요."
+                            )
+
+                        }
+
+
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    ) {
+                        Text(text = "소개글", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
+
+                        Spacer(modifier.size(10.dp))
+
+                        Box(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(100.dp)
+                                .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+                        ){
+
+                            GodLifeTextFieldGray(
+                                text = description.value,
+                                onTextChanged = { viewModel.setDescription(it) },
+                                hint = "소개글을 통해 사용자분들께서 관심을 가질 수 있도록 소개글을 작성해주세요."
+                            )
+
+                        }
+
+
+                    }
+
 
                 }
 
+                item {
 
-                StimulusCoverItem(title = title.value, coverImg = bitmap.value)
+                    Box(
+                        modifier = modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ){
 
+                        GodLifeButton(
+                            onClick = {
+                                navController.navigate(
+                                    route = CreateStimulusPostLoading.route){
+                                    launchSingleTop = true
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.5f),
+                            enabled = buttonEnabled
+                        ) {
+                            Text(text = "다음",
+                                color = Color.White,
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+
+                    }
+
+
+                }
 
             }
-        }
 
-        item{
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                //Text(text = "커버 이미지를 추가해주세요!", style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Normal))
-
-                Spacer(modifier.size(10.dp))
-
-                GodLifeButtonWhite(
-                    modifier = modifier
-                        .fillMaxWidth(),
-                    leadingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = "") },
-                    onClick = {
-                        launcher.launch("image/*")
-                    },
-                    text = { Text(text = "커버 이미지 선택", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            if(uiState.value is CreateStimulusUiState.Loading){
+                Log.e("CreateStimulusPostCover", (uiState.value as CreateStimulusUiState.Loading).type.name)
+                GodLifeLoadingScreen(
+                    text = if((uiState.value as CreateStimulusUiState.Loading).type == UiType.SET_COVER_IMG) "잠시만 기다려주세요.\n커버를 제작하는 중이에요." else "잠시만 기다려주세요."
                 )
             }
-        }
-
-        item {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Text(text = "제목", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
-
-                Spacer(modifier.size(10.dp))
-
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
-                ){
-
-                    GodLifeTextFieldGray(
-                        text = title.value,
-                        onTextChanged = { viewModel.setTitle(it) },
-                        hint = "이곳에 제목을 작성해주세요."
-                    )
-
-                }
-
-
-            }
-        }
-
-        item {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Text(text = "소개글", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
-
-                Spacer(modifier.size(10.dp))
-
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
-                ){
-
-                    GodLifeTextFieldGray(
-                        text = description.value,
-                        onTextChanged = { viewModel.setDescription(it) },
-                        hint = "소개글을 통해 사용자분들께서 관심을 가질 수 있도록 소개글을 작성해주세요."
-                    )
-
-                }
-
-
-            }
-
-
-        }
-
-        item {
-
-            Box(
-                modifier = modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-
-                GodLifeButton(
-                    onClick = {
-                        navController.navigate(
-                            route = CreateStimulusPostLoading.route){
-                            launchSingleTop = true
-                        }
-                              },
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f),
-                    enabled = buttonEnabled
-                ) {
-                    Text(text = "다음",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-
-            }
-
 
         }
 
     }
+
+    else if(uiState.value is CreateStimulusUiState.Error){
+        GodLifeErrorScreen(
+            errorMessage = (uiState.value as CreateStimulusUiState.Error).message,
+            buttonEvent = {navController.popBackStack()},
+            buttonText = "돌아가기"
+        )
+    }
+
+
+
 
 }
 
