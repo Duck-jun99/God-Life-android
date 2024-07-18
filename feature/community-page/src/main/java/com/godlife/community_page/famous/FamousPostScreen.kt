@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,6 +64,8 @@ import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
 import com.godlife.network.model.PostDetailBody
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun FamousPostScreen(
@@ -157,38 +160,40 @@ fun WeeklyFamousPostItem(
                         shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
                     )
             ){
-                //Text(text = "IMAGE", modifier.align(Alignment.Center))
 
-                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                val imageModifier: Modifier = modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+                GlideImage(
+                    imageModel = { if(famousPostItem.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + famousPostItem.imagesURL?.get(0).toString() else R.drawable.category3 },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)),
+                    loading = {
+                        Box(
+                            modifier = modifier
+                                .background(GrayWhite3)
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
 
-                Glide.with(LocalContext.current)
-                    .asBitmap()
-                    .load(if(famousPostItem.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + famousPostItem.imagesURL?.get(0).toString() else R.drawable.category3)
-                    .error(R.drawable.category3)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmap.value = resource
+                            CircularProgressIndicator(
+                                color = PurpleMain
+                            )
+
                         }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
-
-                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = imageModifier
-                    )   //bitmap이 없다면
-                } ?: Image(
-                    painter = painterResource(id = R.drawable.category3),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = imageModifier
+                    },
+                    failure = {
+                        Image(
+                            painter = painterResource(id = R.drawable.category3),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 )
+
             }
             Column(
                 modifier
@@ -327,41 +332,37 @@ fun TotalFamousPostItem(
 
         Spacer(modifier.size(10.dp))
 
-        if(item.imagesURL?.isEmpty() == true){
-            Image(
-                modifier = modifier
-                    .size(100.dp),
-                painter = painterResource(id = R.drawable.category3),
-                contentDescription = "",
-                contentScale = ContentScale.Crop
-            )
-        }
-        else{
-            Glide.with(context)
-                .asBitmap()
-                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL?.get(0))
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-                Image(
+        GlideImage(
+            imageModel = { if(item.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL?.get(0).toString() else R.drawable.category3 },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .size(100.dp),
+            loading = {
+                Box(
                     modifier = modifier
-                        .size(100.dp),
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
+                }
+
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
                     contentScale = ContentScale.Crop
                 )
-
             }
-        }
-
-
+        )
 
         Spacer(modifier.size(10.dp))
 

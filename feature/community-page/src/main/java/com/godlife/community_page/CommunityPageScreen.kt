@@ -112,9 +112,6 @@ fun CommunityPageScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val refreshState = rememberPullToRefreshState()
-
     Log.e("CommunityPageScreen", uiState.toString())
 
     val navController = rememberNavController()
@@ -166,124 +163,112 @@ fun CommunityPageScreen(
                     )
             ) {
 
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    state = refreshState,
-                    onRefresh = {
-
-                        viewModel.refresh()
-
-                    }
-                ) {
-
-                    Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(280.dp)
-                            .background(
-                                brush = Brush.linearGradient(
-                                    listOf(
-                                        Color(0xCC496B9F),
-                                        Color(0xCB494A9F),
-                                        Color(0xCC6A499F),
-                                        Color(0xCC6A499F),
-                                        Color(0xCC96499F),
-                                        Color(0xCCDB67AD),
-                                        Color(0xCCFF5E5E),
-                                    )
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(280.dp)
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color(0xCC496B9F),
+                                    Color(0xCB494A9F),
+                                    Color(0xCC6A499F),
+                                    Color(0xCC6A499F),
+                                    Color(0xCC96499F),
+                                    Color(0xCCDB67AD),
+                                    Color(0xCCFF5E5E),
                                 )
                             )
-                            .statusBarsPadding(),
-                        verticalArrangement = Arrangement.Top
-                    ){
+                        )
+                        .statusBarsPadding(),
+                    verticalArrangement = Arrangement.Top
+                ){
 
-                        Box(
-                            modifier
-                                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                                .height(50.dp)
-                                .fillMaxWidth()){
+                    Box(
+                        modifier
+                            .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                            .height(50.dp)
+                            .fillMaxWidth()){
 
-                            Text(text = topTitle, style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
+                        Text(text = topTitle, style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
+
+                    }
+
+                    Column(
+                        modifier
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                            .height(80.dp)) {
+
+                        Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        GodLifeSearchBar(
+                            searchText = searchText,
+                            containerColor = OpaqueLight,
+                            onTextChanged = { viewModel.onSearchTextChange(it) },
+                            onSearchClicked = {
+                                viewModel.getSearchedPost(keyword = searchText)
+                                navControllerBottomSheet.navigate(SearchResultRoute.route)
+                            }
+                        )
+
+                    }
+
+                    Row(modifier = modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                        verticalAlignment = Alignment.Top) {
+
+                        Column(
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navControllerBottomSheet.navigate(FamousPostRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
+
+                            CategoryBox(route = FamousPostRoute.route, categoryName = "인기 게시물", viewModel = viewModel)
 
                         }
 
                         Column(
-                            modifier
-                                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                                .height(80.dp)) {
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navControllerBottomSheet.navigate(LatestPostRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
 
-                            Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            GodLifeSearchBar(
-                                searchText = searchText,
-                                containerColor = OpaqueLight,
-                                onTextChanged = { viewModel.onSearchTextChange(it) },
-                                onSearchClicked = {
-                                    viewModel.getSearchedPost(keyword = searchText)
-                                    navControllerBottomSheet.navigate(SearchResultRoute.route)
-                                }
-                            )
+                            CategoryBox(route = LatestPostRoute.route, categoryName = "최신 게시물", viewModel = viewModel)
 
                         }
 
-                        Row(modifier = modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                            verticalAlignment = Alignment.Top) {
+                        Column(
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navController.navigate(StimulusPostRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
 
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navControllerBottomSheet.navigate(FamousPostRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
+                            CategoryBox(route = StimulusPostRoute.route, categoryName = "갓생 자극", viewModel = viewModel)
 
-                                CategoryBox(route = FamousPostRoute.route, categoryName = "인기 게시물", viewModel = viewModel)
+                        }
 
-                            }
+                        Column(
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navControllerBottomSheet.navigate(RankingRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
 
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navControllerBottomSheet.navigate(LatestPostRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
-
-                                CategoryBox(route = LatestPostRoute.route, categoryName = "최신 게시물", viewModel = viewModel)
-
-                            }
-
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navController.navigate(StimulusPostRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
-
-                                CategoryBox(route = StimulusPostRoute.route, categoryName = "갓생 자극", viewModel = viewModel)
-
-                            }
-
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navControllerBottomSheet.navigate(RankingRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
-
-                                CategoryBox(route = RankingRoute.route, categoryName = "명예의 전당", viewModel = viewModel)
-
-                            }
+                            CategoryBox(route = RankingRoute.route, categoryName = "명예의 전당", viewModel = viewModel)
 
                         }
 

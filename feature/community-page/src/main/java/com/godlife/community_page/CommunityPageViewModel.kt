@@ -63,10 +63,6 @@ class CommunityPageViewModel @Inject constructor(
     private val _rankingUiState = MutableStateFlow<RankingPageUiState>(RankingPageUiState.Loading)
     val rankingUiState: StateFlow<RankingPageUiState> = _rankingUiState
 
-    // 새로고침 상태
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
-
     /**
      * Data
      */
@@ -397,38 +393,6 @@ class CommunityPageViewModel @Inject constructor(
 
         }
 
-    }
-
-    // 뷰 새로 고침 함수
-    fun refresh() {
-
-        _uiState.value = CommunityPageUiState.Loading
-
-        when(uiState.value){
-            is CommunityPageUiState.Success -> {
-                _isRefreshing.value = false
-            }
-            is CommunityPageUiState.Error -> {
-                _isRefreshing.value = false
-            }
-
-            is CommunityPageUiState.Loading -> {
-                _isRefreshing.value = true
-            }
-        }
-
-        if(selectedRoute.value == "LatestPostScreen"){
-            // 최신 게시물 조회 플래그 초기화
-            latestFlag.value = 0
-            getLatestPost()
-        }
-        else if(selectedRoute.value == "FamousPostScreen"){
-            // 인기 게시물 조회 플래그 초기화
-            weeklyFamousFlag.value = 0
-            getWeeklyFamousPost()
-        }
-
-        // 나머지도 구현해야됨
     }
 
 
