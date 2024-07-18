@@ -385,6 +385,11 @@ class CommunityPageViewModel @Inject constructor(
 
     }
 
+    //rankingUserPostFlag 초기화
+    fun updateRankingUserPostFlag(){
+        rankingUserPostFlag.value = false
+    }
+
     //명예의 전당 유저의 게시물 불러오기
     fun getRankingUserPost(
         keyword: String = "",

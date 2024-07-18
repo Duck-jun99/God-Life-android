@@ -33,6 +33,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -76,6 +77,8 @@ import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.absoluteValue
 
 @Composable
@@ -194,7 +197,8 @@ fun RankingScreen(
                             TotalRankingListItem1(
                                 totalRankingListItem = allRankingList.value[page],
                                 index = page,
-                                parentNavController = parentNavController
+                                parentNavController = parentNavController,
+                                viewModel = viewModel
                             )
                         }
 
@@ -257,9 +261,6 @@ fun WeeklyRankingListItem(
     weeklyRankingListItem: RankingBody
 ){
 
-    val bitmapBack: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val bitmapProfile: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-
     Box(
         modifier
             .padding(
@@ -272,31 +273,41 @@ fun WeeklyRankingListItem(
                 color = Color.White,
                 shape = RoundedCornerShape(16.dp)
             )
-            .clickable{ parentNavController.navigate("${"ProfileScreen"}/${weeklyRankingListItem.memberId}")}
+            .clickable { parentNavController.navigate("${"ProfileScreen"}/${weeklyRankingListItem.memberId}") }
     ){
 
-        Glide.with(LocalContext.current)
-            .asBitmap()
-            .load(if(weeklyRankingListItem.backgroundUrl.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + weeklyRankingListItem.backgroundUrl else R.drawable.category3)
-            .error(R.drawable.category3)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmapBack.value = resource
+        GlideImage(
+            imageModel = { if(weeklyRankingListItem.backgroundUrl.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + weeklyRankingListItem.backgroundUrl else R.drawable.category3 },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(16.dp)),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmapBack.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp))
-            )
-        }
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
 
         Column(
             modifier = modifier
@@ -309,34 +320,43 @@ fun WeeklyRankingListItem(
 
             Spacer(modifier.size(10.dp))
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(if(weeklyRankingListItem.profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + weeklyRankingListItem.profileURL else R.drawable.ic_person)
-                .error(R.drawable.ic_person)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmapProfile.value = resource
+            GlideImage(
+                imageModel = { if(weeklyRankingListItem.profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + weeklyRankingListItem.profileURL else R.drawable.ic_person },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .border(
+                        BorderStroke(4.dp, Color.White),
+                        CircleShape
+                    )
+                    .padding(4.dp),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmapProfile.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .border(
-                            BorderStroke(4.dp, Color.White),
-                            CircleShape
-                        )
-                        .padding(4.dp),
-                )
-            }
-
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            )
 
             Spacer(modifier.size(10.dp))
 
@@ -398,12 +418,13 @@ fun TotalRankingListItem1(
     modifier: Modifier = Modifier,
     index: Int,
     totalRankingListItem: RankingBody,
-    parentNavController: NavController
+    parentNavController: NavController,
+    viewModel: CommunityPageViewModel
 ){
 
-    val bitmapBack: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val bitmapProfile: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-
+    LaunchedEffect(key1 = true) {
+        viewModel.updateRankingUserPostFlag()
+    }
 
     Box(
         modifier = modifier
@@ -414,30 +435,40 @@ fun TotalRankingListItem1(
         contentAlignment = Alignment.Center
     ){
 
-        Glide.with(LocalContext.current)
-            .asBitmap()
-            .load(if(totalRankingListItem.backgroundUrl.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem.backgroundUrl else R.drawable.category3)
-            .error(R.drawable.category3)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmapBack.value = resource
+        GlideImage(
+            imageModel = { if(totalRankingListItem.backgroundUrl.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem.backgroundUrl else R.drawable.category3 },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize()
+                .blur(
+                    radiusX = 15.dp, radiusY = 15.dp
+                ),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmapBack.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-                    .blur(
-                        radiusX = 15.dp, radiusY = 15.dp
-                    )
-            )
-        }
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
 
         Column(
             modifier = modifier
@@ -470,29 +501,38 @@ fun TotalRankingListItem1(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
 
-                Glide.with(LocalContext.current)
-                    .asBitmap()
-                    .load(if(totalRankingListItem.profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem.profileURL else R.drawable.category3)
-                    .error(R.drawable.category3)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmapProfile.value = resource
+                GlideImage(
+                    imageModel = { if(totalRankingListItem.profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem.profileURL else R.drawable.category3 },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .size(150.dp)
+                        .clip(shape = CircleShape),
+                    loading = {
+                        Box(
+                            modifier = modifier
+                                .background(GrayWhite3)
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+
+                            CircularProgressIndicator(
+                                color = PurpleMain
+                            )
+
                         }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
-
-                bitmapProfile.value?.asImageBitmap()?.let { fetchedBitmap ->
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = modifier
-                            .size(150.dp)
-                            .clip(shape = CircleShape),
-                    )
-                }
-
+                    },
+                    failure = {
+                        Image(
+                            painter = painterResource(id = R.drawable.category3),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                )
 
                 Spacer(modifier.size(20.dp))
 
@@ -602,7 +642,6 @@ fun RankingUserPostListItem(
     rankingUserPostListItem: PostDetailBody?,
     navController: NavController
 ){
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     if(rankingUserPostListItem != null){
         Row(
@@ -615,29 +654,38 @@ fun RankingUserPostListItem(
             verticalAlignment = Alignment.CenterVertically
         ){
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(if(rankingUserPostListItem.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + rankingUserPostListItem.imagesURL!![0] else R.drawable.category3)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
+            GlideImage(
+                imageModel = { if(rankingUserPostListItem.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + rankingUserPostListItem.imagesURL!![0] else R.drawable.category3 },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .size(70.dp)
+                    .clip(shape = RoundedCornerShape(15.dp)),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            //대표 이미지 보일 부분
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .size(70.dp)
-                        .clip(shape = RoundedCornerShape(15.dp)),
-                )
-            }
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            )
 
             Spacer(modifier.size(10.dp))
 
