@@ -65,6 +65,8 @@ import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.network.model.StimulusPostList
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun FamousStimulusPostContent(
@@ -126,35 +128,16 @@ fun FamousStimulusItem(
             contentAlignment = Alignment.Center
         ){
 
-            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
+            GlideImage(
+                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
+                imageOptions = ImageOptions(
                     contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .fillMaxSize()
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.category3),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
                 modifier = modifier
                     .fillMaxSize()
             )
+
 
             Box(
                 modifier = modifier

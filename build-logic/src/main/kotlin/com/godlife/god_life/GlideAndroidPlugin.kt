@@ -12,8 +12,9 @@ fun Project.configureAndroidGlide() {
 
     val libs = extensions.libs
     dependencies {
-        "implementation"(libs.findLibrary("glide").get())
-        "kapt"(libs.findLibrary("glide-compiler").get())
+        "implementation"(libs.findLibrary("bumptech-glide").get())
+        "implementation"(libs.findLibrary("landscapist-glide").get())
+        "kapt"(libs.findLibrary("bumptech-glide-compiler").get())
     }
 }
 
