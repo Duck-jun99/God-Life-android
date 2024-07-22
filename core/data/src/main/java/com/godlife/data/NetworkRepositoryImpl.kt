@@ -60,66 +60,65 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.signUp(nickname, email, age, sex, providerId, providerName)
     }
 
-    override suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery> {
-        return networkDataSource.getUserInfo(authorization)
+    override suspend fun getUserInfo(): ApiResponse<UserInfoQuery> {
+        return networkDataSource.getUserInfo()
     }
 
-    override suspend fun logout(authorization: String): ApiResponse<LogoutQuery> {
-        return networkDataSource.logout(authorization)
+    override suspend fun logout(): ApiResponse<LogoutQuery> {
+        return networkDataSource.logout()
     }
 
     override suspend fun getUserProfile(
-        authorization: String,
+
         memberId: String
     ): ApiResponse<UserProfileQuery> {
-        return networkDataSource.getUserProfile(authorization, memberId)
+        return networkDataSource.getUserProfile(memberId)
     }
 
-    override suspend fun reissue(authorization: String): ApiResponse<ReissueQuery> {
-        return networkDataSource.reissue(authorization)
+    override suspend fun reissue(): ApiResponse<ReissueQuery> {
+        return networkDataSource.reissue()
     }
 
     override suspend fun registerFcmToken(
-        authorization: String,
         fcmToken: String
     ): ApiResponse<SignUpCheckNicknameQuery> {
-        return networkDataSource.registerFcmToken(authorization, fcmToken)
+        return networkDataSource.registerFcmToken(fcmToken)
     }
 
     override suspend fun profileImageUpload(
-        authorization: String,
+
         image: Uri
     ): ApiResponse<ImageUploadQuery> {
-        return networkDataSource.profileImageUpload(authorization, image)
+        return networkDataSource.profileImageUpload(image)
     }
 
     override suspend fun backgroundImageUpload(
-        authorization: String,
+
         image: Uri
     ): ApiResponse<ImageUploadQuery> {
-        return networkDataSource.backgroundImageUpload(authorization, image)
+        return networkDataSource.backgroundImageUpload(image)
     }
 
 
     override suspend fun updateIntroduce(
-        authorization: String,
+
         introduce: String
     ): ApiResponse<UpdateIntroduceQuery> {
-        return networkDataSource.updateIntroduce(authorization, introduce)
+        return networkDataSource.updateIntroduce(introduce)
     }
 
     override suspend fun createPost(
-        authorization: String,
+
         title: String,
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
-        return networkDataSource.createPost(authorization, title, content, tags, imagePath)
+        return networkDataSource.createPost(title, content, tags, imagePath)
     }
 
     override suspend fun updatePost(
-        authorization: String,
+
         postId: String,
         title: String,
         content: String,
@@ -127,19 +126,19 @@ class NetworkRepositoryImpl @Inject constructor(
         tags: List<String>,
         imagePath: List<Uri>?
     ): ApiResponse<PostQuery> {
-        return networkDataSource.updatePost(authorization, postId, title, content, categoryType, tags, imagePath)
+        return networkDataSource.updatePost(postId, title, content, categoryType, tags, imagePath)
     }
 
     override suspend fun deletePost(
-        authorization: String,
+
         postId: String
     ): ApiResponse<DeletePostQuery> {
-        return networkDataSource.deletePost(authorization, postId)
+        return networkDataSource.deletePost(postId)
     }
 
 
     override suspend fun getLatestPost(
-        authorization: String,
+
         page: Int,
         keyword: String,
         tag: String
@@ -149,137 +148,137 @@ class NetworkRepositoryImpl @Inject constructor(
 
     /*
     override suspend fun getLatestPost(
-        authorization: String,
+
         page: Int,
         keyword: String,
         tag: String
     ): ApiResponse<LatestPostQuery> {
-        return networkDataSource.getLatestPost(authorization, page, keyword, tag)
+        return networkDataSource.getLatestPost(, page, keyword, tag)
     }
 
      */
 
-    override suspend fun getWeeklyFamousPost(authorization: String): ApiResponse<LatestPostQuery> {
-        return networkDataSource.getWeeklyFamousPost(authorization)
+    override suspend fun getWeeklyFamousPost(): ApiResponse<LatestPostQuery> {
+        return networkDataSource.getWeeklyFamousPost()
     }
 
-    override suspend fun getAllFamousPost(authorization: String): ApiResponse<LatestPostQuery> {
-        return networkDataSource.getAllFamousPost(authorization)
+    override suspend fun getAllFamousPost(): ApiResponse<LatestPostQuery> {
+        return networkDataSource.getAllFamousPost()
     }
 
     override suspend fun getSearchedPost(
-        authorization: String,
+
         page: Int,
         keyword: String,
         tag: String,
         nickname: String
     ): ApiResponse<LatestPostQuery> {
-        return networkDataSource.getSearchedPost(authorization, page, keyword, tag, nickname)
+        return networkDataSource.getSearchedPost(page, keyword, tag, nickname)
     }
 
-    override suspend fun getPostDetail(authorization: String, postId: String): ApiResponse<PostDetailQuery> {
-        return networkDataSource.getPostDetail(authorization, postId)
+    override suspend fun getPostDetail( postId: String): ApiResponse<PostDetailQuery> {
+        return networkDataSource.getPostDetail(postId)
     }
 
-    override suspend fun getComments(authorization: String, postId: String): ApiResponse<GetCommentsQuery> {
-        return networkDataSource.getComments(authorization, postId)
+    override suspend fun getComments( postId: String): ApiResponse<GetCommentsQuery> {
+        return networkDataSource.getComments(postId)
     }
 
     override suspend fun createComment(
-        authorization: String,
+
         postId: String,
         comment: String
     ): ApiResponse<CommentQuery> {
-        return networkDataSource.createComment(authorization, postId, comment)
+        return networkDataSource.createComment(postId, comment)
     }
 
-    override suspend fun deleteComment(authorization: String, commentId: String): ApiResponse<CommentQuery> {
-        return networkDataSource.deleteComment(authorization, commentId)
+    override suspend fun deleteComment( commentId: String): ApiResponse<CommentQuery> {
+        return networkDataSource.deleteComment(commentId)
     }
 
-    override suspend fun agreeGodLife(authorization: String, postId: Int): ApiResponse<GodScoreQuery> {
-        return networkDataSource.agreeGodLife(authorization, postId)
+    override suspend fun agreeGodLife( postId: Int): ApiResponse<GodScoreQuery> {
+        return networkDataSource.agreeGodLife(postId)
     }
 
-    override suspend fun getWeeklyFamousMembers(authorization: String): ApiResponse<RankingQuery> {
-        return networkDataSource.getWeeklyFamousMembers(authorization)
+    override suspend fun getWeeklyFamousMembers(): ApiResponse<RankingQuery> {
+        return networkDataSource.getWeeklyFamousMembers()
     }
 
-    override suspend fun getAllFamousMembers(authorization: String): ApiResponse<RankingQuery> {
-        return networkDataSource.getAllFamousMembers(authorization)
+    override suspend fun getAllFamousMembers(): ApiResponse<RankingQuery> {
+        return networkDataSource.getAllFamousMembers()
     }
 
     override suspend fun postNotificationTime(
-        authorization: String,
+
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery> {
-        return networkDataSource.postNotificationTime(authorization, notificationTime)
+        return networkDataSource.postNotificationTime(notificationTime)
     }
 
     override suspend fun patchNotificationTime(
-        authorization: String,
+
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery> {
-        return networkDataSource.patchNotificationTime(authorization, notificationTime)
+        return networkDataSource.patchNotificationTime(notificationTime)
     }
 
-    override suspend fun deleteNotificationTime(authorization: String): ApiResponse<NotificationQuery> {
-        return networkDataSource.deleteNotificationTime(authorization)
+    override suspend fun deleteNotificationTime(): ApiResponse<NotificationQuery> {
+        return networkDataSource.deleteNotificationTime()
     }
 
-    override suspend fun createStimulusPostTemp(authorization: String): ApiResponse<StimulusPostQuery> {
-        return networkDataSource.createStimulusPostTemp(authorization)
+    override suspend fun createStimulusPostTemp(): ApiResponse<StimulusPostQuery> {
+        return networkDataSource.createStimulusPostTemp()
     }
 
     override suspend fun uploadStimulusPostImage(
-        authorization: String,
+
         tmpBoardId: Int,
         image: Uri
     ): ApiResponse<ImageUploadStimulusQuery> {
-        return networkDataSource.uploadStimulusPostImage(authorization, tmpBoardId, image)
+        return networkDataSource.uploadStimulusPostImage(tmpBoardId, image)
     }
 
     override suspend fun createStimulusPost(
-        authorization: String,
+
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery> {
-        return networkDataSource.createStimulusPost(authorization, stimulusPostBody)
+        return networkDataSource.createStimulusPost(stimulusPostBody)
     }
 
-    override suspend fun getStimulusFamousPost(authorization: String): ApiResponse<StimulusPostListQuery> {
-        return networkDataSource.getStimulusFamousPost(authorization)
+    override suspend fun getStimulusFamousPost(): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusFamousPost()
     }
 
-    override suspend fun getStimulusMostViewPost(authorization: String): ApiResponse<StimulusPostListQuery> {
-        return networkDataSource.getStimulusMostViewPost(authorization)
+    override suspend fun getStimulusMostViewPost(): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusMostViewPost()
     }
 
-    override suspend fun getStimulusFamousAuthorPost(authorization: String): ApiResponse<StimulusPostListQuery> {
-        return networkDataSource.getStimulusFamousAuthorPost(authorization)
+    override suspend fun getStimulusFamousAuthorPost(): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusFamousAuthorPost()
     }
 
-    override suspend fun getStimulusRecommendPost(authorization: String): ApiResponse<StimulusPostListQuery> {
-        return networkDataSource.getStimulusRecommendPost(authorization)
+    override suspend fun getStimulusRecommendPost(): ApiResponse<StimulusPostListQuery> {
+        return networkDataSource.getStimulusRecommendPost()
     }
 
     override suspend fun getStimulusPostDetail(
-        authorization: String,
+
         boardId: String
     ): ApiResponse<StimulusPostDetailQuery> {
-        return networkDataSource.getStimulusPostDetail(authorization, boardId)
+        return networkDataSource.getStimulusPostDetail(boardId)
     }
 
     override suspend fun searchStimulusPost(
-        authorization: String,
+
         title: String,
         nickname: String,
         introduction: String
     ): ApiResponse<StimulusPostListQuery> {
-        return networkDataSource.searchStimulusPost(authorization, title, nickname, introduction)
+        return networkDataSource.searchStimulusPost(title, nickname, introduction)
     }
 
     override suspend fun report(
-        authorization: String,
+
         reporterNickname: String,
         reporterId: Long,
         receivedNickname: String,
@@ -290,7 +289,7 @@ class NetworkRepositoryImpl @Inject constructor(
         //reportTime: LocalDateTime,
         reportType: String
     ): ApiResponse<CommentQuery> {
-        return networkDataSource.report(authorization, reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType)
+        return networkDataSource.report(reporterNickname, reporterId, receivedNickname, receivedId, reason, reportContent, reportId, reportType)
     }
 
 }

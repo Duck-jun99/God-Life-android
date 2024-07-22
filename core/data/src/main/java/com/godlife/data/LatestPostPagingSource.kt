@@ -28,13 +28,9 @@ class LatestPostPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PostDetailBody> {
 
         return try {
-            // Authorization 토큰을 비동기적으로 가져옴
-            val authorization = withContext(Dispatchers.IO) {
-                "Bearer ${localPreferenceUserRepository.getAccessToken()}"
-            }
 
             val page = params.key ?: 1
-            var response = networkApi.getLatestPost(authorization = authorization, page = page, keyword = "", tag = "")
+            var response = networkApi.getLatestPost(page = page, keyword = "", tag = "")
             lateinit var data: LatestPostQuery
 
             response

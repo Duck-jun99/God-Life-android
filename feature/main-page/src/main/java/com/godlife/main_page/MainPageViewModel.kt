@@ -190,7 +190,7 @@ class MainPageViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val response = getUserInfoUseCase.executeGetUserInfo(auth.value)
+            val response = getUserInfoUseCase.executeGetUserInfo()
 
             response
                 //성공적으로 넘어오면 유저 정보를 저장
@@ -241,7 +241,7 @@ class MainPageViewModel @Inject constructor(
                         }
                     }
 
-                    val result = registerFCMTokenUseCase.executeRegisterFCMToken(auth.value, token)
+                    val result = registerFCMTokenUseCase.executeRegisterFCMToken(token)
 
                     result
                         .onSuccess {

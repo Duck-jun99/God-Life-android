@@ -9,8 +9,7 @@ class RegisterFCMTokenUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeRegisterFCMToken(
-        authorId: String,
         fcmToken: String
-    ) = networkRepository.registerFcmToken(authorization = authorId, fcmToken = fcmToken)
+    ) = networkRepository.registerFcmToken(fcmToken = fcmToken)
 
 }

@@ -76,7 +76,7 @@ class CreatePostViewModel @Inject constructor(
         if(!_isGetUserInfo.value){
             Log.e("CreatePostViewModel", "유저 정보 불러오기")
             viewModelScope.launch(Dispatchers.IO) {
-                val result = getUserInfoUseCase.executeGetUserInfo(auth.value)
+                val result = getUserInfoUseCase.executeGetUserInfo()
                 result
                     .onSuccess {
                         _userInfo.value = data.body

@@ -200,7 +200,7 @@ class ReportViewModel @Inject constructor(
     private fun getUserInfo(){
         if(!isGetUserInfo.value){
             viewModelScope.launch {
-                val result = getUserInfoUseCase.executeGetUserInfo(auth.value)
+                val result = getUserInfoUseCase.executeGetUserInfo()
 
                 result
                     .onSuccess {

@@ -7,7 +7,6 @@ class DeletePostUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeDeletePost(
-        authorization: String,
         postId: String,
-    ) = networkRepository.deletePost(authorization, postId)
+    ) = networkRepository.deletePost(postId)
 }

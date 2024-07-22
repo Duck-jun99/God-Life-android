@@ -8,5 +8,6 @@ import javax.inject.Inject
 class GetFamousStimulusPostUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
-    suspend fun executeGetFamousStimulusPost(authorization: String) = networkRepository.getStimulusFamousPost(authorization)
+    suspend fun executeGetFamousStimulusPost(
+    ) = networkRepository.getStimulusFamousPost()
 }

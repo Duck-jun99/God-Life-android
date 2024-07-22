@@ -6,5 +6,5 @@ import javax.inject.Inject
 class LogoutUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
-    suspend fun executeLogout(authorization: String) = networkRepository.logout(authorization)
+    suspend fun executeLogout() = networkRepository.logout()
 }

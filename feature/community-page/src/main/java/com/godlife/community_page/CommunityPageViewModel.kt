@@ -46,8 +46,6 @@ class CommunityPageViewModel @Inject constructor(
     private val searchPostUseCase: SearchPostUseCase,
     private val getWeeklyFamousPostUseCase: GetFamousPostUseCase,
     private val getRankingUseCase: GetRankingUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val reissueUseCase: ReissueUseCase
 ): ViewModel(){
 
 
@@ -66,10 +64,6 @@ class CommunityPageViewModel @Inject constructor(
     /**
      * Data
      */
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     //현재 선택되어 있는 라우트 이름
     var selectedRoute = mutableStateOf("")
@@ -132,12 +126,6 @@ class CommunityPageViewModel @Inject constructor(
      * Init
      */
 
-    init {
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
 
     /**
      * Functions
@@ -225,7 +213,7 @@ class CommunityPageViewModel @Inject constructor(
             _uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getWeeklyFamousPostUseCase.executeGetWeeklyFamousPost(authorId = auth.value)
+                val result = getWeeklyFamousPostUseCase.executeGetWeeklyFamousPost()
 
                 result
                     .onSuccess {
@@ -237,15 +225,7 @@ class CommunityPageViewModel @Inject constructor(
                     .onError {
                         Log.e("getWeeklyFamousPost", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-                            weeklyFamousFlag.value = false
-                            reIssueRefreshToken(callback = { getWeeklyFamousPost() })
-                        }
-                        else{
-                            // UI State Error로 변경
-                            _uiState.value = CommunityPageUiState.Error("${this.response.code()} Error")
-                        }
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
@@ -271,7 +251,7 @@ class CommunityPageViewModel @Inject constructor(
             _uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost(authorId = auth.value)
+                val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost()
                 result
                     .onSuccess {
                         _allFamousPostList.value = data.body
@@ -280,15 +260,7 @@ class CommunityPageViewModel @Inject constructor(
                     .onError {
                         Log.e("getAllFamousPost", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-                            allFamousFlag.value = false
-                            reIssueRefreshToken(callback = { getAllFamousPost() })
-                        }
-                        else{
-                            // UI State Error로 변경
-                            _uiState.value = CommunityPageUiState.Error("${this.response.code()} Error")
-                        }
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
@@ -311,7 +283,7 @@ class CommunityPageViewModel @Inject constructor(
             _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getRankingUseCase.executeGetWeeklyRanking(authorId = auth.value)
+                val result = getRankingUseCase.executeGetWeeklyRanking()
                 result
                     .onSuccess {
                         _weeklyRankingList.value = data.body
@@ -323,15 +295,7 @@ class CommunityPageViewModel @Inject constructor(
                     .onError {
                         Log.e("getWeeklyRanking", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-                            weeklyRankingFlag.value = false
-                            reIssueRefreshToken(callback = { getWeeklyRanking() })
-                        }
-                        else{
-                            // UI State Error로 변경
-                            _uiState.value = CommunityPageUiState.Error("${this.response.code()} Error")
-                        }
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
@@ -354,7 +318,7 @@ class CommunityPageViewModel @Inject constructor(
             _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getRankingUseCase.executeGetAllRanking(authorId = auth.value)
+                val result = getRankingUseCase.executeGetAllRanking()
                 result
                     .onSuccess {
                         _allRankingList.value = data.body
@@ -364,12 +328,8 @@ class CommunityPageViewModel @Inject constructor(
                     .onError {
                         Log.e("getAllRanking", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-                            allRankingFlag.value = false
-                            reIssueRefreshToken(callback = { getAllRanking() })
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
 
-                        }
                     }
                     .onException {
 
@@ -413,73 +373,6 @@ class CommunityPageViewModel @Inject constructor(
 
     }
 
-
-    // refresh token 갱신 후 Callback 실행
-    private fun reIssueRefreshToken(callback: () -> Unit){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
-                .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    //callback 실행
-                    callback()
-
-                }
-                .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = CommunityPageUiState.Error("재로그인 해주세요.")
-
-                    }
-
-                    //기타 오류 시
-                    else{
-
-                        // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
-                    }
-
-                }
-                .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
-
-                }
-
-
-        }
-    }
-
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
-
-        }
-
-    }
 
     override fun onCleared() {
         Log.e("CommunityPageViewModel", "onCleared")

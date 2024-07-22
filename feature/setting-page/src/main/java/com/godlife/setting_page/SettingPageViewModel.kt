@@ -71,7 +71,7 @@ class SettingPageViewModel @Inject constructor(
             viewModelScope.launch {
 
                 val result = withContext(Dispatchers.IO) {
-                    getUserInfoUseCase.executeGetUserInfo(auth.value)
+                    getUserInfoUseCase.executeGetUserInfo()
                 }
 
                 result

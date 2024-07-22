@@ -9,7 +9,6 @@ class DeleteNotificationTimeUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeDeleteNotificationTime(
-        authorId: String
-    ) = networkRepository.deleteNotificationTime(authorization = authorId)
+    ) = networkRepository.deleteNotificationTime()
 
 }

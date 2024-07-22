@@ -9,10 +9,9 @@ class CreatePostUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeCreatePost(
-        authorization: String,
         title: String,
         content: String,
         tags: List<String>,
         imagePath: List<Uri>?
-    ) = networkRepository.createPost(authorization, title, content, tags, imagePath)
+    ) = networkRepository.createPost(title, content, tags, imagePath)
 }

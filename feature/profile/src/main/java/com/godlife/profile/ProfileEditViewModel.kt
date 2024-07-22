@@ -246,7 +246,7 @@ class ProfileEditViewModel @Inject constructor(
 
             viewModelScope.launch {
 
-                val result = getUserInfoUseCase.executeGetUserInfo(authorization = auth.value)
+                val result = getUserInfoUseCase.executeGetUserInfo()
 
                 result
                     .onSuccess {

@@ -7,7 +7,6 @@ class PlusGodScoreUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executePlusGodScore(
-        authorization: String,
         postId: Int,
-    ) = networkRepository.agreeGodLife(authorization, postId )
+    ) = networkRepository.agreeGodLife(postId)
 }

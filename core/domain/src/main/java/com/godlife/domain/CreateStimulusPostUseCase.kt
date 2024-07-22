@@ -10,18 +10,15 @@ class CreateStimulusPostUseCase  @Inject constructor(
 ) {
 
     suspend fun executeCreateStimulusPostTemp(
-        authorization: String
-    ) = networkRepository.createStimulusPostTemp(authorization)
+    ) = networkRepository.createStimulusPostTemp()
 
     suspend fun executeUploadStimulusPostImage(
-        authorization: String,
         tmpBoardId: Int,
         image: Uri
-    ) = networkRepository.uploadStimulusPostImage(authorization, tmpBoardId, image)
+    ) = networkRepository.uploadStimulusPostImage(tmpBoardId, image)
 
     suspend fun executeCreateStimulusPost(
-        authorization: String,
         stimulusPostBody: CreatePostRequest
-    ) = networkRepository.createStimulusPost(authorization, stimulusPostBody)
+    ) = networkRepository.createStimulusPost(stimulusPostBody)
 
 }
