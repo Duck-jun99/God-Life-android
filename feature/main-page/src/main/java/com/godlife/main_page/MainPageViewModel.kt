@@ -206,12 +206,15 @@ class MainPageViewModel @Inject constructor(
                 .onError {
                     Log.e("onError", this.message())
 
+                    /*
                     // 토큰 만료시 재발급 요청
                     if(this.response.code() == 401){
 
                         reIssueRefreshToken()
 
                     }
+
+                     */
 
                 }
                 .onException {
