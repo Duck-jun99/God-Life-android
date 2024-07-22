@@ -34,7 +34,6 @@ sealed class CreatePostUiState {
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val createPostUseCase: CreatePostUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase
 ): ViewModel(){
 
@@ -44,13 +43,8 @@ class CreatePostViewModel @Inject constructor(
     private val _userInfo = MutableStateFlow<UserInfoBody?>(null)
     val userInfo: StateFlow<UserInfoBody?> = _userInfo
 
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
-
     //유저 정보 플래그
     private val _isGetUserInfo = mutableStateOf(false)
-    //val isGetUserInfo: StateFlow<Boolean> = _isGetUserInfo
 
     //게시물 전송 플래그
     private val _isSending = mutableStateOf(false)
@@ -66,12 +60,6 @@ class CreatePostViewModel @Inject constructor(
 
     val tags = mutableListOf("tag1","tag2","tag3")
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
-
     fun getUserInfo(){
         if(!_isGetUserInfo.value){
             Log.e("CreatePostViewModel", "유저 정보 불러오기")
@@ -84,7 +72,7 @@ class CreatePostViewModel @Inject constructor(
                         _uiState.value = CreatePostUiState.Init
                     }
                     .onError {
-                        _uiState.value = CreatePostUiState.Error(this.message())
+                        _uiState.value = CreatePostUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
                         _uiState.value = CreatePostUiState.Error(this.message())
@@ -123,7 +111,7 @@ class CreatePostViewModel @Inject constructor(
 
                 viewModelScope.launch(Dispatchers.IO) {
 
-                    val result = createPostUseCase.executeCreatePost(auth.value, title.value, text.value, tags, selectedImgUri.value)
+                    val result = createPostUseCase.executeCreatePost(title.value, text.value, tags, selectedImgUri.value)
 
                     result
                         .onSuccess {
@@ -132,7 +120,7 @@ class CreatePostViewModel @Inject constructor(
                         }
 
                         .onError {
-                            _uiState.value = CreatePostUiState.Error(this.message())
+                            _uiState.value = CreatePostUiState.Error("${this.response.code()} Error}")
                         }
 
                         .onException {

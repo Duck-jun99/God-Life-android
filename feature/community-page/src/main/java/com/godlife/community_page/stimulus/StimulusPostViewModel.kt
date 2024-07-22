@@ -29,8 +29,6 @@ sealed class StimulusPostUiState {
 
 @HiltViewModel
 class StimulusPostViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 
     /**
@@ -39,32 +37,6 @@ class StimulusPostViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<StimulusPostUiState>(StimulusPostUiState.Loading)
     val uiState: StateFlow<StimulusPostUiState> = _uiState
-
-    /**
-     * Data
-     */
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
-
-    /**
-     * Init
-     */
-
-    init {
-
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-
-
-    }
-
-    /**
-     * Functions
-     */
 
 
 

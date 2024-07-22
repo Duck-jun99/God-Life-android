@@ -55,12 +55,10 @@ enum class LoadingType {
 class PostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val deletePostUseCase: DeletePostUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
     private val plusGodScoreUseCase: PlusGodScoreUseCase,
-    private val reissueUseCase: ReissueUseCase
 ): ViewModel() {
 
     /**
@@ -89,11 +87,6 @@ class PostDetailViewModel @Inject constructor(
     private val _postId = MutableStateFlow("")
     val postId: StateFlow<String> = _postId
 
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
-
-
     //게시물 정보 가져왔는지 플래그
     private var isGetPostDetail = mutableStateOf(false)
 
@@ -109,9 +102,6 @@ class PostDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-
             _postId.value = postId
 
             Log.e("PostDetailViewModel", this.toString())
@@ -125,7 +115,7 @@ class PostDetailViewModel @Inject constructor(
     fun deletePost(){
         if(!isDeletePost.value){
             viewModelScope.launch {
-                val result = deletePostUseCase.executeDeletePost(auth.value, postId.value)
+                val result = deletePostUseCase.executeDeletePost(postId.value)
                 result
                     .onSuccess {
                         _uiState.value = PostDetailUiState.DeleteSuccess
@@ -148,7 +138,7 @@ class PostDetailViewModel @Inject constructor(
 
             viewModelScope.launch{
 
-                val result = getPostDetailUseCase.executeGetPostDetail(auth.value, postId.value)
+                val result = getPostDetailUseCase.executeGetPostDetail(postId.value)
 
                 result
                     .onSuccess {
@@ -161,16 +151,8 @@ class PostDetailViewModel @Inject constructor(
 
                         Log.e("onError", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { initPostDetail() })
-
-                        }
-                        else {
-                            // UI State Error로 변경
-                            _uiState.value = PostDetailUiState.Error(this.message())
-                        }
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
@@ -198,7 +180,7 @@ class PostDetailViewModel @Inject constructor(
 
             viewModelScope.launch{
 
-                val result = getCommentsUseCase.executeGetComments(auth.value, postId.value)
+                val result = getCommentsUseCase.executeGetComments(postId.value)
 
                 result
                     .onSuccess {
@@ -209,16 +191,8 @@ class PostDetailViewModel @Inject constructor(
                     .onError {
                         Log.e("onError", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { initComments() })
-
-                        }
-                        else{
-                            // UI State Error로 변경
-                            _uiState.value = PostDetailUiState.Error(this.message())
-                        }
+                        // UI State Error로 변경
+                        _uiState.value = PostDetailUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
@@ -244,7 +218,7 @@ class PostDetailViewModel @Inject constructor(
     fun createComment(){
 
         viewModelScope.launch {
-            val result = createCommentUseCase.executeCreateComment(auth.value, postId.value, writeComment.value)
+            val result = createCommentUseCase.executeCreateComment(postId.value, writeComment.value)
 
             result
                 .onSuccess {
@@ -262,16 +236,8 @@ class PostDetailViewModel @Inject constructor(
                 .onError {
                     Log.e("onError", this.message())
 
-                    // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 401){
-
-                        reIssueRefreshToken(callback = { createComment() })
-
-                    }
-                    else{
-                        // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error(this.message())
-                    }
+                    // UI State Error로 변경
+                    _uiState.value = PostDetailUiState.Error("${this.response.code()} Error")
                 }
                 .onException {
 
@@ -289,7 +255,7 @@ class PostDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val result = deleteCommentUseCase.executeDeleteComment(auth.value, commentId)
+            val result = deleteCommentUseCase.executeDeleteComment(commentId)
 
             result
                 .onSuccess {
@@ -304,16 +270,8 @@ class PostDetailViewModel @Inject constructor(
                 .onError {
                     Log.e("onError", this.message())
 
-                    // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 401){
-
-                        reIssueRefreshToken(callback = { deleteComment(commentId) })
-
-                    }
-                    else{
-                        // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error(this.message())
-                    }
+                    // UI State Error로 변경
+                    _uiState.value = PostDetailUiState.Error("${this.response.code()} Error")
                 }
                 .onException {
 
@@ -333,7 +291,7 @@ class PostDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val result = plusGodScoreUseCase.executePlusGodScore(auth.value, postId)
+            val result = plusGodScoreUseCase.executePlusGodScore(postId)
 
             result
                 .onSuccess {
@@ -347,16 +305,8 @@ class PostDetailViewModel @Inject constructor(
                 .onError {
                     Log.e("onError", this.message())
 
-                    // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 401){
-
-                        reIssueRefreshToken(callback = { agreeGodLife() })
-
-                    }
-                    else{
-                        // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error(this.message())
-                    }
+                    // UI State Error로 변경
+                    _uiState.value = PostDetailUiState.Error("${this.response.code()} Error")
                 }
                 .onException {
 
@@ -380,74 +330,6 @@ class PostDetailViewModel @Inject constructor(
         isGetPostDetail.value = false
         isGetComments.value = false
         initPostDetail()
-    }
-
-
-    // refresh token 갱신 후 Callback 실행
-    private fun reIssueRefreshToken(callback: () -> Unit){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
-                .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    //callback 실행
-                    callback()
-
-                }
-                .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = PostDetailUiState.Error("재로그인 해주세요.")
-
-                    }
-
-                    //기타 오류 시
-                    else{
-
-                        // UI State Error로 변경
-                        _uiState.value = PostDetailUiState.Error(this.message())
-                    }
-
-                }
-                .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = PostDetailUiState.Error(this.message())
-
-                }
-
-
-        }
-    }
-
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
-
-        }
-
     }
 
     override fun onCleared() {

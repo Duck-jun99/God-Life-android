@@ -24,9 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LatestStimulusPostViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getLatestStimulusPostUseCase: GetLatestStimulusPostUseCase,
-    private val reissueUseCase: ReissueUseCase
+    private val getLatestStimulusPostUseCase: GetLatestStimulusPostUseCase
 ): ViewModel() {
 
     /**
@@ -40,9 +38,6 @@ class LatestStimulusPostViewModel @Inject constructor(
      * Data
      */
 
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     /*
     //게시물
@@ -61,11 +56,6 @@ class LatestStimulusPostViewModel @Inject constructor(
      */
 
     init {
-
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
 
         //최신 게시물 호출
         getLatestStimulusPost()

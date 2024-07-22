@@ -29,18 +29,12 @@ sealed class SearchStimulusUiState {
 
 @HiltViewModel
 class StimulusSearchViewModel @Inject constructor(
-    private val searchPostUseCase: SearchPostUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val reissueUseCase: ReissueUseCase
+    private val searchPostUseCase: SearchPostUseCase
 ): ViewModel() {
 
     // 전체 UI 상태
     private val _uiState = MutableStateFlow<SearchStimulusUiState>(SearchStimulusUiState.Initial)
     val uiState: StateFlow<SearchStimulusUiState> = _uiState
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     //검색 카테고리
     private val _searchCategory = MutableStateFlow<String>("post")
@@ -56,13 +50,6 @@ class StimulusSearchViewModel @Inject constructor(
     private val _searchResult = MutableStateFlow<List<StimulusPostList>>(emptyList())
     val searchResult: StateFlow<List<StimulusPostList>> = _searchResult
 
-
-    init {
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
 
     //체크박스 변경
     fun checkCategory(category: String){
@@ -90,7 +77,7 @@ class StimulusSearchViewModel @Inject constructor(
 
             // 게시물 검색일 경우
             if(searchCategory.value == "post"){
-                val response = searchPostUseCase.executeSearchStimulusPost(auth.value, title = text, nickname = "", introduction = "")
+                val response = searchPostUseCase.executeSearchStimulusPost(title = text, nickname = "", introduction = "")
 
                 response
                     .onSuccess {
@@ -105,18 +92,18 @@ class StimulusSearchViewModel @Inject constructor(
 
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("search", this.message())
 
                         // UI State Error로 변경
-                        _uiState.value = SearchStimulusUiState.Error("오류가 발생했어요.\n잠시 뒤 다시 시도해주세요.")
+                        _uiState.value = SearchStimulusUiState.Error("${this.response.code()} Error")
 
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("search", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = SearchStimulusUiState.Error("오류가 발생했어요.\n잠시 뒤 다시 시도해주세요.")
+                        _uiState.value = SearchStimulusUiState.Error(this.message())
                     }
 
             }
@@ -124,25 +111,25 @@ class StimulusSearchViewModel @Inject constructor(
             // 작가 검색일 경우
             else {
 
-                val response = searchPostUseCase.executeSearchStimulusPost(auth.value, title = "", nickname = text, introduction = "")
+                val response = searchPostUseCase.executeSearchStimulusPost(title = "", nickname = text, introduction = "")
 
                 response
                     .onSuccess {
                         _uiState.value = SearchStimulusUiState.Success(data.toString())
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("search", this.message())
 
                         // UI State Error로 변경
-                        _uiState.value = SearchStimulusUiState.Error("오류가 발생했어요.\n잠시 뒤 다시 시도해주세요.")
+                        _uiState.value = SearchStimulusUiState.Error("${this.response.code()} Error")
 
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("search", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = SearchStimulusUiState.Error("오류가 발생했어요.\n잠시 뒤 다시 시도해주세요.")
+                        _uiState.value = SearchStimulusUiState.Error(this.message())
                     }
 
             }

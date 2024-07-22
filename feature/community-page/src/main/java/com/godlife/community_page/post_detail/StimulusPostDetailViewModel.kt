@@ -34,13 +34,11 @@ sealed class StimulusPostDetailUiState {
 @HiltViewModel
 class StimulusPostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
     private val plusGodScoreUseCase: PlusGodScoreUseCase,
-    private val reissueUseCase: ReissueUseCase
 
 ): ViewModel() {
 
@@ -59,11 +57,6 @@ class StimulusPostDetailViewModel @Inject constructor(
     //게시물 ID 저장 변수
     private val _postId = MutableStateFlow("")
     val postId: StateFlow<String> = _postId
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
-
 
     //게시물 정보
     private val _postDetail = MutableStateFlow<StimulusPost?>(null)
@@ -85,15 +78,6 @@ class StimulusPostDetailViewModel @Inject constructor(
      * Init
      */
 
-    init {
-
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-
-    }
-
 
     /**
      * Functions
@@ -112,7 +96,7 @@ class StimulusPostDetailViewModel @Inject constructor(
         if(!isGetPostDetail.value){
             isGetPostDetail.value = true
             viewModelScope.launch {
-                val result = getPostDetailUseCase.executeGetStimulusPostDetail(auth.value, postId.value)
+                val result = getPostDetailUseCase.executeGetStimulusPostDetail(postId.value)
 
                 result
                     .onSuccess {
@@ -125,20 +109,16 @@ class StimulusPostDetailViewModel @Inject constructor(
 
                         Log.e("onError", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
+                        // UI State Error로 변경
+                        _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
 
-                            isGetPostDetail.value = false
-                            reIssueRefreshToken(callback = { getPostDetail() })
-
-                        }
                     }
                     .onException {
 
                         Log.e("onException", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = StimulusPostDetailUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = StimulusPostDetailUiState.Error(this.message())
 
                     }
             }
@@ -152,7 +132,7 @@ class StimulusPostDetailViewModel @Inject constructor(
         if(!isGetWriterInfo.value){
             isGetWriterInfo.value = true
             viewModelScope.launch {
-                val result = getUserProfileUseCase.executeGetUserProfile(auth.value, writerId)
+                val result = getUserProfileUseCase.executeGetUserProfile(writerId)
 
                 result
                     .onSuccess {
@@ -169,76 +149,6 @@ class StimulusPostDetailViewModel @Inject constructor(
         }
 
     }
-
-
-
-    // refresh token 갱신 후 Callback 실행
-    private fun reIssueRefreshToken(callback: () -> Unit){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
-                .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    //callback 실행
-                    callback()
-
-                }
-                .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = StimulusPostDetailUiState.Error("재로그인 해주세요.")
-
-                    }
-
-                    //기타 오류 시
-                    else{
-
-                        // UI State Error로 변경
-                        _uiState.value = StimulusPostDetailUiState.Error("오류가 발생했습니다.")
-                    }
-
-                }
-                .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = StimulusPostDetailUiState.Error("오류가 발생했습니다.")
-
-                }
-
-
-        }
-    }
-
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
-
-        }
-
-    }
-
 
 
 }

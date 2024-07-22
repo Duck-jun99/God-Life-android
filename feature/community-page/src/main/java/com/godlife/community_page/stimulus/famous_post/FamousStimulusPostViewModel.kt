@@ -20,9 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FamousStimulusPostViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val getFamousStimulusPostUseCase: GetFamousStimulusPostUseCase,
-    private val reissueUseCase: ReissueUseCase
+    private val getFamousStimulusPostUseCase: GetFamousStimulusPostUseCase
 ): ViewModel() {
 
     /**
@@ -36,10 +34,6 @@ class FamousStimulusPostViewModel @Inject constructor(
      * Data
      */
 
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
-
     //게시물
     private val _postList = MutableStateFlow<List<StimulusPostList?>>(emptyList())
     val postList: StateFlow<List<StimulusPostList?>> = _postList
@@ -52,11 +46,6 @@ class FamousStimulusPostViewModel @Inject constructor(
      */
 
     init {
-
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
 
         //인기 게시물 호출
         getFamousStimulusPost()
@@ -72,7 +61,7 @@ class FamousStimulusPostViewModel @Inject constructor(
         if(!isGetPost.value){
 
             viewModelScope.launch {
-                val result = getFamousStimulusPostUseCase.executeGetFamousStimulusPost(auth.value)
+                val result = getFamousStimulusPostUseCase.executeGetFamousStimulusPost()
 
                 result
                     .onSuccess {

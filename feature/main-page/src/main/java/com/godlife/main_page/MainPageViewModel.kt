@@ -51,8 +51,6 @@ enum class ErrorType {
 class MainPageViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
-    private val reissueUseCase: ReissueUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val registerFCMTokenUseCase: RegisterFCMTokenUseCase
 ): ViewModel(){
 
@@ -84,10 +82,6 @@ class MainPageViewModel @Inject constructor(
     /**
      * 변수 관련
      */
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     // 유저 정보 초기화
     private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", 0, ""))
@@ -121,11 +115,6 @@ class MainPageViewModel @Inject constructor(
 
     init {
 
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-
         // 유저 정보 가져오기
         getUserInfo()
 
@@ -133,18 +122,6 @@ class MainPageViewModel @Inject constructor(
         getTodayTodoList()
 
 
-        /*
-        Log.e("init", "userInfoExists.value: ${userInfoExists.value}")
-
-        // getTodayTodoList: 오늘 투두리스트 가져오기 (오늘 투두 리스트가 존재하는지 아닌지 상관 없이 작업이 완료되면 true)
-        //_userInfoExists, getTodayTodoList가 true이면 Success
-        if(userInfoExists.value){
-
-            _uiState.value = MainPageUiState.Success("Success")
-
-        }
-
-         */
     }
 
 
@@ -204,21 +181,20 @@ class MainPageViewModel @Inject constructor(
 
                 }
                 .onError {
-                    Log.e("onError", this.message())
+                    Log.e("getUserInfo", this.message())
 
-                    /*
-                    // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 401){
-
-                        reIssueRefreshToken()
-
+                    // 토큰 만료시
+                    if(this.response.code() == 400){
+                        _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
                     }
-
-                     */
+                    else{
+                        // UI State Error로 변경
+                        _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                    }
 
                 }
                 .onException {
-                    Log.e("onException", "${this.message}")
+                    Log.e("getUserInfo", "${this.message}")
 
                     // UI State Error로 변경
                     _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
@@ -248,83 +224,26 @@ class MainPageViewModel @Inject constructor(
                             fcmTokenRegistered.value = true
                         }
                         .onError {
-                            _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+
+                            // 토큰 만료시
+                            if(this.response.code() == 400){
+                                _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
+                            }
+                            else{
+                                // UI State Error로 변경
+                                _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                            }
+
                         }
                         .onException {
-                            _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                            _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
                         }
                 } catch (e: Exception) {
-                    _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                    _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
                 }
 
             }
         }
-    }
-
-    // refresh token 갱신 후 getUserInfo 다시 실행
-    private fun reIssueRefreshToken(){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
-                .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    getUserInfo()
-
-                }
-                .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경
-                        _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
-
-                    }
-
-                    //기타 오류 시
-                    else{
-
-                        // UI State Error로 변경
-                        _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
-                    }
-
-                }
-                .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
-
-                }
-
-
-        }
-    }
-
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
-
-        }
-
     }
 
     /*
@@ -393,9 +312,6 @@ class MainPageViewModel @Inject constructor(
         Log.e("MainPageViewModel", "onCleared")
         super.onCleared()
     }
-
-
-
 
 
 }
