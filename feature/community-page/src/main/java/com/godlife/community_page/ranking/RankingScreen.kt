@@ -77,6 +77,7 @@ import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
+import com.godlife.network.model.UserProfileBody
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.absoluteValue
@@ -116,10 +117,13 @@ fun RankingScreen(
             val totalPage = remember{ mutableIntStateOf(0) }
 
 
+            /*
             viewModel.getRankingUserPost(nickname = allRankingList.value[totalPage.value].nickname)
 
             val rankingUserPostList = viewModel.rankingUserPostList.collectAsLazyPagingItems()
 
+
+             */
 
             LazyColumn(
                 modifier = modifier
@@ -213,32 +217,10 @@ fun RankingScreen(
 
 
                 item{
-                    TotalRankingListItem2(
-                        totalRankingListItem = allRankingList.value[totalPage.intValue],
-                        rankingUserPostList = rankingUserPostList
-                    )
-                }
-
-
-
-                item{
-                    Text(text = "${allRankingList.value[totalPage.intValue].nickname} 님의 굿생 인증", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
-
-                    Spacer(modifier.size(10.dp))
-
-                    Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                    ) {
-
-                        for(i in 0 until rankingUserPostList.itemCount){
-                            RankingUserPostListItem(
-                                rankingUserPostListItem = rankingUserPostList[i],
-                                navController = parentNavController
-                            )
-                        }
-
-
+                    viewModel.rankingUserPostList.collectAsState().value?.let {
+                        TotalRankingListItem2(
+                            userProfileItem = it
+                        )
                     }
                 }
 
@@ -423,7 +405,7 @@ fun TotalRankingListItem1(
 ){
 
     LaunchedEffect(key1 = true) {
-        viewModel.updateRankingUserPostFlag()
+        viewModel.getTotalRankingUserInfo(totalRankingListItem.memberId.toString())
     }
 
     Box(
@@ -575,62 +557,57 @@ fun TotalRankingListItem1(
 @Composable
 fun TotalRankingListItem2(
     modifier: Modifier = Modifier,
-    totalRankingListItem: RankingBody,
-    rankingUserPostList: LazyPagingItems<PostDetailBody>?
+    userProfileItem: UserProfileBody
 ){
 
-    LazyRow(
+    Row(
         modifier = modifier
             .fillMaxWidth()
     ){
-        item{
-            Column(
-                modifier = modifier
-                    .padding(10.dp)
-                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
-                    .size(width = 300.dp, height = 100.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = modifier,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = PurpleMain)
-                    Spacer(modifier.size(10.dp))
-                    Text(text = "굿생 점수", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
-                }
+        Column(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(10.dp)
+                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                .height(100.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = PurpleMain)
                 Spacer(modifier.size(10.dp))
-
-                Text(text = "${totalRankingListItem.godLifeScore}점", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-
+                Text(text = "굿생 점수", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
+            Spacer(modifier.size(10.dp))
+
+            Text(text = "${userProfileItem.godLifeScore}점", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
         }
 
-        item{
-            Column(
-                modifier = modifier
-                    .padding(10.dp)
-                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
-                    .size(width = 300.dp, height = 100.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = modifier,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = PurpleMain)
-                    Spacer(modifier.size(10.dp))
-                    Text(text = "굿생 인증 게시물", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
-                }
+        Column(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(10.dp)
+                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                .height(100.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = PurpleMain)
                 Spacer(modifier.size(10.dp))
-
-                if (rankingUserPostList != null) {
-                    Text(text = "${rankingUserPostList.itemCount}개", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-                }
-
+                Text(text = "굿생 인증", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
+            Spacer(modifier.size(10.dp))
+
+            Text(text = "${userProfileItem.memberBoardCount}개", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
         }
     }
 
@@ -1046,56 +1023,54 @@ fun TotalRankingListItem1Preview(
 fun TotalRankingListItem2Preview(
     modifier: Modifier = Modifier
 ){
-    LazyRow(
+    Row(
         modifier = modifier
             .fillMaxWidth()
     ){
-        item{
-            Column(
-                modifier = modifier
-                    .padding(10.dp)
-                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
-                    .size(width = 300.dp, height = 100.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = modifier,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = PurpleMain)
-                    Spacer(modifier.size(10.dp))
-                    Text(text = "굿생 점수", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
-                }
+        Column(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(10.dp)
+                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                .height(100.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = PurpleMain)
                 Spacer(modifier.size(10.dp))
-
-                Text(text = "100점", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-
+                Text(text = "굿생 점수", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
+            Spacer(modifier.size(10.dp))
+
+            Text(text = "100점", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
         }
 
-        item{
-            Column(
-                modifier = modifier
-                    .padding(10.dp)
-                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
-                    .size(width = 300.dp, height = 100.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = modifier,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = PurpleMain)
-                    Spacer(modifier.size(10.dp))
-                    Text(text = "굿생 인증 게시물", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
-                }
+        Column(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(10.dp)
+                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                .height(100.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = PurpleMain)
                 Spacer(modifier.size(10.dp))
-
-                Text(text = "100개", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-
+                Text(text = "굿생 인증", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
+            Spacer(modifier.size(10.dp))
+
+            Text(text = "100개", style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
         }
     }
 

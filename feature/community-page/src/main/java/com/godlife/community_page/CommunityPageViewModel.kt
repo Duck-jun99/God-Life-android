@@ -10,11 +10,13 @@ import androidx.paging.cachedIn
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetFamousPostUseCase
 import com.godlife.domain.GetRankingUseCase
+import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
+import com.godlife.network.model.UserProfileBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -46,6 +48,7 @@ class CommunityPageViewModel @Inject constructor(
     private val searchPostUseCase: SearchPostUseCase,
     private val getWeeklyFamousPostUseCase: GetFamousPostUseCase,
     private val getRankingUseCase: GetRankingUseCase,
+    private val getUserProfileUseCase: GetUserProfileUseCase
 ): ViewModel(){
 
 
@@ -105,10 +108,9 @@ class CommunityPageViewModel @Inject constructor(
     private val _allRankingList = MutableStateFlow<List<RankingBody>>(emptyList())
     val allRankingList: StateFlow<List<RankingBody>> = _allRankingList
 
-    //전체 명예의 전당에서 해당 유저의 게시물
-    private val _rankingUserPostList = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
-    val rankingUserPostList: StateFlow<PagingData<PostDetailBody>> = _rankingUserPostList
-    //lateinit var rankingUserPostList: Flow<PagingData<PostDetailBody>>
+    //조회된 전체 명예의 전당 유저 프로필
+    private val _rankingUserPostList = MutableStateFlow<UserProfileBody?>(null)
+    val rankingUserPostList: StateFlow<UserProfileBody?> = _rankingUserPostList
 
     //검색어
     private val _searchText = MutableStateFlow("")
@@ -345,34 +347,25 @@ class CommunityPageViewModel @Inject constructor(
 
     }
 
+    fun getTotalRankingUserInfo(memberId: String){
+        viewModelScope.launch {
+            getUserProfileUseCase.executeGetUserProfile(memberId)
+                .onSuccess {
+                    _rankingUserPostList.value = data.body
+                }
+                .onError {
+                    _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
+                }
+                .onException {
+                    _rankingUiState.value = RankingPageUiState.Error(this.message())
+                }
+        }
+    }
+
     //rankingUserPostFlag 초기화
     fun updateRankingUserPostFlag(){
         rankingUserPostFlag.value = false
     }
-
-    //명예의 전당 유저의 게시물 불러오기
-    fun getRankingUserPost(
-        keyword: String = "",
-        tags: String = "",
-        nickname: String
-    ) {
-        if(!rankingUserPostFlag.value){
-            rankingUserPostFlag.value = true
-
-            viewModelScope.launch {
-
-                searchPostUseCase.executeSearchPost(keyword, tags, nickname)
-                    .collectLatest {
-                        _rankingUserPostList.value = it
-                    }
-                Log.e("getRankingUserPost", "nickname : $nickname")
-
-            }
-        }
-
-
-    }
-
 
     override fun onCleared() {
         Log.e("CommunityPageViewModel", "onCleared")
