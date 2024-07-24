@@ -90,6 +90,7 @@ import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.navigation.HistoryPageRoute
@@ -216,7 +217,7 @@ fun MainPageScreen(
                                         .size(30.dp, 30.dp)
                                         .clip(CircleShape)
                                         .fillMaxSize()
-                                        .background(color = GrayWhite)
+                                        .background(color = GrayWhite2)
                                         .clickable { navController.navigate("${ProfileScreenRoute.route}/${userInfo.memberId}") }
                                 )
 
@@ -450,7 +451,7 @@ fun MainTodoListBox(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = Color(0xFFFA6B80), fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
             }
 
 
@@ -868,7 +869,7 @@ fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
 
         Text(
             text = item[0].toString(),
-            style = TextStyle(color = Color.Black, fontSize = 18.sp)
+            style = TextStyle(color = GrayWhite, fontSize = 18.sp)
         )
 
     }

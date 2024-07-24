@@ -533,11 +533,12 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     .background(
                         brush = Brush.linearGradient(
                             listOf(
-                                Color(0xFF000000),
-                                Color(0xFF0A0022),
-                                Color(0xFF45005E),
-                                Color(0xFFD1659B),
-                                Color(0xFFD16565),
+                                Color(0xFFFF44A2),  // 밝은 핫핑크
+                                Color(0xFFFF5890),  // 연한 핑크
+                                Color(0xFFFA6B80),  // 연한 코럴 핑크
+                                Color(0xFFFF7B75),  // 연한 살몬
+                                Color(0xFFFF8161),  // 밝은 코럴
+                                Color(0xFFFF884D),  // 연한 오렌지
                             )
                         )
                     )
