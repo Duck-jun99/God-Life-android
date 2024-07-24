@@ -97,7 +97,7 @@ class CreateStimulusPostViewModel @Inject constructor(
             .onError {
                 Log.e("setCoverImg", this.message())
 
-                if(this.response.code() == 400){
+                if(this.response.code() == 401){
 
                     // UI State Error로 변경
                     _uiState.value = CreateStimulusUiState.Error("재로그인 해주세요.")
@@ -149,7 +149,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                         Log.e("getTempBoardId", this.message())
 
                         // 토큰 만료시
-                        if(this.response.code() == 400){
+                        if(this.response.code() == 401){
                             _uiState.value = CreateStimulusUiState.Error("재로그인 해주세요.")
                         }
                         else{
@@ -184,7 +184,7 @@ class CreateStimulusPostViewModel @Inject constructor(
             .onError {
                 Log.e("uploadImage", this.message())
 
-                if(this.response.code() == 400){
+                if(this.response.code() == 401){
 
                     // UI State Error로 변경
                     _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
@@ -233,7 +233,7 @@ class CreateStimulusPostViewModel @Inject constructor(
                         Log.e("completeCreateStimulusPost", this.message())
 
                         // 토큰 만료시
-                        if(this.response.code() == 400){
+                        if(this.response.code() == 401){
                             _uiState.value = CreateStimulusUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
 
                         }

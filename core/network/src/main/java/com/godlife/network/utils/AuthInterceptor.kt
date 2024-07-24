@@ -1,6 +1,7 @@
 package com.godlife.network.utils
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.godlife.network.BuildConfig
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
@@ -19,6 +20,7 @@ class AuthInterceptor @Inject constructor(
         val originRequest = response.request
 
         if(originRequest.header("Authorization").isNullOrEmpty()){
+            Log.e("AuthInterceptor", "originRequest.header(\"Authorization\").isNullOrEmpty()")
             return null
         }
         val refreshToken = runBlocking {
@@ -26,11 +28,13 @@ class AuthInterceptor @Inject constructor(
         }
         //재발급 api 요청하기
         val refreshRequest = Request.Builder()
-            .url(BuildConfig.SERVER_DOMAIN + "/reissue")
+            .url(BuildConfig.SERVER_DOMAIN + "reissue")
             .post("".toRequestBody())
             .addHeader("Authorization", "Bearer ${refreshToken!!}")
             .build()
         val refreshResponse = OkHttpClient().newCall(refreshRequest).execute()
+
+        Log.e("AuthInterceptor", "refreshResponse.code : ${refreshResponse.code}")
 
         //재발급에 성공한 경우
         if(refreshResponse.code == 200) {
@@ -44,8 +48,10 @@ class AuthInterceptor @Inject constructor(
                 .removeHeader("Authorization")
                 .addHeader("Authorization", "Bearer $newAccessToken")
                 .build()
+            Log.e("AuthInterceptor", "newRequest : $newRequest")
             return newRequest
         }else{//재발급 실패 - refreshToken 만료
+            Log.e("AuthInterceptor", "refreshToken 만료")
             localPreferences.edit().remove("READ_ME_ACCESS_TOKEN").apply()
             localPreferences.edit().remove("READ_ME_REFRESH_TOKEN").apply()
             localPreferences.edit().remove("USER_ID").apply()

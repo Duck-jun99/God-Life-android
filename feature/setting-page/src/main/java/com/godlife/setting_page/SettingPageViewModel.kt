@@ -72,7 +72,7 @@ class SettingPageViewModel @Inject constructor(
                 .onError {
 
                     // 토큰 만료시 재발급 요청
-                    if(this.response.code() == 400){
+                    if(this.response.code() == 401){
 
                         _uiState.value = SettingPageUiState.Error("세션이 만료되었습니다. 다시 로그인 해주세요")
 

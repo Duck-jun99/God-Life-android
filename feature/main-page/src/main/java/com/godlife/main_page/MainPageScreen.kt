@@ -30,9 +30,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,6 +44,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -115,13 +118,13 @@ fun MainPageScreen(
         
     }
 
-    //공지용
-    var showNotificationBox by remember { mutableStateOf(false) }
+    //굿생 인증 완료용
+    var showCompleteTodayBox by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
 
         delay(2000) // 2초 대기
-        showNotificationBox = true
+        showCompleteTodayBox = true
     }
 
 
@@ -150,7 +153,7 @@ fun MainPageScreen(
                 Column(
                     modifier
                         .fillMaxSize()
-                        .background(Color.White)
+                        .background(GrayWhite3)
                         .statusBarsPadding()
                 ){
 
@@ -241,17 +244,24 @@ fun MainPageScreen(
                             .fillMaxSize()
                             .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
 
-                        if (showNotificationBox){
-                            item { AnimatedVisibility(visible = true, enter = fadeIn(initialAlpha = 0.5f) ) {
-                                NotificationBox()
-                            } }
+                        if (showCompleteTodayBox){
+                            item {
+
+                                AnimatedVisibility(
+                                    visible = true,
+                                    enter = fadeIn(initialAlpha = 0.5f
+                                    )
+                                ) {
+                                    CompleteTodayBox(
+                                        createPostNavigator = createPostNavigator,
+                                        mainActivity = mainActivity
+                                    )
+                                }
+
+                            }
                         }
 
                         item { Spacer(modifier = modifier.size(10.dp)) }
-
-
-                        //TEST CREATE POST
-                        item { TestCreatePost(createPostNavigator, mainActivity) }
 
 
                         item {
@@ -385,7 +395,7 @@ fun MainTodoListBox(
 
 
     // 특정 값으로 색을 채우는 Animation
-    LaunchedEffect(Unit) {
+    LaunchedEffect(todoPercent) {
         animatedValue.animateTo(
             targetValue = todoPercent,
             animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
@@ -396,7 +406,7 @@ fun MainTodoListBox(
         .fillMaxWidth()
         .height(450.dp)
         .background(
-            color = GrayWhite3,
+            color = Color.White,
             shape = RoundedCornerShape(20.dp)
         ),
         contentAlignment = Alignment.Center
@@ -433,8 +443,14 @@ fun MainTodoListBox(
 
                 drawArc(
                     brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xff63C6C4), PurpleMain
+                        colors =
+                        listOf(
+                            Color(0xFFFF44A2),  // 밝은 핫핑크
+                            Color(0xFFFF5890),  // 연한 핑크
+                            Color(0xFFFA6B80),  // 연한 코럴 핑크
+                            Color(0xFFFF7B75),  // 연한 살몬
+                            Color(0xFFFF8161),  // 밝은 코럴
+                            Color(0xFFFF884D),  // 연한 오렌지
                         ),
                         start = Offset.Zero,
                         end = Offset.Infinite,
@@ -481,7 +497,7 @@ fun MainNoTodoListBox(
         .fillMaxWidth()
         .height(450.dp)
         .background(
-            color = GrayWhite3,
+            color = Color.White,
             shape = RoundedCornerShape(20.dp)
         )){
 
@@ -519,8 +535,14 @@ fun MainNoTodoListBox(
 
                     drawArc(
                         brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xff63C6C4), PurpleMain
+                            colors =
+                            listOf(
+                                Color(0xFFFF44A2),  // 밝은 핫핑크
+                                Color(0xFFFF5890),  // 연한 핑크
+                                Color(0xFFFA6B80),  // 연한 코럴 핑크
+                                Color(0xFFFF7B75),  // 연한 살몬
+                                Color(0xFFFF8161),  // 밝은 코럴
+                                Color(0xFFFF884D),  // 연한 오렌지
                             ),
                             start = Offset.Zero,
                             end = Offset.Infinite,
@@ -563,7 +585,7 @@ fun TodoListBox(
     Column(modifier = modifier
         .fillMaxWidth()
         .background(
-            color = GrayWhite3,
+            color = Color.White,
             shape = RoundedCornerShape(20.dp)
         )){
 
@@ -656,6 +678,80 @@ fun CompletedTodayList(
     }
 }
 
+@Composable
+fun CompleteTodayBox(
+    modifier: Modifier = Modifier,
+    createPostNavigator: CreatePostNavigator,
+    mainActivity: Activity
+){
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp),
+            )
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+
+        Icon(
+            imageVector = Icons.Outlined.ThumbUp,
+            contentDescription ="",
+            tint = PurpleMain,
+            modifier = modifier
+                .size(25.dp)
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오늘 목표를 모두 달성하셨군요!",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = "굿생 인증을 하고 하루를 마무리 해주세요.",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal
+            )
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        GodLifeButtonWhite(
+            onClick = {
+                moveCreatePostActivity(createPostNavigator, mainActivity)
+                      },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+            },
+            text = {
+                Text(
+                    text = "굿생 인증하기",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        )
+
+    }
+}
+
 //MainTodoListBox위에 보여질 Text
 @Composable
 fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
@@ -677,20 +773,206 @@ fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
 
         Text(
             text = item[0].toString(),
-            style = TextStyle(color = GrayWhite, fontSize = 18.sp)
+            style = TextStyle(color = Color.Black, fontSize = 18.sp)
         )
 
     }
 }
 
+@Preview
 @Composable
-fun TestCreatePost(createPostNavigator: CreatePostNavigator, mainActivity: Activity){
-    Button(
-        onClick = {
-        moveCreatePostActivity(createPostNavigator, mainActivity)
+fun MainTodoListBoxPreview(
+    modifier: Modifier = Modifier
+){
+
+    val todayTodoListSize = 10
+    val completedTodoListSize = 3
+
+    val todoPercent =
+        360 * ( completedTodoListSize.toFloat() / todayTodoListSize.toFloat() )
+
+    val animatedValue = remember { Animatable(0f) }
+
+
+    // 특정 값으로 색을 채우는 Animation
+    LaunchedEffect(Unit) {
+        animatedValue.animateTo(
+            targetValue = todoPercent,
+            animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        )
+    }
+
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .height(450.dp)
+        .background(
+            color = Color.White,
+            shape = RoundedCornerShape(20.dp)
+        ),
+        contentAlignment = Alignment.Center
+    ){
+
+        Box(
+            modifier = Modifier
+                .size(360.dp),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+            }
+
+
+            Canvas(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val size: Size = drawContext.size
+                val sizeArc = size / 1.75F
+                drawArc(
+                    color = Color(0xFFE1E2E9),
+                    startAngle = 0f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                    size = sizeArc,
+                    style = Stroke(width = 50f)
+                )
+
+                drawArc(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xff63C6C4), PurpleMain
+                        ),
+                        start = Offset.Zero,
+                        end = Offset.Infinite,
+                    ),
+                    startAngle = 100f,
+                    sweepAngle = animatedValue.value,
+                    useCenter = false,
+                    topLeft = Offset(
+                        (size.width - sizeArc.width) / 2f,
+                        (size.height - sizeArc.height) / 2f
+                    ),
+                    size = sizeArc,
+                    style = Stroke(width = 50f, cap = StrokeCap.Round)
+                )
+            }
         }
-    ) {
-        Text(text = "CreatePost")
+        Box(
+            modifier = modifier
+                .padding(horizontal = 5.dp, vertical = 5.dp)
+                .align(Alignment.TopEnd)
+        ){
+            IconButton(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+            }
+        }
+    }
+
+}
+//Preview
+
+@Preview
+@Composable
+fun MainNoTodoListBoxPreview(
+    modifier: Modifier = Modifier
+){
+
+    val animatedValue = remember { Animatable(0f) }
+
+
+    // 특정 값으로 색을 채우는 Animation
+    LaunchedEffect(Unit) {
+        animatedValue.animateTo(
+            //targetValue = targetvalue,
+            targetValue = 360f,
+            animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        )
+    }
+
+
+
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .height(450.dp)
+        .background(
+            color = Color.White,
+            shape = RoundedCornerShape(20.dp)
+        )){
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .size(360.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "오늘의 투두리스트를\n 만들어주세요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 15.sp),
+                    textAlign = TextAlign.Center
+                )
+
+                Canvas(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val size: Size = drawContext.size
+                    val sizeArc = size / 1.75F
+                    drawArc(
+                        color = Color(0xFFE1E2E9),
+                        startAngle = 0f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                        size = sizeArc,
+                        style = Stroke(width = 50f)
+                    )
+
+                    drawArc(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xff63C6C4), PurpleMain
+                            ),
+                            start = Offset.Zero,
+                            end = Offset.Infinite,
+                        ),
+                        startAngle = 100f,
+                        sweepAngle = animatedValue.value,
+                        useCenter = false,
+                        topLeft = Offset(
+                            (size.width - sizeArc.width) / 2f,
+                            (size.height - sizeArc.height) / 2f
+                        ),
+                        size = sizeArc,
+                        style = Stroke(width = 50f, cap = StrokeCap.Round)
+                    )
+                }
+            }
+
+            Box(modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center){
+
+                GodLifeButtonWhite(
+                    onClick = {  },
+                    text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+
+            }
+
+        }
     }
 
 }
@@ -705,42 +987,73 @@ fun LoadingMainPageScreen(modifier: Modifier = Modifier){
     }
 }
 
-//Preview
-
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun NotificationBox(modifier: Modifier = Modifier){
-    Card(modifier = modifier
-        .fillMaxWidth()
-        .height(100.dp)
-        .padding(top = 10.dp, bottom = 20.dp)
-        .background(
-            color = Color.White,
-            shape = RoundedCornerShape(20.dp)
-        ),
-        elevation = CardDefaults.cardElevation(5.dp),
-        colors = CardDefaults.cardColors(Color.White)){
+fun CompleteTodayBoxPreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp),
+            )
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
 
-        Row(
-            modifier.padding(20.dp)
-        ) {
-            Icon(imageVector = Icons.Outlined.Email,
-                contentDescription = "Message",
-                modifier
-                    .weight(0.2f)
-                    .size(100.dp),
-                tint = PurpleMain)
+        Icon(
+            imageVector = Icons.Outlined.ThumbUp,
+            contentDescription ="",
+            tint = PurpleMain,
+            modifier = modifier
+                .size(25.dp)
+        )
 
-            Box(
-                modifier
-                    .weight(0.8f)
-                    .padding(start = 10.dp)
-                    .align(Alignment.CenterVertically)){
-                Text(text = "공지가 도착했어요!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+        Spacer(modifier.size(10.dp))
 
+        Text(
+            text = "오늘 목표를 모두 달성하셨군요!",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = "굿생 인증을 하고 하루를 마무리 해주세요.",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal
+            )
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+            },
+            text = {
+                Text(
+                    text = "굿생 인증하기",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
             }
-
-        }
+        )
 
     }
 }

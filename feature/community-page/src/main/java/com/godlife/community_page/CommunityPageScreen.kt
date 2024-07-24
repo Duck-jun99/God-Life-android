@@ -169,15 +169,7 @@ fun CommunityPageScreen(
                         .height(280.dp)
                         .background(
                             brush = Brush.linearGradient(
-                                listOf(
-                                    Color(0xCC496B9F),
-                                    Color(0xCB494A9F),
-                                    Color(0xCC6A499F),
-                                    Color(0xCC6A499F),
-                                    Color(0xCC96499F),
-                                    Color(0xCCDB67AD),
-                                    Color(0xCCFF5E5E),
-                                )
+                                viewModel.setBackgroundColor()
                             )
                         )
                         .statusBarsPadding(),
@@ -511,14 +503,9 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
             .background(
                 brush = Brush.linearGradient(
                     listOf(
-                        Color(0xCC496B9F),
-                        Color(0xCB494A9F),
-                        Color(0xCC6A499F),
-                        Color(0xCC6A499F),
-                        Color(0xCC96499F),
-                        Color(0xCCDB67AD),
                         Color(0xCCFF5E5E),
-                    )
+                        Color(0xCCFF5E5E),
+                        )
                 )
             )
     ) {
@@ -546,13 +533,11 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     .background(
                         brush = Brush.linearGradient(
                             listOf(
-                                Color(0xCC496B9F),
-                                Color(0xCB494A9F),
-                                Color(0xCC6A499F),
-                                Color(0xCC6A499F),
-                                Color(0xCC96499F),
-                                Color(0xCCDB67AD),
-                                Color(0xCCFF5E5E),
+                                Color(0xFF000000),
+                                Color(0xFF0A0022),
+                                Color(0xFF45005E),
+                                Color(0xFFD1659B),
+                                Color(0xFFD16565),
                             )
                         )
                     )
@@ -664,7 +649,7 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
             BottomSheetScaffold(
                 modifier = modifier.fillMaxWidth(),
                 sheetPeekHeight = deviceHeight.dp - 250.dp,
-                sheetContainerColor = OpaqueLight,
+                sheetContainerColor = Color.White,
                 sheetShape = RoundedCornerShape(
                     bottomStart = 0.dp,
                     bottomEnd = 0.dp,

@@ -261,7 +261,7 @@ class ProfileEditViewModel @Inject constructor(
                     Log.e("initUserInfo", this.message())
 
                     // 토큰 만료시
-                    if(this.response.code() == 400){
+                    if(this.response.code() == 401){
 
                         _uiState.value = ProfileEditUiState.Error("세션이 만료되었습니다. 다시 로그인해주세요.")
                     }
@@ -300,7 +300,7 @@ class ProfileEditViewModel @Inject constructor(
                     .onError {
 
                         // 토큰 만료시
-                        if(this.response.code() == 400){
+                        if(this.response.code() == 401){
 
                             _uiState.value = ProfileEditUiState.Error("세션이 만료되었습니다. 다시 로그인해주세요.")
                         }
@@ -339,7 +339,7 @@ class ProfileEditViewModel @Inject constructor(
                     .onError {
 
                         // 토큰 만료시
-                        if(this.response.code() == 400){
+                        if(this.response.code() == 401){
 
                             _uiState.value = ProfileEditUiState.Error("세션이 만료되었습니다. 다시 로그인해주세요.")
                         }
@@ -376,7 +376,7 @@ class ProfileEditViewModel @Inject constructor(
                     .onError {
 
                         // 토큰 만료시
-                        if(this.response.code() == 400){
+                        if(this.response.code() == 401){
 
                             _uiState.value = ProfileEditUiState.Error("세션이 만료되었습니다. 다시 로그인해주세요.")
                         }

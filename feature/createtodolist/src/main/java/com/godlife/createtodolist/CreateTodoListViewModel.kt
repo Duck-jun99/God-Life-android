@@ -157,7 +157,7 @@ class CreateTodoListViewModel @Inject constructor(
                             .onError {
 
                                 // 토큰 만료시
-                                if(this.response.code() == 400){
+                                if(this.response.code() == 401){
                                     _uiState.value = CreateTodoListUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
 
                                 }

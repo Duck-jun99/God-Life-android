@@ -1,6 +1,7 @@
 package com.godlife.main
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -33,9 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.text.util.LocalePreferences
 
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -81,6 +85,11 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var createPostNavigator: CreatePostNavigator
+
+    //TEST
+    @Inject
+    lateinit var localPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -103,6 +112,8 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        //TEST
+        Log.e("MainActivity", "refreshToken: ${localPreferences.getString("READ_ME_REFRESH_TOKEN", "")}")
 
         /** FCM Token값 가져오기 */
         MyFirebaseMessagingService().getFirebaseToken{
@@ -140,7 +151,7 @@ fun MainUiTheme(
 
 
         val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-        val communityTab = BottomNavItem(title = "God Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+        val communityTab = BottomNavItem(title = "Good Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
         val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
 
@@ -301,7 +312,7 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                 },
                 label = {
                     if(currentRoute == bottomNavItem.route){
-                        Text(bottomNavItem.title) }
+                        Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold)) }
                     else null
                         },
                 colors = NavigationBarItemDefaults.colors(

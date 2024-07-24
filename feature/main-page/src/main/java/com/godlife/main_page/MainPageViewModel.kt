@@ -184,7 +184,7 @@ class MainPageViewModel @Inject constructor(
                     Log.e("getUserInfo", this.message())
 
                     // 토큰 만료시
-                    if(this.response.code() == 400){
+                    if(this.response.code() == 401){
                         _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
                     }
                     else{
@@ -226,7 +226,7 @@ class MainPageViewModel @Inject constructor(
                         .onError {
 
                             // 토큰 만료시
-                            if(this.response.code() == 400){
+                            if(this.response.code() == 401){
                                 _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
                             }
                             else{
