@@ -19,6 +19,7 @@ class AuthInterceptor @Inject constructor(
     override fun authenticate(route: Route?, response: Response): Request? {
         val originRequest = response.request
 
+
         if(originRequest.header("Authorization").isNullOrEmpty()){
             Log.e("AuthInterceptor", "originRequest.header(\"Authorization\").isNullOrEmpty()")
             return null
@@ -39,7 +40,7 @@ class AuthInterceptor @Inject constructor(
         refreshResponse.use { refreshResponseBody ->
             Log.e("AuthInterceptor", "refreshResponse.code : ${refreshResponseBody.code}")
 
-            //재발급에 성공한 경우
+            //재발급 성공
             if(refreshResponseBody.code == 200) {
                 val gson = Gson()
                 val responseBodyString = refreshResponseBody.body?.string()
