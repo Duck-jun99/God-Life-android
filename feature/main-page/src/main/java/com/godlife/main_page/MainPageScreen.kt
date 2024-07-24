@@ -30,6 +30,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Notifications
@@ -90,6 +91,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.update.UpdateAlertDialog
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
@@ -196,7 +198,8 @@ fun MainPageScreen(
                             Row(
                                 modifier = modifier
                                     .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
                             ){
 
                                 //프로필 사진
@@ -236,12 +239,20 @@ fun MainPageScreen(
 
                                 Spacer(modifier.size(10.dp))
 
-                                Icon(imageVector = Icons.Outlined.Notifications,
-                                    contentDescription = "Notification",
-                                    tint = PurpleMain,
-                                    modifier = modifier
-                                        .size(30.dp)
-                                )
+                                IconButton(onClick = {
+                                    navController.navigate(HistoryPageRoute.route){
+                                        launchSingleTop = true
+                                    } }
+                                ) {
+
+                                    Icon(imageVector = Icons.Outlined.DateRange,
+                                        contentDescription = "History",
+                                        tint = Color.Black,
+                                        modifier = modifier
+                                            .size(30.dp)
+                                    )
+                                }
+
                             }
 
                         }
@@ -515,7 +526,7 @@ fun MainTodoListBox(
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = GrayWhite
                 )
                 DropdownMenu(
                     expanded = dropDownVisble,

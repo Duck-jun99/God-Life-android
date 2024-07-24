@@ -10,3 +10,7 @@ fun NavController.navigateMainPage() {
 object MainPageRoute {
     const val route = "Main-Page"
 }
+
+object HistoryPageRoute {
+    const val route = "History-Page"
+}

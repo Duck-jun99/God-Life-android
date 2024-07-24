@@ -60,6 +60,8 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageScreen
+import com.godlife.main_page.history.HistoryPageScreen
+import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.navigation.MainPageRoute
 import com.godlife.model.navigationbar.BottomNavItem
 import com.godlife.navigator.CreatePostNavigator
@@ -206,6 +208,13 @@ fun MainUiTheme(
                         SettingPageScreen(mainActivity = mainActivity, loginNavigator = loginNavigator, navController = navController)
                         currentRoute.value = settingTab.route
                         bottomBarVisibleState.value = true
+                    }
+
+                    //굿생 기록 저장소 화면
+                    composable(HistoryPageRoute.route){
+                        HistoryPageScreen()
+                        currentRoute.value = HistoryPageRoute.route
+                        bottomBarVisibleState.value = false
                     }
 
                     //프로필 화면
