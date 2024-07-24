@@ -30,21 +30,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -82,12 +83,14 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.main_page.update.UpdateAlertDialog
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
@@ -112,11 +115,7 @@ fun MainPageScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
-    LaunchedEffect(key1 = true) {
-        
-        Log.e("MainPageScreen", viewModel.todayTodoList.value.toString())
-        
-    }
+
 
     //굿생 인증 완료용
     var showCompleteTodayBox by remember { mutableStateOf(false) }
@@ -136,6 +135,15 @@ fun MainPageScreen(
     val todayTodoListExists by viewModel.todayTodoListExists.collectAsState()
 
     val userInfo by viewModel.userInfo.collectAsState()
+
+    val showTodoAlertDialog by viewModel.showTodoAlertDialog.collectAsState()
+    val showUpdateAlertDialog by viewModel.showUpdateAlertDialog.collectAsState()
+
+    val todayTodoList by viewModel.todayTodoList.collectAsState()
+
+    LaunchedEffect(todayTodoList) {
+        Log.e("MainPageScreen", todayTodoList?.toString() ?: "TodoList is null")
+    }
 
     GodLifeTheme {
 
@@ -269,13 +277,18 @@ fun MainPageScreen(
                             Spacer(modifier = modifier.size(10.dp))
                         }
 
-                        when(todayTodoListExists){
+                        when{
                             //오늘 설정한 투두리스트가 있을 경우
-                            true -> {
+                            todayTodoList != null -> {
 
-                                item{
-                                    MainTodoListBox(viewModel)
-                                    Spacer(modifier = modifier.size(10.dp))
+                                item {
+                                    todayTodoList?.let { todo ->
+                                        MainTodoListBox(
+                                            viewModel = viewModel,
+                                            todo = todo
+                                        )
+                                        Spacer(modifier = modifier.size(10.dp))
+                                    }
                                 }
 
                                 item {
@@ -291,12 +304,20 @@ fun MainPageScreen(
                                     Spacer(modifier = modifier.size(10.dp))
                                 }
 
-                                item{ TodoListBox(viewModel)}
+
+                                item {
+                                    todayTodoList?.let { todo ->
+                                        TodoListBox(
+                                            viewModel = viewModel,
+                                            todo = todo
+                                        )
+                                    }
+                                }
 
                             }
 
                             //오늘 설정한 투두리스트가 없을 경우
-                            false -> {
+                            else -> {
 
                                 item{ MainNoTodoListBox(mainActivity, createNavigator) }
 
@@ -310,8 +331,19 @@ fun MainPageScreen(
 
                 }
 
-                MainAlertDialog(viewModel)
+                if(showTodoAlertDialog){
+                    TodoAlertDialog(viewModel)
+                }
 
+                if(showUpdateAlertDialog){
+                    UpdateAlertDialog(
+                        viewModel = viewModel,
+                        onUpdateComplete = {
+                            viewModel.getTodayTodoList()
+                            Log.e("onUpdateComplete", "${viewModel.todayTodoList.value}")
+                        }
+                    )
+                }
 
             }
             is MainPageUiState.Error -> {
@@ -330,55 +362,57 @@ fun MainPageScreen(
 }
 
 @Composable
-fun MainAlertDialog(
+fun TodoAlertDialog(
     viewModel: MainPageViewModel
 ){
-    val showAlertDialog by viewModel.showAlertDialog.collectAsState()
+
     val selectedTodo by viewModel.selectedTodo.collectAsState()
 
     val cScope = rememberCoroutineScope()
 
-    if(showAlertDialog){
-        AlertDialog(
-            containerColor = Color.White,
-            onDismissRequest = { viewModel.setAlertDialogFlag() },
-            title = {
-                Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-            },
-            text = {
-                Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
-            },
-            confirmButton = {
-                GodLifeButtonWhite(
-                    onClick = {
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { viewModel.setTodoAlertDialogFlag() },
+        title = {
+            Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        },
+        text = {
+            Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+        },
+        confirmButton = {
+            GodLifeButtonWhite(
+                onClick = {
 
-                        cScope.launch(Dispatchers.IO) {
-                            viewModel.setTodoValueCompleted(selectedTodo)
-                        }
+                    cScope.launch(Dispatchers.IO) {
+                        viewModel.setTodoValueCompleted(selectedTodo)
+                    }
 
-                        viewModel.setAlertDialogFlag()
+                    viewModel.setTodoAlertDialogFlag()
 
-                    },
-                    text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
-                )
-            },
-            dismissButton = {
-                GodLifeButtonWhite(
-                    onClick = { viewModel.setAlertDialogFlag() },
-                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
-                )
-            }
-        )
-    }
-
+                },
+                text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        },
+        dismissButton = {
+            GodLifeButtonWhite(
+                onClick = { viewModel.setTodoAlertDialogFlag() },
+                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        }
+    )
 
 }
+
+
 
 @Composable
 fun MainTodoListBox(
     viewModel: MainPageViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    todo: TodoEntity
 ){
+
+    val dropDownVisble = viewModel.dropDownVisble.collectAsState().value
 
     val todayTodoListSize = viewModel.todayTodoListSize.collectAsState().value
     val completedTodoListSize = viewModel.completedTodoListSize.collectAsState().value
@@ -465,6 +499,70 @@ fun MainTodoListBox(
                     size = sizeArc,
                     style = Stroke(width = 50f, cap = StrokeCap.Round)
                 )
+            }
+
+        }
+        Box(
+            modifier = modifier
+                .padding(horizontal = 5.dp, vertical = 5.dp)
+                .align(Alignment.TopEnd)
+        ){
+            IconButton(
+                modifier = modifier
+                    .size(30.dp),
+                onClick = { viewModel.setDropDownVisble() }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+                DropdownMenu(
+                    expanded = dropDownVisble,
+                    onDismissRequest = { viewModel.setDropDownVisble() },
+                    containerColor = Color.White
+                ) {
+
+                    Column {
+
+                        DropdownMenuItem(
+                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = PurpleMain)) },
+                            onClick = {
+                                viewModel.setDropDownVisble()
+                                viewModel.setUpdateAlertDialogFlag(category = "EDIT_TODOLIST")
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = PurpleMain)
+                            },
+                            colors = MenuDefaults.itemColors(Color.White)
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain)) },
+                            onClick = {
+                                viewModel.setDropDownVisble()
+                                //viewModel.updateUIState(PostDetailUiState.Update)
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = PurpleMain)
+                            },
+                            colors = MenuDefaults.itemColors(Color.White)
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain)) },
+                            onClick = {
+                                viewModel.setDropDownVisble()
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = PurpleMain)
+                            },
+                            colors = MenuDefaults.itemColors(Color.White)
+                        )
+
+                    }
+
+                }
             }
         }
     }
@@ -578,9 +676,13 @@ fun MainNoTodoListBox(
 @Composable
 fun TodoListBox(
     viewModel:MainPageViewModel,
-    modifier: Modifier = Modifier){
+    todo: TodoEntity,
+    modifier: Modifier = Modifier
+){
 
-    val todayTodoList by viewModel.todayTodoList.collectAsState()
+    //val todayTodoList by viewModel.todayTodoList.collectAsState()
+
+    Log.e(" TodoListBox ", "${todo}")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -596,11 +698,10 @@ fun TodoListBox(
 
          */
 
-        todayTodoList?.todoList?.forEach { item ->
+        todo.todoList.forEach { item ->
             if (item.iscompleted) {
                 CompletedTodayList(item, viewModel)
-            }
-            else {
+            } else {
                 NoCompletedTodayList(item, viewModel)
             }
         }
@@ -634,7 +735,7 @@ fun NoCompletedTodayList(
 
             GodLifeButton(
                 onClick = {
-                          viewModel.setAlertDialogFlag(todo)
+                          viewModel.setTodoAlertDialogFlag(todo)
                 },
                 modifier = Modifier.align(Alignment.End)) {
                 Text(text = "달성하기", style = TextStyle(color = Color.White))
@@ -867,6 +968,8 @@ fun MainTodoListBoxPreview(
                 .align(Alignment.TopEnd)
         ){
             IconButton(
+                modifier = modifier
+                    .size(30.dp),
                 onClick = { /*TODO*/ }
             ) {
                 Icon(
