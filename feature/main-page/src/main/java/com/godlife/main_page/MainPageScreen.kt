@@ -61,6 +61,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -98,6 +99,8 @@ import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
 import com.godlife.profile.navigation.ProfileScreenRoute
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -203,38 +206,18 @@ fun MainPageScreen(
                             ){
 
                                 //프로필 사진
-                                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                                val imageModifier: Modifier = modifier
-                                    .size(30.dp, 30.dp)
-                                    .clip(CircleShape)
-                                    .fillMaxSize()
-                                    .background(color = GrayWhite)
-                                    .clickable { navController.navigate("${ProfileScreenRoute.route}/${userInfo.memberId}") }
-
-                                Glide.with(LocalContext.current)
-                                    .asBitmap()
-                                    .load(if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person)
-                                    .error(R.drawable.ic_person)
-                                    .into(object : CustomTarget<Bitmap>() {
-                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                            bitmap.value = resource
-                                        }
-
-                                        override fun onLoadCleared(placeholder: Drawable?) {}
-                                    })
-
-                                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                                    Image(
-                                        bitmap = fetchedBitmap,
-                                        contentDescription = null,
+                                GlideImage(
+                                    imageModel = { if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person },
+                                    imageOptions = ImageOptions(
                                         contentScale = ContentScale.FillWidth,
-                                        modifier = imageModifier
-                                    )   //bitmap이 없다면
-                                } ?: Image(
-                                    painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.FillWidth,
-                                    modifier = imageModifier
+                                        alignment = Alignment.Center
+                                    ),
+                                    modifier = modifier
+                                        .size(30.dp, 30.dp)
+                                        .clip(CircleShape)
+                                        .fillMaxSize()
+                                        .background(color = GrayWhite)
+                                        .clickable { navController.navigate("${ProfileScreenRoute.route}/${userInfo.memberId}") }
                                 )
 
                                 Spacer(modifier.size(10.dp))
