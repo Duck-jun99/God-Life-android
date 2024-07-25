@@ -26,6 +26,7 @@ import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.RecommendPostQuery
 import com.skydoves.sandwich.ApiResponse
 
 interface NetworkDataSource {
@@ -171,7 +172,7 @@ interface NetworkDataSource {
     ): ApiResponse<StimulusPostListQuery>
 
     suspend fun getStimulusFamousAuthorPost(
-    ): ApiResponse<StimulusPostListQuery>
+    ): ApiResponse<RecommendPostQuery>
 
     suspend fun getStimulusRecommendPost(
     ): ApiResponse<StimulusPostListQuery>

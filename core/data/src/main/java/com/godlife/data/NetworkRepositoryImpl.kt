@@ -28,6 +28,7 @@ import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.RecommendPostQuery
 import com.skydoves.sandwich.ApiResponse
 import javax.inject.Inject
 
@@ -253,7 +254,7 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.getStimulusMostViewPost()
     }
 
-    override suspend fun getStimulusFamousAuthorPost(): ApiResponse<StimulusPostListQuery> {
+    override suspend fun getStimulusFamousAuthorPost(): ApiResponse<RecommendPostQuery> {
         return networkDataSource.getStimulusFamousAuthorPost()
     }
 

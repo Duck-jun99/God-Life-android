@@ -30,6 +30,7 @@ import com.godlife.network.model.StimulusPostQuery
 import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.RecommendPostQuery
 import com.godlife.network.model.ReportRequest
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MediaType.Companion.toMediaType
@@ -307,7 +308,7 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getStimulusMostViewPost()
     }
 
-    override suspend fun getStimulusFamousAuthorPost(): ApiResponse<StimulusPostListQuery> {
+    override suspend fun getStimulusFamousAuthorPost(): ApiResponse<RecommendPostQuery> {
         return networkApi.getStimulusFamousAuthorPost()
     }
 

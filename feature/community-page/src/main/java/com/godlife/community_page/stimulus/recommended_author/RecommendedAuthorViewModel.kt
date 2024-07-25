@@ -1,11 +1,11 @@
-package com.godlife.community_page.stimulus.recommended_author_post
+package com.godlife.community_page.stimulus.recommended_author
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.domain.GetFamousAuthorStimulusPostUseCase
-import com.godlife.network.model.StimulusPostList
+import com.godlife.network.model.RecommendPostBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -17,10 +17,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RecommendedAuthorStimulusPostViewModel @Inject constructor(
+class RecommendedAuthorViewModel @Inject constructor(
     private val getRecommendedAuthorStimulusPostUseCase: GetFamousAuthorStimulusPostUseCase
 ): ViewModel() {
-
     /**
      * State
      */
@@ -32,10 +31,9 @@ class RecommendedAuthorStimulusPostViewModel @Inject constructor(
      * Data
      */
 
-
-    //게시물
-    private val _postList = MutableStateFlow<List<StimulusPostList?>>(emptyList())
-    val postList: StateFlow<List<StimulusPostList?>> = _postList
+    //추천 작가 정보
+    private val _authorInfo = MutableStateFlow<RecommendPostBody?>(null)
+    val authorInfo: StateFlow<RecommendPostBody?> = _authorInfo
 
     //게시물을 호출했는지 플래그
     private var isGetPost = mutableStateOf(false)
@@ -46,8 +44,8 @@ class RecommendedAuthorStimulusPostViewModel @Inject constructor(
 
     init {
 
-        //게시물 호출
-        getRecommendedAuthorStimulusPost()
+        //조회수 많은 게시물 호출
+        getRecommendedAuthor()
 
     }
 
@@ -55,7 +53,7 @@ class RecommendedAuthorStimulusPostViewModel @Inject constructor(
      * Functions
      */
 
-    private fun getRecommendedAuthorStimulusPost(){
+    private fun getRecommendedAuthor(){
 
         if(!isGetPost.value){
 
@@ -64,7 +62,7 @@ class RecommendedAuthorStimulusPostViewModel @Inject constructor(
 
                 result
                     .onSuccess {
-                        _postList.value = data.body.responses
+                        _authorInfo.value = data.body
                         _uiState.value = StimulusPostUiState.Success("성공")
                     }
                     .onError {

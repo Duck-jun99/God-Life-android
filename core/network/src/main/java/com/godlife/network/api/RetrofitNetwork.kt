@@ -26,6 +26,7 @@ import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.RecommendPostQuery
 import com.godlife.network.model.ReportRequest
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
@@ -277,7 +278,7 @@ interface RetrofitNetworkApi {
     // 굿생 자극 추천 작가의 정보와 게시물 리스트 조회 (관리자 선정)
     @GET("/recommend/author")
     suspend fun getStimulusFamousAuthorPost(
-    ): ApiResponse<StimulusPostListQuery>
+    ): ApiResponse<RecommendPostQuery>
 
     // 굿생 자극 추천 게시물 리스트 조회 (관리자 선정)
     @GET("/recommend/board")
