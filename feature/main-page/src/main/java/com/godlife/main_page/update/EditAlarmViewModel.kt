@@ -32,7 +32,10 @@ class EditAlarmViewModel @Inject constructor(
     // 오늘 투두리스트 불러온 플래그
     val getTodayTodoListFlag = mutableStateOf<Boolean>(false)
 
-    // 작업 완료 플래그
+    // DB 작업 완료 플래그
+    val dbCompleteFlag = mutableStateOf<Boolean>(false)
+
+    // 서버 작업 완료 플래그
     val completeFlag = mutableStateOf<Boolean>(false)
 
 
@@ -94,15 +97,25 @@ class EditAlarmViewModel @Inject constructor(
             //알람 설정한 경우
             if(notificationFlag.value){
 
-                //내부 DB 업데이트
-                //localDatabaseUseCase.
-
                 //알람 설정이 최초가 아닌경우 업데이트 하기
                 if(todayTodoInfo.value!!.notificationBoolean){
 
                     viewModelScope.launch(Dispatchers.IO) {
                         patchNotificationTimeUseCase.executePatchNotificationTime(notificationTime.value)
                             .onSuccess {
+
+                                //내부 DB 업데이트
+                                _todayTodoInfo.value = TodoEntity(
+                                    id = todayTodoInfo.value!!.id,
+                                    date = todayTodoInfo.value!!.date,
+                                    todoList = todayTodoInfo.value!!.todoList,
+                                    notificationBoolean = true,
+                                    notificationTime = notificationTime.value,
+                                    isCompleted = todayTodoInfo.value!!.isCompleted
+                                )
+
+                                updateDB(todayTodoInfo.value!!)
+
                                 mainPageViewModel.setUpdateAlertDialogFlag()
                                 onUpdateComplete()
                                 onCleared()
@@ -122,6 +135,19 @@ class EditAlarmViewModel @Inject constructor(
                     viewModelScope.launch(Dispatchers.IO) {
                         postNotificationTimeUseCase.executePostNotificationTime(notificationTime.value)
                             .onSuccess {
+
+                                //내부 DB 업데이트
+                                _todayTodoInfo.value = TodoEntity(
+                                    id = todayTodoInfo.value!!.id,
+                                    date = todayTodoInfo.value!!.date,
+                                    todoList = todayTodoInfo.value!!.todoList,
+                                    notificationBoolean = true,
+                                    notificationTime = notificationTime.value,
+                                    isCompleted = todayTodoInfo.value!!.isCompleted
+                                )
+
+                                updateDB(todayTodoInfo.value!!)
+
                                 mainPageViewModel.setUpdateAlertDialogFlag()
                                 onUpdateComplete()
                                 onCleared()
@@ -145,6 +171,19 @@ class EditAlarmViewModel @Inject constructor(
 
                     deleteNotificationTimeUseCase.executeDeleteNotificationTime()
                         .onSuccess {
+
+                            //내부 DB 업데이트
+                            _todayTodoInfo.value = TodoEntity(
+                                id = todayTodoInfo.value!!.id,
+                                date = todayTodoInfo.value!!.date,
+                                todoList = todayTodoInfo.value!!.todoList,
+                                notificationBoolean = false,
+                                notificationTime = notificationTime.value,
+                                isCompleted = todayTodoInfo.value!!.isCompleted
+                            )
+
+                            updateDB(todayTodoInfo.value!!)
+
                             mainPageViewModel.setUpdateAlertDialogFlag()
                             onUpdateComplete()
                             onCleared()
@@ -165,6 +204,16 @@ class EditAlarmViewModel @Inject constructor(
 
         }
 
+    }
+
+    fun updateDB(todoEntity: TodoEntity){
+        if(!dbCompleteFlag.value){
+            dbCompleteFlag.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                localDatabaseUseCase.updateTodoList(todoEntity)
+            }
+
+        }
     }
 
     //설정된 시간값이 현재 시간보다 이후인지 확인
