@@ -16,8 +16,15 @@ data class CreatePostRequest(
 
 data class StimulusPostListQuery(
     val status: String,
-    val body: List<StimulusPostList>,
+    val body: StimulusPostBody,
     val message: String,
+)
+
+data class StimulusPostBody(
+    val nickname: String,
+    val backgroundUrl: String,
+    val whoAmI: String,
+    val responses: List<StimulusPostList>
 )
 
 data class StimulusPostList(

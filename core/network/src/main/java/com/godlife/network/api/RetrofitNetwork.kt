@@ -274,7 +274,7 @@ interface RetrofitNetworkApi {
     suspend fun getStimulusMostViewPost(
     ): ApiResponse<StimulusPostListQuery>
 
-    // 굿생 자극 추천 작가의 게시물 리스트 조회 (관리자 선정)
+    // 굿생 자극 추천 작가의 정보와 게시물 리스트 조회 (관리자 선정)
     @GET("/recommend/author")
     suspend fun getStimulusFamousAuthorPost(
     ): ApiResponse<StimulusPostListQuery>
