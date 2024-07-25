@@ -463,7 +463,7 @@ fun CommunityPageView(
         //검색 결과 뷰
         composable(SearchResultRoute.route){
             viewModel.changeCurrentRoute(route = SearchResultRoute.route)
-            SearchResultScreen(viewModel = viewModel, navController = navController)
+            SearchResultScreen(viewModel = viewModel, navController = parentNavController)
         }
 
 

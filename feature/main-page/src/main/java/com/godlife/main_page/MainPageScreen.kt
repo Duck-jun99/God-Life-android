@@ -223,18 +223,28 @@ fun MainPageScreen(
 
                                 Spacer(modifier.size(10.dp))
 
-                                IconButton(onClick = {
-                                    navController.navigate(HistoryPageRoute.route){
-                                        launchSingleTop = true
-                                    } }
+                                IconButton(
+                                    modifier = modifier
+                                        .size(30.dp),
+                                    onClick = {
+                                        navController.navigate(HistoryPageRoute.route){
+                                            launchSingleTop = true
+                                        }
+                                    }
                                 ) {
 
+                                    Icon(
+                                        painter = painterResource(R.drawable.note_icons8),
+                                        contentDescription = "",
+                                        tint = Color.Unspecified
+                                    )
+
+                                    /*
                                     Icon(imageVector = Icons.Outlined.DateRange,
                                         contentDescription = "History",
-                                        tint = Color.Black,
-                                        modifier = modifier
-                                            .size(30.dp)
+                                        tint = Color.Black
                                     )
+                                     */
                                 }
 
                             }
