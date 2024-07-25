@@ -37,7 +37,7 @@ import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageViewModel
 
 @Composable
-fun EditTodoList(
+fun EditTodoListContent(
     modifier: Modifier = Modifier,
     mainPageViewModel: MainPageViewModel,
     onUpdateComplete: () -> Unit,

@@ -546,7 +546,7 @@ fun MainTodoListBox(
                             text = { Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
-                                //viewModel.updateUIState(PostDetailUiState.Update)
+                                viewModel.setUpdateAlertDialogFlag(category = "EDIT_NOTIFICATION_TIME")
                             },
                             leadingIcon = {
                                 Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = PurpleMain)
@@ -558,6 +558,8 @@ fun MainTodoListBox(
                             text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
+                                viewModel.setUpdateAlertDialogFlag(category = "DELETE")
+
                             },
                             leadingIcon = {
                                 Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = PurpleMain)
