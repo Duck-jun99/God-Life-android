@@ -47,7 +47,10 @@ fun EditTodoListContent(
 
     AlertDialog(
         containerColor = GrayWhite3,
-        onDismissRequest = { mainPageViewModel.setUpdateAlertDialogFlag() },
+        onDismissRequest = {
+            mainPageViewModel.setUpdateAlertDialogFlag()
+            viewModel.setCleared()
+        },
         title = {
             Text(text = "투두 리스트 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },

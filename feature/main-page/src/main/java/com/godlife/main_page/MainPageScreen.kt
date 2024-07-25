@@ -2,8 +2,6 @@ package com.godlife.main_page
 
 
 import android.app.Activity
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -12,7 +10,6 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +27,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Notifications
@@ -52,7 +48,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,14 +56,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -82,9 +75,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
@@ -341,13 +331,16 @@ fun MainPageScreen(
                 }
 
                 if(showUpdateAlertDialog){
-                    UpdateAlertDialog(
-                        viewModel = viewModel,
-                        onUpdateComplete = {
-                            viewModel.getTodayTodoList()
-                            Log.e("onUpdateComplete", "${viewModel.todayTodoList.value}")
-                        }
-                    )
+                    todayTodoList?.id?.let {
+                        UpdateAlertDialog(
+                            viewModel = viewModel,
+                            onUpdateComplete = {
+                                viewModel.getTodayTodoList()
+                                Log.e("onUpdateComplete", "${viewModel.todayTodoList.value}")
+                            },
+                            todoId = it
+                        )
+                    }
                 }
 
             }

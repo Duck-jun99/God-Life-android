@@ -51,7 +51,10 @@ fun EditAlarmContent(
 
     AlertDialog(
         containerColor = GrayWhite3,
-        onDismissRequest = { mainPageViewModel.setUpdateAlertDialogFlag() },
+        onDismissRequest = {
+            mainPageViewModel.setUpdateAlertDialogFlag()
+            viewModel.setCleared()
+        },
         title = {
             Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },

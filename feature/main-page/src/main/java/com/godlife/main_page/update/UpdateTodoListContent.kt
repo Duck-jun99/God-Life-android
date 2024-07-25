@@ -7,7 +7,8 @@ import com.godlife.main_page.MainPageViewModel
 @Composable
 fun UpdateAlertDialog(
     viewModel: MainPageViewModel,
-    onUpdateComplete: () -> Unit
+    onUpdateComplete: () -> Unit,
+    todoId: Int
 ){
     val updateCategory = viewModel.updateCategory.collectAsState().value
 
@@ -24,7 +25,11 @@ fun UpdateAlertDialog(
         )
     }
     else if(updateCategory == "DELETE"){
-
+        DeleteTodoContent(
+            mainPageViewModel = viewModel,
+            onUpdateComplete = onUpdateComplete,
+            todoId = todoId
+        )
     }
 }
 
