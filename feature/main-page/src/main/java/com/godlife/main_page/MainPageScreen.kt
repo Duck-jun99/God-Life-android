@@ -434,72 +434,67 @@ fun MainTodoListBox(
         )
     }
 
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .height(450.dp)
-        .background(
-            color = Color.White,
-            shape = RoundedCornerShape(20.dp)
-        ),
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            ),
         contentAlignment = Alignment.Center
-    ){
+    ) {
 
-        Box(
-            modifier = Modifier
-                .size(300.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = Color(0xFFFA6B80), fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
-            }
-
-
-            Canvas(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val size: Size = drawContext.size
-                val sizeArc = size / 1.75F
-                drawArc(
-                    color = Color(0xFFE1E2E9),
-                    startAngle = 0f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                    topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
-                    size = sizeArc,
-                    style = Stroke(width = 50f)
-                )
-
-                drawArc(
-                    brush = Brush.linearGradient(
-                        colors =
-                        listOf(
-                            Color(0xFFFF44A2),  // 밝은 핫핑크
-                            Color(0xFFFF5890),  // 연한 핑크
-                            Color(0xFFFA6B80),  // 연한 코럴 핑크
-                            Color(0xFFFF7B75),  // 연한 살몬
-                            Color(0xFFFF8161),  // 밝은 코럴
-                            Color(0xFFFF884D),  // 연한 오렌지
-                        ),
-                        start = Offset.Zero,
-                        end = Offset.Infinite,
-                    ),
-                    startAngle = 100f,
-                    sweepAngle = animatedValue.value,
-                    useCenter = false,
-                    topLeft = Offset(
-                        (size.width - sizeArc.width) / 2f,
-                        (size.height - sizeArc.height) / 2f
-                    ),
-                    size = sizeArc,
-                    style = Stroke(width = 50f, cap = StrokeCap.Round)
-                )
-            }
-
+            Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = Color(0xFFFA6B80), fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
         }
+
+
+        Canvas(
+            modifier = Modifier
+                .size(300.dp)
+        ) {
+            val size: Size = drawContext.size
+            val sizeArc = size / 1.5F
+            drawArc(
+                color = Color(0xFFE1E2E9),
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                size = sizeArc,
+                style = Stroke(width = 30f)
+            )
+
+            drawArc(
+                brush = Brush.linearGradient(
+                    colors =
+                    listOf(
+                        Color(0xFFFF44A2),  // 밝은 핫핑크
+                        Color(0xFFFF5890),  // 연한 핑크
+                        Color(0xFFFA6B80),  // 연한 코럴 핑크
+                        Color(0xFFFF7B75),  // 연한 살몬
+                        Color(0xFFFF8161),  // 밝은 코럴
+                        Color(0xFFFF884D),  // 연한 오렌지
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+                startAngle = 100f,
+                sweepAngle = animatedValue.value,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - sizeArc.width) / 2f,
+                    (size.height - sizeArc.height) / 2f
+                ),
+                size = sizeArc,
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
+            )
+        }
+
         Box(
             modifier = modifier
                 .padding(horizontal = 5.dp, vertical = 5.dp)
@@ -565,6 +560,7 @@ fun MainTodoListBox(
                 }
             }
         }
+
     }
 
 }
@@ -904,65 +900,61 @@ fun MainTodoListBoxPreview(
         )
     }
 
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .height(450.dp)
-        .background(
-            color = Color.White,
-            shape = RoundedCornerShape(20.dp)
-        ),
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            ),
         contentAlignment = Alignment.Center
-    ){
+    ) {
 
-        Box(
-            modifier = Modifier
-                .size(360.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
-            }
-
-
-            Canvas(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val size: Size = drawContext.size
-                val sizeArc = size / 1.75F
-                drawArc(
-                    color = Color(0xFFE1E2E9),
-                    startAngle = 0f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                    topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
-                    size = sizeArc,
-                    style = Stroke(width = 50f)
-                )
-
-                drawArc(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xff63C6C4), PurpleMain
-                        ),
-                        start = Offset.Zero,
-                        end = Offset.Infinite,
-                    ),
-                    startAngle = 100f,
-                    sweepAngle = animatedValue.value,
-                    useCenter = false,
-                    topLeft = Offset(
-                        (size.width - sizeArc.width) / 2f,
-                        (size.height - sizeArc.height) / 2f
-                    ),
-                    size = sizeArc,
-                    style = Stroke(width = 50f, cap = StrokeCap.Round)
-                )
-            }
+            Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
         }
+
+
+        Canvas(
+            modifier = Modifier
+                .size(300.dp)
+        ) {
+            val size: Size = drawContext.size
+            val sizeArc = size / 1.5F
+            drawArc(
+                color = Color(0xFFE1E2E9),
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                size = sizeArc,
+                style = Stroke(width = 30f)
+            )
+
+            drawArc(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xff63C6C4), PurpleMain
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+                startAngle = 100f,
+                sweepAngle = animatedValue.value,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - sizeArc.width) / 2f,
+                    (size.height - sizeArc.height) / 2f
+                ),
+                size = sizeArc,
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
+            )
+        }
+
         Box(
             modifier = modifier
                 .padding(horizontal = 5.dp, vertical = 5.dp)
