@@ -88,6 +88,7 @@ import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
 import com.godlife.designsystem.theme.PurpleMain
 import kotlinx.coroutines.delay
@@ -132,7 +133,7 @@ fun CommunityPageScreen(
 
 
     //BottomSheet가 접혀있을 때 높이
-    val initBottomSheetHeight = height - 260.dp
+    val initBottomSheetHeight = height - 240.dp
 
 
     val searchText by viewModel.searchText.collectAsState()
@@ -178,17 +179,24 @@ fun CommunityPageScreen(
 
                     Box(
                         modifier
-                            .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                            .padding(top = 20.dp, start = 10.dp, end = 10.dp)
                             .height(50.dp)
                             .fillMaxWidth()){
 
-                        Text(text = topTitle, style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
+                        Text(
+                            text = topTitle,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 25.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
 
                     }
 
                     Column(
                         modifier
-                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                            .padding(start = 10.dp, end = 20.dp, bottom = 10.dp)
                             .height(80.dp)) {
 
                         Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
@@ -282,7 +290,7 @@ fun CommunityPageScreen(
                         scaffoldState = scaffoldState,
                         sheetPeekHeight = initBottomSheetHeight,
                         sheetMaxWidth = LocalConfiguration.current.screenWidthDp.dp,
-                        sheetContainerColor = Color.White,
+                        sheetContainerColor = GrayWhite3,
                         sheetContent = {
                             Box(
                                 modifier = modifier

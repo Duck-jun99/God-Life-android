@@ -55,6 +55,7 @@ import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
+import com.godlife.designsystem.list.CommunityFamousPostList
 import com.godlife.designsystem.list.CommunityFamousPostListPreview
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
@@ -78,7 +79,7 @@ fun FamousPostScreen(
         LazyColumn(
             modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(GrayWhite3)
         ) {
 
             item{ WeeklyFamousPostListView(viewModel = viewModel, navController = navController) }
@@ -100,7 +101,7 @@ fun WeeklyFamousPostListView(
 
     Box(
         modifier
-            .background(Color.White)
+            //.background(Color.White)
             .fillMaxWidth()
             .padding(
                 start = 10.dp,
@@ -136,116 +137,13 @@ fun WeeklyFamousPostItem(
     famousPostItem: PostDetailBody,
     navController: NavController
 ){
-
     val postId = famousPostItem.board_id.toString()
 
-    Box(modifier.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)){
-        Column(
-            modifier
-                .width(320.dp)
-                .height(520.dp)
-                .shadow(7.dp)
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .clickable { navController.navigate("${PostDetailRoute.route}/$postId") }
-        ){
-            Box(
-                modifier
-                    .weight(0.4f)
-                    .fillMaxWidth()
-                    .background(
-                        color = Color.Gray,
-                        shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-                    )
-            ){
+    CommunityFamousPostList(
+        famousPostItem = famousPostItem,
+        clickOption = {navController.navigate("${PostDetailRoute.route}/$postId")}
+    )
 
-                GlideImage(
-                    imageModel = { if(famousPostItem.imagesURL?.isNotEmpty() == true) BuildConfig.SERVER_IMAGE_DOMAIN + famousPostItem.imagesURL?.get(0).toString() else R.drawable.category3 },
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center
-                    ),
-                    modifier = modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)),
-                    loading = {
-                        Box(
-                            modifier = modifier
-                                .background(GrayWhite3)
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ){
-
-                            CircularProgressIndicator(
-                                color = PurpleMain
-                            )
-
-                        }
-
-                    },
-                    failure = {
-                        Image(
-                            painter = painterResource(id = R.drawable.category3),
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                )
-
-            }
-            Column(
-                modifier
-                    .weight(0.6f)
-                    .fillMaxWidth()
-                    .padding(20.dp)) {
-
-                Row(modifier.fillMaxWidth()){
-                    Text(text = famousPostItem.nickname, style = TextStyle(color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-
-                    Spacer(modifier.size(10.dp))
-
-                    //티어 보여줄 부분
-                    Text(text = famousPostItem.tier,
-                        style = TextStyle(
-                            color = PurpleMain,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
-                    )
-
-                }
-                Spacer(modifier.size(15.dp))
-
-                Text(text = famousPostItem.title,
-                    style = GodLifeTypography.titleMedium,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier.size(20.dp))
-
-                Text(text = famousPostItem.body,
-                    style = GodLifeTypography.bodyMedium,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier.size(20.dp))
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    itemsIndexed(famousPostItem.tags) { index, item ->
-                        TagItem(item)
-                    }
-                }
-
-
-            }
-        }
-    }
 
 }
 
@@ -260,7 +158,7 @@ fun TotalFamousPostListView(
 
     Box(
         modifier
-            .background(Color.White)
+            //.background(Color.White)
             .fillMaxWidth()
             .padding(
                 start = 10.dp,
@@ -294,15 +192,14 @@ fun TotalFamousPostItem(
     item: PostDetailBody,
     navController: NavController
 ){
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val context = LocalContext.current
     Row(
         modifier = modifier
+            .padding(bottom = 10.dp)
             .height(150.dp)
             .fillMaxWidth()
-            .background(Color.White)
-            .padding(10.dp)
             .clickable { navController.navigate("${PostDetailRoute.route}/${item.board_id}") }
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .padding(10.dp)
         ,
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -427,7 +324,7 @@ fun WeeklyFamousPostListViewPreview(
 
     Box(
         modifier
-            .background(Color.White)
+            .background(GrayWhite3)
             .fillMaxWidth()
             .padding(
                 start = 10.dp,
@@ -440,7 +337,6 @@ fun WeeklyFamousPostListViewPreview(
         Column {
 
             Text(text = "이번주 굿생 인정 게시물", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
-
 
 
             Spacer(modifier.size(10.dp))
