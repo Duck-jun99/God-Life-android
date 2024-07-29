@@ -2,6 +2,7 @@ package com.godlife.main_page.history
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,14 +37,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.main_page.navigation.HistoryDetailRoute
 
 @Composable
 fun HistoryPageScreen(
     modifier: Modifier = Modifier,
+    navController: NavController,
     viewModel: HistoryPageViewModel = hiltViewModel()
 ){
     val todoList = viewModel.todoList.collectAsState().value
@@ -73,13 +77,13 @@ fun HistoryPageScreen(
             modifier = modifier
                 .fillMaxSize()
                 .background(color = GrayWhite3)
-                .statusBarsPadding()
         ) {
 
 
             todoList?.size?.let { it ->
                 items(it){
                     HistoryTodoItem(
+                        navController = navController,
                         todo = todoList[it]
                     )
                 }
@@ -94,6 +98,7 @@ fun HistoryPageScreen(
 @Composable
 fun HistoryTodoItem(
     modifier: Modifier = Modifier,
+    navController: NavController,
     todo: TodoEntity
 ){
     Row(
@@ -102,6 +107,7 @@ fun HistoryTodoItem(
             .fillMaxWidth()
             .height(200.dp)
             .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+            .clickable { navController.navigate("${HistoryDetailRoute.route}/${todo.id}") }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -233,7 +239,6 @@ fun HistoryPageScreenPreview(
             modifier = modifier
                 .fillMaxSize()
                 .background(color = GrayWhite3)
-                .statusBarsPadding()
         ) {
 
 

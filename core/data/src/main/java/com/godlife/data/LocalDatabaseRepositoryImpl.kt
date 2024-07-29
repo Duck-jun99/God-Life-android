@@ -27,6 +27,10 @@ class LocalDatabaseRepositoryImpl @Inject constructor(
         return todoDao.updateTodoList(todo.id, todo.todoList, todo.notificationBoolean, todo.notificationTime, todo.isCompleted)
     }
 
+    override suspend fun getTodoList(id: Int): TodoEntity {
+        return todoDao.getTodoList(id)
+    }
+
     override suspend fun getTodayTodoList(): TodoEntity {
 
         val date = TodoTimeData(

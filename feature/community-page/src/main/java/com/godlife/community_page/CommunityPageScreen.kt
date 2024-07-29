@@ -658,7 +658,7 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     topEnd = 12.dp
                 ),
                 sheetContent = {
-                    LatestPostScreen2Preview(deviceHeight = deviceHeight.dp)
+                    //LatestPostScreen2Preview(deviceHeight = deviceHeight.dp)
                 }
             ) {
 

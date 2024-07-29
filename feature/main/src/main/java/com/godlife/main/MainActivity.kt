@@ -60,7 +60,10 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageScreen
+import com.godlife.main_page.history.HistoryDetailScreen
+import com.godlife.main_page.history.HistoryDetailScreenPreview
 import com.godlife.main_page.history.HistoryPageScreen
+import com.godlife.main_page.navigation.HistoryDetailRoute
 import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.navigation.MainPageRoute
 import com.godlife.model.navigationbar.BottomNavItem
@@ -212,9 +215,22 @@ fun MainUiTheme(
 
                     //굿생 기록 저장소 화면
                     composable(HistoryPageRoute.route){
-                        HistoryPageScreen()
+                        HistoryPageScreen(navController = navController)
                         currentRoute.value = HistoryPageRoute.route
                         bottomBarVisibleState.value = false
+                    }
+
+                    //굿생 기록 상세 화면
+                    composable("${HistoryDetailRoute.route}/{id}", arguments =
+                    listOf(navArgument("id"){type = NavType.IntType})
+                    ){
+                        val id = it.arguments?.getInt("id")
+                        if(id != null){
+                            HistoryDetailScreen(id = id)
+                            currentRoute.value = HistoryDetailRoute.route
+                            bottomBarVisibleState.value = false
+                        }
+
                     }
 
                     //프로필 화면

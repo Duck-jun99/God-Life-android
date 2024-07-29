@@ -14,3 +14,7 @@ object MainPageRoute {
 object HistoryPageRoute {
     const val route = "History-Page"
 }
+
+object HistoryDetailRoute {
+    const val route = "History-Detail"
+}

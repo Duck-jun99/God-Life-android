@@ -446,7 +446,7 @@ fun MainTodoListBox(
 
         Box(
             modifier = Modifier
-                .size(360.dp),
+                .size(300.dp),
             contentAlignment = Alignment.Center
         ) {
 
@@ -606,7 +606,7 @@ fun MainNoTodoListBox(
 
             Box(
                 modifier = Modifier
-                    .size(360.dp),
+                    .size(300.dp),
                 contentAlignment = Alignment.Center
             ) {
 
@@ -617,10 +617,11 @@ fun MainNoTodoListBox(
                 )
 
                 Canvas(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
                     val size: Size = drawContext.size
-                    val sizeArc = size / 1.75F
+                    val sizeArc = size / 1.5F
                     drawArc(
                         color = Color(0xFFE1E2E9),
                         startAngle = 0f,
@@ -628,7 +629,7 @@ fun MainNoTodoListBox(
                         useCenter = false,
                         topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
                         size = sizeArc,
-                        style = Stroke(width = 50f)
+                        style = Stroke(width = 30f)
                     )
 
                     drawArc(
@@ -653,7 +654,7 @@ fun MainNoTodoListBox(
                             (size.height - sizeArc.height) / 2f
                         ),
                         size = sizeArc,
-                        style = Stroke(width = 50f, cap = StrokeCap.Round)
+                        style = Stroke(width = 30f, cap = StrokeCap.Round)
                     )
                 }
             }

@@ -20,6 +20,7 @@ class HistoryPageViewModel @Inject constructor(
     private val _todoList = MutableStateFlow<List<TodoEntity>?>(emptyList())
     val todoList: StateFlow<List<TodoEntity>?> = _todoList
 
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _todoList.value = localDatabaseUseCase.getAllTodoList().asReversed()

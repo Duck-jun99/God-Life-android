@@ -105,6 +105,7 @@ class EditTodoListViewModel @Inject constructor(
         val updatedTodayTodoList = _todayTodoList.value.toMutableList()
 
         totalTodoList.value.forEach { todoListForm ->
+            // TODO
             if (todoListForm.isSelected && !updatedTodayTodoList.any { it.name == todoListForm.name }) {
                 updatedTodayTodoList.add(TodoList(name = todoListForm.name, iscompleted = false))
             }

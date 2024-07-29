@@ -237,16 +237,18 @@ fun RecommendedStimulusPostContent(
                     Modifier
                         .align(Alignment.BottomEnd)
                         .padding(bottom = 8.dp, end = 8.dp),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     repeat(pagerState.pageCount) { iteration ->
-                        val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                        val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                        val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
                         Box(
                             modifier = Modifier
                                 .padding(2.dp)
                                 .clip(CircleShape)
                                 .background(color)
-                                .size(10.dp)
+                                .size(size)
                         )
                     }
                 }
@@ -419,16 +421,18 @@ fun RecommendedStimulusPostContentPreview(
             Modifier
                 .align(Alignment.BottomEnd)
                 .padding(bottom = 8.dp, end = 8.dp),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             repeat(pagerState.pageCount) { iteration ->
-                val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
                 Box(
                     modifier = Modifier
                         .padding(2.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .size(10.dp)
+                        .size(size)
                 )
             }
         }
