@@ -270,7 +270,7 @@ fun MainUiTheme(
                     }
 
                     //신고화면
-                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}/ {title}",
+                    composable("${ReportScreenRoute.route}/{postId}/{userNickname}/{userId}/{category}/{title}",
                         arguments = listOf(
                             navArgument("postId"){type = NavType.StringType},
                             navArgument("userNickname"){type = NavType.StringType},

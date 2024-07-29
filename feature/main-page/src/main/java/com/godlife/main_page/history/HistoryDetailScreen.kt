@@ -157,7 +157,7 @@ fun HistoryDetailGraph(
 
     Box(
         modifier = Modifier
-            .size(360.dp),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
 
@@ -169,10 +169,11 @@ fun HistoryDetailGraph(
 
 
         Canvas(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .size(360.dp)
         ) {
             val size: Size = drawContext.size
-            val sizeArc = size / 1.7F
+            val sizeArc = size / 1.75F
             drawArc(
                 color = Color(0xFFE1E2E9),
                 startAngle = 0f,
@@ -180,7 +181,7 @@ fun HistoryDetailGraph(
                 useCenter = false,
                 topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
                 size = sizeArc,
-                style = Stroke(width = 50f)
+                style = Stroke(width = 35f)
             )
 
             drawArc(
@@ -204,7 +205,7 @@ fun HistoryDetailGraph(
                     (size.height - sizeArc.height) / 2f
                 ),
                 size = sizeArc,
-                style = Stroke(width = 50f, cap = StrokeCap.Round)
+                style = Stroke(width = 35f, cap = StrokeCap.Round)
             )
         }
     }
@@ -433,7 +434,7 @@ fun HistoryDetailGraphPreview(
 
     Box(
         modifier = Modifier
-            .size(360.dp),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
 
@@ -445,10 +446,11 @@ fun HistoryDetailGraphPreview(
 
 
         Canvas(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .size(360.dp)
         ) {
             val size: Size = drawContext.size
-            val sizeArc = size / 1.7F
+            val sizeArc = size / 1.75F
             drawArc(
                 color = Color(0xFFE1E2E9),
                 startAngle = 0f,
