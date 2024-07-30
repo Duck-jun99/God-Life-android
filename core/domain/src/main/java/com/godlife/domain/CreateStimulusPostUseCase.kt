@@ -5,14 +5,14 @@ import com.godlife.data.repository.NetworkRepository
 import com.godlife.network.model.CreatePostRequest
 import javax.inject.Inject
 
-class CreateStimulusPostUseCase  @Inject constructor(
+open class CreateStimulusPostUseCase  @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
 
     suspend fun executeCreateStimulusPostTemp(
     ) = networkRepository.createStimulusPostTemp()
 
-    suspend fun executeUploadStimulusPostImage(
+    open suspend fun executeUploadStimulusPostImage(
         tmpBoardId: Int,
         image: Uri
     ) = networkRepository.uploadStimulusPostImage(tmpBoardId, image)

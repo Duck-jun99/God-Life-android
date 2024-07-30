@@ -161,6 +161,14 @@ interface NetworkDataSource {
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>
 
+    suspend fun updateStimulusPost(
+        stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery>
+
+    suspend fun deleteStimulusPost(
+        boardId: String
+    ): ApiResponse<DeletePostQuery>
+
     suspend fun getStimulusLatestPost(
         page: Int
     ): ApiResponse<StimulusPostListQuery>

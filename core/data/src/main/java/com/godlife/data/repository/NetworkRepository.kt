@@ -171,6 +171,14 @@ interface NetworkRepository {
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>
 
+    suspend fun updateStimulusPost(
+        stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery>
+
+    suspend fun deleteStimulusPost(
+        boardId: String
+    ): ApiResponse<DeletePostQuery>
+
     suspend fun getStimulusFamousPost(
     ): ApiResponse<StimulusPostListQuery>
 

@@ -246,6 +246,14 @@ class NetworkRepositoryImpl @Inject constructor(
         return networkDataSource.createStimulusPost(stimulusPostBody)
     }
 
+    override suspend fun updateStimulusPost(stimulusPostBody: CreatePostRequest): ApiResponse<StimulusPostQuery> {
+        return networkDataSource.updateStimulusPost(stimulusPostBody)
+    }
+
+    override suspend fun deleteStimulusPost(boardId: String): ApiResponse<DeletePostQuery> {
+        return networkDataSource.deleteStimulusPost(boardId)
+    }
+
     override suspend fun getStimulusFamousPost(): ApiResponse<StimulusPostListQuery> {
         return networkDataSource.getStimulusFamousPost()
     }

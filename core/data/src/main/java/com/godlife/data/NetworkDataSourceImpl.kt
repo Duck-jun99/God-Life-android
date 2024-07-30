@@ -294,6 +294,14 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.createStimulusPost(stimulusPostBody)
     }
 
+    override suspend fun updateStimulusPost(stimulusPostBody: CreatePostRequest): ApiResponse<StimulusPostQuery> {
+        return networkApi.updateStimulusPost(stimulusPostBody)
+    }
+
+    override suspend fun deleteStimulusPost(boardId: String): ApiResponse<DeletePostQuery> {
+        return networkApi.deleteStimulusPost(boardId)
+    }
+
     override suspend fun getStimulusLatestPost(
         page: Int
     ): ApiResponse<StimulusPostListQuery> {

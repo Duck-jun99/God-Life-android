@@ -258,6 +258,18 @@ interface RetrofitNetworkApi {
         @Body stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>
 
+    //굿생 자극 게시물 수정
+    @PUT("/board/stimulation/")
+    suspend fun updateStimulusPost(
+        @Body stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery>
+
+    //굿생 자극 게시물 삭제
+    @DELETE("/board/stimulation/{id}")
+    suspend fun deleteStimulusPost(
+        @Path("id") boardId: String,
+    ): ApiResponse<DeletePostQuery>
+
 
     // 굿생 자극 최신 게시물 리스트 조회
     @GET("/boards/stimulation")
