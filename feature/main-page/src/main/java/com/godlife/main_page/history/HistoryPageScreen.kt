@@ -18,6 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -51,43 +56,112 @@ fun HistoryPageScreen(
     viewModel: HistoryPageViewModel = hiltViewModel()
 ){
     val todoList = viewModel.todoList.collectAsState().value
-    Column(
+
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = GrayWhite3)
-            .statusBarsPadding()
-            .padding(10.dp)
     ){
 
-        Text(
-            text = "기록 저장소",
-            style = TextStyle(
-                color = Color.Black,
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp,
-                lineHeight = 28.sp,
-                letterSpacing = 0.sp
-            )
-        )
-
-        Spacer(modifier = modifier.height(10.dp))
-
-        LazyColumn(
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .background(color = GrayWhite3)
-        ) {
+                .statusBarsPadding()
+                .padding(10.dp)
+        ){
 
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
 
-            todoList?.size?.let { it ->
-                items(it){
-                    HistoryTodoItem(
-                        navController = navController,
-                        todo = todoList[it]
+                Text(
+                    text = "기록 저장소",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontFamily = FontFamily.Default,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        lineHeight = 28.sp,
+                        letterSpacing = 0.sp
                     )
+                )
+
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.CenterEnd
+                ){
+
+                    IconButton(
+                        onClick = { viewModel.showHelpDialog() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = ""
+                        )
+                    }
+
+                }
+
+
+            }
+
+
+
+            Spacer(modifier = modifier.height(10.dp))
+
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(color = GrayWhite3)
+            ) {
+
+
+                todoList?.size?.let { it ->
+                    items(it){
+                        HistoryTodoItem(
+                            navController = navController,
+                            todo = todoList[it]
+                        )
+                    }
                 }
             }
+
+        }
+
+        if(viewModel.helpDialogVisble.collectAsState().value){
+            AlertDialog(
+                containerColor = Color.White,
+                onDismissRequest = {
+                    viewModel.showHelpDialog()
+                },
+                title = {
+
+                        Text(
+                            text = "기록 저장소란?",
+                            style = TextStyle(
+                                color = PurpleMain,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                },
+                text = {
+                    Text(
+                        text = "지금까지 사용자님께서 설정하신 투두 리스트를 볼 수 있는 공간이에요.\n" +
+                                "그동안 굿생을 살기 위해 어떤 노력을 하셨는지 확인해보세요.",
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            lineHeight = 24.sp
+                        )
+                    )
+                },
+                confirmButton = { /*TODO*/ }
+            )
         }
 
     }
@@ -221,17 +295,44 @@ fun HistoryPageScreenPreview(
             .padding(10.dp)
     ){
 
-        Text(
-            text = "기록 저장소",
-            style = TextStyle(
-                color = Color.Black,
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp,
-                lineHeight = 28.sp,
-                letterSpacing = 0.sp
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Text(
+                text = "기록 저장소",
+                style = TextStyle(
+                    color = Color.Black,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    letterSpacing = 0.sp
+                )
             )
-        )
+
+            Box(
+                modifier = modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ){
+
+                IconButton(
+                    onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = ""
+                    )
+                }
+
+            }
+
+
+
+        }
+
 
         Spacer(modifier = modifier.height(10.dp))
 

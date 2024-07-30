@@ -20,10 +20,19 @@ class HistoryPageViewModel @Inject constructor(
     private val _todoList = MutableStateFlow<List<TodoEntity>?>(emptyList())
     val todoList: StateFlow<List<TodoEntity>?> = _todoList
 
+    //도움말 AlertDialog 보여줄 상태
+    private val _helpDialogVisble = MutableStateFlow(false)
+    val helpDialogVisble: StateFlow<Boolean> = _helpDialogVisble
+
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _todoList.value = localDatabaseUseCase.getAllTodoList().asReversed()
         }
+    }
+
+    fun showHelpDialog() {
+        _helpDialogVisble.value = !helpDialogVisble.value
+
     }
 }

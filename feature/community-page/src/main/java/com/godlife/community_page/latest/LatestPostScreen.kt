@@ -148,7 +148,7 @@ fun LatestPostListView(
             verticalAlignment = Alignment.CenterVertically
         ){
             Row(
-                modifier.weight(0.8f),
+                modifier.weight(0.7f),
                 verticalAlignment = Alignment.CenterVertically
             ){
 
@@ -192,12 +192,12 @@ fun LatestPostListView(
             }
             Text(
                 modifier = modifier
-                    .weight(0.2f)
+                    .weight(0.3f)
                     .padding(end = 10.dp),
                 text = item.writtenAt,
                 style = TextStyle(
                     color = GrayWhite,
-                    fontSize = 15.sp
+                    fontSize = 14.sp
                 ),
                 textAlign = TextAlign.End
             )
