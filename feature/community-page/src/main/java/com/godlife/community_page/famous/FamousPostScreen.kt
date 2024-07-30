@@ -197,8 +197,8 @@ fun TotalFamousPostItem(
             .padding(bottom = 10.dp)
             .height(150.dp)
             .fillMaxWidth()
-            .clickable { navController.navigate("${PostDetailRoute.route}/${item.board_id}") }
             .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .clickable { navController.navigate("${PostDetailRoute.route}/${item.board_id}") }
             .padding(10.dp)
         ,
         verticalAlignment = Alignment.CenterVertically

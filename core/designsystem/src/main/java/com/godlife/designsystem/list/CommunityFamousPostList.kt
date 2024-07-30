@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -59,11 +60,12 @@ fun CommunityFamousPostList(
             .padding(vertical = 5.dp, horizontal = 10.dp)
             .width(220.dp)
             .height(350.dp)
-            .clickable { clickOption() }
             .background(
                 color = Color.White,
                 shape = RoundedCornerShape(10.dp)
             )
+            .shadow(7.dp, shape = RoundedCornerShape(10.dp))
+            .clickable { clickOption() }
     ){
         Box(
             modifier
@@ -113,6 +115,7 @@ fun CommunityFamousPostList(
         }
         Column(
             modifier
+                .background(color = Color.White)
                 .height(200.dp)
                 .fillMaxWidth()
                 .padding(5.dp)) {
@@ -260,6 +263,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
                     color = Color.White,
                     shape = RoundedCornerShape(10.dp)
                 )
+                .shadow(7.dp, shape = RoundedCornerShape(10.dp))
         ){
             Box(
                 modifier
@@ -309,6 +313,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
             }
             Column(
                 modifier
+                    .background(color = Color.White)
                     .height(200.dp)
                     .fillMaxWidth()
                     .padding(5.dp)) {
