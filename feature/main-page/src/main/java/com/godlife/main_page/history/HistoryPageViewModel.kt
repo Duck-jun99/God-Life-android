@@ -26,6 +26,10 @@ class HistoryPageViewModel @Inject constructor(
 
 
     init {
+        getTodoList()
+    }
+
+    fun getTodoList(){
         viewModelScope.launch(Dispatchers.IO) {
             _todoList.value = localDatabaseUseCase.getAllTodoList().asReversed()
         }

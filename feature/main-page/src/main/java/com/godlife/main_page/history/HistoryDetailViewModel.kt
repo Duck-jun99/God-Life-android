@@ -22,6 +22,9 @@ class HistoryDetailViewModel @Inject constructor(
     //평가 플래그
     private val _isEvaluated = MutableStateFlow<Boolean>(false)
 
+    //삭제 플래그
+    private val _isDeleted = MutableStateFlow<Boolean>(false)
+
     //선택된 투두 리스트
     private val _selectedTodoList = MutableStateFlow<TodoEntity?>(null)
     val selectedTodoList: StateFlow<TodoEntity?> = _selectedTodoList
@@ -113,6 +116,16 @@ class HistoryDetailViewModel @Inject constructor(
 
                 }
 
+            }
+        }
+    }
+
+    fun deleteTodoList(){
+        if(!_isDeleted.value){
+            _isDeleted.value = true
+
+            viewModelScope.launch(Dispatchers.IO) {
+                localDatabaseUseCase.deleteTodoList(selectedTodoList.value!!.id)
             }
         }
     }

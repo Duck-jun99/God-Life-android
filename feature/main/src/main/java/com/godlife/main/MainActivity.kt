@@ -228,7 +228,10 @@ fun MainUiTheme(
                     ){
                         val id = it.arguments?.getInt("id")
                         if(id != null){
-                            HistoryDetailScreen(id = id)
+                            HistoryDetailScreen(
+                                id = id,
+                                navController = navController
+                            )
                             currentRoute.value = HistoryDetailRoute.route
                             bottomBarVisibleState.value = false
                         }

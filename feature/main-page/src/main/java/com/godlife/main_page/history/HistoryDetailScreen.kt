@@ -46,14 +46,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.model.todo.TodoList
 
 @Composable
 fun HistoryDetailScreen(
     modifier: Modifier = Modifier,
     id: Int,
+    navController: NavController,
     viewModel: HistoryDetailViewModel = hiltViewModel()
 ){
     viewModel.getTodoList(id)
@@ -90,7 +93,15 @@ fun HistoryDetailScreen(
             )
 
             IconButton(
-                onClick = { /*TODO*/ }
+                onClick = {
+                    viewModel.deleteTodoList()
+                    navController.navigate(HistoryPageRoute.route){
+                        launchSingleTop = true
+                        popUpTo(HistoryPageRoute.route){
+                            inclusive = false
+                        }
+                    }
+                }
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Delete,

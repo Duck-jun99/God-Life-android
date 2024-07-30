@@ -181,7 +181,11 @@ fun HistoryTodoItem(
             .fillMaxWidth()
             .height(200.dp)
             .background(color = Color.White, shape = RoundedCornerShape(16.dp))
-            .clickable { navController.navigate("${HistoryDetailRoute.route}/${todo.id}") }
+            .clickable {
+                navController.navigate("${HistoryDetailRoute.route}/${todo.id}"){
+                    launchSingleTop = true
+                }
+            }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
