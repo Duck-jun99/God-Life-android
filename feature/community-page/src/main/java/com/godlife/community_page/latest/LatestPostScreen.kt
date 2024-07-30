@@ -151,49 +151,35 @@ fun LatestPostListView(
                 modifier.weight(0.8f),
                 verticalAlignment = Alignment.CenterVertically
             ){
+
                 //프로필 이미지 부분
-                if(item.profileURL != ""){
-                    GlideImage(
-                        imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.profileURL },
-                        imageOptions = ImageOptions(
-                            contentScale = ContentScale.Crop,
-                            alignment = Alignment.Center
-                        ),
-                        modifier = modifier
-                            .size(30.dp, 30.dp)
-                            .clip(CircleShape)
-                            .fillMaxSize(),
-                        loading = {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_person),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop
-                            )
+                GlideImage(
+                    imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.profileURL },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .size(30.dp, 30.dp)
+                        .clip(CircleShape)
+                        .background(GrayWhite2)
+                        .fillMaxSize(),
+                    loading = {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
 
-                        },
-                        failure = {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_person),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    )
-                }
-                else{
-                    Image(
-                        modifier = modifier
-                            .size(30.dp, 30.dp)
-                            .clip(CircleShape)
-                            .background(GrayWhite2)
-                            .fillMaxSize(),
-                        painter = painterResource(id = R.drawable.ic_person),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop
-                    )
-
-                }
-
+                    },
+                    failure = {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                )
 
                 Spacer(modifier.size(10.dp))
 
@@ -202,11 +188,19 @@ fun LatestPostListView(
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                //Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
             }
-            Box(modifier.weight(0.2f)){
-                Text(text = item.writtenAt, style = TextStyle(color = GrayWhite, fontSize = 15.sp))
-            }
+            Text(
+                modifier = modifier
+                    .weight(0.2f)
+                    .padding(end = 10.dp),
+                text = item.writtenAt,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 15.sp
+                ),
+                textAlign = TextAlign.End
+            )
         }
 
         Box(
