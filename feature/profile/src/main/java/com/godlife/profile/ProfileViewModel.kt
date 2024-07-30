@@ -103,9 +103,9 @@ class ProfileViewModel @Inject constructor(
 
                         _userInfo.value = data.body
 
-                        //getUserPosts()
-
                         _uiState.value = ProfileUiState.Success("success")
+
+                        getUserPosts()
 
 
                     }
@@ -145,7 +145,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     // 조회한 사용자의 굿생 인증 게시물 불러오기
-    fun getUserPosts(){
+    private fun getUserPosts(){
         if(!_userPostLoaded.value){
             _userPostLoaded.value = true
             _uiState.value = ProfileUiState.Loading
@@ -195,6 +195,4 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
-
-
 }

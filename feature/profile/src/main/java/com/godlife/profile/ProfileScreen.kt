@@ -81,7 +81,6 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
     userId: String,
     viewModel: ProfileViewModel = hiltViewModel()
@@ -524,7 +523,7 @@ fun UserPostListBox(
         // 굿생 인증 게시물
         if(selectedIndex.value == 0){
 
-            viewModel.getUserPosts()
+            //viewModel.getUserPosts()
 
             LazyColumn(
                 modifier = Modifier
@@ -532,7 +531,13 @@ fun UserPostListBox(
             ) {
 
                 items(userPostList.itemCount){
-                    userPostList[it]?.let { it1 -> PostList(item = it1, navController = navController) }
+                    userPostList[it]?.let { it1 ->
+
+                        PostList(
+                            item = it1,
+                            navController = navController
+                        )
+                    }
 
                 }
             }
@@ -548,7 +553,11 @@ fun UserPostListBox(
                     .background(GrayWhite3)
             ) {
                 items(userStimulusPostList.value){ item ->
-                    SearchStimulusPostItem(item = item)
+
+                    SearchStimulusPostItem(
+                        item = item,
+                        navController = navController
+                    )
                 }
             }
 
@@ -636,7 +645,8 @@ fun PostList(
 @Composable
 fun SearchStimulusPostItem(
     modifier: Modifier = Modifier,
-    item: StimulusPostList
+    item: StimulusPostList,
+    navController: NavController
 ){
 
     Row(
@@ -644,6 +654,11 @@ fun SearchStimulusPostItem(
             .padding(5.dp)
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(15.dp))
+            .clickable {
+                navController.navigate("StimulusDetailScreen/${item.boardId}"){
+                    launchSingleTop = true
+                }
+            }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
