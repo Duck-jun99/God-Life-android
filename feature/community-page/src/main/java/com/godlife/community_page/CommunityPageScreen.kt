@@ -242,7 +242,7 @@ fun CommunityPageScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         )  {
 
-                            CategoryBox(route = StimulusPostRoute.route, categoryName = "갓생 자극", viewModel = viewModel)
+                            CategoryBox(route = StimulusPostRoute.route, categoryName = "굿생 자극", viewModel = viewModel)
 
                         }
 

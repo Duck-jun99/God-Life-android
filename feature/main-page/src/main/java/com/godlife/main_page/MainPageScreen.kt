@@ -96,7 +96,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun MainPageScreen(
     modifier:Modifier = Modifier,
@@ -224,9 +223,9 @@ fun MainPageScreen(
                                 ) {
 
                                     Icon(
-                                        painter = painterResource(R.drawable.note_icons8),
+                                        painter = painterResource(R.drawable.cases_24dp_e8eaed_fill0_wght400_grad0_opsz24),
                                         contentDescription = "",
-                                        tint = Color.Unspecified
+                                        tint = Color.Black
                                     )
 
                                     /*

@@ -389,7 +389,6 @@ class CommunityPageViewModel @Inject constructor(
                 )
             }
             in 8 .. 9 -> {
-
                 listOf(
                     Color(0xFF0063CC),
                     Color(0xFF008BCC),
@@ -397,7 +396,6 @@ class CommunityPageViewModel @Inject constructor(
                     Color(0xFF33CCCC),
                     Color(0xFF33CCCC)
                 )
-
             }
             in 10 .. 21 -> {
                 listOf(
