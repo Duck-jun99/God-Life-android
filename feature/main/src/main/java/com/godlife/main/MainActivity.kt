@@ -51,7 +51,9 @@ import androidx.navigation.navArgument
 import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.community_page.navigation.PostDetailRoute
+import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
+import com.godlife.community_page.post_detail.StimulusDetailScreen
 import com.godlife.community_page.report.ReportScreen
 import com.godlife.community_page.report.navigation.ReportScreenRoute
 import com.godlife.designsystem.component.TabIconView
@@ -267,6 +269,18 @@ fun MainUiTheme(
                             )
                             bottomBarVisibleState.value = false
                         }
+                    }
+
+                    //Stimulus Post Detail Screen
+                    composable("${StimulusPostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+                        val postId = it.arguments?.getString("postId")
+                        if (postId != null) {
+                            StimulusDetailScreen(
+                                postId = postId
+                            )
+                            bottomBarVisibleState.value = false
+                        }
+
                     }
 
                     //신고화면

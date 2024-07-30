@@ -305,20 +305,10 @@ fun CommunityPageScreen(
         composable(StimulusPostRoute.route){
             bottomBarVisibleState.value = true
             viewModel.changeCurrentRoute(route = StimulusPostRoute.route)
-            StimulusPostScreen(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
-            //StimulusPostScreenPreview(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
-
-        }
-
-        //Stimulus Post Detail Screen
-        composable("${StimulusPostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
-            val postId = it.arguments?.getString("postId")
-            if (postId != null) {
-                bottomBarVisibleState.value = false
-                StimulusDetailScreen(
-                    postId = postId
-                )
-            }
+            StimulusPostScreen(
+                navController = parentNavController,
+                bottomBarVisibleState = bottomBarVisibleState
+            )
 
         }
 
