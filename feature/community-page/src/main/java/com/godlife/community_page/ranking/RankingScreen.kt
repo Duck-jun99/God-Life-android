@@ -69,11 +69,11 @@ import com.godlife.network.model.UserProfileBody
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.absoluteValue
+import kotlin.math.max
 
 @Composable
 fun RankingScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
     parentNavController: NavController,
     viewModel: CommunityPageViewModel
 ){
@@ -116,13 +116,12 @@ fun RankingScreen(
             LazyColumn(
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Color.White)
+                    .background(GrayWhite3)
             ) {
                 item{
 
                     Box(
                         modifier
-                            .background(Color.White)
                             .fillMaxWidth()
                             .padding(
                                 start = 10.dp,
@@ -144,25 +143,7 @@ fun RankingScreen(
                                 pageSize = PageSize.Fixed(250.dp)
                             ) {page ->
                                 WeeklyRankingListItem(
-                                    Modifier
-                                        .graphicsLayer {
-                                            // Calculate the absolute offset for the current page from the
-                                            // scroll position. We use the absolute value which allows us to mirror
-                                            // any effects for both directions
-                                            val pageOffset = (
-                                                    (weeklyPagerState.currentPage - page) + weeklyPagerState
-                                                        .currentPageOffsetFraction
-                                                    ).absoluteValue
-
-                                            // We animate the alpha, between 50% and 100%
-                                            alpha = lerp(
-                                                start = 0.5f,
-                                                stop = 1f,
-                                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                            )
-
-                                        }
-                                    ,weeklyRankingListItem = weeklyRankingList.value[page],
+                                    weeklyRankingListItem = weeklyRankingList.value[page],
                                     parentNavController = parentNavController
                                 )
                             }
@@ -245,12 +226,12 @@ fun WeeklyRankingListItem(
                 vertical = 10.dp, horizontal = 10.dp
             )
             .width(250.dp)
-            .height(400.dp)
-            .shadow(7.dp)
+            .height(200.dp)
             .background(
                 color = Color.White,
                 shape = RoundedCornerShape(16.dp)
             )
+            .shadow(7.dp, shape = RoundedCornerShape(16.dp))
             .clickable { parentNavController.navigate("${"ProfileScreen"}/${weeklyRankingListItem.memberId}") }
     ){
 
@@ -295,8 +276,6 @@ fun WeeklyRankingListItem(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Spacer(modifier.size(10.dp))
 
             GlideImage(
                 imageModel = { if(weeklyRankingListItem.profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + weeklyRankingListItem.profileURL else R.drawable.ic_person },
@@ -343,44 +322,29 @@ fun WeeklyRankingListItem(
                 style = TextStyle(
                     color = Color.White,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 18.sp
+                    fontSize = 16.sp
                 ),
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier.size(10.dp))
 
-            Column(
+            Box(
                 modifier = modifier
                     .fillMaxSize()
-                    .background(color = OpaqueDark, shape = RoundedCornerShape(16.dp))
-                    .padding(10.dp)
+                    .background(color = OpaqueDark, shape = RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
             ) {
 
                 Text(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .weight(0.8f),
-                    text = weeklyRankingListItem.whoAmI,
+                    text = "이번주 굿생 점수: ${weeklyRankingListItem.godLifeScore}",
                     style = TextStyle(
                         color = Color.White,
                         fontWeight = FontWeight.Normal,
                         fontSize = 12.sp
                     ),
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .weight(0.2f),
-                    text = "이번주 굿생 점수: ${weeklyRankingListItem.godLifeScore}",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 13.sp
-                    ),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
 
             }
@@ -538,8 +502,6 @@ fun TotalRankingListItem1(
                     textAlign = TextAlign.Center
                 )
 
-
-
             }
 
 
@@ -564,7 +526,7 @@ fun TotalRankingListItem2(
             modifier = modifier
                 .weight(0.5f)
                 .padding(10.dp)
-                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
                 .height(100.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -587,7 +549,7 @@ fun TotalRankingListItem2(
             modifier = modifier
                 .weight(0.5f)
                 .padding(10.dp)
-                .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
                 .height(100.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -691,8 +653,8 @@ fun RankingPageScreenPreview(
     modifier: Modifier = Modifier
 ){
 
-    val weeklyPagerState = rememberPagerState(initialPage = 0, pageCount = {10})
-    val totalPagerState = rememberPagerState(initialPage = 0, pageCount = {10})
+    val weeklyPagerState = rememberPagerState(initialPage = 0, pageCount = {2})
+    val totalPagerState = rememberPagerState(initialPage = 0, pageCount = {2})
 
     val totalPage = remember{ mutableIntStateOf(0) }
 
@@ -726,26 +688,7 @@ fun RankingPageScreenPreview(
                         beyondViewportPageCount = 2,
                         pageSize = PageSize.Fixed(250.dp)
                     ) {page ->
-                        WeeklyRankingListItemPreview(
-                            Modifier
-                                .graphicsLayer {
-                                    // Calculate the absolute offset for the current page from the
-                                    // scroll position. We use the absolute value which allows us to mirror
-                                    // any effects for both directions
-                                    val pageOffset = (
-                                            (weeklyPagerState.currentPage - page) + weeklyPagerState
-                                                .currentPageOffsetFraction
-                                            ).absoluteValue
-
-                                    // We animate the alpha, between 50% and 100%
-                                    alpha = lerp(
-                                        start = 0.5f,
-                                        stop = 1f,
-                                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                    )
-
-                                }
-                        )
+                        WeeklyRankingListItemPreview()
                     }
 
                 }
@@ -812,12 +755,12 @@ fun WeeklyRankingListItemPreview(
                 vertical = 10.dp, horizontal = 10.dp
             )
             .width(250.dp)
-            .height(400.dp)
-            .shadow(7.dp)
+            .height(200.dp)
             .background(
                 color = Color.White,
                 shape = RoundedCornerShape(16.dp)
             )
+            .shadow(7.dp, shape = RoundedCornerShape(16.dp))
     ){
 
         Image(
@@ -837,8 +780,6 @@ fun WeeklyRankingListItemPreview(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Spacer(modifier.size(10.dp))
 
             Image(
                 modifier = modifier
@@ -861,42 +802,27 @@ fun WeeklyRankingListItemPreview(
                 style = TextStyle(
                     color = Color.White,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 18.sp
+                    fontSize = 16.sp
                 ),
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier.size(10.dp))
 
-            Column(
+            Box(
                 modifier = modifier
                     .fillMaxSize()
                     .background(color = OpaqueDark, shape = RoundedCornerShape(16.dp))
-                    .padding(10.dp)
+                    .padding(horizontal = 10.dp),
+                contentAlignment = Alignment.Center
             ) {
 
                 Text(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .weight(0.8f),
-                    text = "Introduce",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 12.sp
-                    ),
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .weight(0.2f),
                     text = "이번주 굿생 점수: 50",
                     style = TextStyle(
                         color = Color.White,
                         fontWeight = FontWeight.Normal,
-                        fontSize = 13.sp
+                        fontSize = 12.sp
                     ),
                     textAlign = TextAlign.Center
                 )
