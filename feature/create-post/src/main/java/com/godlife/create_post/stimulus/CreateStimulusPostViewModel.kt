@@ -1,6 +1,11 @@
 package com.godlife.create_post.stimulus
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -19,6 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
 
 sealed class CreateStimulusUiState {
@@ -254,9 +263,78 @@ class CreateStimulusPostViewModel @Inject constructor(
             }
 
 
-
         }
 
+    }
+
+    fun convertResizeImage(
+        imageUri: Uri,
+        context: Context)
+    :Uri? {
+
+        val bitmap: Bitmap
+
+        if (Build.VERSION.SDK_INT >= 29) {
+
+            val source: ImageDecoder.Source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
+
+            try {
+                bitmap = ImageDecoder.decodeBitmap(source)
+
+                val resizedBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.width / 2, bitmap.height / 2, true)
+
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
+
+                val tempFile = File.createTempFile("resized_image", ".jpg", context.cacheDir)
+
+
+                val fileOutputStream = FileOutputStream(tempFile)
+                fileOutputStream.write(byteArrayOutputStream.toByteArray())
+                fileOutputStream.close()
+
+
+
+                /*
+                val contentUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    tempFile
+                )
+
+                 */
+
+
+                return Uri.fromFile(tempFile)
+                //return contentUri
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        } else {
+
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+                //val resizedBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.width / 2, bitmap.height / 2, true)
+                val resizedBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.width / 2, bitmap.height / 2, true)
+
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
+
+                val tempFile = File.createTempFile("resized_image", ".jpg", context.cacheDir)
+                val fileOutputStream = FileOutputStream(tempFile)
+                fileOutputStream.write(byteArrayOutputStream.toByteArray())
+                fileOutputStream.close()
+
+                return Uri.fromFile(tempFile)
+                //return contentUri
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+        return null
     }
 
 

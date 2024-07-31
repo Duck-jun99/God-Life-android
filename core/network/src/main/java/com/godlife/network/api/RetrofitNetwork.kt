@@ -259,7 +259,7 @@ interface RetrofitNetworkApi {
     ): ApiResponse<StimulusPostQuery>
 
     //굿생 자극 게시물 수정
-    @PUT("/board/stimulation/")
+    @PUT("/board/stimulation")
     suspend fun updateStimulusPost(
         @Body stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>

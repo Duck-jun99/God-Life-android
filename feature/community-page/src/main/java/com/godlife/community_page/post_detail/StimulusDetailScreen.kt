@@ -1,9 +1,7 @@
 package com.godlife.community_page.post_detail
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -48,7 +46,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -63,11 +60,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
+import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
@@ -84,6 +81,7 @@ import kotlinx.coroutines.delay
 fun StimulusDetailScreen(
     modifier: Modifier = Modifier,
     postId: String = "",
+    navController: NavController,
     viewModel: StimulusPostDetailViewModel = hiltViewModel()
 ) {
 
@@ -151,7 +149,9 @@ fun StimulusDetailScreen(
                                         PostContent(
                                             height = height.value,
                                             postDetail = post,
-                                            writerInfo = writer
+                                            writerInfo = writer,
+                                            navController = navController,
+                                            viewModel = viewModel
                                         )
                                     }
                                 }
@@ -376,6 +376,8 @@ fun StimulusCoverItem(
 fun PostContent(
     modifier: Modifier = Modifier,
     height: Dp,
+    navController: NavController,
+    viewModel: StimulusPostDetailViewModel,
     postDetail: StimulusPost,
     writerInfo: UserProfileBody
 ){
@@ -516,11 +518,98 @@ fun PostContent(
 
         }
 
+        if(postDetail.owner){
+
+            Spacer(modifier.size(20.dp))
+
+            OwnerOption(
+                navController = navController,
+                viewModel = viewModel,
+                postDetail = postDetail
+            )
+
+        }
+
+
+
 
     }
 
 
 
+}
+
+@Composable
+fun OwnerOption(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: StimulusPostDetailViewModel,
+    postDetail: StimulusPost
+){
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+        .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = {
+                          navController.navigate("${UpdateStimulusPostScreenRoute.route}/${postDetail.boardId}"){
+                              launchSingleTop = true
+                          }
+                          },
+                text = {
+                    Text(
+                        text = "수정하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
+                }
+            )
+
+        }
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = { /*TODO*/ },
+                text = {
+                    Text(
+                        text = "삭제하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
+                }
+            )
+
+        }
+
+
+
+    }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -854,4 +943,71 @@ fun WriterAnotherPostPreview(
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun OwnerOptionPreview(
+    modifier: Modifier = Modifier
+){
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+        .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = { /*TODO*/ },
+                text = {
+                    Text(
+                        text = "수정하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
+                }
+            )
+
+        }
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = { /*TODO*/ },
+                text = {
+                    Text(
+                        text = "삭제하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
+                }
+            )
+
+        }
+
+
+
+    }
 }

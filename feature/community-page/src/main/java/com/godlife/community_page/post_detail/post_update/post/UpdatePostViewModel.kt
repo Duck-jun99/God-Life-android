@@ -1,16 +1,12 @@
-package com.godlife.community_page.post_detail.post_update
+package com.godlife.community_page.post_detail.post_update.post
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godlife.create_post.post.CreatePostUiState
-import com.godlife.domain.LocalPreferenceUserUseCase
-import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.UpdatePostUseCase
 import com.godlife.network.BuildConfig
 import com.godlife.network.model.PostDetailBody

@@ -39,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.text.util.LocalePreferences
 
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -54,6 +53,8 @@ import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.post_detail.StimulusDetailScreen
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreen
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
 import com.godlife.community_page.report.ReportScreen
 import com.godlife.community_page.report.navigation.ReportScreenRoute
 import com.godlife.designsystem.component.TabIconView
@@ -63,7 +64,6 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.history.HistoryDetailScreen
-import com.godlife.main_page.history.HistoryDetailScreenPreview
 import com.godlife.main_page.history.HistoryPageScreen
 import com.godlife.main_page.navigation.HistoryDetailRoute
 import com.godlife.main_page.navigation.HistoryPageRoute
@@ -274,16 +274,29 @@ fun MainUiTheme(
                         }
                     }
 
-                    //Stimulus Post Detail Screen
+                    //굿생 자극 상세 화면
                     composable("${StimulusPostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
                         val postId = it.arguments?.getString("postId")
                         if (postId != null) {
                             StimulusDetailScreen(
-                                postId = postId
+                                postId = postId,
+                                navController = navController
                             )
                             bottomBarVisibleState.value = false
                         }
 
+                    }
+
+                    // 굿생 자극 수정 화면
+                    composable("${UpdateStimulusPostScreenRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+                        val postId = it.arguments?.getString("postId")
+                        if (postId != null) {
+                            UpdateStimulusPostScreen(
+                                postId = postId,
+                                parentNavController = navController
+                            )
+                            bottomBarVisibleState.value = false
+                        }
                     }
 
                     //신고화면

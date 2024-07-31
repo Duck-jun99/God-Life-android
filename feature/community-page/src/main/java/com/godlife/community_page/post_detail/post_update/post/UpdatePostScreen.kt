@@ -1,4 +1,4 @@
-package com.godlife.community_page.post_detail.post_update
+package com.godlife.community_page.post_detail.post_update.post
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -136,7 +135,8 @@ fun UpdatePostScreen(
 
         if(uiState == UpdatePostUiState.Loading ||
             uiState == UpdatePostUiState.Init ||
-            uiState == UpdatePostUiState.SendLoading){
+            uiState == UpdatePostUiState.SendLoading
+        ){
 
             Column(
                 modifier
