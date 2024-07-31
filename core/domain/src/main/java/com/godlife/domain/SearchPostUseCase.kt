@@ -16,9 +16,8 @@ class SearchPostUseCase @Inject constructor(
     ) = searchPostRepository.getSearchedPost(keyword, tags, nickname)
 
     suspend fun executeSearchStimulusPost(
-        authorization: String,
         title: String,
         nickname: String,
         introduction: String
-    ) = networkRepository.searchStimulusPost(authorization, title, nickname, introduction)
+    ) = networkRepository.searchStimulusPost(title, nickname, introduction)
 }

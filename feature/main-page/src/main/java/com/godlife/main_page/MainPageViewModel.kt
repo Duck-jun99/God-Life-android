@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.godlife.database.model.TodoEntity
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
-import com.godlife.domain.LocalPreferenceUserUseCase
-import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.model.todo.TodoList
 import com.godlife.network.model.UserInfoBody
+import com.godlife.service.MyFirebaseMessagingService
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -19,8 +19,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 sealed class MainPageUiState {
     object Loading : MainPageUiState()
@@ -47,8 +49,7 @@ enum class ErrorType {
 class MainPageViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
-    private val reissueUseCase: ReissueUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase
+    private val registerFCMTokenUseCase: RegisterFCMTokenUseCase
 ): ViewModel(){
 
     /**
@@ -70,8 +71,17 @@ class MainPageViewModel @Inject constructor(
     private val _userInfoExists = MutableStateFlow<Boolean>(false)
     val userInfoExists: StateFlow<Boolean> = _userInfoExists
 
-    //AlertDialog 상태
-    val showAlertDialog = MutableStateFlow<Boolean>(false)
+    //TodoAlertDialog 상태
+    val showTodoAlertDialog = MutableStateFlow<Boolean>(false)
+
+    //UpdateAlertDialog 상태
+    val showUpdateAlertDialog = MutableStateFlow<Boolean>(false)
+
+    // FCM 토큰 등록 상태
+    val fcmTokenRegistered = MutableStateFlow<Boolean>(false)
+
+    //DropDownMenu 상태
+    val dropDownVisble = MutableStateFlow<Boolean>(false)
 
     /**
      * 변수 관련
@@ -101,6 +111,10 @@ class MainPageViewModel @Inject constructor(
     private val _selectedTodo = MutableStateFlow<TodoList>(TodoList(""))
     val selectedTodo: StateFlow<TodoList> = _selectedTodo
 
+    //업데이트 항목
+    private val _updateCategory = MutableStateFlow<String>("")
+    val updateCategory: StateFlow<String> = _updateCategory
+
 
 
     /**
@@ -108,6 +122,7 @@ class MainPageViewModel @Inject constructor(
      */
 
     init {
+
         // 유저 정보 가져오기
         getUserInfo()
 
@@ -115,18 +130,6 @@ class MainPageViewModel @Inject constructor(
         getTodayTodoList()
 
 
-        /*
-        Log.e("init", "userInfoExists.value: ${userInfoExists.value}")
-
-        // getTodayTodoList: 오늘 투두리스트 가져오기 (오늘 투두 리스트가 존재하는지 아닌지 상관 없이 작업이 완료되면 true)
-        //_userInfoExists, getTodayTodoList가 true이면 Success
-        if(userInfoExists.value){
-
-            _uiState.value = MainPageUiState.Success("Success")
-
-        }
-
-         */
     }
 
 
@@ -135,31 +138,26 @@ class MainPageViewModel @Inject constructor(
      */
 
     //오늘 설정한 투두 리스트를 로컬 데이터베이스에서 가져오기
-    private fun getTodayTodoList(){
+    fun getTodayTodoList(){
 
         _completedTodoListSize.value = 0
 
-        if(!getTodayTodoListFlag.value){
+        viewModelScope.launch(Dispatchers.IO) {
+            _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
 
-            viewModelScope.launch(Dispatchers.IO) {
-                _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
+            if(todayTodoList.value!=null){
+                _todayTodoListExists.value = true
 
-                if(todayTodoList.value!=null){
-                    _todayTodoListExists.value = true
+                _todayTodoListSize.value = todayTodoList.value!!.todoList.size
 
-                    _todayTodoListSize.value = todayTodoList.value!!.todoList.size
-
-                    todayTodoList.value!!.todoList.forEach {
-                        if(it.iscompleted){
-                            _completedTodoListSize.value += 1
-                        }
-
+                todayTodoList.value!!.todoList.forEach {
+                    if(it.iscompleted){
+                        _completedTodoListSize.value += 1
                     }
 
                 }
 
             }
-            getTodayTodoListFlag.value = true
 
         }
 
@@ -172,13 +170,7 @@ class MainPageViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            var auth = ""
-            launch {
-                auth = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-
-            }.join()
-
-            val response = getUserInfoUseCase.executeGetUserInfo(auth)
+            val response = getUserInfoUseCase.executeGetUserInfo()
 
             response
                 //성공적으로 넘어오면 유저 정보를 저장
@@ -192,92 +184,69 @@ class MainPageViewModel @Inject constructor(
 
                 }
                 .onError {
-                    Log.e("onError", this.message())
+                    Log.e("getUserInfo", this.message())
 
-                    // 토큰 만료시 재발급 요청
+                    // 토큰 만료시
                     if(this.response.code() == 401){
-
-                        reIssueRefreshToken()
-
-                    }
-
-                }
-                .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
-
-                }
-
-        }
-
-    }
-
-    // refresh token 갱신 후 getUserInfo 다시 실행
-    private fun reIssueRefreshToken(){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
-                .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    getUserInfo()
-
-                }
-                .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경
                         _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
-
                     }
-
-                    //기타 오류 시
                     else{
-
                         // UI State Error로 변경
                         _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
                     }
 
                 }
                 .onException {
-                    Log.e("onException", "${this.message}")
+                    Log.e("getUserInfo", "${this.message}")
 
                     // UI State Error로 변경
                     _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
 
                 }
 
-
         }
+
     }
 
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
+    // 로그인 시 FCM 토큰 등록
+    fun setFcmToken() {
+        if (!fcmTokenRegistered.value) {
+            fcmTokenRegistered.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val token = suspendCancellableCoroutine<String> { continuation ->
+                        MyFirebaseMessagingService().getFirebaseToken { token ->
+                            continuation.resume(token)
+                        }
+                    }
 
-        viewModelScope.launch(Dispatchers.IO) {
+                    val result = registerFCMTokenUseCase.executeRegisterFCMToken(token)
 
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
+                    result
+                        .onSuccess {
+                            fcmTokenRegistered.value = true
+                        }
+                        .onError {
 
+                            // 토큰 만료시
+                            if(this.response.code() == 401){
+                                _uiState.value = MainPageUiState.Error(ErrorType.REFRESH_TOKEN_EXPIRED)
+                            }
+                            else{
+                                // UI State Error로 변경
+                                _uiState.value = MainPageUiState.Error(ErrorType.SERVER_ERROR)
+                            }
+
+                        }
+                        .onException {
+                            _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
+                        }
+                } catch (e: Exception) {
+                    _uiState.value = MainPageUiState.Error(ErrorType.UNKNOWN_ERROR)
+                }
+
+            }
         }
-
     }
 
     /*
@@ -314,6 +283,11 @@ class MainPageViewModel @Inject constructor(
         }
     }
 
+    //오늘 투두리스트 존재하는 것으로 플래그 변경
+    fun setTodayTodoListExist(){
+        _todayTodoListExists.value = true
+    }
+
 
 
     // 현재 시간대에 따른 인사말
@@ -331,24 +305,36 @@ class MainPageViewModel @Inject constructor(
     }
 
     //투두 리스트 달성하기 버튼 클릭시 호출
-    fun setAlertDialogFlag(
+    fun setTodoAlertDialogFlag(
         todo: TodoList? = null
     ){
         //AlertDialog 플래그 변경
-        showAlertDialog.value = !showAlertDialog.value
+        showTodoAlertDialog.value = !showTodoAlertDialog.value
 
         if(todo != null){
             _selectedTodo.value = todo
         }
     }
 
+    //투두 업데이트(설정 메뉴) 버튼 클릭시 호출
+    fun setUpdateAlertDialogFlag(
+        category: String? = null
+    ){
+        if(category != null){
+            _updateCategory.value = category
+        }
+        showUpdateAlertDialog.value = !showUpdateAlertDialog.value
+    }
+
+    //드롭다운 메뉴 보여줄 상태 변경
+    fun setDropDownVisble(){
+        dropDownVisble.value = !dropDownVisble.value
+    }
+
     override fun onCleared() {
         Log.e("MainPageViewModel", "onCleared")
         super.onCleared()
     }
-
-
-
 
 
 }

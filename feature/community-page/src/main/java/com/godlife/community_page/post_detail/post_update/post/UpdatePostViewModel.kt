@@ -1,16 +1,12 @@
-package com.godlife.community_page.post_detail.post_update
+package com.godlife.community_page.post_detail.post_update.post
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godlife.create_post.post.CreatePostUiState
-import com.godlife.domain.LocalPreferenceUserUseCase
-import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.UpdatePostUseCase
 import com.godlife.network.BuildConfig
 import com.godlife.network.model.PostDetailBody
@@ -40,18 +36,12 @@ sealed class UpdatePostUiState {
 
 @HiltViewModel
 class UpdatePostViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val updatePostUseCase: UpdatePostUseCase,
-    private val reissueUseCase: ReissueUseCase
 
 ): ViewModel(){
 
     private val _uiState = MutableStateFlow<UpdatePostUiState>(UpdatePostUiState.Loading)
     val uiState: StateFlow<UpdatePostUiState> = _uiState
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     //기존 게시물 담을 변수
     private val _oldPost = MutableStateFlow<PostDetailBody?>(null)
@@ -73,12 +63,6 @@ class UpdatePostViewModel @Inject constructor(
     val text: State<String> = _text
 
     val tags = mutableListOf("tag1","tag2","tag3")
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
 
     fun init(postDetail: PostDetailBody, context: Context) {
         if (!_isInit.value) {
@@ -125,7 +109,6 @@ class UpdatePostViewModel @Inject constructor(
             _uiState.value = UpdatePostUiState.SendLoading
             viewModelScope.launch {
                 val result = updatePostUseCase.executeUpdatePost(
-                    authorization = auth.value,
                     postId = oldPost.value!!.board_id.toString(),
                     title = title.value,
                     content = text.value,

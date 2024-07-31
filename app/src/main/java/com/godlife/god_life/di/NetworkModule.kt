@@ -1,12 +1,16 @@
 package com.godlife.god_life.di
 
+import android.content.SharedPreferences
 import com.godlife.network.BuildConfig
 import com.godlife.network.api.RetrofitNetworkApi
+import com.godlife.network.utils.AuthInterceptor
+import com.godlife.network.utils.HeaderInterceptor
 import com.skydoves.sandwich.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Authenticator
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,12 +25,26 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideHttpClient(): OkHttpClient {
+    fun provideHeaderInterceptor(autoLoginPreferences: SharedPreferences): HeaderInterceptor {
+        return HeaderInterceptor(autoLoginPreferences)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthInterceptor(autoLoginPreferences: SharedPreferences): Authenticator {
+        return AuthInterceptor(autoLoginPreferences)
+    }
+
+    @Singleton
+    @Provides
+    fun provideHttpClient(headerInterceptor: HeaderInterceptor, authInterceptor: AuthInterceptor): OkHttpClient {
         return OkHttpClient
             .Builder()
             .readTimeout(500, TimeUnit.SECONDS)
             .connectTimeout(500, TimeUnit.SECONDS)
             .addInterceptor(getLoggingInterceptor())
+            .addInterceptor(headerInterceptor)
+            .authenticator(authInterceptor)
             .build()
     }
 

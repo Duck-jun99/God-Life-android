@@ -6,6 +6,6 @@ import javax.inject.Inject
 class ReissueUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
-    suspend fun executeReissue(authorization : String) = networkRepository.reissue(authorization)
+    suspend fun executeReissue() = networkRepository.reissue()
 
 }

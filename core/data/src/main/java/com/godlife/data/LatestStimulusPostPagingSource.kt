@@ -28,13 +28,9 @@ class LatestStimulusPostPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StimulusPostList> {
 
         return try {
-            // Authorization 토큰을 비동기적으로 가져옴
-            val authorization = withContext(Dispatchers.IO) {
-                "Bearer ${localPreferenceUserRepository.getAccessToken()}"
-            }
 
             val page = params.key ?: 0
-            var response = networkApi.getStimulusLatestPost(authorization = authorization, page = page)
+            var response = networkApi.getStimulusLatestPost(page = page)
             lateinit var data: StimulusPostListQuery
 
             response

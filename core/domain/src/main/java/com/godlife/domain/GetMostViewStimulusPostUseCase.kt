@@ -8,5 +8,6 @@ import javax.inject.Inject
 class GetMostViewStimulusPostUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
-    suspend fun executeGetGetMostViewStimulusPost(authorization: String) = networkRepository.getStimulusMostViewPost(authorization)
+    suspend fun executeGetGetMostViewStimulusPost(
+    ) = networkRepository.getStimulusMostViewPost()
 }

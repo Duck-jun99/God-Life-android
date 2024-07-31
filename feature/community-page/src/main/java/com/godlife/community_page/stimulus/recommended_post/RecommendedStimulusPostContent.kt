@@ -63,7 +63,10 @@ import com.godlife.community_page.stimulus.StimulusCoverItemPreview
 import com.godlife.community_page.stimulus.StimulusLoadingScreen
 import com.godlife.community_page.stimulus.StimulusPostItem
 import com.godlife.community_page.stimulus.StimulusPostUiState
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -149,42 +152,40 @@ fun RecommendedStimulusPostContent(
                             contentAlignment = Alignment.Center
                         ){
 
-                            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-
-                            Glide.with(LocalContext.current)
-                                .asBitmap()
-                                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-                                .error(R.drawable.category3)
-                                .into(object : CustomTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        bitmap.value = resource
-                                    }
-
-                                    override fun onLoadCleared(placeholder: Drawable?) {}
-                                })
-
-                            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                                Image(
-                                    bitmap = fetchedBitmap,
-                                    contentDescription = null,
+                            GlideImage(
+                                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
+                                imageOptions = ImageOptions(
                                     contentScale = ContentScale.FillWidth,
-                                    modifier = modifier
-                                        .fillMaxSize()
-                                        .blur(
-                                            radiusX = 15.dp, radiusY = 15.dp
-                                        )
-                                )   //bitmap이 없다면
-                            } ?: Image(
-                                painter = painterResource(id = R.drawable.category3),
-                                contentDescription = null,
-                                contentScale = ContentScale.FillWidth,
+                                    alignment = Alignment.Center
+                                ),
                                 modifier = modifier
                                     .fillMaxSize()
                                     .blur(
                                         radiusX = 15.dp, radiusY = 15.dp
-                                    )
-                            )
+                                    ),
+                                loading = {
+                                    Box(
+                                        modifier = modifier
+                                            .background(GrayWhite3)
+                                            .fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ){
 
+                                        CircularProgressIndicator(
+                                            color = PurpleMain
+                                        )
+
+                                    }
+
+                                },
+                                failure = {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.category3),
+                                        contentDescription = "",
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            )
 
                             Column(
                                 modifier = modifier
@@ -236,16 +237,18 @@ fun RecommendedStimulusPostContent(
                     Modifier
                         .align(Alignment.BottomEnd)
                         .padding(bottom = 8.dp, end = 8.dp),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     repeat(pagerState.pageCount) { iteration ->
-                        val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                        val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                        val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
                         Box(
                             modifier = Modifier
                                 .padding(2.dp)
                                 .clip(CircleShape)
                                 .background(color)
-                                .size(10.dp)
+                                .size(size)
                         )
                     }
                 }
@@ -418,16 +421,18 @@ fun RecommendedStimulusPostContentPreview(
             Modifier
                 .align(Alignment.BottomEnd)
                 .padding(bottom = 8.dp, end = 8.dp),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             repeat(pagerState.pageCount) { iteration ->
-                val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
                 Box(
                     modifier = Modifier
                         .padding(2.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .size(10.dp)
+                        .size(size)
                 )
             }
         }

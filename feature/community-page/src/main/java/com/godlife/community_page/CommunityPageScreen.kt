@@ -9,26 +9,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -72,26 +65,21 @@ import com.godlife.community_page.latest.LatestPostScreen
 import com.godlife.community_page.latest.LoadingLatestPostScreen
 import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.community_page.navigation.LatestPostRoute
-import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.community_page.navigation.RankingRoute
 import com.godlife.community_page.navigation.SearchResultRoute
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostRoute
-import com.godlife.community_page.post_detail.PostDetailScreen
 import com.godlife.community_page.post_detail.StimulusDetailScreen
-import com.godlife.community_page.ranking.RankingPageScreenPreview
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
-import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.PurpleMain
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -111,9 +99,6 @@ fun CommunityPageScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
-
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val refreshState = rememberPullToRefreshState()
 
     Log.e("CommunityPageScreen", uiState.toString())
 
@@ -135,7 +120,7 @@ fun CommunityPageScreen(
 
 
     //BottomSheet가 접혀있을 때 높이
-    val initBottomSheetHeight = height - 260.dp
+    val initBottomSheetHeight = height - 240.dp
 
 
     val searchText by viewModel.searchText.collectAsState()
@@ -166,124 +151,111 @@ fun CommunityPageScreen(
                     )
             ) {
 
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    state = refreshState,
-                    onRefresh = {
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(280.dp)
+                        .background(
+                            brush = Brush.linearGradient(
+                                viewModel.setBackgroundColor()
+                            )
+                        )
+                        .statusBarsPadding(),
+                    verticalArrangement = Arrangement.Top
+                ){
 
-                        viewModel.refresh()
+                    Box(
+                        modifier
+                            .padding(top = 20.dp, start = 10.dp, end = 10.dp)
+                            .height(50.dp)
+                            .fillMaxWidth()){
+
+                        Text(
+                            text = topTitle,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 25.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
 
                     }
-                ) {
 
                     Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(280.dp)
-                            .background(
-                                brush = Brush.linearGradient(
-                                    listOf(
-                                        Color(0xCC496B9F),
-                                        Color(0xCB494A9F),
-                                        Color(0xCC6A499F),
-                                        Color(0xCC6A499F),
-                                        Color(0xCC96499F),
-                                        Color(0xCCDB67AD),
-                                        Color(0xCCFF5E5E),
-                                    )
-                                )
-                            )
-                            .statusBarsPadding(),
-                        verticalArrangement = Arrangement.Top
-                    ){
+                        modifier
+                            .padding(start = 10.dp, end = 20.dp, bottom = 10.dp)
+                            .height(80.dp)) {
 
-                        Box(
-                            modifier
-                                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                                .height(50.dp)
-                                .fillMaxWidth()){
+                        Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
 
-                            Text(text = topTitle, style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold))
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        GodLifeSearchBar(
+                            searchText = searchText,
+                            containerColor = OpaqueLight,
+                            onTextChanged = { viewModel.onSearchTextChange(it) },
+                            onSearchClicked = {
+                                viewModel.getSearchedPost(keyword = searchText)
+                                navControllerBottomSheet.navigate(SearchResultRoute.route)
+                            }
+                        )
+
+                    }
+
+                    Row(modifier = modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                        verticalAlignment = Alignment.Top) {
+
+                        Column(
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navControllerBottomSheet.navigate(FamousPostRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
+
+                            CategoryBox(route = FamousPostRoute.route, categoryName = "인기 게시물", viewModel = viewModel)
 
                         }
 
                         Column(
-                            modifier
-                                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                                .height(80.dp)) {
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navControllerBottomSheet.navigate(LatestPostRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
 
-                            Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            GodLifeSearchBar(
-                                searchText = searchText,
-                                containerColor = OpaqueLight,
-                                onTextChanged = { viewModel.onSearchTextChange(it) },
-                                onSearchClicked = {
-                                    viewModel.getSearchedPost(keyword = searchText)
-                                    navControllerBottomSheet.navigate(SearchResultRoute.route)
-                                }
-                            )
+                            CategoryBox(route = LatestPostRoute.route, categoryName = "최신 게시물", viewModel = viewModel)
 
                         }
 
-                        Row(modifier = modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                            verticalAlignment = Alignment.Top) {
+                        Column(
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navController.navigate(StimulusPostRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
 
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navControllerBottomSheet.navigate(FamousPostRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
+                            CategoryBox(route = StimulusPostRoute.route, categoryName = "굿생 자극", viewModel = viewModel)
 
-                                CategoryBox(route = FamousPostRoute.route, categoryName = "인기 게시물", viewModel = viewModel)
+                        }
 
-                            }
+                        Column(
+                            modifier = modifier
+                                .weight(0.25f)
+                                .padding(bottom = 5.dp)
+                                .clickable { navControllerBottomSheet.navigate(RankingRoute.route) },
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )  {
 
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navControllerBottomSheet.navigate(LatestPostRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
-
-                                CategoryBox(route = LatestPostRoute.route, categoryName = "최신 게시물", viewModel = viewModel)
-
-                            }
-
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navController.navigate(StimulusPostRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
-
-                                CategoryBox(route = StimulusPostRoute.route, categoryName = "갓생 자극", viewModel = viewModel)
-
-                            }
-
-                            Column(
-                                modifier = modifier
-                                    .weight(0.25f)
-                                    .padding(bottom = 5.dp)
-                                    .clickable { navControllerBottomSheet.navigate(RankingRoute.route) },
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )  {
-
-                                CategoryBox(route = RankingRoute.route, categoryName = "명예의 전당", viewModel = viewModel)
-
-                            }
+                            CategoryBox(route = RankingRoute.route, categoryName = "명예의 전당", viewModel = viewModel)
 
                         }
 
@@ -305,7 +277,7 @@ fun CommunityPageScreen(
                         scaffoldState = scaffoldState,
                         sheetPeekHeight = initBottomSheetHeight,
                         sheetMaxWidth = LocalConfiguration.current.screenWidthDp.dp,
-                        sheetContainerColor = Color.White,
+                        sheetContainerColor = GrayWhite3,
                         sheetContent = {
                             Box(
                                 modifier = modifier
@@ -333,20 +305,10 @@ fun CommunityPageScreen(
         composable(StimulusPostRoute.route){
             bottomBarVisibleState.value = true
             viewModel.changeCurrentRoute(route = StimulusPostRoute.route)
-            StimulusPostScreen(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
-            //StimulusPostScreenPreview(navController = navController, bottomBarVisibleState = bottomBarVisibleState)
-
-        }
-
-        //Stimulus Post Detail Screen
-        composable("${StimulusPostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
-            val postId = it.arguments?.getString("postId")
-            if (postId != null) {
-                bottomBarVisibleState.value = false
-                StimulusDetailScreen(
-                    postId = postId
-                )
-            }
+            StimulusPostScreen(
+                navController = parentNavController,
+                bottomBarVisibleState = bottomBarVisibleState
+            )
 
         }
 
@@ -454,9 +416,9 @@ fun CommunityPageView(
             viewModel.getWeeklyRanking()
             viewModel.getAllRanking()
             RankingScreen(
-                navController = navController,
                 parentNavController = parentNavController,
-                viewModel = viewModel)
+                viewModel = viewModel
+            )
 
         }
 
@@ -486,7 +448,7 @@ fun CommunityPageView(
         //검색 결과 뷰
         composable(SearchResultRoute.route){
             viewModel.changeCurrentRoute(route = SearchResultRoute.route)
-            SearchResultScreen(viewModel = viewModel, navController = navController)
+            SearchResultScreen(viewModel = viewModel, navController = parentNavController)
         }
 
 
@@ -526,14 +488,9 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
             .background(
                 brush = Brush.linearGradient(
                     listOf(
-                        Color(0xCC496B9F),
-                        Color(0xCB494A9F),
-                        Color(0xCC6A499F),
-                        Color(0xCC6A499F),
-                        Color(0xCC96499F),
-                        Color(0xCCDB67AD),
                         Color(0xCCFF5E5E),
-                    )
+                        Color(0xCCFF5E5E),
+                        )
                 )
             )
     ) {
@@ -561,13 +518,12 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     .background(
                         brush = Brush.linearGradient(
                             listOf(
-                                Color(0xCC496B9F),
-                                Color(0xCB494A9F),
-                                Color(0xCC6A499F),
-                                Color(0xCC6A499F),
-                                Color(0xCC96499F),
-                                Color(0xCCDB67AD),
-                                Color(0xCCFF5E5E),
+                                Color(0xFFFF44A2),  // 밝은 핫핑크
+                                Color(0xFFFF5890),  // 연한 핑크
+                                Color(0xFFFA6B80),  // 연한 코럴 핑크
+                                Color(0xFFFF7B75),  // 연한 살몬
+                                Color(0xFFFF8161),  // 밝은 코럴
+                                Color(0xFFFF884D),  // 연한 오렌지
                             )
                         )
                     )
@@ -679,7 +635,7 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
             BottomSheetScaffold(
                 modifier = modifier.fillMaxWidth(),
                 sheetPeekHeight = deviceHeight.dp - 250.dp,
-                sheetContainerColor = OpaqueLight,
+                sheetContainerColor = Color.White,
                 sheetShape = RoundedCornerShape(
                     bottomStart = 0.dp,
                     bottomEnd = 0.dp,
@@ -687,7 +643,7 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     topEnd = 12.dp
                 ),
                 sheetContent = {
-                    LatestPostScreen2Preview(deviceHeight = deviceHeight.dp)
+                    //LatestPostScreen2Preview(deviceHeight = deviceHeight.dp)
                 }
             ) {
 

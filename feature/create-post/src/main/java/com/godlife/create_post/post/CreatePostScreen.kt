@@ -629,6 +629,7 @@ fun CreatePostSuccessScreen(
     }
 }
 
+/*TODO 에러 메시지 출력 해야 함.*/
 @Composable
 fun CreatePostErrorScreen(
     modifier: Modifier = Modifier,

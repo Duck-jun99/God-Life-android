@@ -13,5 +13,7 @@ interface LocalDatabaseRepository {
 
     suspend fun updateTodoList(todo: TodoEntity)
 
+    suspend fun getTodoList(id: Int) : TodoEntity
+
     suspend fun getTodayTodoList() : TodoEntity
 }

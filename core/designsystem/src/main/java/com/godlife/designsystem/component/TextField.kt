@@ -17,9 +17,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +42,6 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
-import kotlin.math.sin
 
 @Composable
 fun GodLifeTextField(
@@ -252,7 +250,7 @@ fun GodLifeCreateCommentBar(
             modifier = Modifier
                 .size(30.dp)
                 .clickable { onPostClicked() },
-            imageVector = Icons.AutoMirrored.Filled.Send,
+            imageVector = Icons.AutoMirrored.Outlined.Send,
             contentDescription = null,
             tint = PurpleMain
         )

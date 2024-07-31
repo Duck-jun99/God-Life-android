@@ -14,7 +14,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SearchPostPagingSource @Inject constructor(
-    private val localPreferenceUserRepository: LocalPreferenceUserRepository,
     private val networkApi: RetrofitNetworkApi,
 
     private val keyword: String,
@@ -32,13 +31,9 @@ class SearchPostPagingSource @Inject constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PostDetailBody> {
         return try {
-            // Authorization 토큰을 비동기적으로 가져옴
-            val authorization = withContext(Dispatchers.IO) {
-                "Bearer ${localPreferenceUserRepository.getAccessToken()}"
-            }
 
             val page = params.key ?: 1
-            val response = networkApi.searchPost(authorization = authorization, page = page, keyword = keyword, tag = tags, nickname = nickname)
+            val response = networkApi.searchPost(page = page, keyword = keyword, tag = tags, nickname = nickname)
             lateinit var data: LatestPostQuery
 
             response

@@ -2,8 +2,6 @@ package com.godlife.main_page
 
 
 import android.app.Activity
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -12,7 +10,6 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,24 +27,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +62,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -76,24 +75,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.main_page.navigation.HistoryPageRoute
+import com.godlife.main_page.update.UpdateAlertDialog
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
 import com.godlife.profile.navigation.ProfileScreenRoute
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun MainPageScreen(
@@ -109,19 +110,15 @@ fun MainPageScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
-    LaunchedEffect(key1 = true) {
-        
-        Log.e("MainPageScreen", viewModel.todayTodoList.value.toString())
-        
-    }
 
-    //공지용
-    var showNotificationBox by remember { mutableStateOf(false) }
+
+    //굿생 인증 완료용
+    var showCompleteTodayBox by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
 
         delay(2000) // 2초 대기
-        showNotificationBox = true
+        showCompleteTodayBox = true
     }
 
 
@@ -134,6 +131,15 @@ fun MainPageScreen(
 
     val userInfo by viewModel.userInfo.collectAsState()
 
+    val showTodoAlertDialog by viewModel.showTodoAlertDialog.collectAsState()
+    val showUpdateAlertDialog by viewModel.showUpdateAlertDialog.collectAsState()
+
+    val todayTodoList by viewModel.todayTodoList.collectAsState()
+
+    LaunchedEffect(todayTodoList) {
+        Log.e("MainPageScreen", todayTodoList?.toString() ?: "TodoList is null")
+    }
+
     GodLifeTheme {
 
         when(uiState){
@@ -145,10 +151,12 @@ fun MainPageScreen(
 
             is MainPageUiState.Success -> {
 
+                viewModel.setFcmToken()
+
                 Column(
                     modifier
                         .fillMaxSize()
-                        .background(Color.White)
+                        .background(GrayWhite3)
                         .statusBarsPadding()
                 ){
 
@@ -183,52 +191,51 @@ fun MainPageScreen(
                             Row(
                                 modifier = modifier
                                     .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
                             ){
 
                                 //프로필 사진
-                                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                                val imageModifier: Modifier = modifier
-                                    .size(30.dp, 30.dp)
-                                    .clip(CircleShape)
-                                    .fillMaxSize()
-                                    .background(color = GrayWhite)
-                                    .clickable { navController.navigate("${ProfileScreenRoute.route}/${userInfo.memberId}") }
-
-                                Glide.with(LocalContext.current)
-                                    .asBitmap()
-                                    .load(if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person)
-                                    .error(R.drawable.ic_person)
-                                    .into(object : CustomTarget<Bitmap>() {
-                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                            bitmap.value = resource
-                                        }
-
-                                        override fun onLoadCleared(placeholder: Drawable?) {}
-                                    })
-
-                                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                                    Image(
-                                        bitmap = fetchedBitmap,
-                                        contentDescription = null,
+                                GlideImage(
+                                    imageModel = { if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person },
+                                    imageOptions = ImageOptions(
                                         contentScale = ContentScale.FillWidth,
-                                        modifier = imageModifier
-                                    )   //bitmap이 없다면
-                                } ?: Image(
-                                    painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.FillWidth,
-                                    modifier = imageModifier
+                                        alignment = Alignment.Center
+                                    ),
+                                    modifier = modifier
+                                        .size(30.dp, 30.dp)
+                                        .clip(CircleShape)
+                                        .fillMaxSize()
+                                        .background(color = GrayWhite2)
+                                        .clickable { navController.navigate("${ProfileScreenRoute.route}/${userInfo.memberId}") }
                                 )
 
                                 Spacer(modifier.size(10.dp))
 
-                                Icon(imageVector = Icons.Outlined.Notifications,
-                                    contentDescription = "Notification",
-                                    tint = PurpleMain,
+                                IconButton(
                                     modifier = modifier
-                                        .size(30.dp)
-                                )
+                                        .size(30.dp),
+                                    onClick = {
+                                        navController.navigate(HistoryPageRoute.route){
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                ) {
+
+                                    Icon(
+                                        painter = painterResource(R.drawable.cases_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                                        contentDescription = "",
+                                        tint = Color.Black
+                                    )
+
+                                    /*
+                                    Icon(imageVector = Icons.Outlined.DateRange,
+                                        contentDescription = "History",
+                                        tint = Color.Black
+                                    )
+                                     */
+                                }
+
                             }
 
                         }
@@ -239,17 +246,24 @@ fun MainPageScreen(
                             .fillMaxSize()
                             .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
 
-                        if (showNotificationBox){
-                            item { AnimatedVisibility(visible = true, enter = fadeIn(initialAlpha = 0.5f) ) {
-                                NotificationBox()
-                            } }
+                        if (showCompleteTodayBox){
+                            item {
+
+                                AnimatedVisibility(
+                                    visible = true,
+                                    enter = fadeIn(initialAlpha = 0.5f
+                                    )
+                                ) {
+                                    CompleteTodayBox(
+                                        createPostNavigator = createPostNavigator,
+                                        mainActivity = mainActivity
+                                    )
+                                }
+
+                            }
                         }
 
                         item { Spacer(modifier = modifier.size(10.dp)) }
-
-
-                        //TEST CREATE POST
-                        item { TestCreatePost(createPostNavigator, mainActivity) }
 
 
                         item {
@@ -257,13 +271,18 @@ fun MainPageScreen(
                             Spacer(modifier = modifier.size(10.dp))
                         }
 
-                        when(todayTodoListExists){
+                        when{
                             //오늘 설정한 투두리스트가 있을 경우
-                            true -> {
+                            todayTodoList != null -> {
 
-                                item{
-                                    MainTodoListBox(viewModel)
-                                    Spacer(modifier = modifier.size(10.dp))
+                                item {
+                                    todayTodoList?.let { todo ->
+                                        MainTodoListBox(
+                                            viewModel = viewModel,
+                                            todo = todo
+                                        )
+                                        Spacer(modifier = modifier.size(10.dp))
+                                    }
                                 }
 
                                 item {
@@ -279,12 +298,20 @@ fun MainPageScreen(
                                     Spacer(modifier = modifier.size(10.dp))
                                 }
 
-                                item{ TodoListBox(viewModel)}
+
+                                item {
+                                    todayTodoList?.let { todo ->
+                                        TodoListBox(
+                                            viewModel = viewModel,
+                                            todo = todo
+                                        )
+                                    }
+                                }
 
                             }
 
                             //오늘 설정한 투두리스트가 없을 경우
-                            false -> {
+                            else -> {
 
                                 item{ MainNoTodoListBox(mainActivity, createNavigator) }
 
@@ -298,8 +325,22 @@ fun MainPageScreen(
 
                 }
 
-                MainAlertDialog(viewModel)
+                if(showTodoAlertDialog){
+                    TodoAlertDialog(viewModel)
+                }
 
+                if(showUpdateAlertDialog){
+                    todayTodoList?.id?.let {
+                        UpdateAlertDialog(
+                            viewModel = viewModel,
+                            onUpdateComplete = {
+                                viewModel.getTodayTodoList()
+                                Log.e("onUpdateComplete", "${viewModel.todayTodoList.value}")
+                            },
+                            todoId = it
+                        )
+                    }
+                }
 
             }
             is MainPageUiState.Error -> {
@@ -318,55 +359,57 @@ fun MainPageScreen(
 }
 
 @Composable
-fun MainAlertDialog(
+fun TodoAlertDialog(
     viewModel: MainPageViewModel
 ){
-    val showAlertDialog by viewModel.showAlertDialog.collectAsState()
+
     val selectedTodo by viewModel.selectedTodo.collectAsState()
 
     val cScope = rememberCoroutineScope()
 
-    if(showAlertDialog){
-        AlertDialog(
-            containerColor = Color.White,
-            onDismissRequest = { viewModel.setAlertDialogFlag() },
-            title = {
-                Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
-            },
-            text = {
-                Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
-            },
-            confirmButton = {
-                GodLifeButtonWhite(
-                    onClick = {
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { viewModel.setTodoAlertDialogFlag() },
+        title = {
+            Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        },
+        text = {
+            Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+        },
+        confirmButton = {
+            GodLifeButtonWhite(
+                onClick = {
 
-                        cScope.launch(Dispatchers.IO) {
-                            viewModel.setTodoValueCompleted(selectedTodo)
-                        }
+                    cScope.launch(Dispatchers.IO) {
+                        viewModel.setTodoValueCompleted(selectedTodo)
+                    }
 
-                        viewModel.setAlertDialogFlag()
+                    viewModel.setTodoAlertDialogFlag()
 
-                    },
-                    text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
-                )
-            },
-            dismissButton = {
-                GodLifeButtonWhite(
-                    onClick = { viewModel.setAlertDialogFlag() },
-                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
-                )
-            }
-        )
-    }
-
+                },
+                text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        },
+        dismissButton = {
+            GodLifeButtonWhite(
+                onClick = { viewModel.setTodoAlertDialogFlag() },
+                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+            )
+        }
+    )
 
 }
+
+
 
 @Composable
 fun MainTodoListBox(
     viewModel: MainPageViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    todo: TodoEntity
 ){
+
+    val dropDownVisble = viewModel.dropDownVisble.collectAsState().value
 
     val todayTodoListSize = viewModel.todayTodoListSize.collectAsState().value
     val completedTodoListSize = viewModel.completedTodoListSize.collectAsState().value
@@ -383,72 +426,140 @@ fun MainTodoListBox(
 
 
     // 특정 값으로 색을 채우는 Animation
-    LaunchedEffect(Unit) {
+    LaunchedEffect(todoPercent) {
         animatedValue.animateTo(
             targetValue = todoPercent,
             animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
         )
     }
 
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .height(450.dp)
-        .background(
-            color = GrayWhite3,
-            shape = RoundedCornerShape(20.dp)
-        ),
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            ),
         contentAlignment = Alignment.Center
-    ){
+    ) {
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = Color(0xFFFA6B80), fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+        }
+
+
+        Canvas(
+            modifier = Modifier
+                .size(300.dp)
+        ) {
+            val size: Size = drawContext.size
+            val sizeArc = size / 1.5F
+            drawArc(
+                color = Color(0xFFE1E2E9),
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                size = sizeArc,
+                style = Stroke(width = 30f)
+            )
+
+            drawArc(
+                brush = Brush.linearGradient(
+                    colors =
+                    listOf(
+                        Color(0xFFFF44A2),  // 밝은 핫핑크
+                        Color(0xFFFF5890),  // 연한 핑크
+                        Color(0xFFFA6B80),  // 연한 코럴 핑크
+                        Color(0xFFFF7B75),  // 연한 살몬
+                        Color(0xFFFF8161),  // 밝은 코럴
+                        Color(0xFFFF884D),  // 연한 오렌지
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+                startAngle = 100f,
+                sweepAngle = animatedValue.value,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - sizeArc.width) / 2f,
+                    (size.height - sizeArc.height) / 2f
+                ),
+                size = sizeArc,
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
+            )
+        }
 
         Box(
-            modifier = Modifier
-                .size(360.dp),
-            contentAlignment = Alignment.Center
-        ) {
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier
+                .padding(horizontal = 5.dp, vertical = 5.dp)
+                .align(Alignment.TopEnd)
+        ){
+            IconButton(
+                modifier = modifier
+                    .size(30.dp),
+                onClick = { viewModel.setDropDownVisble() }
             ) {
-                Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-                Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
-            }
-
-
-            Canvas(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val size: Size = drawContext.size
-                val sizeArc = size / 1.75F
-                drawArc(
-                    color = Color(0xFFE1E2E9),
-                    startAngle = 0f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                    topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
-                    size = sizeArc,
-                    style = Stroke(width = 50f)
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "",
+                    tint = GrayWhite
                 )
+                DropdownMenu(
+                    expanded = dropDownVisble,
+                    onDismissRequest = { viewModel.setDropDownVisble() },
+                    containerColor = Color.White
+                ) {
 
-                drawArc(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xff63C6C4), PurpleMain
-                        ),
-                        start = Offset.Zero,
-                        end = Offset.Infinite,
-                    ),
-                    startAngle = 100f,
-                    sweepAngle = animatedValue.value,
-                    useCenter = false,
-                    topLeft = Offset(
-                        (size.width - sizeArc.width) / 2f,
-                        (size.height - sizeArc.height) / 2f
-                    ),
-                    size = sizeArc,
-                    style = Stroke(width = 50f, cap = StrokeCap.Round)
-                )
+                    Column {
+
+                        DropdownMenuItem(
+                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = PurpleMain)) },
+                            onClick = {
+                                viewModel.setDropDownVisble()
+                                viewModel.setUpdateAlertDialogFlag(category = "EDIT_TODOLIST")
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = PurpleMain)
+                            },
+                            colors = MenuDefaults.itemColors(Color.White)
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain)) },
+                            onClick = {
+                                viewModel.setDropDownVisble()
+                                viewModel.setUpdateAlertDialogFlag(category = "EDIT_NOTIFICATION_TIME")
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = PurpleMain)
+                            },
+                            colors = MenuDefaults.itemColors(Color.White)
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain)) },
+                            onClick = {
+                                viewModel.setDropDownVisble()
+                                viewModel.setUpdateAlertDialogFlag(category = "DELETE")
+
+                            },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = PurpleMain)
+                            },
+                            colors = MenuDefaults.itemColors(Color.White)
+                        )
+
+                    }
+
+                }
             }
         }
+
     }
 
 }
@@ -479,7 +590,417 @@ fun MainNoTodoListBox(
         .fillMaxWidth()
         .height(450.dp)
         .background(
-            color = GrayWhite3,
+            color = Color.White,
+            shape = RoundedCornerShape(20.dp)
+        )){
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .size(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "오늘의 투두리스트를\n 만들어주세요!",
+                    style = TextStyle(color = GrayWhite, fontSize = 15.sp),
+                    textAlign = TextAlign.Center
+                )
+
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    val size: Size = drawContext.size
+                    val sizeArc = size / 1.5F
+                    drawArc(
+                        color = Color(0xFFE1E2E9),
+                        startAngle = 0f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                        size = sizeArc,
+                        style = Stroke(width = 30f)
+                    )
+
+                    drawArc(
+                        brush = Brush.linearGradient(
+                            colors =
+                            listOf(
+                                Color(0xFFFF44A2),  // 밝은 핫핑크
+                                Color(0xFFFF5890),  // 연한 핑크
+                                Color(0xFFFA6B80),  // 연한 코럴 핑크
+                                Color(0xFFFF7B75),  // 연한 살몬
+                                Color(0xFFFF8161),  // 밝은 코럴
+                                Color(0xFFFF884D),  // 연한 오렌지
+                            ),
+                            start = Offset.Zero,
+                            end = Offset.Infinite,
+                        ),
+                        startAngle = 100f,
+                        sweepAngle = animatedValue.value,
+                        useCenter = false,
+                        topLeft = Offset(
+                            (size.width - sizeArc.width) / 2f,
+                            (size.height - sizeArc.height) / 2f
+                        ),
+                        size = sizeArc,
+                        style = Stroke(width = 30f, cap = StrokeCap.Round)
+                    )
+                }
+            }
+
+            Box(modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center){
+
+                GodLifeButtonWhite(
+                    onClick = { moveCreateTodoListActivity(createNavigator, mainActivity) },
+                    text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+
+            }
+
+        }
+    }
+
+}
+
+@Composable
+fun TodoListBox(
+    viewModel:MainPageViewModel,
+    todo: TodoEntity,
+    modifier: Modifier = Modifier
+){
+
+    //val todayTodoList by viewModel.todayTodoList.collectAsState()
+
+    Log.e(" TodoListBox ", "${todo}")
+
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .background(
+            color = Color.White,
+            shape = RoundedCornerShape(20.dp)
+        )){
+
+        /*
+        itemsIndexed(todayTodoList.todayTodoList){index, item ->
+            if(item.iscompleted) CompletedTodayList(item, viewModel) else NoCompletedTodayList(item, viewModel)
+        }
+
+         */
+
+        todo.todoList.forEach { item ->
+            if (item.iscompleted) {
+                CompletedTodayList(item, viewModel)
+            } else {
+                NoCompletedTodayList(item, viewModel)
+            }
+        }
+
+    }
+}
+
+
+@Composable
+fun NoCompletedTodayList(
+    todo: TodoList,
+    viewModel: MainPageViewModel
+){
+    GodLifeTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(150.dp)
+                .padding(10.dp)
+        ) {
+            Text(text = todo.name,
+                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(vertical = 10.dp),
+                thickness = 2.dp,
+                color = PurpleMain
+            )
+
+            GodLifeButton(
+                onClick = {
+                          viewModel.setTodoAlertDialogFlag(todo)
+                },
+                modifier = Modifier.align(Alignment.End)) {
+                Text(text = "달성하기", style = TextStyle(color = Color.White))
+            }
+
+        }
+    }
+}
+
+@Composable
+fun CompletedTodayList(
+    todo: TodoList,
+    viewModel: MainPageViewModel
+){
+    GodLifeTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(150.dp)
+                .padding(10.dp)
+        ) {
+            Text(text = todo.name,
+                style = TextStyle(fontSize = 20.sp, color = GrayWhite)
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(vertical = 10.dp),
+                thickness = 2.dp,
+                color = GrayWhite
+            )
+
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.End),
+                colors = ButtonDefaults.buttonColors(GrayWhite)) {
+                Text(text = "달성 완료", style = TextStyle(color = Color.White))
+            }
+
+        }
+    }
+}
+
+@Composable
+fun CompleteTodayBox(
+    modifier: Modifier = Modifier,
+    createPostNavigator: CreatePostNavigator,
+    mainActivity: Activity
+){
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp),
+            )
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+
+        Icon(
+            imageVector = Icons.Outlined.ThumbUp,
+            contentDescription ="",
+            tint = PurpleMain,
+            modifier = modifier
+                .size(25.dp)
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Text(
+            text = "오늘 목표를 모두 달성하셨군요!",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = "굿생 인증을 하고 하루를 마무리 해주세요.",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal
+            )
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        GodLifeButtonWhite(
+            onClick = {
+                moveCreatePostActivity(createPostNavigator, mainActivity)
+                      },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+            },
+            text = {
+                Text(
+                    text = "굿생 인증하기",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        )
+
+    }
+}
+
+//MainTodoListBox위에 보여질 Text
+@Composable
+fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
+    val item = viewModel.setTodayTimeText()
+    //item[0] -> Text, item[1] -> Icon resource
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Icon(
+            modifier = modifier.size(25.dp),
+            painter = painterResource(item[1].toString().toInt()),
+            contentDescription = "",
+            tint = Color.Unspecified
+        )
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = item[0].toString(),
+            style = TextStyle(color = GrayWhite, fontSize = 18.sp)
+        )
+
+    }
+}
+
+@Preview
+@Composable
+fun MainTodoListBoxPreview(
+    modifier: Modifier = Modifier
+){
+
+    val todayTodoListSize = 10
+    val completedTodoListSize = 3
+
+    val todoPercent =
+        360 * ( completedTodoListSize.toFloat() / todayTodoListSize.toFloat() )
+
+    val animatedValue = remember { Animatable(0f) }
+
+
+    // 특정 값으로 색을 채우는 Animation
+    LaunchedEffect(Unit) {
+        animatedValue.animateTo(
+            targetValue = todoPercent,
+            animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
+            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+        }
+
+
+        Canvas(
+            modifier = Modifier
+                .size(300.dp)
+        ) {
+            val size: Size = drawContext.size
+            val sizeArc = size / 1.5F
+            drawArc(
+                color = Color(0xFFE1E2E9),
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                size = sizeArc,
+                style = Stroke(width = 30f)
+            )
+
+            drawArc(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xff63C6C4), PurpleMain
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+                startAngle = 100f,
+                sweepAngle = animatedValue.value,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - sizeArc.width) / 2f,
+                    (size.height - sizeArc.height) / 2f
+                ),
+                size = sizeArc,
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
+            )
+        }
+
+        Box(
+            modifier = modifier
+                .padding(horizontal = 5.dp, vertical = 5.dp)
+                .align(Alignment.TopEnd)
+        ){
+            IconButton(
+                modifier = modifier
+                    .size(30.dp),
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+            }
+        }
+    }
+
+}
+//Preview
+
+@Preview
+@Composable
+fun MainNoTodoListBoxPreview(
+    modifier: Modifier = Modifier
+){
+
+    val animatedValue = remember { Animatable(0f) }
+
+
+    // 특정 값으로 색을 채우는 Animation
+    LaunchedEffect(Unit) {
+        animatedValue.animateTo(
+            //targetValue = targetvalue,
+            targetValue = 360f,
+            animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        )
+    }
+
+
+
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .height(450.dp)
+        .background(
+            color = Color.White,
             shape = RoundedCornerShape(20.dp)
         )){
 
@@ -540,155 +1061,13 @@ fun MainNoTodoListBox(
                 contentAlignment = Alignment.Center){
 
                 GodLifeButtonWhite(
-                    onClick = { moveCreateTodoListActivity(createNavigator, mainActivity) },
+                    onClick = {  },
                     text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
 
             }
 
         }
-    }
-
-}
-
-@Composable
-fun TodoListBox(
-    viewModel:MainPageViewModel,
-    modifier: Modifier = Modifier){
-
-    val todayTodoList by viewModel.todayTodoList.collectAsState()
-
-    Column(modifier = modifier
-        .fillMaxWidth()
-        .background(
-            color = GrayWhite3,
-            shape = RoundedCornerShape(20.dp)
-        )){
-
-        /*
-        itemsIndexed(todayTodoList.todayTodoList){index, item ->
-            if(item.iscompleted) CompletedTodayList(item, viewModel) else NoCompletedTodayList(item, viewModel)
-        }
-
-         */
-
-        todayTodoList?.todoList?.forEach { item ->
-            if (item.iscompleted) {
-                CompletedTodayList(item, viewModel)
-            }
-            else {
-                NoCompletedTodayList(item, viewModel)
-            }
-        }
-
-    }
-}
-
-
-@Composable
-fun NoCompletedTodayList(
-    todo: TodoList,
-    viewModel: MainPageViewModel
-){
-    GodLifeTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .size(150.dp)
-                .padding(10.dp)
-        ) {
-            Text(text = todo.name,
-                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
-            )
-
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(vertical = 10.dp),
-                thickness = 2.dp,
-                color = PurpleMain
-            )
-
-            GodLifeButton(
-                onClick = {
-                          viewModel.setAlertDialogFlag(todo)
-                },
-                modifier = Modifier.align(Alignment.End)) {
-                Text(text = "달성하기", style = TextStyle(color = Color.White))
-            }
-
-        }
-    }
-}
-
-@Composable
-fun CompletedTodayList(
-    todo: TodoList,
-    viewModel: MainPageViewModel
-){
-    GodLifeTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .size(150.dp)
-                .padding(10.dp)
-        ) {
-            Text(text = todo.name,
-                style = TextStyle(fontSize = 20.sp, color = GrayWhite)
-            )
-
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(vertical = 10.dp),
-                thickness = 2.dp,
-                color = GrayWhite
-            )
-
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(GrayWhite)) {
-                Text(text = "달성 완료", style = TextStyle(color = Color.White))
-            }
-
-        }
-    }
-}
-
-//MainTodoListBox위에 보여질 Text
-@Composable
-fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
-    val item = viewModel.setTodayTimeText()
-    //item[0] -> Text, item[1] -> Icon resource
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Icon(
-            modifier = modifier.size(25.dp),
-            painter = painterResource(item[1].toString().toInt()),
-            contentDescription = "",
-            tint = Color.Unspecified
-        )
-        Spacer(modifier.size(5.dp))
-
-        Text(
-            text = item[0].toString(),
-            style = TextStyle(color = GrayWhite, fontSize = 18.sp)
-        )
-
-    }
-}
-
-@Composable
-fun TestCreatePost(createPostNavigator: CreatePostNavigator, mainActivity: Activity){
-    Button(
-        onClick = {
-        moveCreatePostActivity(createPostNavigator, mainActivity)
-        }
-    ) {
-        Text(text = "CreatePost")
     }
 
 }
@@ -703,42 +1082,73 @@ fun LoadingMainPageScreen(modifier: Modifier = Modifier){
     }
 }
 
-//Preview
-
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun NotificationBox(modifier: Modifier = Modifier){
-    Card(modifier = modifier
-        .fillMaxWidth()
-        .height(100.dp)
-        .padding(top = 10.dp, bottom = 20.dp)
-        .background(
-            color = Color.White,
-            shape = RoundedCornerShape(20.dp)
-        ),
-        elevation = CardDefaults.cardElevation(5.dp),
-        colors = CardDefaults.cardColors(Color.White)){
+fun CompleteTodayBoxPreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp),
+            )
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
 
-        Row(
-            modifier.padding(20.dp)
-        ) {
-            Icon(imageVector = Icons.Outlined.Email,
-                contentDescription = "Message",
-                modifier
-                    .weight(0.2f)
-                    .size(100.dp),
-                tint = PurpleMain)
+        Icon(
+            imageVector = Icons.Outlined.ThumbUp,
+            contentDescription ="",
+            tint = PurpleMain,
+            modifier = modifier
+                .size(25.dp)
+        )
 
-            Box(
-                modifier
-                    .weight(0.8f)
-                    .padding(start = 10.dp)
-                    .align(Alignment.CenterVertically)){
-                Text(text = "공지가 도착했어요!", style = TextStyle(color = GrayWhite, fontSize = 18.sp), textAlign = TextAlign.Center)
+        Spacer(modifier.size(10.dp))
 
+        Text(
+            text = "오늘 목표를 모두 달성하셨군요!",
+            style = TextStyle(
+                color = PurpleMain,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Spacer(modifier.size(5.dp))
+
+        Text(
+            text = "굿생 인증을 하고 하루를 마무리 해주세요.",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal
+            )
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        GodLifeButtonWhite(
+            onClick = { /*TODO*/ },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "",
+                    tint = PurpleMain
+                )
+            },
+            text = {
+                Text(
+                    text = "굿생 인증하기",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
             }
-
-        }
+        )
 
     }
 }

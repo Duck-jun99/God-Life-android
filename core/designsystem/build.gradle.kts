@@ -13,4 +13,5 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(project(":core:model"))
+    implementation(project(":core:network"))
 }

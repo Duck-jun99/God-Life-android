@@ -3,6 +3,7 @@ package com.godlife.community_page
 import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -10,11 +11,13 @@ import androidx.paging.cachedIn
 import com.godlife.domain.GetLatestPostUseCase
 import com.godlife.domain.GetFamousPostUseCase
 import com.godlife.domain.GetRankingUseCase
+import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
+import com.godlife.network.model.UserProfileBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 sealed class CommunityPageUiState {
@@ -46,8 +50,7 @@ class CommunityPageViewModel @Inject constructor(
     private val searchPostUseCase: SearchPostUseCase,
     private val getWeeklyFamousPostUseCase: GetFamousPostUseCase,
     private val getRankingUseCase: GetRankingUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
-    private val reissueUseCase: ReissueUseCase
+    private val getUserProfileUseCase: GetUserProfileUseCase
 ): ViewModel(){
 
 
@@ -63,17 +66,9 @@ class CommunityPageViewModel @Inject constructor(
     private val _rankingUiState = MutableStateFlow<RankingPageUiState>(RankingPageUiState.Loading)
     val rankingUiState: StateFlow<RankingPageUiState> = _rankingUiState
 
-    // 새로고침 상태
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
-
     /**
      * Data
      */
-
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     //현재 선택되어 있는 라우트 이름
     var selectedRoute = mutableStateOf("")
@@ -85,16 +80,19 @@ class CommunityPageViewModel @Inject constructor(
     lateinit var latestPostList: Flow<PagingData<PostDetailBody>>
 
     //주간 인기 게시물을 호출한 적이 있는지 플래그
-    private var weeklyFamousFlag = mutableIntStateOf(0)
+    private var weeklyFamousFlag = mutableStateOf(false)
 
     //전체 인기 게시물을 호출한 적이 있는지 플래그
-    private var allFamousFlag = mutableIntStateOf(0)
+    private var allFamousFlag = mutableStateOf(false)
 
     //주간 명예의 전당을 호출한 적이 있는지 플래그
-    private var weeklyRankingFlag = mutableIntStateOf(0)
+    private var weeklyRankingFlag = mutableStateOf(false)
 
     //전체 명예의 전당을 호출한 적이 있는지 플래그
-    private var allRankingFlag = mutableIntStateOf(0)
+    private var allRankingFlag = mutableStateOf(false)
+
+    //전체 명예의 전당에서 해당하는 유저의 게시물 호출한 적이 있는지 플래그
+    private var rankingUserPostFlag = mutableStateOf(false)
 
     //조회된 일주일 인기 게시물
     private val _weeklyFamousPostList = MutableStateFlow<List<PostDetailBody>>(emptyList())
@@ -112,10 +110,9 @@ class CommunityPageViewModel @Inject constructor(
     private val _allRankingList = MutableStateFlow<List<RankingBody>>(emptyList())
     val allRankingList: StateFlow<List<RankingBody>> = _allRankingList
 
-    //전체 명예의 전당에서 해당 유저의 게시물
-    private val _rankingUserPostList = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
-    val rankingUserPostList: StateFlow<PagingData<PostDetailBody>> = _rankingUserPostList
-    //lateinit var rankingUserPostList: Flow<PagingData<PostDetailBody>>
+    //조회된 전체 명예의 전당 유저 프로필
+    private val _rankingUserPostList = MutableStateFlow<UserProfileBody?>(null)
+    val rankingUserPostList: StateFlow<UserProfileBody?> = _rankingUserPostList
 
     //검색어
     private val _searchText = MutableStateFlow("")
@@ -133,12 +130,6 @@ class CommunityPageViewModel @Inject constructor(
      * Init
      */
 
-    init {
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
 
     /**
      * Functions
@@ -221,12 +212,12 @@ class CommunityPageViewModel @Inject constructor(
     fun getWeeklyFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
-        if(weeklyFamousFlag.value == 0){
-
+        if(!weeklyFamousFlag.value){
+            weeklyFamousFlag.value = true
             _uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getWeeklyFamousPostUseCase.executeGetWeeklyFamousPost(authorId = auth.value)
+                val result = getWeeklyFamousPostUseCase.executeGetWeeklyFamousPost()
 
                 result
                     .onSuccess {
@@ -234,26 +225,18 @@ class CommunityPageViewModel @Inject constructor(
 
                         _uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
 
-
-                        weeklyFamousFlag.value += 1
-
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getWeeklyFamousPost", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { getWeeklyFamousPost() })
-
-                        }
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getWeeklyFamousPost", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = CommunityPageUiState.Error(this.message())
                     }
 
             }
@@ -266,34 +249,29 @@ class CommunityPageViewModel @Inject constructor(
     fun getAllFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
-        if(allFamousFlag.value == 0){
+        if(!allFamousFlag.value){
+            allFamousFlag.value = true
 
             _uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost(authorId = auth.value)
+                val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost()
                 result
                     .onSuccess {
                         _allFamousPostList.value = data.body
                         _uiState.value = CommunityPageUiState.Success("전체 인기 게시물 조회 완료")
-                        allFamousFlag.value += 1
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getAllFamousPost", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { getAllFamousPost() })
-
-                        }
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getAllFamousPost", "${this.message}")
 
                         // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
+                        _uiState.value = CommunityPageUiState.Error(this.message())
                     }
 
             }
@@ -304,37 +282,31 @@ class CommunityPageViewModel @Inject constructor(
 
     //주간 명예의 전당 불러오기
     fun getWeeklyRanking(){
-        if(weeklyRankingFlag.value == 0){
-
+        if(!weeklyRankingFlag.value){
+            weeklyRankingFlag.value = true
             _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getRankingUseCase.executeGetWeeklyRanking(authorId = auth.value)
+                val result = getRankingUseCase.executeGetWeeklyRanking()
                 result
                     .onSuccess {
                         _weeklyRankingList.value = data.body
                         //_rankingUiState.value = RankingPageUiState.Success("주간 명예의 전당 조회 완료")
-                        weeklyRankingFlag.value +=1
 
                         getAllRanking()
 
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getWeeklyRanking", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { getWeeklyRanking() })
-
-                        }
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getWeeklyRanking", "${this.message}")
 
                         // UI State Error로 변경
-                        _rankingUiState.value = RankingPageUiState.Error("오류가 발생했습니다.")
+                        _rankingUiState.value = RankingPageUiState.Error(this.message())
                     }
             }
 
@@ -345,34 +317,30 @@ class CommunityPageViewModel @Inject constructor(
     //전체 명예의 전당 불러오기
     fun getAllRanking(){
 
-        if(allRankingFlag.value == 0){
-
+        if(!allRankingFlag.value){
+            allRankingFlag.value = true
             _rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
-                val result = getRankingUseCase.executeGetAllRanking(authorId = auth.value)
+                val result = getRankingUseCase.executeGetAllRanking()
                 result
                     .onSuccess {
                         _allRankingList.value = data.body
                         _rankingUiState.value = RankingPageUiState.Success("명예의 전당 조회 완료")
-                        allRankingFlag.value +=1
+
                     }
                     .onError {
-                        Log.e("onError", this.message())
+                        Log.e("getAllRanking", this.message())
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
+                        _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
 
-                            reIssueRefreshToken(callback = { getAllRanking() })
-
-                        }
                     }
                     .onException {
 
-                        Log.e("onException", "${this.message}")
+                        Log.e("getAllRanking", "${this.message}")
 
                         // UI State Error로 변경
-                        _rankingUiState.value = RankingPageUiState.Error("오류가 발생했습니다.")
+                        _rankingUiState.value = RankingPageUiState.Error(this.message())
                     }
             }
 
@@ -381,122 +349,87 @@ class CommunityPageViewModel @Inject constructor(
 
     }
 
-    //명예의 전당 유저의 게시물 불러오기
-    fun getRankingUserPost(
-        keyword: String = "",
-        tags: String = "",
-        nickname: String
-    ) {
+    fun getTotalRankingUserInfo(memberId: String){
         viewModelScope.launch {
-
-            searchPostUseCase.executeSearchPost(keyword, tags, nickname)
-                .collectLatest {
-                    _rankingUserPostList.value = it
-                }
-            Log.e("getRankingUserPost", "nickname : $nickname")
-
-        }
-
-    }
-
-    // 뷰 새로 고침 함수
-    fun refresh() {
-
-        _uiState.value = CommunityPageUiState.Loading
-
-        when(uiState.value){
-            is CommunityPageUiState.Success -> {
-                _isRefreshing.value = false
-            }
-            is CommunityPageUiState.Error -> {
-                _isRefreshing.value = false
-            }
-
-            is CommunityPageUiState.Loading -> {
-                _isRefreshing.value = true
-            }
-        }
-
-        if(selectedRoute.value == "LatestPostScreen"){
-            // 최신 게시물 조회 플래그 초기화
-            latestFlag.value = 0
-            getLatestPost()
-        }
-        else if(selectedRoute.value == "FamousPostScreen"){
-            // 인기 게시물 조회 플래그 초기화
-            weeklyFamousFlag.value = 0
-            getWeeklyFamousPost()
-        }
-
-        // 나머지도 구현해야됨
-    }
-
-
-    // refresh token 갱신 후 Callback 실행
-    private fun reIssueRefreshToken(callback: () -> Unit){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
+            getUserProfileUseCase.executeGetUserProfile(memberId)
                 .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    //callback 실행
-                    callback()
-
+                    _rankingUserPostList.value = data.body
                 }
                 .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = CommunityPageUiState.Error("재로그인 해주세요.")
-
-                    }
-
-                    //기타 오류 시
-                    else{
-
-                        // UI State Error로 변경
-                        _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
-                    }
-
+                    _rankingUiState.value = RankingPageUiState.Error("${this.response.code()} Error")
                 }
                 .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = CommunityPageUiState.Error("오류가 발생했습니다.")
-
+                    _rankingUiState.value = RankingPageUiState.Error(this.message())
                 }
-
-
         }
     }
 
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
-
+    fun setBackgroundColor(): List<Color>{
+        val hour = LocalDateTime.now().hour
+        return when (hour) {
+            in 0..3 -> {
+                listOf(
+                    Color(0xCC496B9F),
+                    Color(0xCB494A9F),
+                    Color(0xCC6A499F),
+                    Color(0xCC6A499F),
+                    Color(0xCC96499F),
+                    Color(0xCCDB67AD),
+                    Color(0xCCFF5E5E),
+                )
+            }
+            in 4..7 -> {
+                listOf(
+                    Color(0xFFFF44A2),  // 밝은 핫핑크
+                    Color(0xFFFF5890),  // 연한 핑크
+                    Color(0xFFFA6B80),  // 연한 코럴 핑크
+                    Color(0xFFFF7B75),  // 연한 살몬
+                    Color(0xFFFF8161),  // 밝은 코럴
+                    Color(0xFFFF884D),  // 연한 오렌지
+                )
+            }
+            in 8 .. 9 -> {
+                listOf(
+                    Color(0xFF0063CC),
+                    Color(0xFF008BCC),
+                    Color(0xFF339CCC),
+                    Color(0xFF33CCCC),
+                    Color(0xFF33CCCC)
+                )
+            }
+            in 10 .. 21 -> {
+                listOf(
+                    Color(0xFFFF44A2),  // 밝은 핫핑크
+                    Color(0xFFFF5890),  // 연한 핑크
+                    Color(0xFFFA6B80),  // 연한 코럴 핑크
+                    Color(0xFFFF7B75),  // 연한 살몬
+                    Color(0xFFFF8161),  // 밝은 코럴
+                    Color(0xFFFF884D),  // 연한 오렌지
+                )
+            }
+            in 22..23 -> {
+                listOf(
+                    Color(0xCC496B9F),
+                    Color(0xCB494A9F),
+                    Color(0xCC6A499F),
+                    Color(0xCC6A499F),
+                    Color(0xCC96499F),
+                    Color(0xCCDB67AD),
+                    Color(0xCCFF5E5E),
+                )
+            }
+            else -> {
+                listOf(
+                    Color(0xCC496B9F),
+                    Color(0xCB494A9F),
+                    Color(0xCC6A499F),
+                    Color(0xCC6A499F),
+                    Color(0xCC96499F),
+                    Color(0xCCDB67AD),
+                    Color(0xCCFF5E5E),
+                )
+            }
         }
-
     }
 
     override fun onCleared() {

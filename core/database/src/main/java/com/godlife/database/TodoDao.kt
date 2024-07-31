@@ -26,6 +26,10 @@ interface TodoDao {
     fun updateTodoList(id : Int, todoList : List<TodoList>, notificationBoolean : Boolean, notificationTime : NotificationTimeData, isCompleted : Boolean)
 
 
+    //특정 데이터베이스 가져오기
+    @Query("SELECT * FROM todos WHERE id = :id")
+    fun getTodoList(id : Int) : TodoEntity
+
     //오늘 날짜 데이터 가져오기
     @Query("SELECT * FROM todos WHERE date = :date")
     fun getTodayTodoList(date : TodoTimeData) : TodoEntity

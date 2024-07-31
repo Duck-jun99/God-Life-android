@@ -133,10 +133,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     /** Token 가져오기 */
-    fun getFirebaseToken() {
-        //비동기 방식
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
-            Log.d(TAG, "token=${it}")
+    fun getFirebaseToken(callback: (String) -> Unit) {
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            callback(token)
         }
 
 //		  //동기방식

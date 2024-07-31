@@ -1,8 +1,10 @@
 package com.godlife.main
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -46,7 +50,11 @@ import androidx.navigation.navArgument
 import com.godlife.community_page.CommunityPageScreen
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.community_page.navigation.PostDetailRoute
+import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.post_detail.PostDetailScreen
+import com.godlife.community_page.post_detail.StimulusDetailScreen
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreen
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
 import com.godlife.community_page.report.ReportScreen
 import com.godlife.community_page.report.navigation.ReportScreenRoute
 import com.godlife.designsystem.component.TabIconView
@@ -55,6 +63,10 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.MainPageScreen
+import com.godlife.main_page.history.HistoryDetailScreen
+import com.godlife.main_page.history.HistoryPageScreen
+import com.godlife.main_page.navigation.HistoryDetailRoute
+import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.navigation.MainPageRoute
 import com.godlife.model.navigationbar.BottomNavItem
 import com.godlife.navigator.CreatePostNavigator
@@ -80,6 +92,11 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var createPostNavigator: CreatePostNavigator
+
+    //TEST
+    @Inject
+    lateinit var localPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -102,8 +119,13 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        /** FCM설정, Token값 가져오기 */
-        MyFirebaseMessagingService().getFirebaseToken()
+        //TEST
+        Log.e("MainActivity", "refreshToken: ${localPreferences.getString("READ_ME_REFRESH_TOKEN", "")}")
+
+        /** FCM Token값 가져오기 */
+        MyFirebaseMessagingService().getFirebaseToken{
+            Log.e("MainActivity", "FCM Token: $it")
+        }
 
         /*
         /** PostNotification 대응 */
@@ -136,7 +158,7 @@ fun MainUiTheme(
 
 
         val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-        val communityTab = BottomNavItem(title = "God Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+        val communityTab = BottomNavItem(title = "Good Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
         val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
 
@@ -193,6 +215,29 @@ fun MainUiTheme(
                         bottomBarVisibleState.value = true
                     }
 
+                    //굿생 기록 저장소 화면
+                    composable(HistoryPageRoute.route){
+                        HistoryPageScreen(navController = navController)
+                        currentRoute.value = HistoryPageRoute.route
+                        bottomBarVisibleState.value = false
+                    }
+
+                    //굿생 기록 상세 화면
+                    composable("${HistoryDetailRoute.route}/{id}", arguments =
+                    listOf(navArgument("id"){type = NavType.IntType})
+                    ){
+                        val id = it.arguments?.getInt("id")
+                        if(id != null){
+                            HistoryDetailScreen(
+                                id = id,
+                                navController = navController
+                            )
+                            currentRoute.value = HistoryDetailRoute.route
+                            bottomBarVisibleState.value = false
+                        }
+
+                    }
+
                     //프로필 화면
                     composable("${ProfileScreenRoute.route}/{userId}", arguments =
                     listOf(navArgument("userId"){type = NavType.StringType})
@@ -224,6 +269,31 @@ fun MainUiTheme(
                                 postId = postId,
                                 parentNavController = navController,
                                 navController = navController
+                            )
+                            bottomBarVisibleState.value = false
+                        }
+                    }
+
+                    //굿생 자극 상세 화면
+                    composable("${StimulusPostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+                        val postId = it.arguments?.getString("postId")
+                        if (postId != null) {
+                            StimulusDetailScreen(
+                                postId = postId,
+                                navController = navController
+                            )
+                            bottomBarVisibleState.value = false
+                        }
+
+                    }
+
+                    // 굿생 자극 수정 화면
+                    composable("${UpdateStimulusPostScreenRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){
+                        val postId = it.arguments?.getString("postId")
+                        if (postId != null) {
+                            UpdateStimulusPostScreen(
+                                postId = postId,
+                                parentNavController = navController
                             )
                             bottomBarVisibleState.value = false
                         }
@@ -297,7 +367,7 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                 },
                 label = {
                     if(currentRoute == bottomNavItem.route){
-                        Text(bottomNavItem.title) }
+                        Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold)) }
                     else null
                         },
                 colors = NavigationBarItemDefaults.colors(

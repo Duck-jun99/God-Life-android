@@ -1,9 +1,6 @@
 package com.godlife.community_page.post_detail
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateIntAsState
@@ -63,7 +60,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -79,23 +75,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
-import com.godlife.community_page.post_detail.post_update.UpdatePostScreen
+import com.godlife.community_page.post_detail.post_update.post.UpdatePostScreen
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
+import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.CommentBody
 import com.godlife.network.model.PostDetailBody
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -154,11 +151,21 @@ fun PostDetailScreen(
                     ) {
                         LazyColumn(
                             modifier
-                                .background(Color.White)
+                                .background(GrayWhite3)
                                 .fillMaxSize()) {
 
                             if (postDetail.body?.imagesURL?.isNotEmpty() == true){
                                 item{ ImageBox(imgUriList = postDetail.body?.imagesURL!!) }
+                            }
+                            else{
+                                item{
+                                    Box(
+                                        modifier = modifier
+                                            .fillMaxWidth()
+                                            .height(30.dp)
+                                            .background(color = Color.White)
+                                    )
+                                }
                             }
 
                             postDetail.body?.let {
@@ -168,7 +175,8 @@ fun PostDetailScreen(
                                         postDetailBody = it,
                                         parentNavController = parentNavController,
                                         viewModel = postDetailViewModel,
-                                        isShowDialog = isShowDialog
+                                        isShowDialog = isShowDialog,
+                                        owner = it.boardOwner
                                     )
                                 }
                             }
@@ -285,7 +293,10 @@ fun PostDetailScreen(
 }
 
 @Composable
-fun ImageBox(modifier: Modifier = Modifier, imgUriList: List<String>){
+fun ImageBox(
+    modifier: Modifier = Modifier,
+    imgUriList: List<String>
+){
     val imgCount  = imgUriList.size
     var imgIndex by remember { mutableIntStateOf(1) }
 
@@ -334,7 +345,7 @@ fun ImageBox(modifier: Modifier = Modifier, imgUriList: List<String>){
                 index%(imgUriList.size)
             )?.let{
                 item ->
-                ImageView(modifier, LocalContext.current, item, width)
+                ImageView(imgUri = item, width = width)
 
             }
 
@@ -363,35 +374,41 @@ fun ImageBox(modifier: Modifier = Modifier, imgUriList: List<String>){
 @Composable
 fun ImageView(
     modifier: Modifier = Modifier,
-    context: Context,
     imgUri: String,
     width: Dp
 ){
 
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+    GlideImage(
+        imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + imgUri },
+        imageOptions = ImageOptions(
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center
+        ),
+        modifier = modifier
+            .size(width = width, height = 400.dp),
+        loading = {
+            Box(
+                modifier = modifier
+                    .background(GrayWhite3)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
 
-    Glide.with(context)
-        .asBitmap()
-        .load(BuildConfig.SERVER_IMAGE_DOMAIN + imgUri)
-        .into(object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                bitmap.value = resource
+                CircularProgressIndicator(
+                    color = PurpleMain
+                )
+
             }
 
-            override fun onLoadCleared(placeholder: Drawable?) {}
-        })
-
-    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-        Image(
-            modifier = modifier
-                .size(width = width, height = 400.dp),
-            bitmap = fetchedBitmap,
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
-
-    }
+        },
+        failure = {
+            Image(
+                painter = painterResource(id = R.drawable.category3),
+                contentDescription = "",
+                contentScale = ContentScale.Crop
+            )
+        }
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -401,6 +418,7 @@ fun Content(
     postDetailBody: PostDetailBody,
     parentNavController: NavController,
     viewModel: PostDetailViewModel,
+    owner: Boolean,
     isShowDialog: MutableState<Boolean>
 ){
 
@@ -408,47 +426,51 @@ fun Content(
 
     Column(
         modifier
+            .background(Color.White)
             .fillMaxWidth()
-            .padding(20.dp)) {
+            .padding(horizontal = 10.dp)
+    ) {
         Row(
             modifier
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(70.dp),
             verticalAlignment = Alignment.CenterVertically){
 
             //프로필 이미지 부분
-            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-            val imageModifier: Modifier = modifier
-                .size(50.dp, 50.dp)
-                .clip(CircleShape)
-                .fillMaxSize()
-                .background(color = GrayWhite)
-                .clickable { parentNavController.navigate("${"ProfileScreen"}/${postDetailBody.writerId}") }
+            GlideImage(
+                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + postDetailBody.profileURL },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .size(50.dp, 50.dp)
+                    .clip(CircleShape)
+                    .fillMaxSize()
+                    .background(color = GrayWhite2)
+                    .clickable { parentNavController.navigate("${"ProfileScreen"}/${postDetailBody.writerId}") },
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetailBody.profileURL)
-                .error(R.drawable.ic_person)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = imageModifier
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.ic_person),
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = imageModifier
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
 
             Spacer(modifier.size(10.dp))
@@ -461,10 +483,11 @@ fun Content(
                     text = postDetailBody.nickname,
                     style = TextStyle(
                         color = GrayWhite,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp
                     ),
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
                 )
 
                 Text(
@@ -474,7 +497,8 @@ fun Content(
                         fontWeight = FontWeight.Normal,
                         fontSize = 12.sp
                     ),
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
                 )
             }
 
@@ -526,29 +550,48 @@ fun Content(
 
         }
 
-        Spacer(modifier.size(20.dp))
+        //Spacer(modifier.size(20.dp))
 
         Text(text = postDetailBody.title, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = postDetailBody.body, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Text(
+            text = postDetailBody.body,
+            style = TextStyle(
+                color = GrayWhite,
+                fontWeight = FontWeight.Normal,
+                fontSize = 15.sp,
+                lineHeight = 22.sp
+            )
+        )
 
         Spacer(modifier.size(20.dp))
 
         FlowRow {
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
+            postDetailBody.tags.forEach {
+                TagItemView(tagItem = it)
+            }
         }
 
         Spacer(modifier.size(20.dp))
 
+        HorizontalDivider()
+
+        Spacer(modifier.size(20.dp))
+
         Text(text = postDetailBody.writtenAt, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "조회수: ${postDetailBody.views}    굿생 점수: ${postDetailBody.godScore-2}",
+            style = TextStyle(
+                color = GrayWhite,
+                fontWeight = FontWeight.Normal,
+                fontSize = 15.sp
+            )
+        )
 
         Spacer(modifier.size(20.dp))
 
@@ -564,15 +607,15 @@ fun Content2(
     owner: Boolean,
     viewModel: PostDetailViewModel
 ){
-    Column(
-        modifier = modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth()
-            .background(color = GrayWhite3, shape = RoundedCornerShape(15.dp))
-            .padding(10.dp)
-    ) {
+    if(!owner){
 
-        if(!owner){
+        Column(
+            modifier = modifier
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .fillMaxWidth()
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .padding(10.dp)
+        ) {
 
             if(!memberLikedBoard){
                 Text(
@@ -604,15 +647,20 @@ fun Content2(
                     modifier = modifier
                         .fillMaxWidth(),
                     text = "유저님께서 굿생을 인정하신 글이에요!",
-                    style = TextStyle(color = GrayWhite, fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
                     textAlign = TextAlign.Center
                 )
             }
 
+
         }
 
-
     }
+
 }
 
 
@@ -628,13 +676,12 @@ fun Comments(
 ){
 
     Column(
-        modifier = Modifier.padding(10.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = GrayWhite3)
+            .padding(10.dp)
     ) {
         Text(text = "댓글 ${comments.size}개", style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
-
-        Spacer(modifier = modifier.size(10.dp))
-
-        HorizontalDivider()
 
         Spacer(modifier = modifier.size(10.dp))
 
@@ -668,7 +715,7 @@ fun CommentBox(
         modifier
             .padding(bottom = 10.dp)
             .fillMaxWidth()
-            .background(GrayWhite3, shape = RoundedCornerShape(15.dp))
+            .background(color = Color.White, shape = RoundedCornerShape(16.dp))
             .padding(10.dp)
     ){
 
@@ -681,42 +728,51 @@ fun CommentBox(
                 verticalAlignment = Alignment.CenterVertically){
 
                 //프로필 이미지 부분
-                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                val imageModifier: Modifier = modifier
-                    .size(40.dp, 40.dp)
-                    .clip(CircleShape)
-                    .fillMaxSize()
-                    .background(color = GrayWhite)
+                GlideImage(
+                    imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + commentBody.profileURL },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .size(40.dp, 40.dp)
+                        .clip(CircleShape)
+                        .fillMaxSize()
+                        .background(color = GrayWhite2),
+                    loading = {
+                        Box(
+                            modifier = modifier
+                                .background(GrayWhite3)
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
 
-                Glide.with(LocalContext.current)
-                    .asBitmap()
-                    .load(BuildConfig.SERVER_IMAGE_DOMAIN + commentBody.profileURL)
-                    .error(R.drawable.ic_person)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmap.value = resource
+                            CircularProgressIndicator(
+                                color = PurpleMain
+                            )
+
                         }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
-
-                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = imageModifier
-                    )   //bitmap이 없다면
-                } ?: Image(
-                    painter = painterResource(id = R.drawable.ic_person),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = imageModifier
+                    },
+                    failure = {
+                        Image(
+                            painter = painterResource(id = R.drawable.category3),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 )
 
                 Spacer(modifier.size(10.dp))
 
-                Text(text = commentBody.nickname, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
+                Text(
+                    text = commentBody.nickname,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                )
 
                 Spacer(modifier.size(10.dp))
 
@@ -736,7 +792,7 @@ fun CommentBox(
                 ) {
 
                     if(commentBody.commentOwner) CommentDropDownDeleteItem(snackbarHostState = snackbarHostState, cScope = cScope, postDetailViewModel =  postDetailViewModel, commentBody = commentBody, expanded = expanded)
-                    else CommentDropDownDeclareItem(snackbarHostState = snackbarHostState, cScope = cScope, parentNavController = parentNavController, viewModel=  postDetailViewModel, commentBody = commentBody, expanded = expanded)
+                    else CommentDropDownDeclareItem(parentNavController = parentNavController, commentBody = commentBody, expanded = expanded)
 
                 }
             }
@@ -831,7 +887,6 @@ fun ContentDropDownNotBoardOwnerItem(
 
 @Composable
 fun ContentDropDownBoardOwnerItem(
-    modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
     isShowDialog: MutableState<Boolean>,
     viewModel: PostDetailViewModel
@@ -872,10 +927,6 @@ fun ContentDropDownBoardOwnerItem(
 
 @Composable
 fun CommentDropDownDeclareItem(
-    modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState,
-    cScope: CoroutineScope,
-    viewModel: PostDetailViewModel,
     parentNavController: NavController,
     commentBody: CommentBody,
     expanded: MutableState<Boolean>
@@ -896,25 +947,7 @@ fun CommentDropDownDeclareItem(
             parentNavController.navigate("${"ReportScreen"}/${postId}/${writerNickname}/${writerId}/${category}/${comment}"){
                 launchSingleTop = true
             }
-            /*
-            cScope.launch {
-                val result =
-                    snackbarHostState.showSnackbar(
-                        "해당 댓글을 신고할까요?",
-                        actionLabel = "신고하기",
-                        duration = SnackbarDuration.Long
-                    )
-                when (result) {
-                    SnackbarResult.ActionPerformed -> {
-                        /* Handle snackbar action performed */
-                    }
-                    SnackbarResult.Dismissed -> {
-                        /* Handle snackbar dismissed */
-                    }
-                }
-            }
 
-             */
         },
         leadingIcon = {
             Icon(imageVector = Icons.Outlined.Warning, contentDescription = "신고하기", tint = GrayWhite)
@@ -925,7 +958,6 @@ fun CommentDropDownDeclareItem(
 
 @Composable
 fun CommentDropDownDeleteItem(
-    modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     cScope: CoroutineScope,
     postDetailViewModel: PostDetailViewModel,

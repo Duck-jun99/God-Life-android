@@ -7,8 +7,7 @@ class GetUserProfileUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeGetUserProfile(
-        authorization : String,
         memberId : String
-    ) = networkRepository.getUserProfile(authorization, memberId)
+    ) = networkRepository.getUserProfile(memberId)
 
 }

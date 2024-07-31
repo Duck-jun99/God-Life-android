@@ -19,5 +19,7 @@ class LocalDatabaseUseCase @Inject constructor(
 
     suspend fun updateTodoList(todo: TodoEntity) = localDatabaseRepository.updateTodoList(todo)
 
+    suspend fun getTodoList(id: Int) = localDatabaseRepository.getTodoList(id)
+
     suspend fun getTodayTodoList() = localDatabaseRepository.getTodayTodoList()
 }

@@ -9,8 +9,7 @@ class PostNotificationTimeUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executePostNotificationTime(
-        authorId: String,
         notificationTime: NotificationTimeData
-    ) = networkRepository.postNotificationTime(authorization = authorId, notificationTime = NotificationRequest(notificationTime.y, notificationTime.m, notificationTime.d, notificationTime.hour, notificationTime.minute))
+    ) = networkRepository.postNotificationTime(notificationTime = NotificationRequest(notificationTime.y, notificationTime.m, notificationTime.d, notificationTime.hour, notificationTime.minute))
 
 }

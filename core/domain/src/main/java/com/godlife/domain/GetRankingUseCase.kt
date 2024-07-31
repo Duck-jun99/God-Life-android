@@ -6,7 +6,7 @@ import javax.inject.Inject
 class GetRankingUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
-    suspend fun executeGetWeeklyRanking(authorId: String) = networkRepository.getWeeklyFamousMembers(authorization = authorId)
+    suspend fun executeGetWeeklyRanking() = networkRepository.getWeeklyFamousMembers()
 
-    suspend fun executeGetAllRanking(authorId: String) = networkRepository.getAllFamousMembers(authorization = authorId)
+    suspend fun executeGetAllRanking() = networkRepository.getAllFamousMembers()
 }

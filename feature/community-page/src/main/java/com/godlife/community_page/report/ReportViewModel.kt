@@ -41,11 +41,9 @@ sealed class ReportUiState{
 
 @HiltViewModel
 class ReportViewModel @Inject constructor(
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val reportUseCase: ReportUseCase,
-    private val reissueUseCase: ReissueUseCase
 ): ViewModel(){
 
     /**
@@ -59,9 +57,6 @@ class ReportViewModel @Inject constructor(
     /**
      * Data 관련
      */
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     // 신고자 닉네임
     private val _reporterNickname = MutableStateFlow("")
@@ -115,13 +110,6 @@ class ReportViewModel @Inject constructor(
     * Init
      */
 
-    init {
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
-
     /*
     * Function
      */
@@ -166,7 +154,7 @@ class ReportViewModel @Inject constructor(
         if(!isGetArticle.value){
             viewModelScope.launch {
 
-                val result = getPostDetailUseCase.executeGetPostDetail(auth.value,
+                val result = getPostDetailUseCase.executeGetPostDetail(
                     articleId.value.toString()
                 )
                 result
@@ -178,15 +166,8 @@ class ReportViewModel @Inject constructor(
                     }
                     .onError {
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { getPost()})
-
-                        }
-                        else{
-                            _uiState.value = ReportUiState.Error(this.response.message())
-                        }
+                        Log.e("getPost", this.message())
+                        _uiState.value = ReportUiState.Error("${this.response.code()} Error")
 
                     }
                     .onException {
@@ -200,7 +181,7 @@ class ReportViewModel @Inject constructor(
     private fun getUserInfo(){
         if(!isGetUserInfo.value){
             viewModelScope.launch {
-                val result = getUserInfoUseCase.executeGetUserInfo(auth.value)
+                val result = getUserInfoUseCase.executeGetUserInfo()
 
                 result
                     .onSuccess {
@@ -211,7 +192,8 @@ class ReportViewModel @Inject constructor(
                         _uiState.value = ReportUiState.Success("성공")
                     }
                     .onError {
-                        _uiState.value = ReportUiState.Error(this.response.message())
+                        Log.e("getUserInfo", this.message())
+                        _uiState.value = ReportUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
                         _uiState.value = ReportUiState.Error(this.message())
@@ -237,7 +219,6 @@ class ReportViewModel @Inject constructor(
             _uiState.value = ReportUiState.Loading
             viewModelScope.launch {
                 val result = reportUseCase.executeReport(
-                    authorization= auth.value,
                     reporterNickname= reporterNickname.value,
                     reporterId= reporterId.value.toLong(),
                     receivedNickname= reportedNickname.value,
@@ -256,16 +237,8 @@ class ReportViewModel @Inject constructor(
                     }
                     .onError {
 
-                        // 토큰 만료시 재발급 요청
-                        if(this.response.code() == 401){
-
-                            reIssueRefreshToken(callback = { sendReport()})
-
-                        }
-                        else{
-                            Log.e("onError", this.message())
-                            _uiState.value = ReportUiState.Error("${this.response.code()} Error")
-                        }
+                        Log.e("sendReport", this.message())
+                        _uiState.value = ReportUiState.Error("${this.response.code()} Error")
                     }
                     .onException {
                         _uiState.value = ReportUiState.Error(this.message())
@@ -276,72 +249,6 @@ class ReportViewModel @Inject constructor(
     }
 
 
-    // refresh token 갱신 후 Callback 실행
-    private fun reIssueRefreshToken(callback: () -> Unit){
-        viewModelScope.launch(Dispatchers.IO) {
-
-            var auth = ""
-            launch { auth = "Bearer ${localPreferenceUserUseCase.getRefreshToken()}" }.join()
-
-            val response = reissueUseCase.executeReissue(auth)
-
-            response
-                //성공적으로 넘어오면 유저 정보의 토큰을 갱신
-                .onSuccess {
-
-                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
-
-                    //callback 실행
-                    callback()
-
-                }
-                .onError {
-                    Log.e("onError", this.message())
-
-                    // 토큰 만료시 로컬에서 토큰 삭제하고 로그아웃 메시지
-                    if(this.response.code() == 400){
-
-                        deleteLocalToken()
-
-                        // UI State Error로 변경 및 로그아웃 메시지
-                        _uiState.value = ReportUiState.Error("재로그인 해주세요.")
-
-                    }
-
-                    //기타 오류 시
-                    else{
-
-                        // UI State Error로 변경
-                        _uiState.value = ReportUiState.Error(this.message())
-                    }
-
-                }
-                .onException {
-                    Log.e("onException", "${this.message}")
-
-                    // UI State Error로 변경
-                    _uiState.value = ReportUiState.Error(this.message())
-
-                }
-
-
-        }
-    }
-
-    // 로컬에서 토큰 및 사용자 정보 삭제
-    private fun deleteLocalToken() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // 로컬 데이터베이스에서 사용자 정보 삭제 후 완료되면 true 반환
-            localPreferenceUserUseCase.removeAccessToken()
-            localPreferenceUserUseCase.removeUserId()
-            localPreferenceUserUseCase.removeRefreshToken()
-
-        }
-
-    }
 
 
 

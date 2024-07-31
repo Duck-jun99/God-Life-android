@@ -9,17 +9,14 @@ class UpdateUserInfoUseCase @Inject constructor(
 ) {
 
     suspend fun executeProfileImageUpload(
-        authorization: String,
         imagePath: Uri
-    ) = networkRepository.profileImageUpload(authorization, imagePath)
+    ) = networkRepository.profileImageUpload(imagePath)
 
     suspend fun executeBackgroundImageUpload(
-        authorization: String,
         imagePath: Uri
-    ) = networkRepository.backgroundImageUpload(authorization, imagePath)
+    ) = networkRepository.backgroundImageUpload(imagePath)
 
     suspend fun executeUpdateIntroduce(
-        authorization: String,
         introduce: String
-    ) = networkRepository.updateIntroduce(authorization, introduce)
+    ) = networkRepository.updateIntroduce(introduce)
 }

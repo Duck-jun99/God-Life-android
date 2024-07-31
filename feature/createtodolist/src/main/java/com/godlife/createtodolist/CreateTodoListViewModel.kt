@@ -34,7 +34,6 @@ sealed class CreateTodoListUiState {
 @HiltViewModel
 class CreateTodoListViewModel @Inject constructor(
     private val localDatabaseUseCase: LocalDatabaseUseCase,
-    private val localPreferenceUserUseCase: LocalPreferenceUserUseCase,
     private val postNotificationTimeUseCase: PostNotificationTimeUseCase
 ) :ViewModel(){
 
@@ -54,9 +53,6 @@ class CreateTodoListViewModel @Inject constructor(
      * Data
      */
 
-    //엑세스 토큰 저장 변수
-    private val _auth = MutableStateFlow("")
-    val auth: StateFlow<String> = _auth
 
     private val _todoList = MutableStateFlow(TodoList().getTodoList())
     val todoList: StateFlow<List<TodoListForm>> = _todoList
@@ -75,13 +71,6 @@ class CreateTodoListViewModel @Inject constructor(
     //서버 알림 시간 전송 플래그
     private val _serverFlag = MutableStateFlow(0)
     val serverFlag: StateFlow<Int> = _serverFlag
-
-    init {
-        viewModelScope.launch {
-            //엑세스 토큰 저장
-            _auth.value = "Bearer ${localPreferenceUserUseCase.getAccessToken()}"
-        }
-    }
 
     fun toggleSelect(todo: TodoListForm){
 
@@ -154,7 +143,6 @@ class CreateTodoListViewModel @Inject constructor(
                         //서버에 알림 시간 전송 후 성공하면 내부 DB에 저장
                         val result =
                             postNotificationTimeUseCase.executePostNotificationTime(
-                                authorId = auth.value,
                                 notificationTime = notificationTime.value
                             )
 
@@ -168,7 +156,16 @@ class CreateTodoListViewModel @Inject constructor(
                             }
                             .onError {
 
-                                _uiState.value = CreateTodoListUiState.Error(this.message())
+                                // 토큰 만료시
+                                if(this.response.code() == 401){
+                                    _uiState.value = CreateTodoListUiState.Error("세션이 만료되었어요. 재로그인 해주세요.")
+
+                                }
+                                else{
+                                    // UI State Error로 변경
+                                    _uiState.value = CreateTodoListUiState.Error("${this.response.code()} Error")
+
+                                }
 
                             }
                             .onException {

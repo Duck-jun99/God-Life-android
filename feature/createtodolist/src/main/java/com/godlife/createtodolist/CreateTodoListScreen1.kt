@@ -409,7 +409,7 @@ fun SelectedTodoListPreview(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun MainUIPreview(){
+fun CreateTodoListScreen1Preview(){
     GodLifeTheme {
 
         Column(

@@ -2,8 +2,7 @@ package com.godlife.community_page.post_detail
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.view.View
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedVisibility
@@ -20,9 +19,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -42,8 +47,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -58,16 +61,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.navigation.CommunityPageRoute
+import com.godlife.community_page.navigation.StimulusPostDetailRoute
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostCoverRoute
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
+import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OpaqueLight
+import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.UserProfileBody
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -75,6 +87,7 @@ import kotlinx.coroutines.delay
 fun StimulusDetailScreen(
     modifier: Modifier = Modifier,
     postId: String = "",
+    navController: NavController,
     viewModel: StimulusPostDetailViewModel = hiltViewModel()
 ) {
 
@@ -87,14 +100,18 @@ fun StimulusDetailScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    var height by remember {
+    val localDensity = LocalDensity.current
+
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
+
+
+    val height = remember {
         mutableStateOf(0.dp)
     }
-    val localDensity = LocalDensity.current
-    val context = LocalContext.current
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
+
 
     val postDetail = viewModel.postDetail.collectAsState()
+    val writerInfo = viewModel.writerInfo.collectAsState()
 
 
     GodLifeTheme {
@@ -104,73 +121,112 @@ fun StimulusDetailScreen(
                 SnackbarHost(hostState = snackBarHostState)
             }
         ) {
-            Box(modifier = modifier
-                .fillMaxSize()
-                .onGloballyPositioned {
-                    height = with(localDensity) {
-                        it.size.height.toDp()
-                    }
-                }
-            ){
 
-                Glide.with(context)
-                    .asBitmap()
-                    .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.value?.thumbnailUrl)
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            bitmap.value = resource
+            if(uiState is StimulusPostDetailUiState.Loading
+                || uiState is StimulusPostDetailUiState.Delete
+                || uiState is StimulusPostDetailUiState.Success){
+                VerticalPager(
+                    state = pagerState,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned {
+                            height.value = with(localDensity) {
+                                it.size.height.toDp()
+                            }
+                        }
+                ) {index ->
+                    when(index){
+                        0 -> {
+                            postDetail.value?.let { it1 ->
+                                StimulusPostCover(
+                                    height = height.value,
+                                    postDetail = it1
+                                )
+                            }
+                        }
+                        1 -> {
+
+                            LazyColumn(
+                                modifier = modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.White)
+                            ) {
+
+                                item {
+                                    postDetail.value?.let { post ->
+                                        writerInfo.value?.let { writer ->
+                                            PostContent(
+                                                height = height.value,
+                                                postDetail = post,
+                                                writerInfo = writer,
+                                                navController = navController,
+                                                viewModel = viewModel
+                                            )
+                                        }
+                                    }
+                                }
+
+                                item{
+                                    writerInfo.value?.nickname?.let { it1 ->
+                                        WriterAnotherPostPreview(
+                                            nickname = it1
+                                        )
+                                    }
+                                }
+                            }
+
+
                         }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
 
-                bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
 
-                    Image(
-                        bitmap = fetchedBitmap,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = modifier
-                            .fillMaxSize()
-                            .blur(
-                                radiusX = 15.dp, radiusY = 15.dp
-                            )
+                    }
+
+                }
+
+                if(uiState is StimulusPostDetailUiState.Loading){
+
+                    if((uiState as StimulusPostDetailUiState.Loading).type == UiType.LOAD_POST){
+                        GodLifeLoadingScreen(
+                            text = "게시물을 불러오고 있어요.\n잠시만 기다려주세요."
+                        )
+                    }
+
+                    else if ((uiState as StimulusPostDetailUiState.Loading).type == UiType.DELETE){
+                        GodLifeLoadingScreen(
+                            text = "게시물을 삭제중이에요.\n잠시만 기다려주세요."
+                        )
+                    }
+
+                }
+
+
+                if(uiState is StimulusPostDetailUiState.Delete){
+                    GodLifeLoadingScreen(
+                        text = "게시물 삭제가 완료되었어요.\n잠시후 자동으로 이동할게요."
                     )
 
-                }
+                    LaunchedEffect(true) {
+                        delay(3000L)
 
-                LazyColumn{
-
-
-                    item {
-                        postDetail.value?.let { it1 ->
-                            StimulusPostCover(
-                                height = height,
-                                postDetail = it1
-                            )
+                        navController.navigate(CommunityPageRoute.route){
+                            popUpTo(navController.graph.startDestinationId) {inclusive = false}
                         }
                     }
-
-                    item {
-                        postDetail.value?.let { it1 ->
-                            PostContent(
-                                height = height,
-                                postDetail = it1
-                            )
-                        }
-                    }
-
-
-                    item {
-                        AnotherPostPreview()
-                    }
-
                 }
+
             }
+
+            else{
+                GodLifeErrorScreen(
+                    errorMessage = (uiState as StimulusPostDetailUiState.Error).message,
+                    buttonEvent = {navController.popBackStack()},
+                    buttonText = "돌아가기"
+                )
+            }
+
+
         }
-
-
-
 
     }
 }
@@ -182,75 +238,122 @@ fun StimulusPostCover(
     postDetail: StimulusPost
 ) {
 
+
     val coverVisible = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(true) {
         delay(1500L)
         coverVisible.value = true
     }
 
-    Box(
-        modifier = modifier
-            .height(height)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .height(height)
+    ){
 
-        AnimatedVisibility(
-            visible = coverVisible.value ,
-            enter = fadeIn(initialAlpha = 0.4f)
+        GlideImage(
+            imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize()
+                .blur(
+                    radiusX = 15.dp, radiusY = 15.dp
+                ),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
+                }
+
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
+        
+        Box(
+            modifier = modifier
+                .height(height)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            AnimatedVisibility(
+                visible = coverVisible.value ,
+                enter = fadeIn(initialAlpha = 0.4f)
+            ) {
 
-                StimulusCoverItem(
-                    postDetail = postDetail
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
 
-                Spacer(modifier.size(5.dp))
-
-                Text(
-                    text = postDetail.introduction,
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Center
+                    StimulusCoverItem(
+                        postDetail = postDetail
                     )
-                )
 
+                    Spacer(modifier.size(5.dp))
 
-
-                Spacer(modifier.size(5.dp))
-
-                HorizontalDivider()
-
-                Spacer(modifier.size(5.dp))
-
-                //User 이름 들어갈 부분
-
-                Text(
-                    text = "by ${postDetail.nickname}",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Center
+                    Text(
+                        text = postDetail.introduction,
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        )
                     )
-                )
 
 
-                Spacer(modifier.size(50.dp))
+
+                    Spacer(modifier.size(5.dp))
+
+                    HorizontalDivider(modifier.width(200.dp))
+
+                    Spacer(modifier.size(5.dp))
+
+                    //User 이름 들어갈 부분
+
+                    Text(
+                        text = "by ${postDetail.nickname}",
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+
+
+                    Spacer(modifier.size(50.dp))
+
+                }
 
             }
+
+
 
         }
 
 
-
     }
+
+
 
 }
 
@@ -260,8 +363,6 @@ fun StimulusCoverItem(
     modifier: Modifier = Modifier,
     postDetail: StimulusPost
 ){
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -271,28 +372,37 @@ fun StimulusCoverItem(
         contentAlignment = Alignment.Center
     ){
 
-        Glide.with(context)
-            .asBitmap()
-            .load(BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
+        GlideImage(
+            imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + postDetail.thumbnailUrl },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-            )
-
-        }
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
 
         Box(
             modifier = modifier
@@ -316,122 +426,271 @@ fun StimulusCoverItem(
 @Composable
 fun PostContent(
     modifier: Modifier = Modifier,
-    height: Dp = 800.dp,
-    postDetail: StimulusPost
+    height: Dp,
+    navController: NavController,
+    viewModel: StimulusPostDetailViewModel,
+    postDetail: StimulusPost,
+    writerInfo: UserProfileBody
 ){
 
-    LazyColumn(
+    Column(
         modifier = modifier
-            .height(height)
             .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(18.dp))
+            .background(color = Color.White)
+            .statusBarsPadding()
+            .padding(horizontal = 15.dp, vertical = 10.dp)
     ){
 
-        item {
-            AndroidView(
-                modifier = modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(18.dp)),
-                factory = { context ->
-                    WebView(context).apply {
-                        webViewClient = object : WebViewClient() {
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
-                                view?.evaluateJavascript(
-                                    """
+        AndroidView(
+            modifier = modifier
+                .fillMaxSize(),
+            factory = { context ->
+
+                WebView(context).apply {
+                    loadUrl("file:///android_asset/content_template.html")
+
+
+                    settings.javaScriptEnabled = true
+                    settings.loadWithOverviewMode = true
+                    settings.useWideViewPort = true
+
+                    // 웹뷰 크기에 맞게 컨텐츠 크기 조정
+                    settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
+
+
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
+                            view?.evaluateJavascript(
+                                """
                         document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
                         document.body.style.backgroundColor = 'transparent';
                         document.documentElement.style.backgroundColor = 'transparent';
                         """.trimIndent(),
-                                    null
-                                )
-                            }
+                                null
+                            )
+                        }
+
+                    }
+
+                }
+            }
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = postDetail.createDate,
+            style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+        )
+
+        Spacer(modifier.size(20.dp))
+
+        Text(
+            text = "조회수: ${postDetail.view}",
+            style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+        )
+
+        Spacer(modifier.size(20.dp))
+
+
+        Column(modifier = modifier
+            .fillMaxWidth()
+            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+            .padding(10.dp),
+            verticalArrangement = Arrangement.Center
+        ){
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                GlideImage(
+                    imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + writerInfo.profileImageURL },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .clip(CircleShape)
+                        .size(70.dp),
+                    loading = {
+                        Box(
+                            modifier = modifier
+                                .background(GrayWhite3)
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+
+                            CircularProgressIndicator(
+                                color = PurpleMain
+                            )
 
                         }
-                        settings.javaScriptEnabled = true
-                        settings.loadWithOverviewMode = true
-                        settings.useWideViewPort = true
 
-
-                        loadUrl("file:///android_asset/content_template.html")
-
+                    },
+                    failure = {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
                     }
+                )
+
+                Spacer(modifier.size(10.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Text(text = writerInfo.nickname,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    )
+
+                    Spacer(modifier.size(5.dp))
+
+                    Text(text = writerInfo.whoAmI,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 12.sp
+                        )
+                    )
+
+                }
+
+
+            }
+
+        }
+
+        if(postDetail.owner){
+
+            Spacer(modifier.size(20.dp))
+
+            OwnerOption(
+                navController = navController,
+                viewModel = viewModel,
+                postDetail = postDetail
+            )
+
+        }
+
+
+
+
+    }
+
+    if(viewModel.isDialogVisble.collectAsState().value){
+        AlertDialog(
+            containerColor = Color.White,
+            onDismissRequest = { viewModel.setDialogVisble() },
+            title = {
+                Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            },
+            text = {
+                Text(text = "게시물을 삭제하시겠어요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+            },
+            confirmButton = {
+                GodLifeButtonWhite(
+                    onClick = {
+                        viewModel.deletePost()
+                        viewModel.setDialogVisble()
+                    },
+                    text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            },
+            dismissButton = {
+                GodLifeButtonWhite(
+                    onClick = { viewModel.setDialogVisble() },
+                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            }
+        )
+    }
+
+
+
+}
+
+@Composable
+fun OwnerOption(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: StimulusPostDetailViewModel,
+    postDetail: StimulusPost
+){
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+        .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = {
+                          navController.navigate("${UpdateStimulusPostScreenRoute.route}/${postDetail.boardId}"){
+                              launchSingleTop = true
+                          }
+                          },
+                text = {
+                    Text(
+                        text = "수정하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
                 }
             )
+
         }
 
-        item {
-            Spacer(modifier.size(20.dp))
-        }
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
 
-        item {
-            Row {
-
-                Text(
-                    text = "조회수: 100",
-                    style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-                )
-
-                Spacer(modifier.size(20.dp))
-
-                Text(
-                    text = "댓글: 33",
-                    style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-                )
-            }
-
-            Spacer(modifier.size(20.dp))
-        }
-
-
-        item {
-            Column(modifier = modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.End){
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-
-                        Text(text = "작성자 닉네임",
-                            style = TextStyle(
-                                color = Color.Black
-                            )
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = {
+                          viewModel.setDialogVisble()
+                },
+                text = {
+                    Text(
+                        text = "삭제하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
                         )
-
-                        Text(text = "대충 나를 이렇게 소개한다는 내용",
-                            style = TextStyle(
-                                color = Color.Black
-                            )
-                        )
-
-                    }
-
-
-                    Spacer(modifier.size(30.dp))
-
-                    Image(painter = painterResource(id = R.drawable.ic_person), contentDescription ="",
-                        modifier
-                            .background(color = GrayWhite, shape = CircleShape)
-                            .size(50.dp))
-
+                    )
                 }
-
-            }
+            )
 
         }
 
 
 
     }
-
-
-
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -487,7 +746,7 @@ fun StimulusDetailScreenPreview(
 
                 item { PostContentPreview(height = height) }
 
-                item { AnotherPostPreview() }
+                item { WriterAnotherPostPreview() }
 
             }
         }
@@ -742,26 +1001,94 @@ fun PostContentPreview(
 
 @Preview
 @Composable
-fun AnotherPostPreview(
-    modifier: Modifier = Modifier
+fun WriterAnotherPostPreview(
+    modifier: Modifier = Modifier,
+    nickname: String = "작성자"
 ){
     Column(
         modifier = modifier
-            .padding(10.dp)
             .fillMaxWidth()
-            .background(color = OpaqueLight, shape = RoundedCornerShape(18.dp))
             .padding(10.dp),
         horizontalAlignment = Alignment.Start
     ){
 
         Text(
-            text = "닉네임 님, 이런 글은 어때요?",
-            style = TextStyle(color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+            text = "${nickname}님의 다른 글도 읽어보세요.",
+            style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         )
+
+        Spacer(modifier.size(10.dp))
 
         HorizontalDivider()
 
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun OwnerOptionPreview(
+    modifier: Modifier = Modifier
+){
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+        .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = { /*TODO*/ },
+                text = {
+                    Text(
+                        text = "수정하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
+                }
+            )
+
+        }
+
+        Box(
+            modifier = modifier
+                .weight(0.5f)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ){
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .fillMaxWidth(),
+                onClick = { /*TODO*/ },
+                text = {
+                    Text(
+                        text = "삭제하기",
+                        style = TextStyle(
+                            color = PurpleMain,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
+                }
+            )
+
+        }
+
+
+
+    }
 }

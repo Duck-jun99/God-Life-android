@@ -9,8 +9,7 @@ class PatchNotificationTimeUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executePatchNotificationTime(
-        authorId: String,
         notificationTime: NotificationTimeData
-    ) = networkRepository.patchNotificationTime(authorization = authorId, notificationTime = NotificationRequest(notificationTime.y, notificationTime.m, notificationTime.d, notificationTime.hour, notificationTime.minute))
+    ) = networkRepository.patchNotificationTime(notificationTime = NotificationRequest(notificationTime.y, notificationTime.m, notificationTime.d, notificationTime.hour, notificationTime.minute))
 
 }

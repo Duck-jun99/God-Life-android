@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -70,13 +71,16 @@ import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.StimulusPostList
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
     userId: String,
     viewModel: ProfileViewModel = hiltViewModel()
@@ -88,28 +92,22 @@ fun ProfileScreen(
 
     GodLifeTheme {
 
-        Scaffold(
+        Scaffold { innerPadding ->
 
-        ) { innerPadding ->
+            if(uiState !is ProfileUiState.Error){
+                ProfileBox(innerPadding = innerPadding, navController = navController, viewModel = viewModel)
+            }
 
-            when(uiState){
-                is ProfileUiState.Loading -> {
+            //오류 발생 시
+            else{
+                GodLifeErrorScreen(
+                    errorMessage = (uiState as ProfileUiState.Error).message,
+                    buttonEnabled = false
+                )
+            }
 
-                    /* TODO */
-
-                }
-
-                is ProfileUiState.Success -> {
-
-                    ProfileBox(innerPadding = innerPadding, navController = navController, viewModel = viewModel)
-
-                }
-
-                is ProfileUiState.Error -> {
-
-                    /* TODO */
-
-                }
+            if(uiState is ProfileUiState.Loading){
+                GodLifeLoadingScreen()
             }
 
         }
@@ -208,14 +206,6 @@ fun ProfileBox(
 
                 //프로필 사진
                 val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                val imageModifier: Modifier = modifier
-                    .size(130.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        bitmap.value?.let { viewModel.setFullImageBitmap(it) }
-                        viewModel.setFullImageVisibility()
-                    }
-
                 Glide.with(LocalContext.current)
                     .asBitmap()
                     .load( if(userInfo.profileImageURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImageURL else (R.drawable.category4) )
@@ -233,13 +223,25 @@ fun ProfileBox(
                         bitmap = fetchedBitmap,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = imageModifier
+                        modifier = modifier
+                            .size(130.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                bitmap.value?.let { viewModel.setFullImageBitmap(it) }
+                                viewModel.setFullImageVisibility()
+                            }
                     )   //bitmap이 없다면
                 } ?: Image(
                     painter = painterResource(id = R.drawable.category4),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = imageModifier
+                    modifier = modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            bitmap.value?.let { viewModel.setFullImageBitmap(it) }
+                            viewModel.setFullImageVisibility()
+                        }
                 )
 
 
@@ -521,7 +523,7 @@ fun UserPostListBox(
         // 굿생 인증 게시물
         if(selectedIndex.value == 0){
 
-            viewModel.getUserPosts()
+            //viewModel.getUserPosts()
 
             LazyColumn(
                 modifier = Modifier
@@ -529,7 +531,13 @@ fun UserPostListBox(
             ) {
 
                 items(userPostList.itemCount){
-                    userPostList[it]?.let { it1 -> PostList(item = it1, navController = navController) }
+                    userPostList[it]?.let { it1 ->
+
+                        PostList(
+                            item = it1,
+                            navController = navController
+                        )
+                    }
 
                 }
             }
@@ -545,7 +553,11 @@ fun UserPostListBox(
                     .background(GrayWhite3)
             ) {
                 items(userStimulusPostList.value){ item ->
-                    SearchStimulusPostItem(item = item)
+
+                    SearchStimulusPostItem(
+                        item = item,
+                        navController = navController
+                    )
                 }
             }
 
@@ -573,36 +585,38 @@ fun PostList(
     ){
 
         //대표 이미지 보일 부분
-        val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-        val imageModifier: Modifier = modifier
-            .size(70.dp)
-            .clip(RoundedCornerShape(15.dp))
-            .fillMaxSize()
+        GlideImage(
+            imageModel = { if(item.imagesURL.isNullOrEmpty()) R.drawable.category3 else BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL!![0] },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = modifier
+                .size(70.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
 
-        Glide.with(LocalContext.current)
-            .asBitmap()
-            .load(if(item.imagesURL.isNullOrEmpty()) R.drawable.category3 else BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL!![0])
-            .error(R.drawable.category3)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
+                    CircularProgressIndicator(
+                        color = PurpleMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = imageModifier
-            )   //bitmap이 없다면
-        } ?: Image(
-            painter = painterResource(id = R.drawable.category3),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = imageModifier
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
         )
 
         Spacer(modifier.size(10.dp))
@@ -631,17 +645,20 @@ fun PostList(
 @Composable
 fun SearchStimulusPostItem(
     modifier: Modifier = Modifier,
-    item: StimulusPostList
+    item: StimulusPostList,
+    navController: NavController
 ){
-
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-
 
     Row(
         modifier = modifier
             .padding(5.dp)
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(15.dp))
+            .clickable {
+                navController.navigate("StimulusDetailScreen/${item.boardId}"){
+                    launchSingleTop = true
+                }
+            }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -654,32 +671,36 @@ fun SearchStimulusPostItem(
             contentAlignment = Alignment.Center
         ){
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
+            GlideImage(
+                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .fillMaxSize(),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .fillMaxWidth()
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.category3),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxWidth()
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
 
             Box(

@@ -3,6 +3,7 @@ package com.godlife.create_post.stimulus
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -61,51 +64,50 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OpaqueLight
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
 
 @Composable
 fun CreateStimulusPostScreen(
     modifier: Modifier = Modifier,
     bottomBarVisibleState: MutableState<Boolean>,
     fabVisibleState: MutableState<Boolean>,
+    parentNavController: NavController,
     viewModel: CreateStimulusPostViewModel = hiltViewModel()
 ){
     val navController = rememberNavController()
-    val uiState by viewModel.uiState.collectAsState()
 
     val cScope = rememberCoroutineScope()
 
+    viewModel.getTempBoardId()
+
     NavHost(navController = navController, startDestination = CreateStimulusPostCoverRoute.route){
 
-
         composable(CreateStimulusPostCoverRoute.route){
+
             bottomBarVisibleState.value = false
             fabVisibleState.value = false
 
-            viewModel.getTempBoardId()
+            CreateStimulusPostCover(
+                navController = navController,
+                viewModel = viewModel,
+                cScope = cScope
+            )
 
-            when(uiState){
-
-                is CreateStimulusUiState.Loading -> {
-
-                }
-                is CreateStimulusUiState.Success -> {
-
-                    CreateStimulusPostCover(navController = navController, viewModel = viewModel, cScope = cScope)
-
-                }
-                is CreateStimulusUiState.Error -> {
-
-                }
-
-            }
+            Log.e("CreateStimulusPostScreen", navController.currentBackStackEntry.toString())
 
         }
 
         composable(CreateStimulusPostLoading.route){
+
             bottomBarVisibleState.value = false
             fabVisibleState.value = false
 
-            CreateStimulusPostLoading(navController = navController, viewModel = viewModel)
+            CreateStimulusPostLoading(
+                navController = navController,
+                viewModel = viewModel
+            )
+
+            Log.e("CreateStimulusPostScreen", navController.currentBackStackEntry.toString())
         }
 
         composable(
@@ -118,10 +120,18 @@ fun CreateStimulusPostScreen(
             }
         ){
 
+
             bottomBarVisibleState.value = false
             fabVisibleState.value = false
 
-            CreateStimulusPostContent(navController = navController, viewModel = viewModel, cScope = cScope)
+            CreateStimulusPostContent(
+                navController = navController,
+                viewModel = viewModel,
+                cScope = cScope,
+                parentNavController = parentNavController
+            )
+
+            Log.e("CreateStimulusPostScreen", navController.currentBackStackEntry.toString())
 
         }
 
@@ -144,7 +154,7 @@ fun CreateStimulusPostScreenPreview(
 
         composable(CreateStimulusPostContent.route){
 
-            CreateStimulusPostContentPreview( )
+            //CreateStimulusPostContentPreview( )
         }
 
     }

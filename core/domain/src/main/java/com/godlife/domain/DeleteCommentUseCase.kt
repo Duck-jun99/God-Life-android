@@ -7,7 +7,6 @@ class DeleteCommentUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
     suspend fun executeDeleteComment(
-        authorization: String,
         commentId: String,
-    ) = networkRepository.deleteComment(authorization, commentId)
+    ) = networkRepository.deleteComment(commentId)
 }

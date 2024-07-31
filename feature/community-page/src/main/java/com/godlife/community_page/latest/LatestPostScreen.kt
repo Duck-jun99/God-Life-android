@@ -73,6 +73,8 @@ import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun LatestPostScreen(
@@ -146,73 +148,38 @@ fun LatestPostListView(
             verticalAlignment = Alignment.CenterVertically
         ){
             Row(
-                modifier.weight(0.8f),
+                modifier.weight(0.7f),
                 verticalAlignment = Alignment.CenterVertically
             ){
+
                 //프로필 이미지 부분
-
-                val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-                val imageModifier: Modifier = modifier
-                    .size(30.dp, 30.dp)
-                    .clip(CircleShape)
-                    .fillMaxSize()
-                    .background(color = GrayWhite)
-
-                if(item.profileURL != ""){
-                    Glide.with(LocalContext.current)
-                        .asBitmap()
-                        .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.profileURL)
-                        .error(R.drawable.ic_person)
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                bitmap.value = resource
-                            }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {}
-                        })
-
-                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                GlideImage(
+                    imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.profileURL },
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    ),
+                    modifier = modifier
+                        .size(30.dp, 30.dp)
+                        .clip(CircleShape)
+                        .background(GrayWhite2)
+                        .fillMaxSize(),
+                    loading = {
                         Image(
-                            bitmap = fetchedBitmap,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = imageModifier
-                        )   //bitmap이 없다면
-                    } ?: Image(
-                        painter = painterResource(id = R.drawable.ic_person),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = imageModifier
-                    )
-                }
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
 
-                else{
-                    Glide.with(LocalContext.current)
-                        .asBitmap()
-                        .load(R.drawable.ic_person)
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                bitmap.value = resource
-                            }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {}
-                        })
-
-                    bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
+                    },
+                    failure = {
                         Image(
-                            bitmap = fetchedBitmap,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = imageModifier
-                        )   //bitmap이 없다면
-                    } ?: Image(
-                        painter = painterResource(id = R.drawable.ic_person),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = imageModifier
-                    )
-                }
-
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                )
 
                 Spacer(modifier.size(10.dp))
 
@@ -221,11 +188,19 @@ fun LatestPostListView(
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                //Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
             }
-            Box(modifier.weight(0.2f)){
-                Text(text = item.writtenAt, style = TextStyle(color = GrayWhite, fontSize = 15.sp))
-            }
+            Text(
+                modifier = modifier
+                    .weight(0.3f)
+                    .padding(end = 10.dp),
+                text = item.writtenAt,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 14.sp
+                ),
+                textAlign = TextAlign.End
+            )
         }
 
         Box(
@@ -239,37 +214,31 @@ fun LatestPostListView(
         //게시물 대표 사진 보여질 곳
         if(item.imagesURL?.isNotEmpty() == true){
 
-            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-            val imageModifier: Modifier = modifier
-                .height(500.dp)
-                .fillMaxSize()
-                .background(color = Color.Black)
+            GlideImage(
+                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.imagesURL?.get(0) },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .height(500.dp)
+                    .fillMaxSize()
+                    .background(color = Color.Black),
+                loading = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
 
-
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load("${BuildConfig.SERVER_IMAGE_DOMAIN}${item.imagesURL?.get(0)}")
-                .error(R.drawable.ic_person)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = imageModifier
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.ic_person),
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = imageModifier
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
         }
 

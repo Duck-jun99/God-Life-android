@@ -9,6 +9,7 @@ import com.godlife.network.model.DeletePostQuery
 import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
+import com.godlife.network.model.LogoutQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -25,6 +26,7 @@ import com.godlife.network.model.UpdateIntroduceQuery
 import com.godlife.network.model.UserInfoQuery
 import com.godlife.network.model.UserProfileQuery
 import com.godlife.network.model.RankingQuery
+import com.godlife.network.model.RecommendPostQuery
 import com.skydoves.sandwich.ApiResponse
 
 interface NetworkDataSource {
@@ -42,33 +44,34 @@ interface NetworkDataSource {
                        providerName: String
     ): SignUpQuery
 
-    suspend fun getUserInfo(authorization: String): ApiResponse<UserInfoQuery>
+    suspend fun getUserInfo(): ApiResponse<UserInfoQuery>
+
+    suspend fun logout(): ApiResponse<LogoutQuery>
 
     suspend fun getUserProfile(
-        authorization: String,
         memberId: String
     ): ApiResponse<UserProfileQuery>
 
-    suspend fun reissue(authorization: String): ApiResponse<ReissueQuery>
+    suspend fun reissue(): ApiResponse<ReissueQuery>
+
+    suspend fun registerFcmToken(
+        fcmToken: String
+    ): ApiResponse<SignUpCheckNicknameQuery>
 
     suspend fun profileImageUpload(
-        authorization: String,
         image: Uri
     ):ApiResponse<ImageUploadQuery>
 
     suspend fun backgroundImageUpload(
-        authorization: String,
         image: Uri
     ):ApiResponse<ImageUploadQuery>
 
     suspend fun updateIntroduce(
-        authorization: String,
         introduce: String
     ): ApiResponse<UpdateIntroduceQuery>
 
 
     suspend fun createPost(
-        authorization: String,
         title: String,
         content: String,
         tags: List<String>,
@@ -76,7 +79,6 @@ interface NetworkDataSource {
     ): ApiResponse<PostQuery>
 
     suspend fun updatePost(
-        authorization: String,
         postId: String,
         title: String,
         content: String,
@@ -86,27 +88,22 @@ interface NetworkDataSource {
     ): ApiResponse<PostQuery>
 
     suspend fun deletePost(
-        authorization: String,
         postId: String
     ): ApiResponse<DeletePostQuery>
 
     suspend fun getLatestPost(
-        authorization: String,
         page: Int,
         keyword: String,
         tag: String
     ): ApiResponse<LatestPostQuery>
 
     suspend fun getWeeklyFamousPost(
-        authorization: String
     ): ApiResponse<LatestPostQuery>
 
     suspend fun getAllFamousPost(
-        authorization: String
     ): ApiResponse<LatestPostQuery>
 
     suspend fun getSearchedPost(
-        authorization: String,
         page: Int,
         keyword: String,
         tag: String,
@@ -114,104 +111,91 @@ interface NetworkDataSource {
     ): ApiResponse<LatestPostQuery>
 
     suspend fun getPostDetail(
-        authorization: String,
         postId: String
     ): ApiResponse<PostDetailQuery>
 
     suspend fun getComments(
-        authorization: String,
         postId: String
     ): ApiResponse<GetCommentsQuery>
 
     suspend fun createComment(
-        authorization: String,
         postId: String,
         comment: String
     ): ApiResponse<CommentQuery>
 
     suspend fun deleteComment(
-        authorization: String,
         commentId: String
     ): ApiResponse<CommentQuery>
 
     suspend fun agreeGodLife(
-        authorization: String,
         postId: Int
     ): ApiResponse<GodScoreQuery>
 
 
     suspend fun getWeeklyFamousMembers(
-        authorization: String
     ): ApiResponse<RankingQuery>
 
     suspend fun getAllFamousMembers(
-        authorization: String
     ): ApiResponse<RankingQuery>
 
     suspend fun postNotificationTime(
-        authorization: String,
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery>
 
     suspend fun patchNotificationTime(
-        authorization: String,
         notificationTime: NotificationRequest
     ): ApiResponse<NotificationQuery>
 
     suspend fun deleteNotificationTime(
-        authorization: String
     ): ApiResponse<NotificationQuery>
 
     suspend fun createStimulusPostTemp(
-        authorization: String
     ): ApiResponse<StimulusPostQuery>
 
     suspend fun uploadStimulusPostImage(
-        authorization: String,
         tmpBoardId: Int,
         image: Uri
     ): ApiResponse<ImageUploadStimulusQuery>
 
     suspend fun createStimulusPost(
-        authorization: String,
         stimulusPostBody: CreatePostRequest
     ): ApiResponse<StimulusPostQuery>
 
+    suspend fun updateStimulusPost(
+        stimulusPostBody: CreatePostRequest
+    ): ApiResponse<StimulusPostQuery>
+
+    suspend fun deleteStimulusPost(
+        boardId: String
+    ): ApiResponse<DeletePostQuery>
+
     suspend fun getStimulusLatestPost(
-        authorization: String,
         page: Int
     ): ApiResponse<StimulusPostListQuery>
 
     suspend fun getStimulusFamousPost(
-        authorization: String
     ): ApiResponse<StimulusPostListQuery>
 
     suspend fun getStimulusMostViewPost(
-        authorization: String
     ): ApiResponse<StimulusPostListQuery>
 
     suspend fun getStimulusFamousAuthorPost(
-        authorization: String
-    ): ApiResponse<StimulusPostListQuery>
+    ): ApiResponse<RecommendPostQuery>
 
     suspend fun getStimulusRecommendPost(
-        authorization: String
     ): ApiResponse<StimulusPostListQuery>
 
     suspend fun getStimulusPostDetail(
-        authorization: String,
         boardId: String
     ): ApiResponse<StimulusPostDetailQuery>
 
     suspend fun searchStimulusPost(
-        authorization: String,
         title: String,
         nickname: String,
         introduction: String
     ): ApiResponse<StimulusPostListQuery>
 
     suspend fun report(
-        authorization: String,
         reporterNickname: String,
         reporterId: Long,
         receivedNickname: String,

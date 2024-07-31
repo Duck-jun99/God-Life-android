@@ -11,7 +11,6 @@ import javax.inject.Inject
  * Paging을 위해 SearchPostRepository를 따로 생성
  */
 class SearchPostRepository @Inject constructor(
-    private val localPreferenceUserRepository: LocalPreferenceUserRepository,
     private val networkApi: RetrofitNetworkApi
 ) {
     fun getSearchedPost(
@@ -23,7 +22,7 @@ class SearchPostRepository @Inject constructor(
             pageSize = 10,
         ),
         pagingSourceFactory = {
-            SearchPostPagingSource(localPreferenceUserRepository, networkApi, keyword, tags, nickname)
+            SearchPostPagingSource(networkApi, keyword, tags, nickname)
         }
     ).flow
 }

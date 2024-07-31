@@ -6,7 +6,7 @@ import javax.inject.Inject
 class GetFamousPostUseCase @Inject constructor(
     private val networkRepository: NetworkRepository
 ) {
-    suspend fun executeGetWeeklyFamousPost(authorId: String) = networkRepository.getWeeklyFamousPost(authorization = authorId)
+    suspend fun executeGetWeeklyFamousPost() = networkRepository.getWeeklyFamousPost()
 
-    suspend fun executeGetAllFamousPost(authorId: String) = networkRepository.getAllFamousPost(authorization = authorId)
+    suspend fun executeGetAllFamousPost() = networkRepository.getAllFamousPost()
 }
