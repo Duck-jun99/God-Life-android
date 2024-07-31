@@ -26,6 +26,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -63,6 +64,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
+import com.godlife.community_page.navigation.CommunityPageRoute
+import com.godlife.community_page.navigation.StimulusPostDetailRoute
+import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostCoverRoute
 import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -70,6 +74,8 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.StimulusPost
 import com.godlife.network.model.UserProfileBody
 import com.skydoves.landscapist.ImageOptions
@@ -116,64 +122,109 @@ fun StimulusDetailScreen(
             }
         ) {
 
-            VerticalPager(
-                state = pagerState,
-                modifier = modifier
-                    .fillMaxSize()
-                    .onGloballyPositioned {
-                        height.value = with(localDensity) {
-                            it.size.height.toDp()
+            if(uiState is StimulusPostDetailUiState.Loading
+                || uiState is StimulusPostDetailUiState.Delete
+                || uiState is StimulusPostDetailUiState.Success){
+                VerticalPager(
+                    state = pagerState,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned {
+                            height.value = with(localDensity) {
+                                it.size.height.toDp()
+                            }
                         }
-                    }
-            ) {index ->
-                when(index){
-                    0 -> {
-                        postDetail.value?.let { it1 ->
-                            StimulusPostCover(
-                                height = height.value,
-                                postDetail = it1
-                            )
+                ) {index ->
+                    when(index){
+                        0 -> {
+                            postDetail.value?.let { it1 ->
+                                StimulusPostCover(
+                                    height = height.value,
+                                    postDetail = it1
+                                )
+                            }
                         }
-                    }
-                    1 -> {
+                        1 -> {
 
-                        LazyColumn(
-                            modifier = modifier
-                                .fillMaxSize()
-                                .background(color = Color.White)
-                        ) {
+                            LazyColumn(
+                                modifier = modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.White)
+                            ) {
 
-                            item {
-                                postDetail.value?.let { post ->
-                                    writerInfo.value?.let { writer ->
-                                        PostContent(
-                                            height = height.value,
-                                            postDetail = post,
-                                            writerInfo = writer,
-                                            navController = navController,
-                                            viewModel = viewModel
+                                item {
+                                    postDetail.value?.let { post ->
+                                        writerInfo.value?.let { writer ->
+                                            PostContent(
+                                                height = height.value,
+                                                postDetail = post,
+                                                writerInfo = writer,
+                                                navController = navController,
+                                                viewModel = viewModel
+                                            )
+                                        }
+                                    }
+                                }
+
+                                item{
+                                    writerInfo.value?.nickname?.let { it1 ->
+                                        WriterAnotherPostPreview(
+                                            nickname = it1
                                         )
                                     }
                                 }
                             }
 
-                            item{
-                                writerInfo.value?.nickname?.let { it1 ->
-                                    WriterAnotherPostPreview(
-                                        nickname = it1
-                                    )
-                                }
-                            }
+
                         }
+
 
 
                     }
 
+                }
 
+                if(uiState is StimulusPostDetailUiState.Loading){
+
+                    if((uiState as StimulusPostDetailUiState.Loading).type == UiType.LOAD_POST){
+                        GodLifeLoadingScreen(
+                            text = "게시물을 불러오고 있어요.\n잠시만 기다려주세요."
+                        )
+                    }
+
+                    else if ((uiState as StimulusPostDetailUiState.Loading).type == UiType.DELETE){
+                        GodLifeLoadingScreen(
+                            text = "게시물을 삭제중이에요.\n잠시만 기다려주세요."
+                        )
+                    }
 
                 }
-                
+
+
+                if(uiState is StimulusPostDetailUiState.Delete){
+                    GodLifeLoadingScreen(
+                        text = "게시물 삭제가 완료되었어요.\n잠시후 자동으로 이동할게요."
+                    )
+
+                    LaunchedEffect(true) {
+                        delay(3000L)
+
+                        navController.navigate(CommunityPageRoute.route){
+                            popUpTo(navController.graph.startDestinationId) {inclusive = false}
+                        }
+                    }
+                }
+
             }
+
+            else{
+                GodLifeErrorScreen(
+                    errorMessage = (uiState as StimulusPostDetailUiState.Error).message,
+                    buttonEvent = {navController.popBackStack()},
+                    buttonText = "돌아가기"
+                )
+            }
+
 
         }
 
@@ -535,6 +586,34 @@ fun PostContent(
 
     }
 
+    if(viewModel.isDialogVisble.collectAsState().value){
+        AlertDialog(
+            containerColor = Color.White,
+            onDismissRequest = { viewModel.setDialogVisble() },
+            title = {
+                Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            },
+            text = {
+                Text(text = "게시물을 삭제하시겠어요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
+            },
+            confirmButton = {
+                GodLifeButtonWhite(
+                    onClick = {
+                        viewModel.deletePost()
+                        viewModel.setDialogVisble()
+                    },
+                    text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            },
+            dismissButton = {
+                GodLifeButtonWhite(
+                    onClick = { viewModel.setDialogVisble() },
+                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                )
+            }
+        )
+    }
+
 
 
 }
@@ -592,7 +671,9 @@ fun OwnerOption(
             GodLifeButtonWhite(
                 modifier = modifier
                     .fillMaxWidth(),
-                onClick = { /*TODO*/ },
+                onClick = {
+                          viewModel.setDialogVisble()
+                },
                 text = {
                     Text(
                         text = "삭제하기",

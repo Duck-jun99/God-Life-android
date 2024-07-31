@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.domain.CreateCommentUseCase
 import com.godlife.domain.DeleteCommentUseCase
+import com.godlife.domain.DeleteStimulusPostUseCase
 import com.godlife.domain.GetCommentsUseCase
 import com.godlife.domain.GetPostDetailUseCase
 import com.godlife.domain.GetUserInfoUseCase
@@ -26,19 +27,22 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class StimulusPostDetailUiState {
-    object Loading : StimulusPostDetailUiState()
-    data class Success(val data: String) : StimulusPostDetailUiState()
+    data class Loading(val type: UiType) : StimulusPostDetailUiState()
+    data class Success(val type: UiType) : StimulusPostDetailUiState()
+    object Delete: StimulusPostDetailUiState()
     data class Error(val message: String) : StimulusPostDetailUiState()
+}
+
+enum class UiType{
+    LOAD_POST,
+    DELETE
 }
 
 @HiltViewModel
 class StimulusPostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val getCommentsUseCase: GetCommentsUseCase,
-    private val createCommentUseCase: CreateCommentUseCase,
-    private val deleteCommentUseCase: DeleteCommentUseCase,
-    private val plusGodScoreUseCase: PlusGodScoreUseCase,
+    private val deleteStimulusPostUseCase: DeleteStimulusPostUseCase
 
 ): ViewModel() {
 
@@ -47,7 +51,7 @@ class StimulusPostDetailViewModel @Inject constructor(
      */
 
     // 전체 UI 상태
-    private val _uiState = MutableStateFlow<StimulusPostDetailUiState>(StimulusPostDetailUiState.Loading)
+    private val _uiState = MutableStateFlow<StimulusPostDetailUiState>(StimulusPostDetailUiState.Loading(UiType.LOAD_POST))
     val uiState: StateFlow<StimulusPostDetailUiState> = _uiState
 
     /**
@@ -66,12 +70,17 @@ class StimulusPostDetailViewModel @Inject constructor(
     private val _writerInfo = MutableStateFlow<UserProfileBody?>(null)
     val writerInfo: StateFlow<UserProfileBody?> = _writerInfo
 
+    //삭제 Dialog 보여줄 플래그
+    val isDialogVisble = MutableStateFlow(false)
 
     //게시물 정보 받아왔는지 플래그
-    val isGetPostDetail = MutableStateFlow(false)
+    private val isGetPostDetail = MutableStateFlow(false)
 
     //작성자 정보 받아왔는지 플래그
-    val isGetWriterInfo = MutableStateFlow(false)
+    private val isGetWriterInfo = MutableStateFlow(false)
+
+    //삭제 완료 플래그
+    private val isDeleted = MutableStateFlow(false)
 
 
     /**
@@ -137,7 +146,7 @@ class StimulusPostDetailViewModel @Inject constructor(
                 result
                     .onSuccess {
                         _writerInfo.value = data.body
-                        _uiState.value = StimulusPostDetailUiState.Success("성공")
+                        _uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
                     }
                     .onError {
                         _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
@@ -148,6 +157,33 @@ class StimulusPostDetailViewModel @Inject constructor(
             }
         }
 
+    }
+
+    //삭제 버튼 Dialog flag 변경 함수
+    fun setDialogVisble(){
+        isDialogVisble.value = !isDialogVisble.value
+    }
+
+    //삭제 함수 (작성자인 경우)
+    fun deletePost(){
+        if(!isDeleted.value){
+            isDeleted.value = true
+
+            _uiState.value = StimulusPostDetailUiState.Loading(UiType.DELETE)
+
+            viewModelScope.launch {
+                deleteStimulusPostUseCase.executeDeleteStimulusPost(boardId  = postId.value)
+                    .onSuccess {
+                        _uiState.value = StimulusPostDetailUiState.Delete
+                    }
+                    .onError {
+                        _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
+                    }
+                    .onException {
+                        _uiState.value = StimulusPostDetailUiState.Error(this.message())
+                    }
+            }
+        }
     }
 
 
