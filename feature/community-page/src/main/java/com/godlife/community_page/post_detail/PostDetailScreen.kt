@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -351,21 +352,25 @@ fun ImageBox(
 
         }
 
-        Box(
-            modifier
+        Row(
+            Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)){
-
-            Box(modifier = modifier
-                .size(width = 50.dp, height = 30.dp)
-                .background(color = CheckColor, shape = RoundedCornerShape(20.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "${imgIndex+1}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
+                .padding(bottom = 8.dp, end = 8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(size)
+                )
             }
-
         }
-
 
 
     }
@@ -580,18 +585,80 @@ fun Content(
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = postDetailBody.writtenAt, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
+        Row(
+            modifier = modifier
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetailBody.writtenAt,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal, fontSize = 15.sp
+                )
+            )
+
+        }
+
 
         Spacer(modifier.size(20.dp))
 
-        Text(
-            text = "조회수: ${postDetailBody.views}    굿생 점수: ${postDetailBody.godScore-2}",
-            style = TextStyle(
-                color = GrayWhite,
-                fontWeight = FontWeight.Normal,
-                fontSize = 15.sp
+        Row(
+            modifier = modifier
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
             )
-        )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${postDetailBody.views}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${postDetailBody.godScore-2}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+        }
 
         Spacer(modifier.size(20.dp))
 
