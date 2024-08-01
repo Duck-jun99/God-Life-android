@@ -81,6 +81,7 @@ import com.godlife.community_page.R
 import com.godlife.community_page.post_detail.post_update.post.UpdatePostScreen
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
+import com.godlife.designsystem.component.GodLifeCreateCommentBarPreview
 import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -213,6 +214,7 @@ fun PostDetailScreen(
                         comment = writeComment,
                         onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
                         onPostClicked = { postDetailViewModel.createComment() },
+                        context = context
                     )
 
 
@@ -1094,7 +1096,7 @@ fun PostDetailScreenPreview(modifier: Modifier = Modifier){
             }
 
             Box {
-                GodLifeCreateCommentBar()
+                GodLifeCreateCommentBarPreview()
             }
 
 

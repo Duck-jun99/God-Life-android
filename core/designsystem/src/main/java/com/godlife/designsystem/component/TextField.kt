@@ -1,6 +1,8 @@
 package com.godlife.designsystem.component
 
+import android.content.Context
 import android.graphics.BlurMaskFilter
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -140,6 +142,78 @@ fun GodLifeTextFieldGray(
     )
 }
 
+@Composable
+fun GodLifeCreateCommentBar(
+    modifier: Modifier = Modifier,
+    comment: String = "",
+    hint: String = "댓글을 입력해주세요.",
+    onTextChanged: (String) -> Unit = {},
+    containerColor: Color = Color.White,
+    onPostClicked: () -> Unit =  {},
+    context: Context
+) {
+
+    Row(
+        modifier = modifier
+            .coloredShadow(
+                color = OpaqueDark,
+                borderRadius = 0.dp,
+                blurRadius = 5.dp,
+                offsetY = (-1).dp,
+                offsetX = 0.dp,
+                spread = 0f
+            )
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(color = containerColor)
+            .padding(5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Spacer(modifier = Modifier.size(15.dp))
+
+
+        BasicTextField(
+            modifier = modifier.weight(0.8f),
+            value = comment,
+            onValueChange = onTextChanged,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Send),
+            singleLine = true,
+            decorationBox = {innerTextField ->
+
+                innerTextField()
+                if(comment.isEmpty()){
+
+                    Text(text = hint,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontSize = 15.sp
+                        )
+
+                    )
+
+                }
+
+
+            }
+        )
+
+        Icon(
+            modifier = Modifier
+                .size(30.dp)
+                .clickable {
+                    if(comment.isNotBlank()) onPostClicked() else Toast.makeText(context, "댓글을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                           },
+            imageVector = Icons.AutoMirrored.Outlined.Send,
+            contentDescription = null,
+            tint = PurpleMain
+        )
+
+
+    }
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GodLifeSearchBar(
@@ -198,7 +272,7 @@ fun GodLifeSearchBar(
 
 @Preview(showBackground = true)
 @Composable
-fun GodLifeCreateCommentBar(
+fun GodLifeCreateCommentBarPreview(
     modifier: Modifier = Modifier,
     comment: String = "",
     hint: String = "댓글을 입력해주세요.",
@@ -233,15 +307,19 @@ fun GodLifeCreateCommentBar(
             onValueChange = onTextChanged,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Send),
             singleLine = true,
-            decorationBox = {
+            decorationBox = {innerTextField ->
+                innerTextField()
+                if(comment.isEmpty()){
 
-                Text(text = if (comment.isEmpty()) hint else comment,
-                    style = TextStyle(
-                        color = GrayWhite,
-                        fontSize = 15.sp
+                    Text(text = hint,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontSize = 15.sp
+                        )
+
                     )
 
-                )
+                }
 
             }
         )
@@ -293,7 +371,7 @@ fun TextFiledPreview(){
 
             Spacer(modifier = Modifier.size(20.dp))
 
-            GodLifeCreateCommentBar()
+            GodLifeCreateCommentBarPreview()
 
 
         }
