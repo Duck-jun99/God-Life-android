@@ -42,7 +42,8 @@ enum class UiType{
 class StimulusPostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val deleteStimulusPostUseCase: DeleteStimulusPostUseCase
+    private val deleteStimulusPostUseCase: DeleteStimulusPostUseCase,
+    private val plusGodScoreUseCase: PlusGodScoreUseCase
 
 ): ViewModel() {
 
@@ -155,6 +156,49 @@ class StimulusPostDetailViewModel @Inject constructor(
                         _uiState.value = StimulusPostDetailUiState.Error(this.message())
                     }
             }
+        }
+
+    }
+
+    //갓생 인정 버튼 클릭
+    fun agreeGodLife(){
+
+        val postId = postId.value.toInt()
+
+        viewModelScope.launch {
+
+            val result = plusGodScoreUseCase.executePlusGodScore(postId)
+
+            result
+                .onSuccess {
+                    //갓생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
+
+                    if(data.body == "true"){
+                        isGetPostDetail.value = false
+                        getPostDetail()
+                    }
+                }
+                .onError {
+                    Log.e("onError", this.message())
+
+                    // UI State Error로 변경
+
+                    if(this.response.code() == 400){
+                        _uiState.value = StimulusPostDetailUiState.Error("재로그인이 필요합니다.")
+                    }
+                    else if(this.response.code() == 409){
+                        _uiState.value = StimulusPostDetailUiState.Error("이미 굿생인정한 게시물입니다.")
+                    }
+                    _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
+                }
+                .onException {
+
+                    Log.e("onException", "${this.message}")
+
+                    // UI State Error로 변경
+                    _uiState.value = StimulusPostDetailUiState.Error(this.message())
+                }
+
         }
 
     }

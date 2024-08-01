@@ -27,6 +27,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -648,6 +649,14 @@ fun PostContent(
             )
 
         }
+        else {
+            Spacer(modifier.size(20.dp))
+            GoodScoreOption(
+                navController = navController,
+                viewModel = viewModel,
+                postDetail = postDetail
+            )
+        }
 
 
 
@@ -756,6 +765,61 @@ fun OwnerOption(
 
         }
 
+    }
+}
+
+@Composable
+fun GoodScoreOption(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: StimulusPostDetailViewModel,
+    postDetail: StimulusPost
+){
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+            .padding(10.dp)
+    ) {
+
+        if(!postDetail.owner){
+            Text(
+                text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
+                style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+            )
+
+            Spacer(modifier.size(20.dp))
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
+                onClick = { viewModel.agreeGodLife() },
+                text = { Text(text = "굿생 인정!") }
+            )
+        }
+
+        else{
+            Icon(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = PurpleMain
+            )
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "유저님께서 굿생을 인정하신 글이에요!",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal
+                ),
+                textAlign = TextAlign.Center
+            )
+        }
 
 
     }
