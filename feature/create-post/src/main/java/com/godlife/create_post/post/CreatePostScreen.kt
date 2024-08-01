@@ -77,6 +77,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextFieldGray
+import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
@@ -112,6 +113,8 @@ fun CreatePostScreen(
 
     val title by remember { viewModel.title }
     val text by remember { viewModel.text }
+
+    val tags = viewModel.tags.collectAsState().value
 
     var isDialogVisble by remember { mutableStateOf(false) }
 
@@ -151,7 +154,6 @@ fun CreatePostScreen(
                 Box(
                     modifier
                         .fillMaxWidth()
-                        .height(70.dp)
                         .statusBarsPadding(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -267,11 +269,9 @@ fun CreatePostScreen(
 
                     item{
                         FlowRow {
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
+                            tags.forEach {
+                                TagItemView(tagItem = it)
+                            }
                         }
                     }
 
@@ -373,7 +373,13 @@ fun CreatePostScreen(
                                     .padding(12.dp)
                                     .fillMaxWidth()
                                     .clickable {
-                                        if( title == "" || text == "") Toast.makeText(context, "제목과 내용을 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+                                        if (title == "" || text == "") Toast
+                                            .makeText(
+                                                context,
+                                                "제목과 내용을 모두 입력해주세요.",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                         else isDialogVisble = !isDialogVisble
                                     },
                                 shape = RoundedCornerShape(8.dp),

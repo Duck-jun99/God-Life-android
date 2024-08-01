@@ -212,7 +212,6 @@ fun CommunityFamousPostList(
                 )
             ){
                 famousPostItem.tags.forEach {
-                    Log.e("daklkljdas", it.toString())
                     TagItemView(it)
                 }
 
