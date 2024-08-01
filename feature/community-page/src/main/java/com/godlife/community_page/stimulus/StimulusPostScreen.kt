@@ -155,7 +155,7 @@ fun StimulusPostScreen(
                             Text(
                                 modifier = modifier
                                     .padding(20.dp),
-                                text = "닉네임 님, 인기 글을 읽어보세요.",
+                                text = "인기 글을 읽어보세요.",
                                 style = TextStyle(
                                     color = Color.Black,
                                     fontSize = 18.sp,
@@ -174,7 +174,7 @@ fun StimulusPostScreen(
                             Text(
                                 modifier = modifier
                                     .padding(20.dp),
-                                text = "최신글",
+                                text = "따끈따끈, 최신글",
                                 style = TextStyle(
                                     color = Color.Black,
                                     fontSize = 18.sp,
@@ -194,7 +194,7 @@ fun StimulusPostScreen(
                             Text(
                                 modifier = modifier
                                     .padding(20.dp),
-                                text = "조회수가 높은 글이에요.",
+                                text = "많이 본 글이에요.",
                                 style = TextStyle(
                                     color = Color.Black,
                                     fontSize = 18.sp,
@@ -209,8 +209,14 @@ fun StimulusPostScreen(
                             )
                         }
 
-                        item { RecommendedAuthorInfoContent() }
+                        item {
+                            RecommendedAuthorInfoContent(
+                                navController = navController
+                            )
+                        }
 
+                        /*
+                        //RecommendedAuthorInfoContent로 이전
                         item {
 
                             Text(
@@ -232,10 +238,12 @@ fun StimulusPostScreen(
                             )
                         }
 
+                         */
+
 
                     }
 
-                    /*TODO : 도움말 Dialog */
+                    // 도움말 다이얼로그
                     if(viewModel.helpDialogVisible.value){
                         AlertDialog(
                             containerColor = Color.White,
