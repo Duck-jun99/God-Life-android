@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -242,12 +243,77 @@ fun LatestPostListView(
             )
         }
 
-        Box(
-            modifier
-                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
-            contentAlignment = Alignment.CenterStart
+        Row(
+            modifier = modifier
+                .padding(
+                    horizontal = 5.dp,
+                    vertical = 10.dp
+                )
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ){
-            Text(text = "조회수: ${item.views}    댓글: ${item.commentCount}개")
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${item.views}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.comment_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${item.commentCount}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${item.godScore}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+            //Text(text = "조회수: ${item.views}    댓글: ${item.commentCount}개")
         }
     }
 }

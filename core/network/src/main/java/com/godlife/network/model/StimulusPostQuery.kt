@@ -63,5 +63,6 @@ data class StimulusPost(
     val owner: Boolean,
     val content: String,
     val writerId: Int,
-    val createDate: String
+    val createDate: String,
+    val memberLikedBoard: Boolean
 )
