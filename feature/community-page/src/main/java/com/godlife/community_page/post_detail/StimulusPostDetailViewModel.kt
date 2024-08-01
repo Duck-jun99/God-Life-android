@@ -172,11 +172,8 @@ class StimulusPostDetailViewModel @Inject constructor(
             result
                 .onSuccess {
                     //갓생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
-
-                    if(data.body == "true"){
-                        isGetPostDetail.value = false
-                        getPostDetail()
-                    }
+                    isGetPostDetail.value = false
+                    getPostDetail()
                 }
                 .onError {
                     Log.e("onError", this.message())
@@ -203,7 +200,7 @@ class StimulusPostDetailViewModel @Inject constructor(
 
     }
 
-    //삭제 버튼 Dialog flag 변경 함수
+    //삭제 버튼 Dialog flag 변경 함수 (작성자인 경우)
     fun setDialogVisble(){
         isDialogVisble.value = !isDialogVisble.value
     }

@@ -782,6 +782,7 @@ fun GoodScoreOption(
             .padding(10.dp)
     ) {
 
+        /* TODO : !postDetail.owner를 !postDetail.memberLiked로 바꿔야 함. */
         if(!postDetail.owner){
             Text(
                 text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
