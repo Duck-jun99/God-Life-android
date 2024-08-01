@@ -155,7 +155,7 @@ fun RecommendedStimulusPostContent(
                             GlideImage(
                                 imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
                                 imageOptions = ImageOptions(
-                                    contentScale = ContentScale.FillWidth,
+                                    contentScale = ContentScale.Crop,
                                     alignment = Alignment.Center
                                 ),
                                 modifier = modifier
