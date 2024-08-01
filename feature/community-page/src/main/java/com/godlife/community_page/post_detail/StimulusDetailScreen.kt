@@ -26,9 +26,12 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -65,8 +68,6 @@ import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.CommunityPageRoute
-import com.godlife.community_page.navigation.StimulusPostDetailRoute
-import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostCoverRoute
 import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -479,17 +480,84 @@ fun PostContent(
 
         Spacer(modifier.size(20.dp))
 
-        Text(
-            text = postDetail.createDate,
-            style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-        )
+        Row(
+            modifier = modifier
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
 
-        Spacer(modifier.size(20.dp))
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
 
-        Text(
-            text = "조회수: ${postDetail.view}",
-            style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-        )
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.view.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.godLifeScore.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+            Spacer(modifier.width(5.dp))
+
+
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+                Icon(
+                    modifier = modifier
+                        .size(20.dp),
+                    painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                    contentDescription = "",
+                    tint = GrayWhite
+                )
+
+                Spacer(modifier.width(2.dp))
+
+                Text(
+                    text = postDetail.createDate,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+
+            }
+
+        }
 
         Spacer(modifier.size(20.dp))
 
@@ -513,7 +581,7 @@ fun PostContent(
                     ),
                     modifier = modifier
                         .clip(CircleShape)
-                        .size(70.dp),
+                        .size(50.dp),
                     loading = {
                         Box(
                             modifier = modifier

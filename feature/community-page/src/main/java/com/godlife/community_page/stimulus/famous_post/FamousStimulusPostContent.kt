@@ -22,8 +22,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,7 +77,6 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun FamousStimulusPostContent(
-    modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: FamousStimulusPostViewModel = hiltViewModel()
 ){
@@ -199,15 +202,49 @@ fun FamousStimulusItem(
 
         Spacer(modifier.size(5.dp))
 
-        Text(
-            text = "by ${item.nickname}",
-            style = TextStyle(
-                color = GrayWhite,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Center
+        Row(
+            modifier = modifier
+                .height(15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Icon(
+                imageVector = Icons.Outlined.Create,
+                contentDescription = "",
+                tint = GrayWhite
             )
-        )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = item.nickname,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+            Spacer(modifier.width(5.dp))
+
+            Icon(
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = item.godLifeScore.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+        }
 
     }
 

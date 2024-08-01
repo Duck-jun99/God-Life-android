@@ -218,7 +218,7 @@ fun RecommendedAuthorPostItem(
                     style = TextStyle(
                         color = GrayWhite,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.Bold,
                     )
                 )
 
