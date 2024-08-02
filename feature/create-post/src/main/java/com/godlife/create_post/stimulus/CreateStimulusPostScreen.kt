@@ -52,19 +52,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import com.godlife.create_post.R
-import com.godlife.designsystem.component.GodLifeButton
-import com.godlife.designsystem.component.GodLifeButtonWhite
-import com.godlife.designsystem.component.GodLifeTextField
-import com.godlife.designsystem.component.GodLifeTextFieldGray
-import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.designsystem.view.GodLifeErrorScreen
 
 @Composable
 fun CreateStimulusPostScreen(

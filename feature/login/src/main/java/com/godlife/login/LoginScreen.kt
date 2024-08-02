@@ -77,10 +77,25 @@ fun LoginScreen(
                     contentDescription = "KAKAO_LOGIN")
             }
 
-            Button(onClick = { navController.navigate(SignUpScreenRoute.route) },
+            Button(
+                onClick = { navController.navigate(SignUpScreenRoute.route) },
                 colors = ButtonDefaults.buttonColors(PurpleMain)
             ){
                 Text("회원가입 테스트", style = TextStyle(color = Color.White))
+            }
+
+            Button(
+                onClick = { navController.navigate(TestUserSignUpScreenRoute.route) },
+                colors = ButtonDefaults.buttonColors(PurpleMain)
+            ){
+                Text("테스트 계정 생성", style = TextStyle(color = Color.White))
+            }
+
+            Button(
+                onClick = { navController.navigate(TestUserLoginScreenRoute.route) },
+                colors = ButtonDefaults.buttonColors(PurpleMain)
+            ){
+                Text("테스트 계정 로그인", style = TextStyle(color = Color.White))
             }
 
         }
@@ -120,6 +135,12 @@ fun LoginScreenPreview(){
 
             }, colors = ButtonDefaults.buttonColors(PurpleMain)){
                 Text("회원가입 테스트", style = TextStyle(color = Color.White))
+            }
+
+            Button(onClick = {
+
+            }, colors = ButtonDefaults.buttonColors(PurpleMain)){
+                Text("테스트 계정 생성", style = TextStyle(color = Color.White))
             }
 
         }

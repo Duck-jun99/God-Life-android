@@ -1,4 +1,5 @@
-package com.godlife.login
+package com.godlife.login.fake
+
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
+class TestSignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val localPreferenceUserUseCase: LocalPreferenceUserUseCase
 ) : ViewModel() {
@@ -30,7 +31,8 @@ class SignUpViewModel @Inject constructor(
     val age = mutableStateOf("")
     val sex = mutableStateOf("")
 
-    lateinit var id: String
+    //임의로 넣을 USER ID
+    var id = mutableStateOf("")
 
 
     // 닉네임, 이메일, 나이, 성별 로직을 통과하는지에 대한 여부
@@ -161,38 +163,30 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun signUp(){
+    fun testUserSignUp(){
         viewModelScope.launch {
 
-            id = localPreferenceUserUseCase.getUserId()
-
-            if(::id.isInitialized){
-
-                val result =
+            val result =
                 signUpUseCase.executeSignUp(nickname = nickname.value,
                     email = email.value,
                     age = age.value.toInt(),
                     sex = sex.value,
-                    providerId = id,
-                    providerName = "KaKao")
+                    providerId = id.value,
+                    providerName = "TEST")
 
-                result
-                    .onSuccess {
-                        localPreferenceUserUseCase.saveAccessToken(data.accessToken)
-                        localPreferenceUserUseCase.saveRefreshToken(data.refershToken)
-                    }
-                    .onError {
+            result
+                .onSuccess {
+                    localPreferenceUserUseCase.saveAccessToken(data.accessToken)
+                    localPreferenceUserUseCase.saveRefreshToken(data.refershToken)
+                }
+                .onError {
 
-                    }
-                    .onException {
+                }
+                .onException {
 
-                    }
-
-            }
+                }
 
         }
-
-
     }
 
 }

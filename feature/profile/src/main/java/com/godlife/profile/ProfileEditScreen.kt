@@ -73,7 +73,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
-import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite

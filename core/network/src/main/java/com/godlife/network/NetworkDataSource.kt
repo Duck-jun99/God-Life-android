@@ -42,7 +42,7 @@ interface NetworkDataSource {
                        sex: String,
                        providerId: String,
                        providerName: String
-    ): SignUpQuery
+    ): ApiResponse<SignUpQuery>
 
     suspend fun getUserInfo(): ApiResponse<UserInfoQuery>
 

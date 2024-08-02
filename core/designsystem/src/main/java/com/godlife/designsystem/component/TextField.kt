@@ -43,7 +43,66 @@ import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.OpaqueLight
 import com.godlife.designsystem.theme.PurpleMain
+
+
+@Composable
+fun GodLifeSignUpTextField(
+    text: String,
+    onTextChanged: (String) -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    actionCallBack: () -> Unit = {},
+    containerColor: Color = OpaqueLight,
+    hint: String = "",
+    singleLine: Boolean = true,
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    BasicTextField(
+        value = text,
+        onValueChange = { newText ->
+            if(singleLine){
+                // 줄바꿈 문자를 제거하고 한 줄로 제한합니다.
+                val singleLineText = newText.replace("\n", "")
+                onTextChanged(singleLineText)
+            }
+            else{
+                onTextChanged(newText)
+            }
+
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                actionCallBack()
+                keyboardController?.hide()
+            }
+        ),
+        cursorBrush = SolidColor(Color.Black),
+        singleLine = singleLine,
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier
+                    .background(color = containerColor)
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ) {
+                innerTextField()
+                if (text.isEmpty()) {
+                    Text(
+                        text = hint,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontSize = 15.sp
+                        )
+                    )
+                }
+            }
+        }
+    )
+}
 
 @Composable
 fun GodLifeTextField(

@@ -73,7 +73,7 @@ interface RetrofitNetworkApi {
     @Headers("Auth: false")
     suspend fun signUp(
         @Body request: SignUpRequest
-    ): SignUpQuery
+    ): ApiResponse<SignUpQuery>
 
     // 로그인 시 유저 정보 받아옴
     @GET("/member")

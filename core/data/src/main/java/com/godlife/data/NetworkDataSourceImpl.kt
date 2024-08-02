@@ -66,7 +66,7 @@ class NetworkDataSourceImpl @Inject constructor(
         sex: String,
         providerId: String,
         providerName: String
-    ): SignUpQuery {
+    ): ApiResponse<SignUpQuery> {
         return networkApi.signUp(SignUpRequest( nickname, email, age, sex, providerId, providerName))
     }
 
