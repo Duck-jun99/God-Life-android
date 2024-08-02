@@ -35,6 +35,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -47,18 +48,21 @@ interface RetrofitNetworkApi {
 
     // 아이디 존재여부 확인
     @GET("check/id")
+    @Headers("Auth: false")
     suspend fun checkUserExistence(
         @Query("memberId") id: String?,
     ): UserExistenceCheckResult
 
     // 닉네임 중복체크
     @GET("check/nickname")
+    @Headers("Auth: false")
     suspend fun checkNickname(
         @Query("nickname") nickname :String?
     ): SignUpCheckNicknameQuery
 
     // 이메일 중복체크
     @GET("check/email")
+    @Headers("Auth: false")
     suspend fun checkEmail(
         @Query("email") email :String?
     ): SignUpCheckEmailQuery
@@ -66,6 +70,7 @@ interface RetrofitNetworkApi {
 
     // 회원가입
     @POST("/signup")
+    @Headers("Auth: false")
     suspend fun signUp(
         @Body request: SignUpRequest
     ): SignUpQuery
