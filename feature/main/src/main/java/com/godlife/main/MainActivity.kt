@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -157,9 +158,9 @@ fun MainUiTheme(
         SnackbarHost(hostState = snackBarHostState)
 
 
-        val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-        val communityTab = BottomNavItem(title = "Good Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
-        val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
+        val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Outlined.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
+        val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Outlined.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+        val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Outlined.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
 
         val tabBarItems = listOf(mainTab, communityTab, settingTab)

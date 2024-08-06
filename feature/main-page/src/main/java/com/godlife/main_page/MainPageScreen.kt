@@ -10,6 +10,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,17 +58,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -82,6 +85,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.update.UpdateAlertDialog
@@ -176,6 +180,8 @@ fun MainPageScreen(
                         ){
 
                             //Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
+
+                            /*
                             Text(text = "Good Life",
                                 style = TextStyle(
                                     color = Color.Black,
@@ -185,6 +191,16 @@ fun MainPageScreen(
                                     lineHeight = 28.sp,
                                     letterSpacing = 0.sp
                                 )
+                            )
+
+                             */
+
+
+                            Image(
+                                modifier = modifier
+                                    .size(height = 70.dp, width = 100.dp),
+                                painter = painterResource(id = R.drawable.goodlife_inside_logo),
+                                contentDescription = "",
                             )
 
 
@@ -225,7 +241,26 @@ fun MainPageScreen(
                                     Icon(
                                         painter = painterResource(R.drawable.cases_24dp_e8eaed_fill0_wght400_grad0_opsz24),
                                         contentDescription = "",
-                                        tint = Color.Black
+                                        modifier = modifier
+                                            .graphicsLayer(alpha = 0.99f)
+                                            .drawWithCache {
+                                                onDrawWithContent {
+                                                    drawContent()
+                                                    drawRect(
+                                                        brush = Brush.linearGradient(
+                                                            listOf(
+                                                                Color(0xFFFF44A2),
+                                                                Color(0xFFFF5890),
+                                                                Color(0xFFFA6B80),
+                                                                Color(0xFFFF7B75),
+                                                                Color(0xFFFF8161),
+                                                                Color(0xFFFF884D)
+                                                            )
+                                                        ),
+                                                        blendMode = BlendMode.SrcAtop
+                                                    )
+                                                }
+                                            }
                                     )
 
                                     /*
@@ -798,6 +833,25 @@ fun CompleteTodayBox(
             tint = PurpleMain,
             modifier = modifier
                 .size(25.dp)
+                .graphicsLayer(alpha = 0.99f)
+                .drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color(0xFFFF44A2),
+                                    Color(0xFFFF5890),
+                                    Color(0xFFFA6B80),
+                                    Color(0xFFFF7B75),
+                                    Color(0xFFFF8161),
+                                    Color(0xFFFF884D)
+                                )
+                            ),
+                            blendMode = BlendMode.SrcAtop
+                        )
+                    }
+                }
         )
 
         Spacer(modifier.size(10.dp))
@@ -805,7 +859,7 @@ fun CompleteTodayBox(
         Text(
             text = "오늘 목표를 모두 달성하셨군요!",
             style = TextStyle(
-                color = PurpleMain,
+                color = GrayWhite,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -837,9 +891,9 @@ fun CompleteTodayBox(
             },
             text = {
                 Text(
-                    text = "굿생 인증하기",
+                    text = "굿생 인증",
                     style = TextStyle(
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -1104,6 +1158,25 @@ fun CompleteTodayBoxPreview(
             tint = PurpleMain,
             modifier = modifier
                 .size(25.dp)
+                .graphicsLayer(alpha = 0.99f)
+                .drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color(0xFFFF44A2),
+                                    Color(0xFFFF5890),
+                                    Color(0xFFFA6B80),
+                                    Color(0xFFFF7B75),
+                                    Color(0xFFFF8161),
+                                    Color(0xFFFF884D)
+                                )
+                            ),
+                            blendMode = BlendMode.SrcAtop
+                        )
+                    }
+                }
         )
 
         Spacer(modifier.size(10.dp))
@@ -1111,7 +1184,7 @@ fun CompleteTodayBoxPreview(
         Text(
             text = "오늘 목표를 모두 달성하셨군요!",
             style = TextStyle(
-                color = PurpleMain,
+                color = GrayWhite,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1141,7 +1214,7 @@ fun CompleteTodayBoxPreview(
             },
             text = {
                 Text(
-                    text = "굿생 인증하기",
+                    text = "굿생 인증",
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -1320,4 +1393,42 @@ private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Acti
         activity = mainActivity,
         withFinish = true
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TabBarPreview(modifier: Modifier = Modifier){
+
+    Row(
+        modifier
+            .height(70.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        //Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
+
+        /*
+        Text(text = "Good Life",
+            style = TextStyle(
+                color = Color.Black,
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                lineHeight = 28.sp,
+                letterSpacing = 0.sp
+            )
+        )
+
+         */
+
+
+        Image(
+            modifier = modifier
+                .size(height = 70.dp, width = 100.dp),
+            painter = painterResource(id = R.drawable.goodlife_inside_logo),
+            contentDescription = "",
+        )
+    }
+
 }
