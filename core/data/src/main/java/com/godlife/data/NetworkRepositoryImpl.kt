@@ -12,6 +12,7 @@ import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LogoutQuery
+import com.godlife.network.model.NotificationListQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -63,6 +64,10 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun getUserInfo(): ApiResponse<UserInfoQuery> {
         return networkDataSource.getUserInfo()
+    }
+
+    override suspend fun getNotificationList(): ApiResponse<NotificationListQuery> {
+        return networkDataSource.getNotificationList()
     }
 
     override suspend fun logout(): ApiResponse<LogoutQuery> {

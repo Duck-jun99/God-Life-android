@@ -271,7 +271,50 @@ fun MainPageScreen(
                                      */
                                 }
 
+                                Spacer(modifier.size(10.dp))
+
+                                IconButton(
+                                    modifier = modifier
+                                        .size(30.dp),
+                                    onClick = {
+                                        /*
+                                        navController.navigate(){
+                                            launchSingleTop = true
+                                        }
+
+                                         */
+                                    }
+                                ) {
+
+                                    Icon(
+                                        imageVector = Icons.Outlined.Notifications,
+                                        contentDescription = "",
+                                        modifier = modifier
+                                            .graphicsLayer(alpha = 0.99f)
+                                            .drawWithCache {
+                                                onDrawWithContent {
+                                                    drawContent()
+                                                    drawRect(
+                                                        brush = Brush.linearGradient(
+                                                            listOf(
+                                                                Color(0xFFFF44A2),
+                                                                Color(0xFFFF5890),
+                                                                Color(0xFFFA6B80),
+                                                                Color(0xFFFF7B75),
+                                                                Color(0xFFFF8161),
+                                                                Color(0xFFFF884D)
+                                                            )
+                                                        ),
+                                                        blendMode = BlendMode.SrcAtop
+                                                    )
+                                                }
+                                            }
+                                    )
+
+                                }
+
                             }
+
 
                         }
                     }

@@ -9,6 +9,7 @@ import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LogoutQuery
+import com.godlife.network.model.NotificationListQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -91,6 +92,11 @@ interface RetrofitNetworkApi {
     suspend fun getUserProfile(
         @Path("memberId") memberId: String
     ): ApiResponse<UserProfileQuery>
+
+    // 수신된 알림 리스트 조회
+    @GET("/alarm")
+    suspend fun getNotificationList(
+    ): ApiResponse<NotificationListQuery>
 
     // 엑세스 토큰 갱신
     @POST("/reissue")
