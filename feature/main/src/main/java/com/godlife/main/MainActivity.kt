@@ -1,6 +1,7 @@
 package com.godlife.main
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -29,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -139,10 +141,58 @@ class MainActivity : ComponentActivity() {
          */
 
         setContent {
-            MainUiTheme(this, createNavigator, loginNavigator, createPostNavigator)
+            MainUiTheme(
+                this,
+                createNavigator,
+                loginNavigator,
+                createPostNavigator,
+                intent
+            )
+        }
+
+    }
+
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        setContent {
+            MainUiTheme(
+                this,
+                createNavigator,
+                loginNavigator,
+                createPostNavigator,
+                intent
+            )
         }
     }
 }
+
+private fun handleNotificationIntent(
+    intent: Intent?,
+    navController: NavController
+) {
+    intent?.let {
+        if (it.getStringExtra("navigation") == "postDetail") {
+            val postId = it.getStringExtra("postId")
+            if (postId != null) {
+                //navController.navigate("${PostDetailRoute.route}/$postId")
+                // 기존 백 스택을 클리어하고 메인 화면을 시작점으로 설정
+                navController.navigate(MainPageRoute.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+
+                // 그 다음 PostDetail 화면으로 이동
+                navController.navigate("${PostDetailRoute.route}/$postId")
+            }
+        }
+    }
+}
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -150,7 +200,8 @@ fun MainUiTheme(
     mainActivity: MainActivity,
     createNavigator: CreatetodolistNavigator,
     loginNavigator: LoginNavigator,
-    createPostNavigator: CreatePostNavigator
+    createPostNavigator: CreatePostNavigator,
+    intent: Intent?
 ){
     GodLifeTheme {
 
@@ -171,7 +222,6 @@ fun MainUiTheme(
         val currentRoute = remember { mutableStateOf(MainPageRoute.route)}
 
         val bottomBarVisibleState = remember { mutableStateOf(true) }
-
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -330,6 +380,14 @@ fun MainUiTheme(
 
 
                 }
+
+                LaunchedEffect(Unit) {
+                    handleNotificationIntent(
+                        intent = intent,
+                        navController = navController
+                    )
+                }
+
             }
         }
     }
@@ -383,5 +441,4 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
         }
     }
 }
-
 
