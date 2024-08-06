@@ -79,6 +79,10 @@ class NetworkDataSourceImpl @Inject constructor(
         return networkApi.getNotificationList()
     }
 
+    override suspend fun patchNotificationRead(alarmId: Int): ApiResponse<NotificationQuery> {
+        return networkApi.patchNotificationRead(alarmId)
+    }
+
     override suspend fun logout(): ApiResponse<LogoutQuery> {
         return networkApi.logout()
     }

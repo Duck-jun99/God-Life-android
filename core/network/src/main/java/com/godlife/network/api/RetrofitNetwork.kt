@@ -98,6 +98,12 @@ interface RetrofitNetworkApi {
     suspend fun getNotificationList(
     ): ApiResponse<NotificationListQuery>
 
+    // 알림 읽음 처리
+    @PUT("/alarm/{alarmId}")
+    suspend fun patchNotificationRead(
+        @Path("alarmId") alarmId: Int
+    ): ApiResponse<NotificationQuery>
+
     // 엑세스 토큰 갱신
     @POST("/reissue")
     suspend fun reissue(

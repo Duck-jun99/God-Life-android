@@ -49,6 +49,10 @@ interface NetworkDataSource {
 
     suspend fun getNotificationList(): ApiResponse<NotificationListQuery>
 
+    suspend fun patchNotificationRead(
+        alarmId: Int
+    ): ApiResponse<NotificationQuery>
+
     suspend fun logout(): ApiResponse<LogoutQuery>
 
     suspend fun getUserProfile(
