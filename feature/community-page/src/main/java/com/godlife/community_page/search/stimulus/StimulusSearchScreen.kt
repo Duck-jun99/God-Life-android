@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -43,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -51,13 +55,19 @@ import com.godlife.community_page.R
 import com.godlife.community_page.stimulus.StimulusPostItem
 import com.godlife.designsystem.component.GodLifeSearchBar
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.OrangeLight
+import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
 
 @Composable
 fun StimulusSearchScreen(
     modifier: Modifier = Modifier,
+    parentNavController: NavController,
     viewModel: StimulusSearchViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
@@ -89,14 +99,22 @@ fun StimulusSearchScreen(
                 checked = checkPostCategory,
                 onCheckedChange = {
                     viewModel.checkCategory("post")
-                }
+                },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = PurpleMain
+                )
             )
             Text(text = "게시물")
 
-            Checkbox(checked = checkWriterCategory,
+            Checkbox(
+                checked = checkWriterCategory,
                 onCheckedChange = {
                     viewModel.checkCategory("writer")
-                })
+                },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = PurpleMain
+                )
+            )
             Text(text = "작가")
 
         }
@@ -108,7 +126,9 @@ fun StimulusSearchScreen(
             onTextChanged = { searchText.value = it },
             onSearchClicked = {
                 cScope.launch { viewModel.search(searchText.value) }
-            }
+            },
+            containerColor = OrangeLight,
+            contentColor = GrayWhite
         )
 
         Spacer(modifier.height(16.dp))
@@ -131,7 +151,10 @@ fun StimulusSearchScreen(
 
                 LazyColumn {
                     itemsIndexed(searchResult){index, item ->
-                        SearchStimulusPostItem(item = item)
+                        SearchStimulusPostItem(
+                            parentNavController = parentNavController,
+                            item = item
+                        )
                     }
                 }
 
@@ -155,16 +178,20 @@ fun StimulusSearchScreen(
 @Composable
 fun SearchStimulusPostItem(
     modifier: Modifier = Modifier,
+    parentNavController: NavController,
     item: StimulusPostList
 ){
-
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White),
+            .background(Color.White)
+            .clickable {
+                parentNavController.navigate("StimulusDetailScreen/${item.boardId}"){
+                    launchSingleTop = true
+                }
+                       },
         verticalAlignment = Alignment.CenterVertically
     ){
 
@@ -176,32 +203,36 @@ fun SearchStimulusPostItem(
             contentAlignment = Alignment.Center
         ){
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
+            GlideImage(
+                imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .fillMaxSize(),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = PurpleMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .fillMaxWidth()
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.category3),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxWidth()
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
 
             Box(

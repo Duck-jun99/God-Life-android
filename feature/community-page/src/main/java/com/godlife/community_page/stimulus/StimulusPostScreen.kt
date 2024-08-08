@@ -292,7 +292,9 @@ fun StimulusPostScreen(
 
                 composable("StimulusSearchScreen"){
                     fabVisibleState.value = false
-                    StimulusSearchScreen()
+                    StimulusSearchScreen(
+                        parentNavController = navController
+                    )
 
                 }
 

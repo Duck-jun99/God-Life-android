@@ -283,7 +283,8 @@ fun GodLifeSearchBar(
     hint: String = "검색어를 입력해주세요.",
     onTextChanged: (String) -> Unit = {},
     containerColor: Color = OpaqueDark,
-    onSearchClicked: () -> Unit =  {}
+    onSearchClicked: () -> Unit =  {},
+    contentColor: Color = Color.White
     ) {
 
     Row(
@@ -301,7 +302,7 @@ fun GodLifeSearchBar(
                 .clickable { onSearchClicked() },
             imageVector = Icons.Default.Search,
             contentDescription = null,
-            tint = Color.White
+            tint = contentColor
         )
 
         Spacer(modifier = Modifier.size(15.dp))
@@ -315,7 +316,7 @@ fun GodLifeSearchBar(
             decorationBox = {
 
                 Text(text = if (searchText.isEmpty()) hint else searchText, style = TextStyle(
-                    color = Color.White,
+                    color = contentColor,
                     fontSize = 15.sp)
                 )
 
