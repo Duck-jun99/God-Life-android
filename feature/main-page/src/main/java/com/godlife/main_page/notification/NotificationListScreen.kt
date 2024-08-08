@@ -124,8 +124,6 @@ fun NoReadNotificationItem(
         Box(
             modifier = modifier
                 .size(70.dp)
-                .background(Color.White, RoundedCornerShape(16.dp))
-                .shadow(5.dp, RoundedCornerShape(16.dp))
                 .align(Alignment.CenterVertically)
         ){
 
@@ -134,13 +132,11 @@ fun NoReadNotificationItem(
                 contentDescription = "",
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Color.White)
-                    .clip(RoundedCornerShape(16.dp))
             )
 
         }
 
-        Spacer(modifier.width(10.dp))
+        Spacer(modifier.width(20.dp))
 
         Column(
             modifier = modifier
@@ -153,7 +149,7 @@ fun NoReadNotificationItem(
                     color = GrayWhite,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 14.sp
                 )
             )
 
@@ -165,7 +161,7 @@ fun NoReadNotificationItem(
                     color = GrayWhite,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
+                    fontSize = 12.sp
                 )
             )
 
@@ -197,8 +193,6 @@ fun ReadNotificationItem(
         Box(
             modifier = modifier
                 .size(70.dp)
-                .background(Color.White, RoundedCornerShape(16.dp))
-                .shadow(5.dp, RoundedCornerShape(16.dp))
                 .align(Alignment.CenterVertically)
         ){
 
@@ -207,13 +201,11 @@ fun ReadNotificationItem(
                 contentDescription = "",
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Color.White)
-                    .clip(RoundedCornerShape(16.dp))
             )
 
         }
 
-        Spacer(modifier.width(10.dp))
+        Spacer(modifier.width(20.dp))
 
         Column(
             modifier = modifier
@@ -226,7 +218,7 @@ fun ReadNotificationItem(
                     color = GrayWhite,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 14.sp
                 )
             )
 
@@ -238,7 +230,7 @@ fun ReadNotificationItem(
                     color = GrayWhite,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
+                    fontSize = 12.sp
                 )
             )
 
