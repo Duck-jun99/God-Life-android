@@ -82,13 +82,8 @@ class StimulusSearchViewModel @Inject constructor(
                 response
                     .onSuccess {
 
-                        if(data.body.isNotEmpty()){
-                            _searchResult.value = data.body
-                            _uiState.value = SearchStimulusUiState.Success(data.toString())
-                        }
-                        else{
-                            _uiState.value = SearchStimulusUiState.Error("검색 결과가 없습니다.")
-                        }
+                        _searchResult.value = data.body
+                        _uiState.value = SearchStimulusUiState.Success(data.toString())
 
                     }
                     .onError {
@@ -115,7 +110,10 @@ class StimulusSearchViewModel @Inject constructor(
 
                 response
                     .onSuccess {
+
+                        _searchResult.value = data.body
                         _uiState.value = SearchStimulusUiState.Success(data.toString())
+
                     }
                     .onError {
                         Log.e("search", this.message())

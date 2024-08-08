@@ -117,6 +117,7 @@ fun NoReadNotificationItem(
                 navController.navigate("PostDetailScreen/${item.boardId}"){
                     launchSingleTop = true
                 }
+
             }
             .padding(10.dp)
     ) {

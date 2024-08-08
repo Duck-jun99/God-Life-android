@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -59,6 +62,7 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -81,97 +85,150 @@ fun StimulusSearchScreen(
 
     val cScope = rememberCoroutineScope()
 
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .statusBarsPadding()
-            .padding(16.dp)
-    ) {
-
-        Row(
+    if(uiState !is SearchStimulusUiState.Error){
+        Column(
             modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ){
+                .fillMaxSize()
+                .background(Color.White)
+                .statusBarsPadding()
+                .padding(16.dp)
+        ) {
 
-            Checkbox(
-                checked = checkPostCategory,
-                onCheckedChange = {
-                    viewModel.checkCategory("post")
-                },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = PurpleMain
+            Row(
+                modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+                Checkbox(
+                    checked = checkPostCategory,
+                    onCheckedChange = {
+                        viewModel.checkCategory("post")
+                    },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = PurpleMain
+                    )
                 )
-            )
-            Text(text = "게시물")
-
-            Checkbox(
-                checked = checkWriterCategory,
-                onCheckedChange = {
-                    viewModel.checkCategory("writer")
-                },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = PurpleMain
+                Text(
+                    text = "제목으로 검색",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
                 )
-            )
-            Text(text = "작가")
 
-        }
-
-
-        GodLifeSearchBar(
-            searchText = searchText.value,
-            hint = "검색어를 2자 이상 입력해주세요.",
-            onTextChanged = { searchText.value = it },
-            onSearchClicked = {
-                cScope.launch { viewModel.search(searchText.value) }
-            },
-            containerColor = OrangeLight,
-            contentColor = GrayWhite
-        )
-
-        Spacer(modifier.height(16.dp))
-
-        when(uiState){
-            is SearchStimulusUiState.Initial -> {
+                Checkbox(
+                    checked = checkWriterCategory,
+                    onCheckedChange = {
+                        viewModel.checkCategory("writer")
+                    },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = PurpleMain
+                    )
+                )
+                Text(
+                    text = "작가명으로 검색",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                )
 
             }
-            is SearchStimulusUiState.Loading -> {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ){
-                    CircularProgressIndicator()
+
+
+            GodLifeSearchBar(
+                searchText = searchText.value,
+                hint = "검색어를 2자 이상 입력해주세요.",
+                onTextChanged = { searchText.value = it },
+                onSearchClicked = {
+                    cScope.launch { viewModel.search(searchText.value) }
+                },
+                containerColor = OrangeLight,
+                contentColor = GrayWhite
+            )
+
+            Spacer(modifier.height(16.dp))
+
+            when(uiState){
+                is SearchStimulusUiState.Initial -> {
+
                 }
-
-            }
-            is SearchStimulusUiState.Success -> {
-
-                LazyColumn {
-                    itemsIndexed(searchResult){index, item ->
-                        SearchStimulusPostItem(
-                            parentNavController = parentNavController,
-                            item = item
-                        )
+                is SearchStimulusUiState.Loading -> {
+                    Box(
+                        modifier = modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        CircularProgressIndicator()
                     }
-                }
 
-            }
-            is SearchStimulusUiState.Error -> {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ){
-                    Text(text = (uiState as SearchStimulusUiState.Error).message)
                 }
+                is SearchStimulusUiState.Success -> {
 
+                    if(searchResult.isNotEmpty()){
+                        Column() {
+
+                            Text(
+                                text = "\"${searchText.value}\"에 대해 ${searchResult.size}개의 게시물을 찾았어요.",
+                                style = TextStyle(
+                                    color = PurpleMain,
+                                    fontSize = 14.sp
+                                )
+                            )
+
+                            Spacer(modifier.height(10.dp))
+
+                            LazyColumn {
+                                itemsIndexed(searchResult){index, item ->
+                                    SearchStimulusPostItem(
+                                        parentNavController = parentNavController,
+                                        item = item
+                                    )
+                                }
+                            }
+
+                        }
+
+                    }
+
+                    else{
+                        Box(
+                            modifier = modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "검색 결과가 없습니다.",
+                                style = TextStyle(
+                                    color = PurpleMain,
+                                    fontSize = 16.sp
+                                )
+                            )
+                        }
+                    }
+
+
+
+                }
+                is SearchStimulusUiState.Error -> {
+
+                }
             }
+
+
         }
+    }
 
 
+
+    if(uiState is SearchStimulusUiState.Error){
+        GodLifeErrorScreen(
+            errorMessage = (uiState as SearchStimulusUiState.Error).message,
+            buttonEnabled = false
+        )
     }
 }
 
@@ -188,10 +245,10 @@ fun SearchStimulusPostItem(
             .fillMaxWidth()
             .background(Color.White)
             .clickable {
-                parentNavController.navigate("StimulusDetailScreen/${item.boardId}"){
+                parentNavController.navigate("StimulusDetailScreen/${item.boardId}") {
                     launchSingleTop = true
                 }
-                       },
+            },
         verticalAlignment = Alignment.CenterVertically
     ){
 
@@ -274,14 +331,30 @@ fun SearchStimulusPostItem(
 
             Spacer(modifier.size(5.dp))
 
-            Text(
-                text = "by ${item.nickname}",
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal
+            Row(
+                modifier = modifier
+                    .height(15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    imageVector = Icons.Outlined.Create,
+                    contentDescription = "",
+                    tint = GrayWhite
                 )
-            )
+
+                Spacer(modifier.width(2.dp))
+
+                Text(
+                    text = item.nickname,
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+            }
+
         }
 
     }
@@ -309,10 +382,24 @@ fun StimulusSearchScreenPreview(
         ){
 
             Checkbox(checked = true, onCheckedChange = {})
-            Text(text = "게시물")
+            Text(
+                text = "제목으로 검색",
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
 
             Checkbox(checked = false, onCheckedChange = {})
-            Text(text = "작가")
+            Text(
+                text = "작가명으로 검색",
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
 
         }
 
