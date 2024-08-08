@@ -62,12 +62,11 @@ class MainPageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<MainPageUiState>(MainPageUiState.Loading)
     val uiState: StateFlow<MainPageUiState> = _uiState
 
-    // 오늘 투두리스트 설정 상태
-    private val _todayTodoListExists = MutableStateFlow<Boolean>(false)
-    val todayTodoListExists: StateFlow<Boolean> = _todayTodoListExists
-
     // 오늘 투두리스트 불러온 플래그
     val getTodayTodoListFlag = MutableStateFlow<Boolean>(false)
+
+    // 오늘 투두리스트 완료했는지 상태
+    val isTodayTodoListCompleted = MutableStateFlow<Boolean>(false)
 
     // 유저 정보 불러온 상태
     private val _userInfoExists = MutableStateFlow<Boolean>(false)
@@ -96,10 +95,6 @@ class MainPageViewModel @Inject constructor(
     // 오늘 투두리스트
     private val _todayTodoList = MutableStateFlow<TodoEntity?>(null)
     val todayTodoList: StateFlow<TodoEntity?> = _todayTodoList
-
-    //오늘 투두리스트 진행 상황
-    private val _completedCount = MutableStateFlow<Int>(0)
-    val completedCount: StateFlow<Int> = _completedCount
 
     //오늘 투두리스트 사이즈
     private val _todayTodoListSize = MutableStateFlow<Int>(0)
@@ -147,7 +142,8 @@ class MainPageViewModel @Inject constructor(
             _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
 
             if(todayTodoList.value!=null){
-                _todayTodoListExists.value = true
+
+               isTodayTodoListCompleted.value = todayTodoList.value!!.isCompleted
 
                 _todayTodoListSize.value = todayTodoList.value!!.todoList.size
 
@@ -266,11 +262,6 @@ class MainPageViewModel @Inject constructor(
             getTodayTodoListFlag.value = false
             getTodayTodoList()
         }
-    }
-
-    //오늘 투두리스트 존재하는 것으로 플래그 변경
-    fun setTodayTodoListExist(){
-        _todayTodoListExists.value = true
     }
 
 

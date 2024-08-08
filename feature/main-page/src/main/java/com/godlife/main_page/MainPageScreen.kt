@@ -119,22 +119,10 @@ fun MainPageScreen(
     SnackbarHost(hostState = snackBarHostState)
 
 
-    //굿생 인증 완료용
-    var showCompleteTodayBox by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-
-        delay(2000) // 2초 대기
-        showCompleteTodayBox = true
-    }
-
-
     //Ui State 관찰
     val uiState by viewModel.uiState.collectAsState()
 
     val context = LocalContext.current
-
-    val todayTodoListExists by viewModel.todayTodoListExists.collectAsState()
 
     val userInfo by viewModel.userInfo.collectAsState()
 
@@ -143,9 +131,31 @@ fun MainPageScreen(
 
     val todayTodoList by viewModel.todayTodoList.collectAsState()
 
+    val completedTodoListSize by viewModel.completedTodoListSize.collectAsState()
+    val todayTodoListSize by viewModel.todayTodoListSize.collectAsState()
+
+    val isTodayTodoListCompleted by viewModel.isTodayTodoListCompleted.collectAsState()
+
+    //굿생 인증 완료용
+    var showCompleteTodayBox by remember { mutableStateOf(false) }
+
+    LaunchedEffect(completedTodoListSize) {
+
+        if(!isTodayTodoListCompleted){
+            if( completedTodoListSize != 0 && completedTodoListSize == todayTodoListSize){
+                showCompleteTodayBox = true
+            }
+        }
+
+
+    }
+
+    /*
     LaunchedEffect(todayTodoList) {
         Log.e("MainPageScreen", todayTodoList?.toString() ?: "TodoList is null")
     }
+
+     */
 
     GodLifeTheme {
 
@@ -322,9 +332,14 @@ fun MainPageScreen(
                     }
 
                     LazyColumn(
-                        modifier
+                        modifier = modifier
                             .fillMaxSize()
-                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
+                            .padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                bottom = 20.dp
+                            )
+                    ) {
 
                         if (showCompleteTodayBox){
                             item {
@@ -357,10 +372,16 @@ fun MainPageScreen(
 
                                 item {
                                     todayTodoList?.let { todo ->
-                                        MainTodoListBox(
-                                            viewModel = viewModel,
-                                            todo = todo
-                                        )
+                                        if(!isTodayTodoListCompleted){
+                                            MainTodoListBox(
+                                                viewModel = viewModel,
+                                                todo = todo
+                                            )
+                                        }
+                                        else{
+                                            MainCompletedTodoListBox()
+                                        }
+
                                         Spacer(modifier = modifier.size(10.dp))
                                     }
                                 }
@@ -638,6 +659,87 @@ fun MainTodoListBox(
 
                 }
             }
+        }
+
+    }
+
+}
+
+@Composable
+fun MainCompletedTodoListBox(
+    modifier: Modifier = Modifier
+){
+
+    val animatedValue = remember { Animatable(0f) }
+
+
+    // 특정 값으로 색을 채우는 Animation
+    LaunchedEffect(Unit) {
+        animatedValue.animateTo(
+            //targetValue = targetvalue,
+            targetValue = 360f,
+            animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "오늘 하루도\n고생 많으셨어요!", style = TextStyle(color = Color(0xFFFA6B80), fontSize = 15.sp), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+        }
+
+
+        Canvas(
+            modifier = modifier
+                .size(300.dp)
+        ) {
+            val size: Size = drawContext.size
+            val sizeArc = size / 1.5F
+            drawArc(
+                color = Color(0xFFE1E2E9),
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                size = sizeArc,
+                style = Stroke(width = 30f)
+            )
+
+            drawArc(
+                brush = Brush.linearGradient(
+                    colors =
+                    listOf(
+                        Color(0xFFFF44A2),  // 밝은 핫핑크
+                        Color(0xFFFF5890),  // 연한 핑크
+                        Color(0xFFFA6B80),  // 연한 코럴 핑크
+                        Color(0xFFFF7B75),  // 연한 살몬
+                        Color(0xFFFF8161),  // 밝은 코럴
+                        Color(0xFFFF884D),  // 연한 오렌지
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+                startAngle = 100f,
+                sweepAngle = animatedValue.value,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - sizeArc.width) / 2f,
+                    (size.height - sizeArc.height) / 2f
+                ),
+                size = sizeArc,
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
+            )
         }
 
     }
