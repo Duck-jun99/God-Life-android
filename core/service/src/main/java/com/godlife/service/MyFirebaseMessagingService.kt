@@ -108,7 +108,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         //boardId가 있을 경우 Intent에 추가
         if(remoteMessage.data["boardId"] != ""){
-            intent.putExtra("navigation", "postDetail")
+            intent.putExtra("navigation", remoteMessage.data["type"])
             intent.putExtra("postId", remoteMessage.data["boardId"].toString())
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // Activity Stack 을 경로만 남김(A-B-C-D-B => A-B)
         }

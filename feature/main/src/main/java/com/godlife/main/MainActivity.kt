@@ -175,7 +175,8 @@ private fun handleNotificationIntent(
     navController: NavController
 ) {
     intent?.let {
-        if (it.getStringExtra("navigation") == "postDetail") {
+
+        if (it.getStringExtra("navigation") == "normal") {
             val postId = it.getStringExtra("postId")
             if (postId != null) {
                 //navController.navigate("${PostDetailRoute.route}/$postId")
@@ -190,6 +191,23 @@ private fun handleNotificationIntent(
 
                 // 그 다음 PostDetail 화면으로 이동
                 navController.navigate("${PostDetailRoute.route}/$postId")
+            }
+        }
+        else if (it.getStringExtra("navigation") == "stimulus") {
+            val postId = it.getStringExtra("postId")
+            if (postId != null) {
+                //navController.navigate("${PostDetailRoute.route}/$postId")
+                // 기존 백 스택을 클리어하고 메인 화면을 시작점으로 설정
+                navController.navigate(MainPageRoute.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+
+                // 그 다음 PostDetail 화면으로 이동
+                navController.navigate("${StimulusPostDetailRoute.route}/$postId")
             }
         }
     }

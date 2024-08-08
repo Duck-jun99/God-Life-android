@@ -114,9 +114,17 @@ fun NoReadNotificationItem(
             .background(color = Color.White)
             .clickable {
                 viewModel.patchNotificationRead(item.alarmId)
-                navController.navigate("PostDetailScreen/${item.boardId}"){
-                    launchSingleTop = true
+                if(item.type == "normal"){
+                    navController.navigate("PostDetailScreen/${item.boardId}"){
+                        launchSingleTop = true
+                    }
                 }
+                else if(item.type == "stimulus"){
+                    navController.navigate("StimulusDetailScreen/${item.boardId}"){
+                        launchSingleTop = true
+                    }
+                }
+
 
             }
             .padding(10.dp)
