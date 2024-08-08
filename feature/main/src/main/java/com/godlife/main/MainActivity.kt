@@ -71,6 +71,8 @@ import com.godlife.main_page.history.HistoryPageScreen
 import com.godlife.main_page.navigation.HistoryDetailRoute
 import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.navigation.MainPageRoute
+import com.godlife.main_page.navigation.NotificationListRoute
+import com.godlife.main_page.notification.NotificationListScreen
 import com.godlife.model.navigationbar.BottomNavItem
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
@@ -289,6 +291,15 @@ fun MainUiTheme(
 
                     }
 
+                    //알림 리스트 화면
+                    composable(NotificationListRoute.route){
+                        NotificationListScreen(
+                            navController = navController
+                        )
+                        currentRoute.value = NotificationListRoute.route
+                        bottomBarVisibleState.value = false
+                    }
+
                     //프로필 화면
                     composable("${ProfileScreenRoute.route}/{userId}", arguments =
                     listOf(navArgument("userId"){type = NavType.StringType})
@@ -421,7 +432,7 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                         selectedIcon = bottomNavItem.selectedIcon,
                         unselectedIcon = bottomNavItem.unselectedIcon,
                         title = bottomNavItem.title,
-                        badgeAmount = bottomNavItem.badgeAmount
+                        //badgeAmount = bottomNavItem.badgeAmount
                     )
                 },
                 label = {

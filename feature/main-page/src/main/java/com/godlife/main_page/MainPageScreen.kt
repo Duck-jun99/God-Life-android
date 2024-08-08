@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -81,6 +82,7 @@ import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
+import com.godlife.designsystem.component.TabBarBadgeView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -88,6 +90,7 @@ import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.main_page.navigation.HistoryPageRoute
+import com.godlife.main_page.navigation.NotificationListRoute
 import com.godlife.main_page.update.UpdateAlertDialog
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
@@ -155,7 +158,7 @@ fun MainPageScreen(
 
             is MainPageUiState.Success -> {
 
-                viewModel.setFcmToken()
+                //viewModel.setFcmToken()
 
                 Column(
                     modifier
@@ -277,12 +280,9 @@ fun MainPageScreen(
                                     modifier = modifier
                                         .size(30.dp),
                                     onClick = {
-                                        /*
-                                        navController.navigate(){
+                                        navController.navigate(NotificationListRoute.route){
                                             launchSingleTop = true
                                         }
-
-                                         */
                                     }
                                 ) {
 
@@ -310,6 +310,8 @@ fun MainPageScreen(
                                                 }
                                             }
                                     )
+
+
 
                                 }
 

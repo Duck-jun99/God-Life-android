@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.database.model.TodoEntity
+import com.godlife.domain.GetNotificationListUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.model.todo.TodoList
+import com.godlife.network.model.NotificationListBody
 import com.godlife.network.model.UserInfoBody
 import com.godlife.service.MyFirebaseMessagingService
 import com.skydoves.sandwich.message
@@ -116,7 +118,6 @@ class MainPageViewModel @Inject constructor(
     val updateCategory: StateFlow<String> = _updateCategory
 
 
-
     /**
      * 초기화
      */
@@ -180,7 +181,9 @@ class MainPageViewModel @Inject constructor(
 
                     _userInfoExists.value = true
 
-                    _uiState.value = MainPageUiState.Success("Success")
+                    setFcmToken()
+
+                    //_uiState.value = MainPageUiState.Success("Success")
 
                 }
                 .onError {
@@ -209,7 +212,7 @@ class MainPageViewModel @Inject constructor(
     }
 
     // 로그인 시 FCM 토큰 등록
-    fun setFcmToken() {
+    private fun setFcmToken() {
         if (!fcmTokenRegistered.value) {
             fcmTokenRegistered.value = true
             viewModelScope.launch(Dispatchers.IO) {
@@ -225,6 +228,9 @@ class MainPageViewModel @Inject constructor(
                     result
                         .onSuccess {
                             fcmTokenRegistered.value = true
+
+                            _uiState.value = MainPageUiState.Success("Success")
+
                         }
                         .onError {
 
@@ -248,27 +254,6 @@ class MainPageViewModel @Inject constructor(
             }
         }
     }
-
-    /*
-    fun getTodoListCount(): List<Int?> {
-        val todayTodoListValue = todayTodoList.value
-
-        val completedCount = if (todayTodoListValue != null) {
-            var count = 0
-            todayTodoListValue.todoList.forEach {
-                if (it.iscompleted) {
-                    count += 1
-                }
-            }
-            count
-        } else {
-            0
-        }
-
-        return listOf(todayTodoListSize, completedCount)
-    }
-
-     */
 
 
     suspend fun setTodoValueCompleted(todo: TodoList){

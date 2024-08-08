@@ -18,3 +18,7 @@ object HistoryPageRoute {
 object HistoryDetailRoute {
     const val route = "History-Detail"
 }
+
+object NotificationListRoute {
+    const val route = "Notification-List"
+}

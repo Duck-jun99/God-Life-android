@@ -10,5 +10,6 @@ data class NotificationListBody(
     val alarmId: Int,
     val boardId: Int,
     val title: String,
-    val content: String
+    val content: String,
+    val read: Boolean
 )

@@ -36,7 +36,7 @@ fun TabIconView(
     selectedIcon: ImageVector,
     unselectedIcon: ImageVector,
     title: String,
-    badgeAmount: Int? = null
+    badgeAmount: Boolean? = null
 ) {
     BadgedBox(badge = { TabBarBadgeView(badgeAmount) }) {
         Icon(
@@ -48,11 +48,14 @@ fun TabIconView(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun TabBarBadgeView(count: Int? = null) {
-    if (count != null) {
-        Badge {
-            Text(count.toString())
+fun TabBarBadgeView(
+    badge: Boolean? = null
+) {
+    if (badge != null) {
+        if(badge){
+            Badge()
         }
+
     }
 }
 
@@ -84,7 +87,7 @@ fun BottomNavigationPreview() {
                         selectedIcon = tabBarItem.selectedIcon,
                         unselectedIcon = tabBarItem.unselectedIcon,
                         title = tabBarItem.title,
-                        badgeAmount = tabBarItem.badgeAmount
+                        //badgeAmount = tabBarItem.badgeAmount
                     )
                 },
                 label = { Text(tabBarItem.title) },
