@@ -208,7 +208,7 @@ class CommunityPageViewModel @Inject constructor(
         }
     }
 
-    //일주일 인기 게시물 불러오기
+    //일주일 인기 게시물 불러오기 -> 성공하면 전체 인기 게시물 불러오기
     fun getWeeklyFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
@@ -223,7 +223,9 @@ class CommunityPageViewModel @Inject constructor(
                     .onSuccess {
                         _weeklyFamousPostList.value = data.body
 
-                        _uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
+                        getAllFamousPost()
+
+                        //_uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
 
                     }
                     .onError {
@@ -246,13 +248,13 @@ class CommunityPageViewModel @Inject constructor(
     }
 
     //전체 인기 게시물 불러오기
-    fun getAllFamousPost(){
+    private fun getAllFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
         if(!allFamousFlag.value){
             allFamousFlag.value = true
 
-            _uiState.value = CommunityPageUiState.Loading
+            //_uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
                 val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost()
@@ -319,7 +321,7 @@ class CommunityPageViewModel @Inject constructor(
 
         if(!allRankingFlag.value){
             allRankingFlag.value = true
-            _rankingUiState.value = RankingPageUiState.Loading
+            //_rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
                 val result = getRankingUseCase.executeGetAllRanking()
