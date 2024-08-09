@@ -30,6 +30,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -75,6 +77,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
@@ -166,6 +169,8 @@ fun StimulusDetailScreen(
                                             )
                                         }
                                     }
+
+                                    Spacer(modifier.size(10.dp))
                                 }
 
                                 item{
@@ -439,138 +444,21 @@ fun PostContent(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.White)
-            .statusBarsPadding()
-            .padding(horizontal = 15.dp, vertical = 10.dp)
+            //.statusBarsPadding()
+            //.padding(horizontal = 15.dp, vertical = 10.dp)
     ){
 
-        AndroidView(
+        Card(
+            shape = RoundedCornerShape(0.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
             modifier = modifier
-                .fillMaxSize(),
-            factory = { context ->
-
-                WebView(context).apply {
-                    loadUrl("file:///android_asset/content_template.html")
-
-
-                    settings.javaScriptEnabled = true
-                    settings.loadWithOverviewMode = true
-                    settings.useWideViewPort = true
-
-                    // 웹뷰 크기에 맞게 컨텐츠 크기 조정
-                    settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
-
-
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
-                            view?.evaluateJavascript(
-                                """
-                        document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
-                        document.body.style.backgroundColor = 'transparent';
-                        document.documentElement.style.backgroundColor = 'transparent';
-                        """.trimIndent(),
-                                null
-                            )
-                        }
-
-                    }
-
-                }
-            }
-        )
-
-        Spacer(modifier.size(20.dp))
-
-        Row(
-            modifier = modifier
-                .height(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-
-            Icon(
-                modifier = modifier
-                    .size(20.dp),
-                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
-                contentDescription = "",
-                tint = GrayWhite
-            )
-
-            Spacer(modifier.width(2.dp))
-
-            Text(
-                text = postDetail.view.toString(),
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            )
-
-            Spacer(modifier.width(10.dp))
-
-            Icon(
-                modifier = modifier
-                    .size(20.dp),
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = "",
-                tint = GrayWhite
-            )
-
-            Spacer(modifier.width(2.dp))
-
-            Text(
-                text = postDetail.godLifeScore.toString(),
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            )
-
-            Spacer(modifier.width(5.dp))
-
-
+                .fillMaxWidth()
+        ) {
             Row(
                 modifier = modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-
-                Icon(
-                    modifier = modifier
-                        .size(20.dp),
-                    painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
-                    contentDescription = "",
-                    tint = GrayWhite
-                )
-
-                Spacer(modifier.width(2.dp))
-
-                Text(
-                    text = postDetail.createDate,
-                    style = TextStyle(
-                        color = GrayWhite,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                )
-
-            }
-
-        }
-
-        Spacer(modifier.size(20.dp))
-
-
-        Column(modifier = modifier
-            .fillMaxWidth()
-            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
-            .padding(10.dp),
-            verticalArrangement = Arrangement.Center
-        ){
-
-            Row(
+                    .statusBarsPadding()
+                    .padding(start = 10.dp, end = 10.dp, bottom = 5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -638,9 +526,129 @@ fun PostContent(
 
         }
 
-        if(postDetail.owner){
+        Spacer(modifier.size(10.dp))
 
-            Spacer(modifier.size(20.dp))
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.createDate,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+        }
+
+        Spacer(modifier.size(5.dp))
+
+        AndroidView(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp, vertical = 10.dp),
+            factory = { context ->
+
+                WebView(context).apply {
+                    loadUrl("file:///android_asset/content_template.html")
+
+
+                    settings.javaScriptEnabled = true
+                    settings.loadWithOverviewMode = true
+                    settings.useWideViewPort = true
+
+                    // 웹뷰 크기에 맞게 컨텐츠 크기 조정
+                    settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
+
+
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
+                            view?.evaluateJavascript(
+                                """
+                        document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
+                        document.body.style.backgroundColor = 'transparent';
+                        document.documentElement.style.backgroundColor = 'transparent';
+                        """.trimIndent(),
+                                null
+                            )
+                        }
+
+                    }
+
+                }
+            }
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Row(
+            modifier = modifier
+                .padding(horizontal = 15.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.view.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.godLifeScore.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+        }
+
+        Spacer(modifier.size(10.dp))
+
+        if(postDetail.owner){
 
             OwnerOption(
                 navController = navController,
@@ -650,7 +658,7 @@ fun PostContent(
 
         }
         else {
-            Spacer(modifier.size(20.dp))
+
             GoodScoreOption(
                 navController = navController,
                 viewModel = viewModel,
@@ -704,7 +712,7 @@ fun OwnerOption(
 ){
     Row(modifier = modifier
         .fillMaxWidth()
-        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+        .background(color = GrayWhite3)
         .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -777,8 +785,9 @@ fun GoodScoreOption(
 ){
     Column(
         modifier = modifier
+            .padding(horizontal = 10.dp)
             .fillMaxWidth()
-            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+            .background(color = OrangeLight, shape = RoundedCornerShape(16.dp))
             .padding(10.dp)
     ) {
 
@@ -1145,13 +1154,14 @@ fun WriterAnotherPostPreview(
     ){
 
         Text(
-            text = "${nickname}님의 다른 글도 읽어보세요.",
-            style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            text = "${nickname}님의 다른 글은 어때요?.",
+            style = TextStyle(color = GrayWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         )
 
         Spacer(modifier.size(10.dp))
 
         HorizontalDivider()
+
 
 
     }
@@ -1222,5 +1232,29 @@ fun OwnerOptionPreview(
 
 
 
+    }
+}
+
+@Preview
+@Composable
+fun PostUserInfoPreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(70.dp),
+            shape = RoundedCornerShape(0.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        ) {
+
+        }
     }
 }

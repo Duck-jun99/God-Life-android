@@ -41,6 +41,7 @@ import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.model.community.TagItem
 import com.godlife.network.BuildConfig
@@ -234,7 +235,7 @@ fun TagItemView(
     ) {
         Box(
             modifier
-                .background(color = GrayWhite3, shape = RoundedCornerShape(7.dp))
+                .background(color = OrangeLight, shape = RoundedCornerShape(7.dp))
                 .padding(horizontal = 5.dp, vertical = 2.dp)
             ,
             contentAlignment = Alignment.Center
@@ -433,7 +434,7 @@ fun TagItemPreview(
     ) {
         Box(
             modifier
-                .background(color = GrayWhite3, shape = RoundedCornerShape(7.dp))
+                .background(color = OrangeLight, shape = RoundedCornerShape(7.dp))
                 .padding(horizontal = 5.dp, vertical = 2.dp)
             ,
             contentAlignment = Alignment.Center

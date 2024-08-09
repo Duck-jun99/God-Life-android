@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 
 
@@ -91,6 +92,28 @@ fun GodLifeButtonWhiteWrap(
 }
 
 @Composable
+fun GodLifeButtonOrangeWrap(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = OrangeLight,
+            contentColor = PurpleMain
+        ),
+        contentPadding = contentPadding,
+        content = content,
+        elevation = ButtonDefaults.buttonElevation(3.dp)
+    )
+}
+
+@Composable
 fun GodLifeButtonWhite(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -103,6 +126,33 @@ fun GodLifeButtonWhite(
         modifier = modifier,
         enabled = enabled,
         contentPadding = if (leadingIcon != null) {
+            ButtonDefaults.ButtonWithIconContentPadding
+        } else {
+            ButtonDefaults.ContentPadding
+        },
+
+        ) {
+        GodLifeButtonContent(
+            text = text,
+            leadingIcon = leadingIcon,
+        )
+    }
+}
+
+@Composable
+fun GodLifeButtonOrange(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    text: @Composable () -> Unit,
+    leadingIcon: @Composable (() -> Unit)? = null,
+) {
+    GodLifeButtonOrangeWrap(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        contentPadding =
+        if (leadingIcon != null) {
             ButtonDefaults.ButtonWithIconContentPadding
         } else {
             ButtonDefaults.ContentPadding

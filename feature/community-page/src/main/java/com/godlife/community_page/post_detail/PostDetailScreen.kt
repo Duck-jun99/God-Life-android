@@ -79,6 +79,7 @@ import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.post_detail.post_update.post.UpdatePostScreen
+import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.component.GodLifeCreateCommentBarPreview
@@ -187,6 +188,7 @@ fun PostDetailScreen(
 
                                 item{
                                     Content2(
+                                        writer = it.nickname,
                                         memberLikedBoard = it.memberLikedBoard,
                                         owner = it.boardOwner,
                                         viewModel = postDetailViewModel
@@ -559,6 +561,37 @@ fun Content(
 
         //Spacer(modifier.size(20.dp))
 
+        Spacer(modifier.size(5.dp))
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ){
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetailBody.writtenAt,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal, fontSize = 15.sp
+                )
+            )
+
+        }
+
+        Spacer(modifier.size(5.dp))
+
         Text(text = postDetailBody.title, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
@@ -584,34 +617,6 @@ fun Content(
         Spacer(modifier.size(20.dp))
 
         HorizontalDivider()
-
-        Spacer(modifier.size(20.dp))
-
-        Row(
-            modifier = modifier
-                .height(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(
-                modifier = modifier
-                    .size(20.dp),
-                painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
-                contentDescription = "",
-                tint = GrayWhite
-            )
-
-            Spacer(modifier.width(2.dp))
-
-            Text(
-                text = postDetailBody.writtenAt,
-                style = TextStyle(
-                    color = GrayWhite,
-                    fontWeight = FontWeight.Normal, fontSize = 15.sp
-                )
-            )
-
-        }
-
 
         Spacer(modifier.size(20.dp))
 
@@ -672,6 +677,7 @@ fun Content(
 @Composable
 fun Content2(
     modifier: Modifier = Modifier,
+    writer: String,
     memberLikedBoard: Boolean = true,
     owner: Boolean,
     viewModel: PostDetailViewModel
@@ -687,14 +693,40 @@ fun Content2(
         ) {
 
             if(!memberLikedBoard){
+                Row(){
+                    Text(
+                        text = writer,
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 16.sp
+                        )
+                    )
+                    Text(
+                        text = "님의 굿생을 인정하시나요?",
+                        style = TextStyle(
+                            color = GrayWhite,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            lineHeight = 16.sp
+                        )
+                    )
+                }
                 Text(
-                    text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
-                    style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+                    text = "그렇다면, 아래 [굿생 인정!] 버튼을 눌러주세요!",
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        lineHeight = 16.sp
+                    )
                 )
+
 
                 Spacer(modifier.size(20.dp))
 
-                GodLifeButtonWhite(
+                GodLifeButtonOrange(
                     modifier = modifier
                         .align(Alignment.CenterHorizontally),
                     leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},

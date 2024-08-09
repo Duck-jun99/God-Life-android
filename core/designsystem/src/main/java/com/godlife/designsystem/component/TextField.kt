@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +45,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OpaqueLight
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 
 
@@ -223,9 +225,10 @@ fun GodLifeCreateCommentBar(
                 spread = 0f
             )
             .fillMaxWidth()
-            .height(40.dp)
+            .height(50.dp)
             .background(color = containerColor)
-            .padding(5.dp),
+            //.padding(5.dp)
+                ,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -257,18 +260,25 @@ fun GodLifeCreateCommentBar(
             }
         )
 
-        Icon(
+        Box(
             modifier = Modifier
-                .size(30.dp)
+                .size(50.dp)
+                .background(color = PurpleMain)
                 .clickable {
                     if(comment.isNotBlank()) onPostClicked() else Toast.makeText(context, "댓글을 입력해주세요.", Toast.LENGTH_SHORT).show()
-                           },
-            imageVector = Icons.AutoMirrored.Outlined.Send,
-            contentDescription = null,
-            tint = PurpleMain
-        )
+                },
+            contentAlignment = Alignment.Center
+        ) {
 
+            Icon(
+                modifier = Modifier
+                    .size(30.dp),
+                imageVector = Icons.Outlined.Create,
+                contentDescription = null,
+                tint = Color.White
+            )
 
+        }
     }
 
 }
@@ -352,9 +362,10 @@ fun GodLifeCreateCommentBarPreview(
                 spread = 0f
             )
             .fillMaxWidth()
-            .height(40.dp)
+            .height(50.dp)
             .background(color = containerColor)
-            .padding(5.dp),
+            //.padding(5.dp),
+                ,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -384,15 +395,24 @@ fun GodLifeCreateCommentBarPreview(
             }
         )
 
-        Icon(
+        Box(
             modifier = Modifier
-                .size(30.dp)
+                .size(50.dp)
+                .background(color = PurpleMain)
                 .clickable { onPostClicked() },
-            imageVector = Icons.AutoMirrored.Outlined.Send,
-            contentDescription = null,
-            tint = PurpleMain
-        )
+            contentAlignment = Alignment.Center
+        ) {
 
+            Icon(
+                modifier = Modifier
+                    .size(30.dp),
+                imageVector = Icons.Outlined.Create,
+                contentDescription = null,
+                tint = Color.White
+            )
+
+        }
+        
 
     }
 
