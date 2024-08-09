@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -215,6 +217,33 @@ fun RecommendedAuthorPostItem(
                     modifier = modifier
                         .fillMaxWidth(),
                     text = item.view.toString(),
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+
+            }
+
+            Row(
+                modifier = modifier
+                    .height(15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+                Icon(
+                    imageVector = Icons.Outlined.ThumbUp,
+                    contentDescription = "",
+                    tint = GrayWhite
+                )
+
+                Spacer(modifier.width(2.dp))
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = item.godLifeScore.toString(),
                     style = TextStyle(
                         color = GrayWhite,
                         fontSize = 12.sp,

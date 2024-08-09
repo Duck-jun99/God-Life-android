@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -72,6 +74,7 @@ import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.CommunityPageRoute
 import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
+import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorPostItem
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
@@ -175,8 +178,10 @@ fun StimulusDetailScreen(
 
                                 item{
                                     writerInfo.value?.nickname?.let { it1 ->
-                                        WriterAnotherPostPreview(
-                                            nickname = it1
+                                        WriterAnotherPost(
+                                            nickname = it1,
+                                            viewModel = viewModel,
+                                            navController = navController
                                         )
                                     }
                                 }
@@ -834,6 +839,52 @@ fun GoodScoreOption(
     }
 }
 
+@Composable
+fun WriterAnotherPost(
+    modifier: Modifier = Modifier,
+    nickname: String,
+    viewModel: StimulusPostDetailViewModel,
+    navController: NavController
+){
+
+    val item = viewModel.writerAnotherPost.collectAsState().value
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalAlignment = Alignment.Start
+    ){
+
+        Text(
+            text = "${nickname}님의 다른 글은 어때요?",
+            style = TextStyle(color = GrayWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        HorizontalDivider()
+
+        LazyHorizontalGrid(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(500.dp),
+            rows = GridCells.Fixed(3)
+        ) {
+            items(item.size){
+                RecommendedAuthorPostItem(
+                    item = item[it],
+                    navController = navController
+                )
+            }
+        }
+
+
+
+
+    }
+
+}
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview
 @Composable
@@ -887,7 +938,7 @@ fun StimulusDetailScreenPreview(
 
                 item { PostContentPreview(height = height) }
 
-                item { WriterAnotherPostPreview() }
+                //item { WriterAnotherPost() }
 
             }
         }
@@ -1140,34 +1191,6 @@ fun PostContentPreview(
 }
 
 
-@Preview
-@Composable
-fun WriterAnotherPostPreview(
-    modifier: Modifier = Modifier,
-    nickname: String = "작성자"
-){
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalAlignment = Alignment.Start
-    ){
-
-        Text(
-            text = "${nickname}님의 다른 글은 어때요?.",
-            style = TextStyle(color = GrayWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        )
-
-        Spacer(modifier.size(10.dp))
-
-        HorizontalDivider()
-
-
-
-    }
-
-}
-
 @Preview(showBackground = true)
 @Composable
 fun OwnerOptionPreview(
@@ -1232,29 +1255,5 @@ fun OwnerOptionPreview(
 
 
 
-    }
-}
-
-@Preview
-@Composable
-fun PostUserInfoPreview(
-    modifier: Modifier = Modifier
-){
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(70.dp),
-            shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
-        ) {
-
-        }
     }
 }

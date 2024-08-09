@@ -13,7 +13,9 @@ import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.SearchPostUseCase
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.StimulusPostList
 import com.godlife.network.model.UserProfileBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -43,9 +45,10 @@ class StimulusPostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val deleteStimulusPostUseCase: DeleteStimulusPostUseCase,
-    private val plusGodScoreUseCase: PlusGodScoreUseCase
+    private val plusGodScoreUseCase: PlusGodScoreUseCase,
+    private val getSearchPostUseCase: SearchPostUseCase,
 
-): ViewModel() {
+    ): ViewModel() {
 
     /**
      * State 관련
@@ -71,6 +74,10 @@ class StimulusPostDetailViewModel @Inject constructor(
     private val _writerInfo = MutableStateFlow<UserProfileBody?>(null)
     val writerInfo: StateFlow<UserProfileBody?> = _writerInfo
 
+    //작성자 게시물
+    private val _writerAnotherPost = MutableStateFlow<List<StimulusPostList>>(emptyList())
+    val writerAnotherPost: StateFlow<List<StimulusPostList>> = _writerAnotherPost
+
     //삭제 Dialog 보여줄 플래그
     val isDialogVisble = MutableStateFlow(false)
 
@@ -79,6 +86,9 @@ class StimulusPostDetailViewModel @Inject constructor(
 
     //작성자 정보 받아왔는지 플래그
     private val isGetWriterInfo = MutableStateFlow(false)
+
+    //작성자 게시물 받아왔는지 플래그
+    private val isGetSearchPost = MutableStateFlow(false)
 
     //삭제 완료 플래그
     private val isDeleted = MutableStateFlow(false)
@@ -147,7 +157,8 @@ class StimulusPostDetailViewModel @Inject constructor(
                 result
                     .onSuccess {
                         _writerInfo.value = data.body
-                        _uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
+                        getWriterAnotherPost()
+                        //_uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
                     }
                     .onError {
                         _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
@@ -158,6 +169,30 @@ class StimulusPostDetailViewModel @Inject constructor(
             }
         }
 
+    }
+
+    private fun getWriterAnotherPost(){
+        if(!isGetSearchPost.value){
+            isGetSearchPost.value = true
+
+            viewModelScope.launch {
+                getSearchPostUseCase.executeSearchStimulusPost(
+                    title = "",
+                    nickname = writerInfo.value!!.nickname,
+                    introduction = ""
+                )
+                    .onSuccess {
+                        _writerAnotherPost.value = data.body
+                        _uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
+                    }
+                    .onError {
+                        _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
+                    }
+                    .onException {
+                        _uiState.value = StimulusPostDetailUiState.Error(this.message())
+                    }
+            }
+        }
     }
 
     //갓생 인정 버튼 클릭
