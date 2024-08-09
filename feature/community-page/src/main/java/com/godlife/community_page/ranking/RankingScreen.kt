@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +63,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
@@ -171,17 +173,13 @@ fun RankingScreen(
                             textAlign = TextAlign.Center
                         )
 
-                        HorizontalPager(
-                            state = totalPagerState
-                        ) {page ->
-                            totalPage.intValue = page
-                            TotalRankingListItem1(
-                                totalRankingListItem = allRankingList.value[page],
-                                index = page,
-                                parentNavController = parentNavController,
-                                viewModel = viewModel
-                            )
-                        }
+                        TotalRankingListItem1(
+                            totalRankingListItem = allRankingList.value,
+                            index = totalPagerState.currentPage,
+                            parentNavController = parentNavController,
+                            viewModel = viewModel,
+                            pagerState = totalPagerState
+                        )
 
                         Spacer(modifier.size(10.dp))
 
@@ -359,99 +357,45 @@ fun WeeklyRankingListItem(
 fun TotalRankingListItem1(
     modifier: Modifier = Modifier,
     index: Int,
-    totalRankingListItem: RankingBody,
+    totalRankingListItem: List<RankingBody>,
+    pagerState: PagerState,
     parentNavController: NavController,
     viewModel: CommunityPageViewModel
 ){
 
-    LaunchedEffect(key1 = true) {
-        viewModel.getTotalRankingUserInfo(totalRankingListItem.memberId.toString())
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        viewModel.getTotalRankingUserInfo(totalRankingListItem[pagerState.currentPage].memberId.toString())
     }
 
     Box(
         modifier = modifier
             .height(400.dp)
             .fillMaxWidth()
-            .background(Color.Black)
-            .clickable { parentNavController.navigate("${"ProfileScreen"}/${totalRankingListItem.memberId}") },
+            .background(OrangeLight),
         contentAlignment = Alignment.Center
     ){
 
-        GlideImage(
-            imageModel = { if(totalRankingListItem.backgroundUrl.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem.backgroundUrl else R.drawable.category3 },
-            imageOptions = ImageOptions(
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
-            ),
-            modifier = modifier
-                .fillMaxSize()
-                .blur(
-                    radiusX = 15.dp, radiusY = 15.dp
-                ),
-            loading = {
-                Box(
-                    modifier = modifier
-                        .background(GrayWhite3)
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ){
-
-                    CircularProgressIndicator(
-                        color = PurpleMain
-                    )
-
-                }
-
-            },
-            failure = {
-                Image(
-                    painter = painterResource(id = R.drawable.category3),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop
-                )
-            }
-        )
-
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
+        HorizontalPager(
+            state = pagerState
+        ) {page ->
 
             Box(
                 modifier = modifier
-                    .size(50.dp)
-                    .background(color = OpaqueDark, shape = CircleShape),
+                    .clickable { parentNavController.navigate("${"ProfileScreen"}/${totalRankingListItem[pagerState.currentPage].memberId}") },
                 contentAlignment = Alignment.Center
-            ){
-                Text(
-                    text = "${index+1}",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 10.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
             ){
 
                 GlideImage(
-                    imageModel = { if(totalRankingListItem.profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem.profileURL else R.drawable.category3 },
+                    imageModel = { if(totalRankingListItem[pagerState.currentPage].backgroundUrl.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem[pagerState.currentPage].backgroundUrl else R.drawable.category3 },
                     imageOptions = ImageOptions(
                         contentScale = ContentScale.Crop,
                         alignment = Alignment.Center
                     ),
                     modifier = modifier
-                        .size(150.dp)
-                        .clip(shape = CircleShape),
+                        .fillMaxSize()
+                        .blur(
+                            radiusX = 15.dp, radiusY = 15.dp
+                        ),
                     loading = {
                         Box(
                             modifier = modifier
@@ -476,39 +420,142 @@ fun TotalRankingListItem1(
                     }
                 )
 
-                Spacer(modifier.size(20.dp))
-
-                Text(
-                    text = totalRankingListItem.nickname,
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier.size(20.dp))
-
-                Text(
+                Column(
                     modifier = modifier
-                        .padding(start = 20.dp, end = 20.dp),
-                    text = "\"${totalRankingListItem.whoAmI}\"",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal
-                    ),
-                    textAlign = TextAlign.Center
-                )
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Box(
+                        modifier = modifier
+                            .size(45.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if(index==0) {
+                                    Color(0xFFFFBE3B)
+                                }
+                                else if(index==1) {
+                                    Color(0xFFF3E3E3)
+                                }
+                                else if(index==2) {
+                                    Color(0xFFFD8F6D)
+                                }
+                                else {
+                                    OpaqueDark
+                                }
+                            ),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = "${index+1}",
+                            style = TextStyle(
+                                color = if(index==1) Color.Black else Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 10.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+
+                        GlideImage(
+                            imageModel = { if(totalRankingListItem[pagerState.currentPage].profileURL.isNotEmpty()) BuildConfig.SERVER_IMAGE_DOMAIN + totalRankingListItem[pagerState.currentPage].profileURL else R.drawable.category3 },
+                            imageOptions = ImageOptions(
+                                contentScale = ContentScale.Crop,
+                                alignment = Alignment.Center
+                            ),
+                            modifier = modifier
+                                .size(150.dp)
+                                .clip(shape = CircleShape),
+                            loading = {
+                                Box(
+                                    modifier = modifier
+                                        .background(GrayWhite3)
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ){
+
+                                    CircularProgressIndicator(
+                                        color = PurpleMain
+                                    )
+
+                                }
+
+                            },
+                            failure = {
+                                Image(
+                                    painter = painterResource(id = R.drawable.category3),
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        )
+
+                        Spacer(modifier.size(20.dp))
+
+                        Text(
+                            text = totalRankingListItem[pagerState.currentPage].nickname,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier.size(20.dp))
+
+                        Text(
+                            modifier = modifier
+                                .padding(start = 20.dp, end = 20.dp),
+                            text = "\"${totalRankingListItem[pagerState.currentPage].whoAmI}\"",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                    }
+
+
+                }
+
 
             }
 
-
         }
 
+        Row(
+            Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 10.dp, bottom = 10.dp, end = 10.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(size)
+                )
+            }
+        }
 
     }
+
 
 }
 

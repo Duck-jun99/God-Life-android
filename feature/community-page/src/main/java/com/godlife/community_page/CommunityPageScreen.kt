@@ -74,6 +74,7 @@ import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
 import com.godlife.designsystem.component.GodLifeSearchBar
+import com.godlife.designsystem.component.GodLifeSearchBar2
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -183,20 +184,28 @@ fun CommunityPageScreen(
 
                     Column(
                         modifier
-                            .padding(start = 10.dp, end = 20.dp, bottom = 10.dp)
-                            .height(80.dp)) {
+                            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                            .height(80.dp)
+                    ) {
 
-                        Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+                        Text(text = "다른 굿생러 분들은 어떻게 살고 있을까요?", style = TextStyle(color = Color.White, fontSize = 15.sp))
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        GodLifeSearchBar(
+                        GodLifeSearchBar2(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally),
                             searchText = searchText,
                             containerColor = OpaqueLight,
                             onTextChanged = { viewModel.onSearchTextChange(it) },
                             onSearchClicked = {
                                 viewModel.getSearchedPost(keyword = searchText)
                                 navControllerBottomSheet.navigate(SearchResultRoute.route)
+                            },
+                            sortBoolean = true,
+                            onSortClicked = {
+
                             }
                         )
 
@@ -550,6 +559,9 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     Spacer(modifier = Modifier.height(15.dp))
 
                     GodLifeSearchBar(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
                         searchText = searchText,
                         containerColor = OpaqueLight,
                         onTextChanged = { it -> searchText },
