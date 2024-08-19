@@ -849,7 +849,7 @@ fun ProfileEditBoxPreview(
                 Spacer(modifier = modifier.size(10.dp))
 
                 //소개글
-                Text(text = "안녕하세요! 갓생을 꿈꾸는 유저입니다.",
+                Text(text = "안녕하세요! 굿생을 꿈꾸는 유저입니다.",
                     style = TextStyle(
                         color = GrayWhite2,
                         fontSize = 15.sp,

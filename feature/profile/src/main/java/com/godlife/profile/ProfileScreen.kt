@@ -283,7 +283,7 @@ fun ProfileBox(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 티어",
+                        Text(text = "굿생 티어",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,
@@ -318,7 +318,7 @@ fun ProfileBox(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 점수",
+                        Text(text = "굿생 점수",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,
@@ -1016,7 +1016,7 @@ fun ProfileBoxPreview(
                 Spacer(modifier = modifier.size(10.dp))
 
                 //소개글
-                Text(text = "안녕하세요! 갓생을 꿈꾸는 유저입니다.",
+                Text(text = "안녕하세요! 굿생을 꿈꾸는 유저입니다.",
                     style = TextStyle(
                         color = GrayWhite2,
                         fontSize = 15.sp,
@@ -1039,7 +1039,7 @@ fun ProfileBoxPreview(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 티어",
+                        Text(text = "굿생 티어",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,
@@ -1074,7 +1074,7 @@ fun ProfileBoxPreview(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 점수",
+                        Text(text = "굿생 점수",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,

@@ -81,6 +81,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.TabBarBadgeView
 import com.godlife.designsystem.theme.GodLifeTheme
@@ -839,9 +840,10 @@ fun MainNoTodoListBox(
             Box(modifier = modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center){
 
-                GodLifeButtonWhite(
+                GodLifeButtonOrange(
                     onClick = { moveCreateTodoListActivity(createNavigator, mainActivity) },
-                    text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) },
+                    showElevation = false
                 )
 
             }

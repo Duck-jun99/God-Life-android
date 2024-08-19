@@ -97,6 +97,7 @@ fun GodLifeButtonOrangeWrap(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    showElevation: Boolean = true,
     content: @Composable RowScope.() -> Unit,
 ) {
     Button(
@@ -109,7 +110,7 @@ fun GodLifeButtonOrangeWrap(
         ),
         contentPadding = contentPadding,
         content = content,
-        elevation = ButtonDefaults.buttonElevation(3.dp)
+        elevation = if(showElevation) ButtonDefaults.buttonElevation(3.dp) else ButtonDefaults.buttonElevation(0.dp)
     )
 }
 
@@ -144,6 +145,7 @@ fun GodLifeButtonOrange(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    showElevation: Boolean = true,
     text: @Composable () -> Unit,
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
@@ -151,14 +153,14 @@ fun GodLifeButtonOrange(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
+        showElevation = showElevation,
         contentPadding =
         if (leadingIcon != null) {
             ButtonDefaults.ButtonWithIconContentPadding
         } else {
             ButtonDefaults.ContentPadding
-        },
-
-        ) {
+        }
+    ) {
         GodLifeButtonContent(
             text = text,
             leadingIcon = leadingIcon,

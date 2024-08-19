@@ -333,7 +333,7 @@ fun SelectMenu1(
 
             }
 
-            //갓생 점수
+            //굿생 점수
             Box(
                 modifier
                     .weight(0.3f)
@@ -348,7 +348,7 @@ fun SelectMenu1(
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "갓생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "굿생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
 
             }
@@ -584,7 +584,7 @@ fun SelectMenu1Preview(
 
             }
 
-            //갓생 점수
+            //굿생 점수
             Box(
                 modifier
                     .weight(0.3f)
@@ -599,7 +599,7 @@ fun SelectMenu1Preview(
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "갓생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "굿생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
 
             }
@@ -674,7 +674,7 @@ fun SelectMenu2(modifier: Modifier = Modifier){
 
                     HorizontalDivider(modifier.padding(10.dp))
 
-                    Text(text = "갓생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
+                    Text(text = "굿생 점수", style = TextStyle(color = GrayWhite), textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
                 }
             }
 

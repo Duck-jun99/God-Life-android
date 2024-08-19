@@ -195,7 +195,7 @@ class StimulusPostDetailViewModel @Inject constructor(
         }
     }
 
-    //갓생 인정 버튼 클릭
+    //굿생 인정 버튼 클릭
     fun agreeGodLife(){
 
         val postId = postId.value.toInt()
@@ -206,7 +206,7 @@ class StimulusPostDetailViewModel @Inject constructor(
 
             result
                 .onSuccess {
-                    //갓생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
+                    //굿생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
                     isGetPostDetail.value = false
                     getPostDetail()
                 }

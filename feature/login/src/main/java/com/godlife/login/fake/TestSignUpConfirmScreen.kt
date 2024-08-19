@@ -118,7 +118,7 @@ fun TestSignUpConfirmScreen(
 
                 AnimatedVisibility(visible = true) {
                     Text(
-                        text = "갓생러가 될 준비가 되셨다면,\n갓생 시작 버튼을 눌러주세요!",
+                        text = "굿생러가 될 준비가 되셨다면,\n굿생 시작 버튼을 눌러주세요!",
                         style = TextStyle(
                             color = Color.White,
                             fontSize = 20.sp
@@ -141,7 +141,7 @@ fun TestSignUpConfirmScreen(
                         .align(Alignment.CenterHorizontally)
                         .fillMaxWidth(0.5f),
 
-                    text = { Text(text = "갓생 시작",
+                    text = { Text(text = "굿생 시작",
                         color = PurpleMain,
                         style = TextStyle(
                             fontSize = 18.sp,

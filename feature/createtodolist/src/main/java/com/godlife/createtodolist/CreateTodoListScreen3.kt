@@ -169,7 +169,7 @@ fun DoneLodingUI(
                         .align(Alignment.Center)
                         .fillMaxWidth(0.5f)
                 ) {
-                    Text(text = "갓생 시작",
+                    Text(text = "굿생 시작",
                         color = Color.White,
                         style = TextStyle(
                             fontSize = 18.sp,
@@ -242,7 +242,7 @@ fun CreateTodoListScreen3Preview(){
                         .align(Alignment.Center)
                         .fillMaxWidth(0.5f)
                 ) {
-                    Text(text = "갓생 시작",
+                    Text(text = "굿생 시작",
                         color = Color.White,
                         style = TextStyle(
                             fontSize = 18.sp,

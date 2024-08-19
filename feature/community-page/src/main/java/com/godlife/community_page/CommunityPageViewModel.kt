@@ -183,7 +183,7 @@ class CommunityPageViewModel @Inject constructor(
             title = "최신 게시물"
         }
         else if(route == "StimulusPostScreen"){
-            title = "갓생 자극"
+            title = "굿생 자극"
         }
         else if(route == "RankingScreen"){
             title = "명예의 전당"

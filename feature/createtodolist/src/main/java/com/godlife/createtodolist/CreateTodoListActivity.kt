@@ -194,7 +194,7 @@ fun CreateTodoList(
                     .fillMaxWidth(0.5f),
                 text = {Text(text = if(currentRoute == CreateTodoListScreen1Route.route) {"다음"}
                 else if (currentRoute == CreateTodoListScreen2Route.route) {"완료"}
-                else {"갓생 시작"},
+                else {"굿생 시작"},
                     style = TextStyle(color = Color.White)
                 )
                 }) {

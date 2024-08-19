@@ -680,7 +680,7 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                         horizontalAlignment = Alignment.CenterHorizontally
                     )  {
 
-                        CategoryBoxPreview(categoryName = "갓생 자극", isSelected = false)
+                        CategoryBoxPreview(categoryName = "굿생 자극", isSelected = false)
 
                     }
 
