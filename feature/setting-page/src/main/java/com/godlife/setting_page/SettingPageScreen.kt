@@ -1,9 +1,12 @@
 package com.godlife.setting_page
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
@@ -64,11 +68,15 @@ import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.navigator.LoginNavigator
 import com.godlife.network.model.UserInfoBody
 import com.godlife.profile.navigation.ProfileEditScreenRoute
+import com.godlife.profile.navigation.ProfileScreenRoute
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun SettingPageScreen(
@@ -87,6 +95,8 @@ fun SettingPageScreen(
 
     val logoutResult by viewModel.logoutResult.collectAsState()
     val userInfo by viewModel.userInfo.collectAsState()
+
+    val context = LocalContext.current
 
     if(logoutResult == true){
         moveLoginActivity(loginNavigator, mainActivity)
@@ -147,7 +157,20 @@ fun SettingPageScreen(
 
                 item{ Spacer(modifier.size(12.dp)) }
 
-                item { ProfileButton(imageVector = Icons.Outlined.Notifications, text = "알림 설정") }
+                item {
+                    ProfileButton(
+                        imageVector = Icons.Outlined.Notifications,
+                        text = "알림 설정",
+                        modifier = modifier
+                            .clickable {
+                                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                }
+                                // 인텐트를 통해 설정 앱 열기
+                                startActivity(context, intent, null)
+                            }
+                    )
+                }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -211,36 +234,17 @@ fun ProfileCard(
             verticalAlignment = Alignment.CenterVertically){
 
             //프로필 이미지 부분
-            val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
-            val imageModifier: Modifier = modifier
-                .size(50.dp, 50.dp)
-                .clip(CircleShape)
-                .fillMaxSize()
-                .background(color = GrayWhite)
-
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load( if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = imageModifier
-                )   //bitmap이 없다면
-            } ?: Image(
-                painter = painterResource(id = R.drawable.ic_person),
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = imageModifier
+            GlideImage(
+                imageModel = { if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .size(50.dp, 50.dp)
+                    .clip(CircleShape)
+                    .fillMaxSize()
+                    .background(color = GrayWhite)
             )
 
             Spacer(modifier.size(10.dp))
@@ -305,6 +309,8 @@ fun SelectMenu1(
     modifier: Modifier = Modifier,
     navController: NavController){
 
+    val context = LocalContext.current
+
     Box(modifier = modifier
         .fillMaxWidth()
         .height(150.dp)
@@ -357,7 +363,9 @@ fun SelectMenu1(
             Box(
                 modifier
                     .weight(0.3f)
-                    .clickable { /* TODO */ },
+                    .clickable {
+                               Toast.makeText(context, "준비중입니다.", Toast.LENGTH_SHORT).show()
+                    },
                 contentAlignment = Alignment.Center){
 
                 Column {
