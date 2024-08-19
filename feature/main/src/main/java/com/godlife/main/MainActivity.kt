@@ -250,9 +250,9 @@ fun MainUiTheme(
         SnackbarHost(hostState = snackBarHostState)
 
 
-        val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Outlined.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-        val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Outlined.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
-        val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Outlined.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
+        val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
+        val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+        val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
 
         val tabBarItems = listOf(mainTab, communityTab, settingTab)
@@ -507,9 +507,9 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
 @Preview
 @Composable
 fun MyBottomNavigationPreview() {
-    val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Outlined.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-    val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Outlined.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
-    val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Outlined.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
+    val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
+    val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+    val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
     val bottomNavItems = listOf(mainTab, communityTab, settingTab)
 
@@ -519,6 +519,17 @@ fun MyBottomNavigationPreview() {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
     val cScope = rememberCoroutineScope()
+
+    // 그라데이션 컬러 리스트
+    val gradientColors = listOf(
+        Color(0xFFFF44A2),
+        Color(0xFFFF5890),
+        Color(0xFFFA6B80),
+        Color(0xFFFF7B75),
+        Color(0xFFFF8161),
+        Color(0xFFFF884D)
+    )
+
 
     NavigationBar(
         containerColor = Color.White,
@@ -567,7 +578,7 @@ fun MyBottomNavigationPreview() {
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PurpleMain,
+                            selectedIconColor = Color.Unspecified,
                             selectedTextColor = PurpleMain,
                             unselectedIconColor = GrayWhite,
                             unselectedTextColor = GrayWhite,

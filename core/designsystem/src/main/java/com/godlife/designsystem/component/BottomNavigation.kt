@@ -18,7 +18,12 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,10 +44,40 @@ fun TabIconView(
     badgeAmount: Boolean? = null
 ) {
     BadgedBox(badge = { TabBarBadgeView(badgeAmount) }) {
-        Icon(
-            imageVector = if (isSelected) selectedIcon else unselectedIcon,
-            contentDescription = title
-        )
+
+        if(isSelected){
+            Icon(
+                imageVector = selectedIcon,
+                contentDescription = title,
+                modifier = Modifier
+                    .graphicsLayer(alpha = 0.99f)
+                    .drawWithCache {
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    listOf(
+                                        Color(0xFFFF44A2),
+                                        Color(0xFFFF5890),
+                                        Color(0xFFFA6B80),
+                                        Color(0xFFFF7B75),
+                                        Color(0xFFFF8161),
+                                        Color(0xFFFF884D)
+                                    )
+                                ),
+                                blendMode = BlendMode.SrcAtop
+                            )
+                        }
+                    },
+            )
+        }
+        else{
+            Icon(
+                imageVector = unselectedIcon,
+                contentDescription = title
+            )
+        }
+
     }
 }
 
