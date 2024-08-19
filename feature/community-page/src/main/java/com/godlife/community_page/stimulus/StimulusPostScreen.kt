@@ -75,6 +75,7 @@ import com.godlife.create_post.stimulus.CreateStimulusPostScreen
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.landscapist.ImageOptions
@@ -397,7 +398,7 @@ fun CustomExpandableFAB(
         // parent layout
         Column(
             modifier = Modifier
-                .background(color = GrayWhite3)
+                .background(color = OrangeLight)
         ) {
 
 //            you can also use the spring() in EnterTransition/ExitTransition provided by Material-3 library for a more smooth animation, but it increases the collapse time of the sheet/FAB
@@ -414,7 +415,7 @@ fun CustomExpandableFAB(
                 // display the items
                 Column(
                     modifier = Modifier
-                        .background(color = GrayWhite3)
+                        .background(color = OrangeLight)
                         .padding(vertical = 10.dp, horizontal = 10.dp)
                 ) {
                     items.forEach { item ->
@@ -455,12 +456,16 @@ fun CustomExpandableFAB(
                         viewModel.setFabExpanded()
                         //buttonClicked = !buttonClicked
                     }
-                ), colors = CardDefaults.cardColors(Color.White)) {
+                ),
+                colors = CardDefaults.cardColors(PurpleMain)
+            ) {
                 Row(
                     modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
                 ) {
                     Icon(
-                        imageVector = fabButton.icon, contentDescription = ""
+                        imageVector = fabButton.icon,
+                        contentDescription = "",
+                        tint = Color.White
                     )
                     AnimatedVisibility(
                         visible = buttonClicked,
@@ -472,7 +477,7 @@ fun CustomExpandableFAB(
                             Text(
                                 text = fabButton.text,
                                 style = TextStyle(
-                                    color = Color.Black
+                                    color = Color.White
                                 )
                             )
                         }

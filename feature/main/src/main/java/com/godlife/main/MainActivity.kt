@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
@@ -18,6 +20,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -34,11 +38,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -435,7 +444,19 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
         modifier = Modifier.shadow(7.dp)
     ) {
         bottomNavItems.forEach { bottomNavItem ->
+
             NavigationBarItem(
+                modifier = Modifier.drawWithContent {
+                    drawContent()
+                    if (currentRoute == bottomNavItem.route) {
+                        drawLine(
+                            color = PurpleMain,
+                            start = Offset(0f, 0f),
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 5.dp.toPx()
+                        )
+                    }
+                },
                 selected = currentRoute == bottomNavItem.route,
                 onClick = {
                     navController.navigate(bottomNavItem.route){
@@ -467,6 +488,85 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                     disabledTextColor = GrayWhite3,
                     indicatorColor = Color.White),
                 )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun MyBottomNavigationPreview(
+) {
+
+    val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Outlined.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
+    val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Outlined.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+    val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Outlined.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
+
+
+    val bottomNavItems = listOf(mainTab, communityTab, settingTab)
+
+    var currentRoute = remember {
+        mutableStateOf("Main")
+    }
+
+
+    NavigationBar(
+        containerColor = Color.White,
+        contentColor = contentColorFor(backgroundColor = Color.White),
+        modifier = Modifier.shadow(7.dp)
+    ) {
+        bottomNavItems.forEach { bottomNavItem ->
+
+            /*
+            if (currentRoute.value == bottomNavItem.route) {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .width(48.dp),
+                    thickness = 3.dp,
+                    color = PurpleMain
+                )
+            }
+
+             */
+            NavigationBarItem(
+                modifier = Modifier.drawWithContent {
+                    drawContent()
+                    if (currentRoute.value == bottomNavItem.route) {
+                        drawLine(
+                            color = PurpleMain,
+                            start = Offset(0f, 0f),
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 5.dp.toPx()
+                        )
+                    }
+                },
+                selected = currentRoute.value == bottomNavItem.route,
+                onClick = {
+                    currentRoute.value = bottomNavItem.route
+                },
+
+                icon = {
+                    TabIconView(
+                        isSelected = currentRoute.value == bottomNavItem.route,
+                        selectedIcon = bottomNavItem.selectedIcon,
+                        unselectedIcon = bottomNavItem.unselectedIcon,
+                        title = bottomNavItem.title,
+                        //badgeAmount = bottomNavItem.badgeAmount
+                    )
+                },
+                label = {
+                    if(currentRoute.value == bottomNavItem.route){
+                        Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold)) }
+                    else null
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = PurpleMain,
+                    selectedTextColor = PurpleMain,
+                    unselectedIconColor = GrayWhite,
+                    unselectedTextColor = GrayWhite,
+                    disabledIconColor = GrayWhite3,
+                    disabledTextColor = GrayWhite3,
+                    indicatorColor = Color.White),
+            )
         }
     }
 }
