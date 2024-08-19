@@ -122,6 +122,9 @@ class CommunityPageViewModel @Inject constructor(
     private val _searchedPosts = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
     val searchedPosts: StateFlow<PagingData<PostDetailBody>> = _searchedPosts
 
+    //검색 카테고리
+    var searchCategory = mutableStateOf("title")
+
     //최상단 타이틀
     var topTitle = mutableStateOf("굿생 커뮤니티")
 
@@ -140,9 +143,14 @@ class CommunityPageViewModel @Inject constructor(
         _searchText.value = text
     }
 
+    //검색 카테고리 변경
+    fun onSearchCategoryChange(category: String){
+        searchCategory.value = category
+    }
+
 
     fun getSearchedPost(
-        keyword: String,
+        keyword: String = "",
         tags: String = "",
         nickname: String = ""
     ) {

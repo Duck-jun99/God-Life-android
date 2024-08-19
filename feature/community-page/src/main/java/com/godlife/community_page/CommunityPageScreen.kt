@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -54,11 +55,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
 import com.godlife.community_page.latest.LatestPostScreen
@@ -67,14 +66,12 @@ import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.community_page.navigation.LatestPostRoute
 import com.godlife.community_page.navigation.RankingRoute
 import com.godlife.community_page.navigation.SearchResultRoute
-import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostRoute
-import com.godlife.community_page.post_detail.StimulusDetailScreen
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
 import com.godlife.designsystem.component.GodLifeSearchBar
-import com.godlife.designsystem.component.GodLifeSearchBar2
+import com.godlife.designsystem.component.CommunitySearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -123,8 +120,9 @@ fun CommunityPageScreen(
     //BottomSheet가 접혀있을 때 높이
     val initBottomSheetHeight = height - 240.dp
 
-
     val searchText by viewModel.searchText.collectAsState()
+
+    val searchCategory = viewModel.searchCategory.value
 
     NavHost(navController = navController, startDestination = "CommunityPageScreen"){
         composable("CommunityPageScreen"){
@@ -192,7 +190,7 @@ fun CommunityPageScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        GodLifeSearchBar2(
+                        CommunitySearchBar(
                             modifier = modifier
                                 .fillMaxWidth()
                                 .align(Alignment.CenterHorizontally),
@@ -200,12 +198,70 @@ fun CommunityPageScreen(
                             containerColor = OpaqueLight,
                             onTextChanged = { viewModel.onSearchTextChange(it) },
                             onSearchClicked = {
-                                viewModel.getSearchedPost(keyword = searchText)
+
+                                when(searchCategory){
+                                    "title" -> {
+                                        viewModel.getSearchedPost(keyword = searchText)
+                                    }
+                                    "nickname" -> {
+                                        viewModel.getSearchedPost(nickname = searchText)
+                                    }
+                                    "tag" -> {
+                                        viewModel.getSearchedPost(tags = searchText)
+                                    }
+                                }
+
                                 navControllerBottomSheet.navigate(SearchResultRoute.route)
                             },
-                            sortBoolean = true,
-                            onSortClicked = {
-
+                            optionBoolean = true,
+                            optionMenu = {
+                                Column {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Checkbox(
+                                            checked = searchCategory == "title",
+                                            onCheckedChange = { viewModel.onSearchCategoryChange("title") }
+                                        )
+                                        Text(
+                                            text = "제목으로 검색",
+                                            style = TextStyle(
+                                                color = Color.Black,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Checkbox(
+                                            checked = searchCategory == "nickname",
+                                            onCheckedChange = { viewModel.onSearchCategoryChange("nickname") }
+                                        )
+                                        Text(
+                                            text = "작성자명으로 검색",
+                                            style = TextStyle(
+                                                color = Color.Black,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Checkbox(
+                                            checked = searchCategory == "tag",
+                                            onCheckedChange = { viewModel.onSearchCategoryChange("tag") }
+                                        )
+                                        Text(
+                                            text = "태그로 검색",
+                                            style = TextStyle(
+                                                color = Color.Black,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+                                    }
+                                }
                             }
                         )
 

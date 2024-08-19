@@ -12,24 +12,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,14 +56,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -79,7 +74,6 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import kotlinx.coroutines.delay
 
@@ -422,7 +416,7 @@ fun GodLifeSearchBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun GodLifeSearchBar2(
+fun CommunitySearchBar(
     modifier: Modifier = Modifier,
     searchText: String = "",
     hint: String = "검색어를 입력해주세요.",
@@ -430,11 +424,12 @@ fun GodLifeSearchBar2(
     contentColor: Color = Color.White,
     containerColor: Color = OpaqueDark,
     onSearchClicked: () -> Unit =  {},
-    sortBoolean: Boolean = true,
-    onSortClicked: () -> Unit = {}
+    optionBoolean: Boolean = true,
+    optionMenu: @Composable () -> Unit = {},
 ) {
 
-    //var expanded by rememberSaveable { mutableStateOf(false) }
+    var optionMenuExpanded by rememberSaveable { mutableStateOf(false) }
+
     SearchBar(
         inputField = {
             GodLifeInputField(
@@ -468,17 +463,36 @@ fun GodLifeSearchBar2(
                             contentDescription = null,
                             tint = contentColor
                         )
+
                     } },
                 trailingIcon = {
-                    if(sortBoolean){
+                    if(optionBoolean){
                         IconButton(
-                            onClick = { onSortClicked() }
+                            onClick = { optionMenuExpanded = true }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = null,
                                 tint = contentColor
                             )
+
+                            DropdownMenu(
+                                expanded = optionMenuExpanded,
+                                onDismissRequest = { optionMenuExpanded = false }
+                            ) {
+
+                                DropdownMenuItem(
+                                    text = {
+                                           optionMenu()
+                                           },
+                                    onClick = {
+                                        //optionMenuExpanded = false
+                                        //optionMenu()
+                                    }
+                                )
+
+                            }
+
                         }
                     }
                      },
