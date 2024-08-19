@@ -89,6 +89,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
+import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
@@ -686,9 +687,10 @@ fun Content2(
 
         Column(
             modifier = modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .background(Color.White)
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 20.dp)
                 .fillMaxWidth()
-                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .background(color = OrangeLight, shape = RoundedCornerShape(16.dp))
                 .padding(10.dp)
         ) {
 
@@ -697,7 +699,7 @@ fun Content2(
                     Text(
                         text = writer,
                         style = TextStyle(
-                            color = GrayWhite,
+                            color = Color.Black,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             lineHeight = 16.sp
@@ -706,7 +708,7 @@ fun Content2(
                     Text(
                         text = "님의 굿생을 인정하시나요?",
                         style = TextStyle(
-                            color = GrayWhite,
+                            color = Color.Black,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Normal,
                             lineHeight = 16.sp
@@ -716,7 +718,7 @@ fun Content2(
                 Text(
                     text = "그렇다면, 아래 [굿생 인정!] 버튼을 눌러주세요!",
                     style = TextStyle(
-                        color = GrayWhite,
+                        color = Color.Black,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal,
                         lineHeight = 16.sp
@@ -726,12 +728,21 @@ fun Content2(
 
                 Spacer(modifier.size(20.dp))
 
-                GodLifeButtonOrange(
+                GodLifeButtonWhite(
                     modifier = modifier
                         .align(Alignment.CenterHorizontally),
                     leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
                     onClick = { viewModel.agreeGodLife() },
-                    text = { Text(text = "굿생 인정!") }
+                    text = {
+                        Text(
+                            text = "굿생 인정!",
+                            style = TextStyle(
+                                color = PurpleMain,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                           }
                 )
             }
 
@@ -749,7 +760,7 @@ fun Content2(
                         .fillMaxWidth(),
                     text = "유저님께서 굿생을 인정하신 글이에요!",
                     style = TextStyle(
-                        color = GrayWhite,
+                        color = PurpleMain,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal
                     ),
