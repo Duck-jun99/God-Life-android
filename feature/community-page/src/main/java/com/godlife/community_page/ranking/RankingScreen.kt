@@ -135,7 +135,7 @@ fun RankingScreen(
                     ){
                         Column {
 
-                            Text(text = "이번주 Top10 굿생러", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
+                            Text(text = "이번주 Top10 굿생러는 누구일까요?", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp), textAlign = TextAlign.Center)
 
                             Spacer(modifier.size(10.dp))
 
