@@ -73,6 +73,7 @@ import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAu
 import com.godlife.community_page.stimulus.recommended_post.RecommendedStimulusPostContent
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeLight
@@ -143,11 +144,13 @@ fun StimulusPostScreen(
                     LazyColumn(
                         modifier
                             .fillMaxSize()
-                            .background(Color.White)
+                            .background(GrayWhite3)
                     ) {
 
                         item {
                             RecommendedStimulusPostContent(navController = navController)
+
+                            //Spacer(modifier = Modifier.height(10.dp))
                         }
 
 
@@ -155,7 +158,9 @@ fun StimulusPostScreen(
 
                             Text(
                                 modifier = modifier
-                                    .padding(20.dp),
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(top = 10.dp, start = 20.dp),
                                 text = "인기 글을 읽어보세요.",
                                 style = TextStyle(
                                     color = Color.Black,
@@ -168,13 +173,16 @@ fun StimulusPostScreen(
 
                         item {
                             FamousStimulusPostContent(navController = navController)
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
 
                         item {
 
                             Text(
                                 modifier = modifier
-                                    .padding(20.dp),
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(top = 10.dp, start = 20.dp),
                                 text = "따끈따끈, 최신글",
                                 style = TextStyle(
                                     color = Color.Black,
@@ -189,12 +197,15 @@ fun StimulusPostScreen(
                             LatestStimulusPostContent(
                                 navController = navController
                             )
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
 
                         item{
                             Text(
                                 modifier = modifier
-                                    .padding(20.dp),
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(top = 10.dp, start = 20.dp),
                                 text = "많이 본 글이에요.",
                                 style = TextStyle(
                                     color = Color.Black,
@@ -208,6 +219,7 @@ fun StimulusPostScreen(
                             MostViewStimulusPostContent(
                                 navController = navController
                             )
+                            //Spacer(modifier = Modifier.height(10.dp))
                         }
 
                         item {
@@ -398,7 +410,7 @@ fun CustomExpandableFAB(
         // parent layout
         Column(
             modifier = Modifier
-                .background(color = OrangeLight)
+                .background(color = Color.White)
         ) {
 
 //            you can also use the spring() in EnterTransition/ExitTransition provided by Material-3 library for a more smooth animation, but it increases the collapse time of the sheet/FAB
@@ -415,7 +427,7 @@ fun CustomExpandableFAB(
                 // display the items
                 Column(
                     modifier = Modifier
-                        .background(color = OrangeLight)
+                        .background(color = Color.White)
                         .padding(vertical = 10.dp, horizontal = 10.dp)
                 ) {
                     items.forEach { item ->
@@ -431,7 +443,9 @@ fun CustomExpandableFAB(
                                 }
                             )) {
                             Icon(
-                                imageVector = item.icon, contentDescription = "refresh"
+                                imageVector = item.icon,
+                                contentDescription = "",
+                                tint = PurpleMain
                             )
 
                             Spacer(modifier = Modifier.width(15.dp))
@@ -439,7 +453,7 @@ fun CustomExpandableFAB(
                             Text(
                                 text = item.text,
                                 style = TextStyle(
-                                    color = Color.Black
+                                    color = GrayWhite
                                 )
                             )
                         }

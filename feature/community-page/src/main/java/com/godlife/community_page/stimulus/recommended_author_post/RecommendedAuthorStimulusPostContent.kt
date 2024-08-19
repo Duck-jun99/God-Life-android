@@ -77,6 +77,7 @@ fun RecommendedAuthorStimulusPostContent(
             LazyHorizontalGrid(
                 modifier = modifier
                     .fillMaxWidth()
+                    .background(Color.White)
                     .height(500.dp),
                 rows = GridCells.Fixed(3)
             ) {

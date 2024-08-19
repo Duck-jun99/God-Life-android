@@ -8,8 +8,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -38,6 +45,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -45,6 +54,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,6 +105,7 @@ import com.godlife.service.MyFirebaseMessagingService
 import com.godlife.setting_page.SettingPageScreen
 import com.godlife.setting_page.navigation.SettingPageRoute
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -494,80 +506,76 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
 
 @Preview
 @Composable
-fun MyBottomNavigationPreview(
-) {
-
+fun MyBottomNavigationPreview() {
     val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Outlined.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
     val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Outlined.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
     val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Outlined.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
-
     val bottomNavItems = listOf(mainTab, communityTab, settingTab)
 
-    var currentRoute = remember {
-        mutableStateOf("Main")
-    }
+    var currentRoute by remember { mutableStateOf("Main") }
+    var indicatorOffset by remember { mutableStateOf(0f) }
 
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+    val cScope = rememberCoroutineScope()
 
     NavigationBar(
         containerColor = Color.White,
         contentColor = contentColorFor(backgroundColor = Color.White),
         modifier = Modifier.shadow(7.dp)
     ) {
-        bottomNavItems.forEach { bottomNavItem ->
+        val itemWidth = configuration.screenWidthDp / bottomNavItems.size
 
-            /*
-            if (currentRoute.value == bottomNavItem.route) {
-                HorizontalDivider(
-                    modifier = Modifier
-                        .width(48.dp),
-                    thickness = 3.dp,
-                    color = PurpleMain
-                )
-            }
-
-             */
-            NavigationBarItem(
-                modifier = Modifier.drawWithContent {
-                    drawContent()
-                    if (currentRoute.value == bottomNavItem.route) {
-                        drawLine(
-                            color = PurpleMain,
-                            start = Offset(0f, 0f),
-                            end = Offset(size.width, 0f),
-                            strokeWidth = 5.dp.toPx()
-                        )
-                    }
-                },
-                selected = currentRoute.value == bottomNavItem.route,
-                onClick = {
-                    currentRoute.value = bottomNavItem.route
-                },
-
-                icon = {
-                    TabIconView(
-                        isSelected = currentRoute.value == bottomNavItem.route,
-                        selectedIcon = bottomNavItem.selectedIcon,
-                        unselectedIcon = bottomNavItem.unselectedIcon,
-                        title = bottomNavItem.title,
-                        //badgeAmount = bottomNavItem.badgeAmount
-                    )
-                },
-                label = {
-                    if(currentRoute.value == bottomNavItem.route){
-                        Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold)) }
-                    else null
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PurpleMain,
-                    selectedTextColor = PurpleMain,
-                    unselectedIconColor = GrayWhite,
-                    unselectedTextColor = GrayWhite,
-                    disabledIconColor = GrayWhite3,
-                    disabledTextColor = GrayWhite3,
-                    indicatorColor = Color.White),
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // 애니메이션이 적용된 인디케이터
+            Box(
+                Modifier
+                    .offset(x = with(density) { indicatorOffset.toDp() })
+                    .width(itemWidth.dp)
+                    .height(3.dp)
+                    .background(PurpleMain)
             )
+
+            Row {
+                bottomNavItems.forEachIndexed { index, bottomNavItem ->
+                    NavigationBarItem(
+                        selected = currentRoute == bottomNavItem.route,
+                        onClick = {
+                            currentRoute = bottomNavItem.route
+                            // 애니메이션 적용
+                            cScope.launch {
+                                animate(
+                                    initialValue = indicatorOffset,
+                                    targetValue = index.toFloat() * (itemWidth.toFloat())
+                                ) { value, _ ->
+                                    indicatorOffset = value
+                                }
+                            }
+                        },
+                        icon = {
+                            TabIconView(
+                                isSelected = currentRoute == bottomNavItem.route,
+                                selectedIcon = bottomNavItem.selectedIcon,
+                                unselectedIcon = bottomNavItem.unselectedIcon,
+                                title = bottomNavItem.title,
+                            )
+                        },
+                        label = {
+                            if(currentRoute == bottomNavItem.route){
+                                Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold))
+                            }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = PurpleMain,
+                            selectedTextColor = PurpleMain,
+                            unselectedIconColor = GrayWhite,
+                            unselectedTextColor = GrayWhite,
+                            indicatorColor = Color.Transparent // 기본 인디케이터를 숨김.
+                        ),
+                    )
+                }
+            }
         }
     }
 }
-

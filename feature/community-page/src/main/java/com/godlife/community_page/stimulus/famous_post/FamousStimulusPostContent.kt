@@ -91,7 +91,11 @@ fun FamousStimulusPostContent(
         }
         is StimulusPostUiState.Success -> {
 
-            LazyRow {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+            ) {
                 itemsIndexed(item){index, it ->
 
                     if (it != null) {

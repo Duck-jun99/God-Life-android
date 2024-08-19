@@ -103,9 +103,13 @@ fun RecommendedAuthorInfoContent(
 
     }
 
+    //Spacer(modifier.height(10.dp))
+
     Text(
         modifier = modifier
-            .padding(20.dp),
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(top = 10.dp, start = 20.dp),
         text = "${user.value?.nickname}님의 게시물",
         style = TextStyle(
             color = Color.Black,

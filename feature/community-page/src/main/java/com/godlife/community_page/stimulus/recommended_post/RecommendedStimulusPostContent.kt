@@ -216,7 +216,7 @@ fun RecommendedStimulusPostContent(
                                 Spacer(modifier.size(5.dp))
 
                                 Text(
-                                    text = "by.${item.nickname}",
+                                    text = "by ${item.nickname}",
                                     style = TextStyle(
                                         color = Color.White,
                                         fontSize = 12.sp,
