@@ -197,7 +197,8 @@ private fun handleNotificationIntent(
 ) {
     intent?.let {
 
-        if (it.getStringExtra("navigation") == "normal") {
+        if (it.getStringExtra("navigation") == "normal"
+            || it.getStringExtra("navigation") == "comment") {
             val postId = it.getStringExtra("postId")
             if (postId != null) {
                 //navController.navigate("${PostDetailRoute.route}/$postId")
