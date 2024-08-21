@@ -1,6 +1,7 @@
 package com.godlife.community_page.stimulus
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +74,8 @@ import com.godlife.community_page.stimulus.recommended_author.RecommendedAuthorI
 import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorStimulusPostContent
 import com.godlife.community_page.stimulus.recommended_post.RecommendedStimulusPostContent
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
+import com.godlife.designsystem.list.AdMobListView
+import com.godlife.designsystem.list.NativeAdView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
@@ -79,6 +83,12 @@ import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -107,6 +117,42 @@ fun StimulusPostScreen(
         FABItem(icon = Icons.Outlined.Search, text = "검색"),
         FABItem(icon = Icons.Outlined.Info, text = "도움말"),
     )
+
+    val context = LocalContext.current
+
+    /* TODO AdMob TEST */
+    var nativeAd by remember { mutableStateOf<NativeAd?>(null) }
+
+
+    /* TODO adunitId는 테스트용으로 이용중 */
+    val adLoader = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110")
+        .forNativeAd { ad : NativeAd ->
+            // Show the ad.
+
+            nativeAd = ad
+            /*
+            if (isDestroyed) {
+                ad.destroy()
+                return@forNativeAd
+            }
+             */
+        }
+        .withAdListener(object : AdListener() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                // Handle the failure.
+
+                Log.e("AdMob", "Ad failed to load. Error code: ${adError.code}, Message: ${adError.message}")
+            }
+        })
+        .withNativeAdOptions(
+            NativeAdOptions.Builder()
+                // Methods in the NativeAdOptions.Builder class can be
+                // used here to specify individual options settings.
+                .build()
+        )
+        .build()
+
+    adLoader.loadAd(AdRequest.Builder().build())
 
 
     GodLifeTheme {
@@ -173,7 +219,22 @@ fun StimulusPostScreen(
 
                         item {
                             FamousStimulusPostContent(navController = navController)
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+
+                        item{
+                            /* TODO AdMob TEST */
+
+                            nativeAd?.let { it ->
+                                NativeAdView(ad = it) { ad, view ->
+                                    AdMobListView(
+                                        ad = ad,
+                                        view = view,
+                                        context = context
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
 
                         item {

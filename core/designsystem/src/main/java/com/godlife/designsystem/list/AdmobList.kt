@@ -19,10 +19,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,12 +34,42 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.godlife.designsystem.R
 import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.theme.GrayWhite
 import com.google.android.gms.ads.nativead.AdChoicesView
 import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdView
 import com.skydoves.landscapist.rememberDrawablePainter
+
+@Composable
+fun NativeAdView(
+    ad: NativeAd,
+    adContent: @Composable (ad: NativeAd, contentView: View) -> Unit,
+) {
+    val contentViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    val adViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    AndroidView(
+        factory = { context ->
+            val contentView = ComposeView(context).apply {
+                id = contentViewId
+            }
+            NativeAdView(context).apply {
+                id = adViewId
+                addView(contentView)
+            }
+        },
+        update = { view ->
+            val adView = view.findViewById<NativeAdView>(adViewId)
+            val contentView = view.findViewById<ComposeView>(contentViewId)
+
+            adView.setNativeAd(ad)
+            adView.callToActionView = contentView
+            contentView.setContent { adContent(ad, contentView) }
+        }
+    )
+}
 
 @Composable
 fun AdMobListView(

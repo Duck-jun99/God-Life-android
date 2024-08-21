@@ -90,6 +90,7 @@ import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.TabBarBadgeView
 import com.godlife.designsystem.list.AdMobListView
+import com.godlife.designsystem.list.NativeAdView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -113,7 +114,6 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.AdChoicesView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.google.android.gms.ads.nativead.NativeAdView
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.rememberDrawablePainter
@@ -160,6 +160,8 @@ fun MainPageScreen(
     /* TODO AdMob TEST */
     var nativeAd by remember { mutableStateOf<NativeAd?>(null) }
 
+
+    /* TODO adunitId는 테스트용으로 이용중 */
     val adLoader = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110")
         .forNativeAd { ad : NativeAd ->
             // Show the ad.
@@ -1159,34 +1161,6 @@ fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
         )
 
     }
-}
-
-@Composable
-fun NativeAdView(
-    ad: NativeAd,
-    adContent: @Composable (ad: NativeAd, contentView: View) -> Unit,
-) {
-    val contentViewId by remember { mutableIntStateOf(View.generateViewId()) }
-    val adViewId by remember { mutableIntStateOf(View.generateViewId()) }
-    AndroidView(
-        factory = { context ->
-            val contentView = ComposeView(context).apply {
-                id = contentViewId
-            }
-            NativeAdView(context).apply {
-                id = adViewId
-                addView(contentView)
-            }
-        },
-        update = { view ->
-            val adView = view.findViewById<NativeAdView>(adViewId)
-            val contentView = view.findViewById<ComposeView>(contentViewId)
-
-            adView.setNativeAd(ad)
-            adView.callToActionView = contentView
-            contentView.setContent { adContent(ad, contentView) }
-        }
-    )
 }
 
 @Preview
