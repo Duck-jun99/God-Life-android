@@ -1,3 +1,4 @@
+import com.godlife.god_life.configureAdmob
 import com.godlife.god_life.configureAndroidPaging
 import com.godlife.god_life.configureFirebase
 import com.godlife.god_life.configureHiltAndroid
@@ -21,6 +22,7 @@ configureKakaoSdk()
 configureLottie()
 configureAndroidPaging()
 configureFirebase()
+configureAdmob()
 
 dependencies {
     implementation(project(":core:model"))

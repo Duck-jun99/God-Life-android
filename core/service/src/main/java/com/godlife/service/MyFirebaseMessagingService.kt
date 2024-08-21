@@ -130,31 +130,31 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 // 투두 알림
                 channelId = "todo_channel"
                 channelName = "투두 알림"
-                channelDescription = "오늘 투두 목록에 대한 알림입니다."
+                channelDescription = "오늘 진행중인 투두에 대한 알림이에요."
             }
             "all" -> {
                 // 전체 알림
                 channelId = "general_channel"
-                channelName = "전체 알림"
-                channelDescription = "전체 사용자에게 보내는 알림입니다."
+                channelName = "광고, 전체 알림"
+                channelDescription = "광고 또는 전체 공지 알림이에요."
             }
             "comment" -> {
                 // 댓글 알림
                 channelId = "comment_channel"
-                channelName = "댓글 알림"
-                channelDescription = "게시물에 댓글이 달렸을 때 알려드립니다."
+                channelName = "게시물 댓글 알림"
+                channelDescription = "게시물에 댓글이 달렸을 때 알림이에요."
             }
             "stimulus" -> {
                 // 굿생 인정
                 channelId = "recognition_channel"
-                channelName = "굿생 인정"
-                channelDescription = "굿생 기록이 인정받았을 때 알려드립니다."
+                channelName = "굿생 인정 알림"
+                channelDescription = "굿생 인정을 받았을 때 알림이에요."
             }
             "normal" ->{
                 // 굿생 인정
                 channelId = "recognition_channel"
-                channelName = "굿생 인정"
-                channelDescription = "굿생 기록이 인정받았을 때 알려드립니다."
+                channelName = "굿생 인정 알림"
+                channelDescription = "굿생 인정을 받았을 때 알림이에요."
             }
             else -> {
                 // 기본 채널 (type이 없는 경우 등)

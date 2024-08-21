@@ -3,6 +3,7 @@ package com.godlife.main_page
 
 import android.app.Activity
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -48,10 +49,12 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -69,6 +72,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -77,6 +81,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
@@ -84,6 +89,7 @@ import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.TabBarBadgeView
+import com.godlife.designsystem.list.AdMobListView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -98,8 +104,19 @@ import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
 import com.godlife.profile.navigation.ProfileScreenRoute
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.AdChoicesView
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.google.android.gms.ads.nativead.NativeAdView
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -139,6 +156,38 @@ fun MainPageScreen(
 
     //굿생 인증 완료용
     var showCompleteTodayBox by remember { mutableStateOf(false) }
+
+    /* TODO AdMob TEST */
+    var nativeAd by remember { mutableStateOf<NativeAd?>(null) }
+
+    val adLoader = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110")
+        .forNativeAd { ad : NativeAd ->
+            // Show the ad.
+
+            nativeAd = ad
+            /*
+            if (isDestroyed) {
+                ad.destroy()
+                return@forNativeAd
+            }
+             */
+        }
+        .withAdListener(object : AdListener() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                // Handle the failure.
+
+                Log.e("AdMob", "Ad failed to load. Error code: ${adError.code}, Message: ${adError.message}")
+            }
+        })
+        .withNativeAdOptions(
+            NativeAdOptions.Builder()
+                // Methods in the NativeAdOptions.Builder class can be
+                // used here to specify individual options settings.
+                .build()
+        )
+        .build()
+
+    adLoader.loadAd(AdRequest.Builder().build())
 
     LaunchedEffect(completedTodoListSize) {
 
@@ -422,6 +471,39 @@ fun MainPageScreen(
 
                         // item { Spacer(modifier = modifier.size(30.dp)) }
 
+                        item{
+
+                            /* TODO AdMob TEST */
+
+                            nativeAd?.let { it ->
+                                NativeAdView(ad = it) { ad, view ->
+                                    AdMobListView(
+                                        ad = ad,
+                                        view = view,
+                                        context = context
+                                    )
+                                }
+                            }
+
+                            /*
+                            AndroidView(
+                                modifier = modifier
+                                    .fillMaxWidth(),
+                                factory = { context ->
+                                    AdView(context).apply {
+                                        setAdSize(AdSize.BANNER)
+                                        adUnitId = "ca-app-pub-3940256099942544/9214589741"
+                                        loadAd(AdRequest.Builder().build())
+                                    }
+                                },
+                                update = { adView ->
+                                    adView.loadAd(AdRequest.Builder().build())
+                                }
+                            )
+
+                             */
+
+                        }
 
                     }
 
@@ -1077,6 +1159,34 @@ fun TextToday(viewModel: MainPageViewModel, modifier: Modifier = Modifier){
         )
 
     }
+}
+
+@Composable
+fun NativeAdView(
+    ad: NativeAd,
+    adContent: @Composable (ad: NativeAd, contentView: View) -> Unit,
+) {
+    val contentViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    val adViewId by remember { mutableIntStateOf(View.generateViewId()) }
+    AndroidView(
+        factory = { context ->
+            val contentView = ComposeView(context).apply {
+                id = contentViewId
+            }
+            NativeAdView(context).apply {
+                id = adViewId
+                addView(contentView)
+            }
+        },
+        update = { view ->
+            val adView = view.findViewById<NativeAdView>(adViewId)
+            val contentView = view.findViewById<ComposeView>(contentViewId)
+
+            adView.setNativeAd(ad)
+            adView.callToActionView = contentView
+            contentView.setContent { adContent(ad, contentView) }
+        }
+    )
 }
 
 @Preview

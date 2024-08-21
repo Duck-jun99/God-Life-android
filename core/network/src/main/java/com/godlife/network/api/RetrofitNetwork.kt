@@ -192,8 +192,8 @@ interface RetrofitNetworkApi {
     suspend fun searchPost(
         @Query("page") page: Int,
         @Query("keyword") keyword: String,
-        @Query("Tag") tag: String,
-        @Query("Nickname") nickname: String
+        @Query("tags") tag: String,
+        @Query("nickname") nickname: String
     ): ApiResponse<LatestPostQuery>
 
 
