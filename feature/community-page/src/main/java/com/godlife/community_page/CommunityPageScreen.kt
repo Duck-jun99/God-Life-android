@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +78,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
+import com.google.android.gms.ads.AdLoader
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -444,8 +446,10 @@ fun CommunityPageView(
         }
 
         composable(LatestPostRoute.route) {
+            val context = LocalContext.current
             viewModel.changeCurrentRoute(route = LatestPostRoute.route)
-            viewModel.getLatestPost()
+            /*TODO 광고 테스트 UnitID 사용중*/
+            viewModel.getLatestPost(AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110"))
 
             when(uiState){
 

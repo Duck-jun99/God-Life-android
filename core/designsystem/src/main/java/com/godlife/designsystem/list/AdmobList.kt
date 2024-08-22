@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +23,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
@@ -37,8 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.godlife.designsystem.R
 import com.godlife.designsystem.component.GodLifeButtonOrange
+import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GrayWhite
-import com.google.android.gms.ads.nativead.AdChoicesView
+import com.godlife.designsystem.theme.OrangeLight
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.skydoves.landscapist.rememberDrawablePainter
@@ -46,7 +45,7 @@ import com.skydoves.landscapist.rememberDrawablePainter
 @Composable
 fun NativeAdView(
     ad: NativeAd,
-    adContent: @Composable (ad: NativeAd, contentView: View) -> Unit,
+    adContent: @Composable (adView: NativeAdView, ad: NativeAd, contentView: View) -> Unit,
 ) {
     val contentViewId by remember { mutableIntStateOf(View.generateViewId()) }
     val adViewId by remember { mutableIntStateOf(View.generateViewId()) }
@@ -65,18 +64,18 @@ fun NativeAdView(
             val contentView = view.findViewById<ComposeView>(contentViewId)
 
             adView.setNativeAd(ad)
-            adView.callToActionView = contentView
-            contentView.setContent { adContent(ad, contentView) }
+            //adView.callToActionView = contentView
+            contentView.setContent { adContent(adView, ad, contentView) }
         }
     )
 }
 
 @Composable
-fun AdMobListView(
+fun AdMobListViewWhite(
     modifier: Modifier = Modifier,
     ad: NativeAd,
     view: View,
-    context: Context
+    adView: NativeAdView
 ){
     Column(
         modifier
@@ -163,7 +162,10 @@ fun AdMobListView(
             modifier = modifier
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth(),
-            onClick = { view.performClick() },
+            onClick = {
+                adView.callToActionView = view
+                view.performClick()
+                      },
             text = {
                 ad.callToAction?.let {
                     Text(
@@ -184,7 +186,7 @@ fun AdMobListView(
 // TODO: native 광고가 돋보이게 그림자 효과 필요
 @Preview
 @Composable
-fun AdMobListViewPreview(
+fun AdMobListViewWhitePreview(
     modifier: Modifier = Modifier
 ){
     Column(
@@ -207,14 +209,6 @@ fun AdMobListViewPreview(
                 tint = Color.Unspecified,
                 modifier = modifier
                     .align(Alignment.TopStart)
-            )
-
-            Icon(
-                painter = painterResource(id = R.drawable.ad_badge),
-                contentDescription = "",
-                tint = Color.Unspecified,
-                modifier = modifier
-                    .align(Alignment.TopEnd)
             )
 
         }
@@ -271,6 +265,104 @@ fun AdMobListViewPreview(
         Spacer(modifier = modifier.height(10.dp))
 
         GodLifeButtonOrange(
+            modifier = modifier
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth(),
+            onClick = { /*TODO*/ },
+            text = {
+                Text(
+                    text = "설치하기",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        )
+
+    }
+}
+
+@Preview
+@Composable
+fun AdMobListViewOrangePreview(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier
+            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .fillMaxWidth()
+            .heightIn(max = 500.dp)
+            .background(OrangeLight, shape = RoundedCornerShape(15.dp))
+            .padding(horizontal = 5.dp, vertical = 10.dp)
+    ){
+
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+        ){
+
+            Icon(
+                painter = painterResource(id = R.drawable.ad_badge),
+                contentDescription = "",
+                tint = Color.Unspecified,
+                modifier = modifier
+                    .align(Alignment.TopStart)
+            )
+
+        }
+
+        Spacer(modifier = modifier.height(10.dp))
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(70.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Icon(
+                painter = painterResource(id = R.drawable.ad_badge),
+                contentDescription = "",
+                tint = Color.Unspecified,
+                modifier = modifier
+                    .size(70.dp)
+            )
+
+            Spacer(modifier = modifier.width(10.dp))
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "광고 제목",
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                overflow = TextOverflow.Ellipsis
+            )
+
+        }
+
+        Spacer(modifier = modifier.height(10.dp))
+
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .heightIn(max = 100.dp)
+                .padding(horizontal = 5.dp),
+            text = "광고 설명",
+            style = TextStyle(
+                color = GrayWhite,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Spacer(modifier = modifier.height(10.dp))
+
+        GodLifeButtonWhite(
             modifier = modifier
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth(),

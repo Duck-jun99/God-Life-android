@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.godlife.data.LatestPostPagingSource
 import com.godlife.network.api.RetrofitNetworkApi
+import com.google.android.gms.ads.AdLoader
 import javax.inject.Inject
 
 /**
@@ -11,14 +12,16 @@ import javax.inject.Inject
  */
 class LatestPostRepository @Inject constructor(
     private val localPreferenceUserRepository: LocalPreferenceUserRepository,
-    private val networkApi: RetrofitNetworkApi
+    private val networkApi: RetrofitNetworkApi,
 ) {
-    fun getLatestPost() = Pager(
+    fun getLatestPost(
+        adLoaderBuilder: AdLoader.Builder
+    ) = Pager(
         config = PagingConfig(
-            pageSize = 10,
+            pageSize = 1,
         ),
         pagingSourceFactory = {
-            LatestPostPagingSource(localPreferenceUserRepository, networkApi)
+            LatestPostPagingSource(localPreferenceUserRepository, networkApi, adLoaderBuilder)
         }
     ).flow
 }

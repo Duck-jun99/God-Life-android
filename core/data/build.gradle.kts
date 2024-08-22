@@ -12,7 +12,8 @@ dependencies {
     api(projects.core.network)
     api(projects.core.sharedpreference)
     api(projects.core.database)
-
+    
+    implementation(libs.google.ads)
     implementation(libs.androidx.junit.ktx)
 
     implementation(libs.okhttp.logging)

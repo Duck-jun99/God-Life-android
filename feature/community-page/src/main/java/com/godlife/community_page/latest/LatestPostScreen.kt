@@ -3,6 +3,8 @@ package com.godlife.community_page.latest
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -59,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -68,12 +71,17 @@ import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.designsystem.component.shimmerEffect
+import com.godlife.designsystem.list.AdMobListViewWhite
+import com.godlife.designsystem.list.NativeAdView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.network.model.PostDetailBody
+import com.godlife.designsystem.view.GodLifeErrorScreen
+import com.godlife.designsystem.view.GodLifeLoadingScreen
+import com.godlife.model.community.LatestContentUi
+import com.godlife.model.community.LatestContentUi.PostDetailBody
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -88,6 +96,9 @@ fun LatestPostScreen(
 
     //val postList = viewModel.getLatestPost().collectAsLazyPagingItems()
     val postList = viewModel.latestPostList.collectAsLazyPagingItems()
+    Log.e("LatestPostScreen", "postList.loadState: ${postList.loadState}")
+
+
 
     GodLifeTheme {
 
@@ -98,7 +109,23 @@ fun LatestPostScreen(
         ) {
 
             items(postList.itemCount){
-                postList[it]?.let { it1 -> LatestPostListView(item = it1, navController = navController) }
+
+                postList[it]?.let { it1 ->
+                    when (it1) {
+                        is PostDetailBody -> {
+                            LatestPostListView(item = it1, navController = navController)
+                        }
+                        is LatestContentUi.NativeAds -> {
+                            NativeAdView(ad = it1.ad) { adView, ad, view ->
+                                AdMobListViewWhite(
+                                    adView = adView,
+                                    ad = ad,
+                                    view = view
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             /*
@@ -115,6 +142,36 @@ fun LatestPostScreen(
              */
 
 
+        }
+
+        // 새로운 페이지 로드 중
+        if(postList.loadState.append == LoadState.Loading){
+            GodLifeLoadingScreen(
+                text = "게시물을 불러오는 중이에요."
+            )
+        }
+        // 마지막 페이지 도달 시
+        else if(postList.loadState.append == LoadState.NotLoading(true)){
+            Toast.makeText(LocalContext.current, "마지막 페이지 입니다.", Toast.LENGTH_SHORT).show()
+        }
+
+        when(postList.loadState.refresh){
+            //최초 로드 시
+            is LoadState.Loading -> {
+                LoadingLatestPostScreen()
+            }
+
+            is LoadState.Error -> {
+                GodLifeErrorScreen(
+                    errorMessageEnabled = false,
+                    buttonEnabled = false
+                )
+
+            }
+            is LoadState.NotLoading -> {
+
+
+            }
         }
 
 

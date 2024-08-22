@@ -28,14 +28,12 @@ import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Create
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -70,17 +68,14 @@ import com.godlife.community_page.stimulus.famous_post.FamousStimulusPostContent
 import com.godlife.community_page.stimulus.latest_post.LatestStimulusPostContent
 import com.godlife.community_page.stimulus.most_view_post.MostViewStimulusPostContent
 import com.godlife.community_page.stimulus.recommended_author.RecommendedAuthorInfoContent
-import com.godlife.community_page.stimulus.recommended_author.RecommendedAuthorInfoContentPreview
-import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorStimulusPostContent
 import com.godlife.community_page.stimulus.recommended_post.RecommendedStimulusPostContent
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
-import com.godlife.designsystem.list.AdMobListView
+import com.godlife.designsystem.list.AdMobListViewWhite
 import com.godlife.designsystem.list.NativeAdView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.OrangeLight
 import com.godlife.designsystem.theme.PurpleMain
 import com.godlife.network.model.StimulusPostList
 import com.google.android.gms.ads.AdListener
@@ -226,11 +221,11 @@ fun StimulusPostScreen(
                             /* TODO AdMob TEST */
 
                             nativeAd?.let { it ->
-                                NativeAdView(ad = it) { ad, view ->
-                                    AdMobListView(
+                                NativeAdView(ad = it) { adView, ad, view ->
+                                    AdMobListViewWhite(
+                                        adView = adView,
                                         ad = ad,
-                                        view = view,
-                                        context = context
+                                        view = view
                                     )
                                 }
                             }

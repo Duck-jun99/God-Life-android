@@ -27,6 +27,7 @@ import com.godlife.designsystem.theme.PurpleMain
 @Composable
 fun GodLifeErrorScreen(
     modifier: Modifier = Modifier,
+    errorMessageEnabled: Boolean = true,
     errorMessage: String = "",
     buttonEnabled: Boolean = true,
     buttonEvent: () -> Unit = {},
@@ -63,15 +64,21 @@ fun GodLifeErrorScreen(
 
         Spacer(modifier.size(20.dp))
 
-        Text(
-            text = "에러 메시지: $errorMessage",
-            style = TextStyle(
-                color = Color.Black,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Normal
-            ),
-            textAlign = TextAlign.Center
-        )
+        if(errorMessageEnabled){
+
+            Text(
+                text = "에러 메시지: $errorMessage",
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Normal
+                ),
+                textAlign = TextAlign.Center
+            )
+
+        }
+
+
 
         if(buttonEnabled){
 

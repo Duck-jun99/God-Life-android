@@ -5,3 +5,8 @@ plugins {
 android {
     namespace = "com.godlife.model"
 }
+
+dependencies{
+    implementation(libs.google.ads)
+
+}
