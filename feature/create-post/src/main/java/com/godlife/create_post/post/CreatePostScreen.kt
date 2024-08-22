@@ -61,10 +61,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -75,6 +77,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.godlife.create_post.R
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
@@ -89,6 +92,8 @@ import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.community.TagItem
 import com.godlife.navigator.MainNavigator
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -522,35 +527,12 @@ fun CreatePostScreen(
 }
 
 @Composable
-fun TagItem(tagItem: TagItem, modifier: Modifier = Modifier){
-    Column(
-        modifier = Modifier.padding(5.dp)
-    ) {
-        Box(
-            modifier
-                .size(70.dp, 30.dp)
-                .background(color = OrangeMain, shape = RoundedCornerShape(7.dp))
-                .padding(2.dp)
-            ,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = tagItem.tagName,
-                style = TextStyle(color = Color.White),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-
-}
-
-@Composable
 fun SelectImage(
     index:Int,
     imageUri: Uri,
     context: Context,
     viewModel: CreatePostViewModel
 ){
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     Box(modifier = Modifier
         .padding(end = 10.dp)
@@ -559,29 +541,39 @@ fun SelectImage(
     ) {
 
         //Image 부분
-        val imageModifier: Modifier = Modifier
-            .size(150.dp, 150.dp)
-            .fillMaxSize()
 
-        Glide.with(context)
-            .asBitmap()
-            .load(imageUri)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
+        GlideImage(
+            imageModel = { imageUri },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = Modifier
+                .size(150.dp, 150.dp)
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = Modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = OrangeMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = imageModifier
-            )
-        }
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
 
         Box(
             modifier = Modifier
