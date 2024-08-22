@@ -10,6 +10,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,17 +58,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,23 +80,32 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
+import com.godlife.designsystem.list.AdMobListViewWhite
+import com.godlife.designsystem.list.NativeAdView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.navigation.HistoryPageRoute
+import com.godlife.main_page.navigation.NotificationListRoute
 import com.godlife.main_page.update.UpdateAlertDialog
 import com.godlife.model.todo.TodoList
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
 import com.godlife.navigator.LoginNavigator
 import com.godlife.profile.navigation.ProfileScreenRoute
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -112,22 +124,10 @@ fun MainPageScreen(
     SnackbarHost(hostState = snackBarHostState)
 
 
-    //굿생 인증 완료용
-    var showCompleteTodayBox by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-
-        delay(2000) // 2초 대기
-        showCompleteTodayBox = true
-    }
-
-
     //Ui State 관찰
     val uiState by viewModel.uiState.collectAsState()
 
     val context = LocalContext.current
-
-    val todayTodoListExists by viewModel.todayTodoListExists.collectAsState()
 
     val userInfo by viewModel.userInfo.collectAsState()
 
@@ -136,9 +136,65 @@ fun MainPageScreen(
 
     val todayTodoList by viewModel.todayTodoList.collectAsState()
 
+    val completedTodoListSize by viewModel.completedTodoListSize.collectAsState()
+    val todayTodoListSize by viewModel.todayTodoListSize.collectAsState()
+
+    val isTodayTodoListCompleted by viewModel.isTodayTodoListCompleted.collectAsState()
+
+    //굿생 인증 완료용
+    var showCompleteTodayBox by remember { mutableStateOf(false) }
+
+    /* TODO AdMob TEST */
+    var nativeAd by remember { mutableStateOf<NativeAd?>(null) }
+
+
+    /* TODO adunitId는 테스트용으로 이용중 */
+    val adLoader = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110")
+        .forNativeAd { ad : NativeAd ->
+            // Show the ad.
+
+            nativeAd = ad
+            /*
+            if (isDestroyed) {
+                ad.destroy()
+                return@forNativeAd
+            }
+             */
+        }
+        .withAdListener(object : AdListener() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                // Handle the failure.
+
+                Log.e("AdMob", "Ad failed to load. Error code: ${adError.code}, Message: ${adError.message}")
+            }
+        })
+        .withNativeAdOptions(
+            NativeAdOptions.Builder()
+                // Methods in the NativeAdOptions.Builder class can be
+                // used here to specify individual options settings.
+                .build()
+        )
+        .build()
+
+    adLoader.loadAd(AdRequest.Builder().build())
+
+    LaunchedEffect(completedTodoListSize) {
+
+        if(!isTodayTodoListCompleted){
+            if( completedTodoListSize != 0 && completedTodoListSize == todayTodoListSize){
+                showCompleteTodayBox = true
+            }
+        }
+
+
+    }
+
+    /*
     LaunchedEffect(todayTodoList) {
         Log.e("MainPageScreen", todayTodoList?.toString() ?: "TodoList is null")
     }
+
+     */
 
     GodLifeTheme {
 
@@ -151,7 +207,7 @@ fun MainPageScreen(
 
             is MainPageUiState.Success -> {
 
-                viewModel.setFcmToken()
+                //viewModel.setFcmToken()
 
                 Column(
                     modifier
@@ -175,16 +231,11 @@ fun MainPageScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ){
 
-                            //Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
-                            Text(text = "Good Life",
-                                style = TextStyle(
-                                    color = Color.Black,
-                                    fontFamily = FontFamily.Default,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 22.sp,
-                                    lineHeight = 28.sp,
-                                    letterSpacing = 0.sp
-                                )
+                            Image(
+                                modifier = modifier
+                                    .size(height = 70.dp, width = 100.dp),
+                                painter = painterResource(id = R.drawable.goodlife_inside_logo),
+                                contentDescription = "",
                             )
 
 
@@ -225,7 +276,26 @@ fun MainPageScreen(
                                     Icon(
                                         painter = painterResource(R.drawable.cases_24dp_e8eaed_fill0_wght400_grad0_opsz24),
                                         contentDescription = "",
-                                        tint = Color.Black
+                                        modifier = modifier
+                                            .graphicsLayer(alpha = 0.99f)
+                                            .drawWithCache {
+                                                onDrawWithContent {
+                                                    drawContent()
+                                                    drawRect(
+                                                        brush = Brush.linearGradient(
+                                                            listOf(
+                                                                Color(0xFFFF44A2),
+                                                                Color(0xFFFF5890),
+                                                                Color(0xFFFA6B80),
+                                                                Color(0xFFFF7B75),
+                                                                Color(0xFFFF8161),
+                                                                Color(0xFFFF884D)
+                                                            )
+                                                        ),
+                                                        blendMode = BlendMode.SrcAtop
+                                                    )
+                                                }
+                                            }
                                     )
 
                                     /*
@@ -236,15 +306,62 @@ fun MainPageScreen(
                                      */
                                 }
 
+                                Spacer(modifier.size(10.dp))
+
+                                IconButton(
+                                    modifier = modifier
+                                        .size(30.dp),
+                                    onClick = {
+                                        navController.navigate(NotificationListRoute.route){
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                ) {
+
+                                    Icon(
+                                        imageVector = Icons.Outlined.Notifications,
+                                        contentDescription = "",
+                                        modifier = modifier
+                                            .graphicsLayer(alpha = 0.99f)
+                                            .drawWithCache {
+                                                onDrawWithContent {
+                                                    drawContent()
+                                                    drawRect(
+                                                        brush = Brush.linearGradient(
+                                                            listOf(
+                                                                Color(0xFFFF44A2),
+                                                                Color(0xFFFF5890),
+                                                                Color(0xFFFA6B80),
+                                                                Color(0xFFFF7B75),
+                                                                Color(0xFFFF8161),
+                                                                Color(0xFFFF884D)
+                                                            )
+                                                        ),
+                                                        blendMode = BlendMode.SrcAtop
+                                                    )
+                                                }
+                                            }
+                                    )
+
+
+
+                                }
+
                             }
+
 
                         }
                     }
 
                     LazyColumn(
-                        modifier
+                        modifier = modifier
                             .fillMaxSize()
-                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
+                            .padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                bottom = 20.dp
+                            )
+                    ) {
 
                         if (showCompleteTodayBox){
                             item {
@@ -277,10 +394,16 @@ fun MainPageScreen(
 
                                 item {
                                     todayTodoList?.let { todo ->
-                                        MainTodoListBox(
-                                            viewModel = viewModel,
-                                            todo = todo
-                                        )
+                                        if(!isTodayTodoListCompleted){
+                                            MainTodoListBox(
+                                                viewModel = viewModel,
+                                                todo = todo
+                                            )
+                                        }
+                                        else{
+                                            MainCompletedTodoListBox()
+                                        }
+
                                         Spacer(modifier = modifier.size(10.dp))
                                     }
                                 }
@@ -320,6 +443,41 @@ fun MainPageScreen(
 
                         // item { Spacer(modifier = modifier.size(30.dp)) }
 
+                        item{
+
+                            /* TODO AdMob TEST */
+
+                            nativeAd?.let { it ->
+                                NativeAdView(ad = it) { adView, ad, view ->
+                                    AdMobListViewWhite(
+                                        adView = adView,
+                                        ad = ad,
+                                        view = view,
+                                        outerHorizontalPadding = 0.dp,
+                                        outerVerticalPadding = 10.dp
+                                    )
+                                }
+                            }
+
+                            /*
+                            AndroidView(
+                                modifier = modifier
+                                    .fillMaxWidth(),
+                                factory = { context ->
+                                    AdView(context).apply {
+                                        setAdSize(AdSize.BANNER)
+                                        adUnitId = "ca-app-pub-3940256099942544/9214589741"
+                                        loadAd(AdRequest.Builder().build())
+                                    }
+                                },
+                                update = { adView ->
+                                    adView.loadAd(AdRequest.Builder().build())
+                                }
+                            )
+
+                             */
+
+                        }
 
                     }
 
@@ -371,7 +529,7 @@ fun TodoAlertDialog(
         containerColor = Color.White,
         onDismissRequest = { viewModel.setTodoAlertDialogFlag() },
         title = {
-            Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = selectedTodo.name, style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -387,13 +545,13 @@ fun TodoAlertDialog(
                     viewModel.setTodoAlertDialogFlag()
 
                 },
-                text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "달성하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         },
         dismissButton = {
             GodLifeButtonWhite(
                 onClick = { viewModel.setTodoAlertDialogFlag() },
-                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         }
     )
@@ -518,38 +676,44 @@ fun MainTodoListBox(
                     Column {
 
                         DropdownMenuItem(
-                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = PurpleMain)) },
+                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = GrayWhite)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "EDIT_TODOLIST")
                             },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = PurpleMain)
+                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = OrangeMain)
                             },
                             colors = MenuDefaults.itemColors(Color.White)
                         )
 
                         DropdownMenuItem(
-                            text = { Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain)) },
+                            text = {
+                                Text(
+                                    text = "알림 시간 수정",
+                                    style = TextStyle(
+                                        color = GrayWhite)
+                                )
+                                   },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "EDIT_NOTIFICATION_TIME")
                             },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = PurpleMain)
+                                Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = OrangeMain)
                             },
                             colors = MenuDefaults.itemColors(Color.White)
                         )
 
                         DropdownMenuItem(
-                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain)) },
+                            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "DELETE")
 
                             },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = PurpleMain)
+                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = OrangeMain)
                             },
                             colors = MenuDefaults.itemColors(Color.White)
                         )
@@ -558,6 +722,87 @@ fun MainTodoListBox(
 
                 }
             }
+        }
+
+    }
+
+}
+
+@Composable
+fun MainCompletedTodoListBox(
+    modifier: Modifier = Modifier
+){
+
+    val animatedValue = remember { Animatable(0f) }
+
+
+    // 특정 값으로 색을 채우는 Animation
+    LaunchedEffect(Unit) {
+        animatedValue.animateTo(
+            //targetValue = targetvalue,
+            targetValue = 360f,
+            animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "오늘 하루도\n고생 많으셨어요!", style = TextStyle(color = Color(0xFFFA6B80), fontSize = 15.sp), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+        }
+
+
+        Canvas(
+            modifier = modifier
+                .size(300.dp)
+        ) {
+            val size: Size = drawContext.size
+            val sizeArc = size / 1.5F
+            drawArc(
+                color = Color(0xFFE1E2E9),
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                size = sizeArc,
+                style = Stroke(width = 30f)
+            )
+
+            drawArc(
+                brush = Brush.linearGradient(
+                    colors =
+                    listOf(
+                        Color(0xFFFF44A2),  // 밝은 핫핑크
+                        Color(0xFFFF5890),  // 연한 핑크
+                        Color(0xFFFA6B80),  // 연한 코럴 핑크
+                        Color(0xFFFF7B75),  // 연한 살몬
+                        Color(0xFFFF8161),  // 밝은 코럴
+                        Color(0xFFFF884D),  // 연한 오렌지
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+                startAngle = 100f,
+                sweepAngle = animatedValue.value,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - sizeArc.width) / 2f,
+                    (size.height - sizeArc.height) / 2f
+                ),
+                size = sizeArc,
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
+            )
         }
 
     }
@@ -657,9 +902,10 @@ fun MainNoTodoListBox(
             Box(modifier = modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center){
 
-                GodLifeButtonWhite(
+                GodLifeButtonOrange(
                     onClick = { moveCreateTodoListActivity(createNavigator, mainActivity) },
-                    text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    text = { Text(text = "투두 리스트 만들기", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) },
+                    showElevation = false
                 )
 
             }
@@ -719,14 +965,14 @@ fun NoCompletedTodayList(
                 .padding(10.dp)
         ) {
             Text(text = todo.name,
-                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
+                style = TextStyle(fontSize = 20.sp, color = OrangeMain)
             )
 
             HorizontalDivider(
                 modifier = Modifier
                     .padding(vertical = 10.dp),
                 thickness = 2.dp,
-                color = PurpleMain
+                color = OrangeMain
             )
 
             GodLifeButton(
@@ -795,9 +1041,28 @@ fun CompleteTodayBox(
         Icon(
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription ="",
-            tint = PurpleMain,
+            tint = OrangeMain,
             modifier = modifier
                 .size(25.dp)
+                .graphicsLayer(alpha = 0.99f)
+                .drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color(0xFFFF44A2),
+                                    Color(0xFFFF5890),
+                                    Color(0xFFFA6B80),
+                                    Color(0xFFFF7B75),
+                                    Color(0xFFFF8161),
+                                    Color(0xFFFF884D)
+                                )
+                            ),
+                            blendMode = BlendMode.SrcAtop
+                        )
+                    }
+                }
         )
 
         Spacer(modifier.size(10.dp))
@@ -805,7 +1070,7 @@ fun CompleteTodayBox(
         Text(
             text = "오늘 목표를 모두 달성하셨군요!",
             style = TextStyle(
-                color = PurpleMain,
+                color = GrayWhite,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -832,14 +1097,14 @@ fun CompleteTodayBox(
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
             },
             text = {
                 Text(
-                    text = "굿생 인증하기",
+                    text = "굿생 인증",
                     style = TextStyle(
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -914,7 +1179,7 @@ fun MainTodoListBoxPreview(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = OrangeMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
         }
 
 
@@ -937,7 +1202,7 @@ fun MainTodoListBoxPreview(
             drawArc(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xff63C6C4), PurpleMain
+                        Color(0xff63C6C4), OrangeMain
                     ),
                     start = Offset.Zero,
                     end = Offset.Infinite,
@@ -967,7 +1232,7 @@ fun MainTodoListBoxPreview(
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
             }
         }
@@ -1039,7 +1304,7 @@ fun MainNoTodoListBoxPreview(
                     drawArc(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                Color(0xff63C6C4), PurpleMain
+                                Color(0xff63C6C4), OrangeMain
                             ),
                             start = Offset.Zero,
                             end = Offset.Infinite,
@@ -1101,9 +1366,28 @@ fun CompleteTodayBoxPreview(
         Icon(
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription ="",
-            tint = PurpleMain,
+            tint = OrangeMain,
             modifier = modifier
                 .size(25.dp)
+                .graphicsLayer(alpha = 0.99f)
+                .drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color(0xFFFF44A2),
+                                    Color(0xFFFF5890),
+                                    Color(0xFFFA6B80),
+                                    Color(0xFFFF7B75),
+                                    Color(0xFFFF8161),
+                                    Color(0xFFFF884D)
+                                )
+                            ),
+                            blendMode = BlendMode.SrcAtop
+                        )
+                    }
+                }
         )
 
         Spacer(modifier.size(10.dp))
@@ -1111,7 +1395,7 @@ fun CompleteTodayBoxPreview(
         Text(
             text = "오늘 목표를 모두 달성하셨군요!",
             style = TextStyle(
-                color = PurpleMain,
+                color = GrayWhite,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1136,12 +1420,12 @@ fun CompleteTodayBoxPreview(
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
             },
             text = {
                 Text(
-                    text = "굿생 인증하기",
+                    text = "굿생 인증",
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -1159,7 +1443,7 @@ fun CompletedTodoListBoxPreview() {
     Column(
         modifier = Modifier
             .background(
-                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                brush = Brush.verticalGradient(listOf(PurpleSecond, OrangeMain)),
                 shape = RoundedCornerShape(30.dp),
                 alpha = 0.8f
             )
@@ -1225,11 +1509,11 @@ fun NoCompletedTodayListPreview(){
                 .padding(10.dp)
         ) {
             Text(text = "아침 식사",
-                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
+                style = TextStyle(fontSize = 20.sp, color = OrangeMain)
             )
 
             Divider(
-                color = PurpleMain,
+                color = OrangeMain,
                 thickness = 2.dp,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -1320,4 +1604,42 @@ private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Acti
         activity = mainActivity,
         withFinish = true
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TabBarPreview(modifier: Modifier = Modifier){
+
+    Row(
+        modifier
+            .height(70.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        //Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
+
+        /*
+        Text(text = "Good Life",
+            style = TextStyle(
+                color = Color.Black,
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                lineHeight = 28.sp,
+                letterSpacing = 0.sp
+            )
+        )
+
+         */
+
+
+        Image(
+            modifier = modifier
+                .size(height = 70.dp, width = 100.dp),
+            painter = painterResource(id = R.drawable.goodlife_inside_logo),
+            contentDescription = "",
+        )
+    }
+
 }

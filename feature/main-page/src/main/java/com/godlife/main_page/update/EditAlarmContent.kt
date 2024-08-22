@@ -33,7 +33,7 @@ import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTimeInput
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.MainPageViewModel
 import com.godlife.model.todo.NotificationTimeData
 import java.time.LocalDateTime
@@ -56,7 +56,7 @@ fun EditAlarmContent(
             viewModel.setCleared()
         },
         title = {
-            Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "알림 시간 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             Column {
@@ -68,13 +68,13 @@ fun EditAlarmContent(
                         imageVector = Icons.Outlined.Notifications,
                         contentDescription = null,
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        tint = PurpleMain
+                        tint = OrangeMain
                     )
 
                     Text(
                         text = "알림 설정",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         ),
@@ -99,12 +99,12 @@ fun EditAlarmContent(
                             imageVector = Icons.Outlined.DateRange,
                             contentDescription = null,
                             modifier = Modifier.align(Alignment.CenterVertically),
-                            tint = PurpleMain
+                            tint = OrangeMain
                         )
 
                         Text(text = "알림 시간",
                             style = TextStyle(
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
                             ),
@@ -140,7 +140,7 @@ fun EditAlarmContent(
                     }
 
                 },
-                text = { Text(text = "완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+                text = { Text(text = "완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
         },
 
         dismissButton = {
@@ -202,7 +202,7 @@ fun EditAlarmContentPreview(
         containerColor = GrayWhite3,
         onDismissRequest = {  },
         title = {
-            Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "알림 시간 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
                Column {
@@ -214,13 +214,13 @@ fun EditAlarmContentPreview(
                            imageVector = Icons.Outlined.Notifications,
                            contentDescription = null,
                            modifier = Modifier.align(Alignment.CenterVertically),
-                           tint = PurpleMain
+                           tint = OrangeMain
                        )
 
                        Text(
                            text = "알림 설정",
                            style = TextStyle(
-                               color = PurpleMain,
+                               color = OrangeMain,
                                fontWeight = FontWeight.Bold,
                                fontSize = 18.sp
                            ),
@@ -244,12 +244,12 @@ fun EditAlarmContentPreview(
                                imageVector = Icons.Outlined.DateRange,
                                contentDescription = null,
                                modifier = Modifier.align(Alignment.CenterVertically),
-                               tint = PurpleMain
+                               tint = OrangeMain
                            )
 
                            Text(text = "알림 시간",
                                style = TextStyle(
-                                   color = PurpleMain,
+                                   color = OrangeMain,
                                    fontWeight = FontWeight.Bold,
                                    fontSize = 18.sp
                                ),
@@ -268,7 +268,7 @@ fun EditAlarmContentPreview(
                 onClick = {
 
                 },
-                text = { Text(text = "완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+                text = { Text(text = "완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
         },
 
         dismissButton = {

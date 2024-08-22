@@ -147,7 +147,7 @@ fun DoneLodingUI(
             Column(
                 modifier = Modifier
                     .padding(20.dp)
-                    .weight(0.8f)
+                    .weight(0.9f)
             ) {
 
                 Text(
@@ -160,7 +160,9 @@ fun DoneLodingUI(
             }
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.2f)){
+                .weight(0.1f),
+                contentAlignment = Alignment.TopCenter
+            ){
 
                 GodLifeButton(onClick = {
                     moveMainActivity(mainNavigator, createTodoListActivity)
@@ -169,7 +171,7 @@ fun DoneLodingUI(
                         .align(Alignment.Center)
                         .fillMaxWidth(0.5f)
                 ) {
-                    Text(text = "갓생 시작",
+                    Text(text = "굿생 시작",
                         color = Color.White,
                         style = TextStyle(
                             fontSize = 18.sp,
@@ -242,7 +244,7 @@ fun CreateTodoListScreen3Preview(){
                         .align(Alignment.Center)
                         .fillMaxWidth(0.5f)
                 ) {
-                    Text(text = "갓생 시작",
+                    Text(text = "굿생 시작",
                         color = Color.White,
                         style = TextStyle(
                             fontSize = 18.sp,

@@ -55,7 +55,7 @@ import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import java.time.LocalDate
@@ -136,14 +136,14 @@ fun ReportScreen(
                             Icon(
                                 imageVector = Icons.Outlined.Info,
                                 contentDescription = "",
-                                tint = PurpleMain,
+                                tint = OrangeMain,
                             )
                             Spacer(modifier.size(5.dp))
 
                             Text(
                                 text = "신고 전, 주의사항을 확인해주세요.",
                                 style = TextStyle(
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -217,7 +217,7 @@ fun ReportScreen(
                             Text(
                                 text = "신고 대상 닉네임 :  ",
                                 style = TextStyle(
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -245,7 +245,7 @@ fun ReportScreen(
                             Text(
                                 text = if(category.value == "board") "신고 게시물 제목 :  " else "신고 댓글 내용 :  ",
                                 style = TextStyle(
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -269,7 +269,7 @@ fun ReportScreen(
                         Text(
                             text = "신고 사유",
                             style = TextStyle(
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -291,8 +291,8 @@ fun ReportScreen(
                                 colors = ExposedDropdownMenuDefaults.textFieldColors(
                                     focusedContainerColor = GrayWhite3,
                                     unfocusedContainerColor = GrayWhite3,
-                                    focusedIndicatorColor = PurpleMain,
-                                    unfocusedIndicatorColor = PurpleMain
+                                    focusedIndicatorColor = OrangeMain,
+                                    unfocusedIndicatorColor = OrangeMain
                                 ),
                             )
                             ExposedDropdownMenu(
@@ -322,7 +322,7 @@ fun ReportScreen(
                         Text(
                             text = "신고 내용",
                             style = TextStyle(
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -372,7 +372,7 @@ fun ReportScreen(
                             Text(
                                 text = "주의사항을 숙지하셨나요?",
                                 style = TextStyle(
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Normal
                                 )
@@ -382,7 +382,7 @@ fun ReportScreen(
                                 checked = isCheck,
                                 onCheckedChange = { isCheck = !isCheck},
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = PurpleMain
+                                    checkedColor = OrangeMain
                                 )
                             )
                         }
@@ -412,7 +412,7 @@ fun ReportScreen(
                                     Text(
                                         text = "신고하기",
                                         style = TextStyle(
-                                            color = if(isCheck) PurpleMain else GrayWhite,
+                                            color = if(isCheck) OrangeMain else GrayWhite,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -453,7 +453,7 @@ fun ReportScreen(
                 containerColor = Color.White,
                 onDismissRequest = { isDialogVisble = !isDialogVisble },
                 title = {
-                    Text(text = "신고하시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                    Text(text = "신고하시겠어요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                 },
                 text = {
                     Text(text = "신고 내역은 수정하실 수 없어요."
@@ -469,13 +469,13 @@ fun ReportScreen(
                             isDialogVisble = !isDialogVisble
 
                         },
-                        text = { Text(text = "신고하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                        text = { Text(text = "신고하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                     )
                 },
                 dismissButton = {
                     GodLifeButtonWhite(
                         onClick = { isDialogVisble = !isDialogVisble },
-                        text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                        text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                     )
                 }
             )
@@ -535,14 +535,14 @@ fun ReportPageScreenPreview(
                     Icon(
                         imageVector = Icons.Outlined.Info,
                         contentDescription = "",
-                        tint = PurpleMain,
+                        tint = OrangeMain,
                     )
                     Spacer(modifier.size(5.dp))
 
                     Text(
                         text = "신고 전, 주의사항을 확인해주세요.",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -616,7 +616,7 @@ fun ReportPageScreenPreview(
                     Text(
                         text = "신고 대상 닉네임 :  ",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -644,7 +644,7 @@ fun ReportPageScreenPreview(
                     Text(
                         text = "신고 게시물 제목 :  ",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -668,7 +668,7 @@ fun ReportPageScreenPreview(
                 Text(
                     text = "신고 사유",
                     style = TextStyle(
-                        color = PurpleMain,
+                        color = OrangeMain,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -690,8 +690,8 @@ fun ReportPageScreenPreview(
                         colors = ExposedDropdownMenuDefaults.textFieldColors(
                             focusedContainerColor = GrayWhite3,
                             unfocusedContainerColor = GrayWhite3,
-                            focusedIndicatorColor = PurpleMain,
-                            unfocusedIndicatorColor = PurpleMain
+                            focusedIndicatorColor = OrangeMain,
+                            unfocusedIndicatorColor = OrangeMain
                         ),
                     )
                     ExposedDropdownMenu(
@@ -718,7 +718,7 @@ fun ReportPageScreenPreview(
                 Text(
                     text = "신고 내용",
                     style = TextStyle(
-                        color = PurpleMain,
+                        color = OrangeMain,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -768,7 +768,7 @@ fun ReportPageScreenPreview(
                     Text(
                         text = "주의사항을 숙지하셨나요?",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -778,7 +778,7 @@ fun ReportPageScreenPreview(
                         checked = isCheck,
                         onCheckedChange = { isCheck = !isCheck},
                         colors = CheckboxDefaults.colors(
-                            checkedColor = PurpleMain
+                            checkedColor = OrangeMain
                         )
                     )
                 }
@@ -798,7 +798,7 @@ fun ReportPageScreenPreview(
                             Text(
                                 text = "신고하기",
                                 style = TextStyle(
-                                    color = if(isCheck) PurpleMain else GrayWhite,
+                                    color = if(isCheck) OrangeMain else GrayWhite,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -842,7 +842,7 @@ fun SendSuccessReportPageScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Info,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -850,7 +850,7 @@ fun SendSuccessReportPageScreen(
         Text(
             text = "신고 접수가 완료되었어요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -875,7 +875,7 @@ fun SendSuccessReportPageScreen(
 
         GodLifeButtonWhite(
             onClick = { navController?.popBackStack() },
-            text = { Text(text = buttonText, style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = buttonText, style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 

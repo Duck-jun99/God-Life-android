@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godlife.database.model.TodoEntity
+import com.godlife.domain.GetNotificationListUseCase
 import com.godlife.domain.GetUserInfoUseCase
 import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.RegisterFCMTokenUseCase
 import com.godlife.model.todo.TodoList
+import com.godlife.network.model.NotificationListBody
 import com.godlife.network.model.UserInfoBody
 import com.godlife.service.MyFirebaseMessagingService
 import com.skydoves.sandwich.message
@@ -60,12 +62,11 @@ class MainPageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<MainPageUiState>(MainPageUiState.Loading)
     val uiState: StateFlow<MainPageUiState> = _uiState
 
-    // 오늘 투두리스트 설정 상태
-    private val _todayTodoListExists = MutableStateFlow<Boolean>(false)
-    val todayTodoListExists: StateFlow<Boolean> = _todayTodoListExists
-
     // 오늘 투두리스트 불러온 플래그
     val getTodayTodoListFlag = MutableStateFlow<Boolean>(false)
+
+    // 오늘 투두리스트 완료했는지 상태
+    val isTodayTodoListCompleted = MutableStateFlow<Boolean>(false)
 
     // 유저 정보 불러온 상태
     private val _userInfoExists = MutableStateFlow<Boolean>(false)
@@ -95,10 +96,6 @@ class MainPageViewModel @Inject constructor(
     private val _todayTodoList = MutableStateFlow<TodoEntity?>(null)
     val todayTodoList: StateFlow<TodoEntity?> = _todayTodoList
 
-    //오늘 투두리스트 진행 상황
-    private val _completedCount = MutableStateFlow<Int>(0)
-    val completedCount: StateFlow<Int> = _completedCount
-
     //오늘 투두리스트 사이즈
     private val _todayTodoListSize = MutableStateFlow<Int>(0)
     val todayTodoListSize: StateFlow<Int> = _todayTodoListSize
@@ -114,7 +111,6 @@ class MainPageViewModel @Inject constructor(
     //업데이트 항목
     private val _updateCategory = MutableStateFlow<String>("")
     val updateCategory: StateFlow<String> = _updateCategory
-
 
 
     /**
@@ -146,7 +142,8 @@ class MainPageViewModel @Inject constructor(
             _todayTodoList.value = localDatabaseUseCase.getTodayTodoList()
 
             if(todayTodoList.value!=null){
-                _todayTodoListExists.value = true
+
+               isTodayTodoListCompleted.value = todayTodoList.value!!.isCompleted
 
                 _todayTodoListSize.value = todayTodoList.value!!.todoList.size
 
@@ -180,7 +177,9 @@ class MainPageViewModel @Inject constructor(
 
                     _userInfoExists.value = true
 
-                    _uiState.value = MainPageUiState.Success("Success")
+                    setFcmToken()
+
+                    //_uiState.value = MainPageUiState.Success("Success")
 
                 }
                 .onError {
@@ -209,7 +208,7 @@ class MainPageViewModel @Inject constructor(
     }
 
     // 로그인 시 FCM 토큰 등록
-    fun setFcmToken() {
+    private fun setFcmToken() {
         if (!fcmTokenRegistered.value) {
             fcmTokenRegistered.value = true
             viewModelScope.launch(Dispatchers.IO) {
@@ -225,6 +224,9 @@ class MainPageViewModel @Inject constructor(
                     result
                         .onSuccess {
                             fcmTokenRegistered.value = true
+
+                            _uiState.value = MainPageUiState.Success("Success")
+
                         }
                         .onError {
 
@@ -249,27 +251,6 @@ class MainPageViewModel @Inject constructor(
         }
     }
 
-    /*
-    fun getTodoListCount(): List<Int?> {
-        val todayTodoListValue = todayTodoList.value
-
-        val completedCount = if (todayTodoListValue != null) {
-            var count = 0
-            todayTodoListValue.todoList.forEach {
-                if (it.iscompleted) {
-                    count += 1
-                }
-            }
-            count
-        } else {
-            0
-        }
-
-        return listOf(todayTodoListSize, completedCount)
-    }
-
-     */
-
 
     suspend fun setTodoValueCompleted(todo: TodoList){
         val updatedList = _todayTodoList.value
@@ -281,11 +262,6 @@ class MainPageViewModel @Inject constructor(
             getTodayTodoListFlag.value = false
             getTodayTodoList()
         }
-    }
-
-    //오늘 투두리스트 존재하는 것으로 플래그 변경
-    fun setTodayTodoListExist(){
-        _todayTodoListExists.value = true
     }
 
 

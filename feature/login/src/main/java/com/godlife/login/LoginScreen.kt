@@ -1,8 +1,6 @@
 package com.godlife.login
 
 import android.content.Context
-import android.util.Log
-import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -11,21 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -35,12 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.login.login_manager.KakaoLoginManager
 import com.godlife.navigator.MainNavigator
-import kotlinx.coroutines.flow.first
 
 
 @Composable
@@ -77,10 +66,25 @@ fun LoginScreen(
                     contentDescription = "KAKAO_LOGIN")
             }
 
-            Button(onClick = { navController.navigate(SignUpScreenRoute.route) },
-                colors = ButtonDefaults.buttonColors(PurpleMain)
+            Button(
+                onClick = { navController.navigate(SignUpScreenRoute.route) },
+                colors = ButtonDefaults.buttonColors(OrangeMain)
             ){
                 Text("회원가입 테스트", style = TextStyle(color = Color.White))
+            }
+
+            Button(
+                onClick = { navController.navigate(TestUserSignUpScreenRoute.route) },
+                colors = ButtonDefaults.buttonColors(OrangeMain)
+            ){
+                Text("테스트 계정 생성", style = TextStyle(color = Color.White))
+            }
+
+            Button(
+                onClick = { navController.navigate(TestUserLoginScreenRoute.route) },
+                colors = ButtonDefaults.buttonColors(OrangeMain)
+            ){
+                Text("테스트 계정 로그인", style = TextStyle(color = Color.White))
             }
 
         }
@@ -91,7 +95,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview(){
     GodLifeTheme(
-        modifier = Modifier.background(PurpleMain)
+        modifier = Modifier.background(OrangeMain)
     ) {
 
         Column(
@@ -118,8 +122,14 @@ fun LoginScreenPreview(){
 
             Button(onClick = {
 
-            }, colors = ButtonDefaults.buttonColors(PurpleMain)){
+            }, colors = ButtonDefaults.buttonColors(OrangeMain)){
                 Text("회원가입 테스트", style = TextStyle(color = Color.White))
+            }
+
+            Button(onClick = {
+
+            }, colors = ButtonDefaults.buttonColors(OrangeMain)){
+                Text("테스트 계정 생성", style = TextStyle(color = Color.White))
             }
 
         }

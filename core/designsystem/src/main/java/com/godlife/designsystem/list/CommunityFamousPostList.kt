@@ -1,6 +1,5 @@
 package com.godlife.designsystem.list
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,8 +40,8 @@ import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.model.community.TagItem
+import com.godlife.designsystem.theme.OrangeLight
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.BuildConfig
 import com.godlife.network.model.PostDetailBody
 import com.skydoves.landscapist.ImageOptions
@@ -95,7 +94,7 @@ fun CommunityFamousPostList(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -145,7 +144,7 @@ fun CommunityFamousPostList(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -212,7 +211,6 @@ fun CommunityFamousPostList(
                 )
             ){
                 famousPostItem.tags.forEach {
-                    Log.e("daklkljdas", it.toString())
                     TagItemView(it)
                 }
 
@@ -235,13 +233,13 @@ fun TagItemView(
     ) {
         Box(
             modifier
-                .background(color = GrayWhite3, shape = RoundedCornerShape(7.dp))
+                .background(color = OrangeLight, shape = RoundedCornerShape(7.dp))
                 .padding(horizontal = 5.dp, vertical = 2.dp)
             ,
             contentAlignment = Alignment.Center
         ) {
             Text(text = "#${tagItem}",
-                style = TextStyle(color = Color.Black),
+                style = TextStyle(color = GrayWhite),
                 textAlign = TextAlign.Center,
             )
         }
@@ -293,7 +291,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -343,7 +341,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
                             ){
 
                                 CircularProgressIndicator(
-                                    color = PurpleMain
+                                    color = OrangeMain
                                 )
 
                             }
@@ -434,13 +432,13 @@ fun TagItemPreview(
     ) {
         Box(
             modifier
-                .background(color = GrayWhite3, shape = RoundedCornerShape(7.dp))
+                .background(color = OrangeLight, shape = RoundedCornerShape(7.dp))
                 .padding(horizontal = 5.dp, vertical = 2.dp)
             ,
             contentAlignment = Alignment.Center
         ) {
             Text(text = "#${text}",
-                style = TextStyle(color = Color.Black),
+                style = TextStyle(color = GrayWhite),
                 textAlign = TextAlign.Center,
             )
         }

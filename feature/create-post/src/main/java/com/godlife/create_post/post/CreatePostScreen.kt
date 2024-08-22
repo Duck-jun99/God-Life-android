@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,10 +63,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -75,18 +79,27 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.godlife.create_post.R
+import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextFieldGray
+import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.community.TagItem
 import com.godlife.navigator.MainNavigator
-import kotlinx.coroutines.launch
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -112,6 +125,8 @@ fun CreatePostScreen(
 
     val title by remember { viewModel.title }
     val text by remember { viewModel.text }
+
+    val tags = viewModel.tags.collectAsState().value
 
     var isDialogVisble by remember { mutableStateOf(false) }
 
@@ -151,7 +166,6 @@ fun CreatePostScreen(
                 Box(
                     modifier
                         .fillMaxWidth()
-                        .height(70.dp)
                         .statusBarsPadding(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -267,11 +281,9 @@ fun CreatePostScreen(
 
                     item{
                         FlowRow {
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
+                            tags.forEach {
+                                TagItemView(tagItem = it)
+                            }
                         }
                     }
 
@@ -294,7 +306,19 @@ fun CreatePostScreen(
                             Spacer(modifier = Modifier.size(20.dp))
 
                             AddButton(
-                                onClick = { launcher.launch("image/*") }
+                                onClick = {
+                                    if(selectedImgList!!.size < 5){
+                                        launcher.launch("image/*")
+                                    }
+                                    else{
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "이미지는 최대 5장까지 올릴 수 있어요.",
+                                                Toast.LENGTH_SHORT).show()
+                                    }
+
+                                }
                             )
                         }
                     }
@@ -309,6 +333,46 @@ fun CreatePostScreen(
                     }
 
                     item{
+                        val state = rememberReorderableLazyListState(onMove = { from, to ->
+                            viewModel.onMove(from.index, to.index)
+                        })
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .detectReorderAfterLongPress(state)
+                        ) {
+
+                            LazyRow(
+                                state = state.listState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .reorderable(state)
+                            ) {
+                                selectedImgList?.let { imgList ->
+                                    items(
+                                        items = imgList,
+                                        key = { it.hashCode() } // URI나 복잡한 객체의 경우 고유한 식별자를 사용
+                                    ) { item ->
+                                        ReorderableItem(
+                                            reorderableState = state,
+                                            key = item.hashCode()
+                                        ) { isDragging ->
+                                            //val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                                            SelectImage(
+                                                index = imgList.indexOf(item),
+                                                imageUri = item,
+                                                context = LocalContext.current,
+                                                viewModel = viewModel,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        /*
+
                         LazyRow {
                             selectedImgList?.let {
                                 itemsIndexed(it){ index, item ->
@@ -318,6 +382,8 @@ fun CreatePostScreen(
                             }
 
                         }
+
+                         */
                     }
 
                     item{ Spacer(modifier.padding(10.dp)) }
@@ -332,6 +398,47 @@ fun CreatePostScreen(
                             .fillMaxWidth()
                             .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically){
+
+                        GodLifeButtonWhite(
+                            modifier = modifier
+                                .weight(0.5f)
+                                .padding(horizontal = 10.dp),
+                            onClick = {
+                                navController.navigate("CreatePostPreviewScreen") {
+                                    launchSingleTop = true
+                                }
+                                      },
+                            text = {
+                                Text(
+                                    text = "미리 보기",
+                                    color = OrangeMain,
+                                    style = TextStyle(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        )
+
+                        GodLifeButton(
+                            modifier = modifier
+                                .weight(0.5f)
+                                .padding(horizontal = 10.dp),
+                            onClick = {
+                                if (title == "" || text == "") Toast
+                                    .makeText(
+                                        context,
+                                        "제목과 내용을 모두 입력해주세요.",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                                else isDialogVisble = !isDialogVisble
+                                      },
+                            text = {
+                                Text(
+                                    text = "작성 완료",
+                                    style = TextStyle(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        )
+                        /*
                         Box(
                             Modifier
                                 .weight(0.5f)
@@ -353,7 +460,7 @@ fun CreatePostScreen(
                             ) {
                                 Text(
                                     text = "미리 보기",
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                                     modifier = Modifier
                                         .padding(20.dp)
@@ -373,12 +480,18 @@ fun CreatePostScreen(
                                     .padding(12.dp)
                                     .fillMaxWidth()
                                     .clickable {
-                                        if( title == "" || text == "") Toast.makeText(context, "제목과 내용을 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+                                        if (title == "" || text == "") Toast
+                                            .makeText(
+                                                context,
+                                                "제목과 내용을 모두 입력해주세요.",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                         else isDialogVisble = !isDialogVisble
                                     },
                                 shape = RoundedCornerShape(8.dp),
                                 elevation = CardDefaults.cardElevation(7.dp),
-                                colors = CardDefaults.cardColors(PurpleMain)
+                                colors = CardDefaults.cardColors(OrangeMain)
                             ) {
                                 Text(
                                     text = "작성 완료",
@@ -389,6 +502,8 @@ fun CreatePostScreen(
                                 )
                             }
                         }
+
+                         */
                     } }
 
                 }
@@ -401,7 +516,7 @@ fun CreatePostScreen(
                     containerColor = Color.White,
                     onDismissRequest = { isDialogVisble = !isDialogVisble },
                     title = {
-                        Text(text = "게시물을 게시할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "게시물을 게시할까요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "아래의 내용을 꼭 확인해주세요!\n\n" +
@@ -422,13 +537,13 @@ fun CreatePostScreen(
                                 isDialogVisble = !isDialogVisble
 
                             },
-                            text = { Text(text = "게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "게시하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { isDialogVisble = !isDialogVisble },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -472,35 +587,12 @@ fun CreatePostScreen(
 }
 
 @Composable
-fun TagItem(tagItem: TagItem, modifier: Modifier = Modifier){
-    Column(
-        modifier = Modifier.padding(5.dp)
-    ) {
-        Box(
-            modifier
-                .size(70.dp, 30.dp)
-                .background(color = PurpleMain, shape = RoundedCornerShape(7.dp))
-                .padding(2.dp)
-            ,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = tagItem.tagName,
-                style = TextStyle(color = Color.White),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-
-}
-
-@Composable
 fun SelectImage(
     index:Int,
     imageUri: Uri,
     context: Context,
     viewModel: CreatePostViewModel
 ){
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     Box(modifier = Modifier
         .padding(end = 10.dp)
@@ -509,29 +601,39 @@ fun SelectImage(
     ) {
 
         //Image 부분
-        val imageModifier: Modifier = Modifier
-            .size(150.dp, 150.dp)
-            .fillMaxSize()
 
-        Glide.with(context)
-            .asBitmap()
-            .load(imageUri)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap.value = resource
+        GlideImage(
+            imageModel = { imageUri },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            ),
+            modifier = Modifier
+                .size(150.dp, 150.dp)
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = Modifier
+                        .background(GrayWhite3)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    CircularProgressIndicator(
+                        color = OrangeMain
+                    )
+
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-            Image(
-                bitmap = fetchedBitmap,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = imageModifier
-            )
-        }
+            },
+            failure = {
+                Image(
+                    painter = painterResource(id = R.drawable.category3),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
 
         Box(
             modifier = Modifier
@@ -590,7 +692,7 @@ fun CreatePostSuccessScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -598,7 +700,7 @@ fun CreatePostSuccessScreen(
         Text(
             text = "${score}점",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -621,7 +723,7 @@ fun CreatePostSuccessScreen(
 
         GodLifeButtonWhite(
             onClick = { mainNavigator.navigateFrom(activity = createPostActivity, withFinish = true) },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -650,7 +752,7 @@ fun CreatePostErrorScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -658,7 +760,7 @@ fun CreatePostErrorScreen(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -681,7 +783,7 @@ fun CreatePostErrorScreen(
 
         GodLifeButtonWhite(
             onClick = { mainNavigator.navigateFrom(activity = createPostActivity, withFinish = true) },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -871,6 +973,33 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                         .fillMaxWidth()
                         .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically){
+                    GodLifeButtonWhite(
+                        modifier = modifier
+                            .weight(0.5f)
+                            .padding(horizontal = 10.dp),
+                        onClick = { /*TODO*/ },
+                        text = {
+                            Text(
+                                text = "미리 보기",
+                                color = OrangeMain,
+                                style = TextStyle(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    )
+
+                    GodLifeButton(
+                        modifier = modifier
+                            .weight(0.5f)
+                            .padding(horizontal = 10.dp),
+                        onClick = { /*TODO*/ },
+                        text = {
+                            Text(
+                                text = "작성 완료",
+                                style = TextStyle(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    )
+                    /*
                     Box(
                         Modifier
                             .weight(0.5f)
@@ -887,7 +1016,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                         ) {
                             Text(
                                 text = "미리 보기",
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                                 modifier = Modifier
                                     .padding(20.dp)
@@ -908,7 +1037,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                                 .fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
                             elevation = CardDefaults.cardElevation(7.dp),
-                            colors = CardDefaults.cardColors(PurpleMain)
+                            colors = CardDefaults.cardColors(OrangeMain)
                         ) {
                             Text(
                                 text = "작성 완료",
@@ -919,6 +1048,8 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                             )
                         }
                     }
+
+                     */
                 } }
             }
         }
@@ -952,11 +1083,11 @@ fun AddButton(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Outlined.Add, // Choose an appropriate icon
                 contentDescription = "Add icon",
-                tint = PurpleMain,
+                tint = OrangeMain,
                 modifier = Modifier.size(24.dp)
             )
         },
-        text = {Text("추가하기", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold))}
+        text = {Text("추가하기", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold))}
     )
 }
 
@@ -969,11 +1100,11 @@ fun AddButtonPreview() {
             Icon(
                 imageVector = Icons.Outlined.Add, // Choose an appropriate icon
                 contentDescription = "Add icon",
-                tint = PurpleMain,
+                tint = OrangeMain,
                 modifier = Modifier.size(24.dp)
             )
         },
-        text = {Text("추가하기", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold))}
+        text = {Text("추가하기", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold))}
     )
 }
 
@@ -991,7 +1122,7 @@ fun SelectImagePreview(){
         }
         Box(modifier = Modifier
             .size(50.dp)
-            .background(PurpleMain, shape = CircleShape)
+            .background(OrangeMain, shape = CircleShape)
         ){
             Text(text = "1", style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) ,modifier = Modifier.align(Alignment.Center))
         }
@@ -1022,7 +1153,7 @@ fun RowButton(){
             ) {
                 Text(
                     text = "미리 보기",
-                    color = PurpleMain,
+                    color = OrangeMain,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     modifier = Modifier
                         .padding(20.dp)
@@ -1043,7 +1174,7 @@ fun RowButton(){
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(7.dp),
-                colors = CardDefaults.cardColors(PurpleMain)
+                colors = CardDefaults.cardColors(OrangeMain)
             ) {
                 Text(
                     text = "작성 완료",
@@ -1111,7 +1242,7 @@ fun CreatePostErrorScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1119,7 +1250,7 @@ fun CreatePostErrorScreenPreview(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1142,7 +1273,7 @@ fun CreatePostErrorScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -1184,7 +1315,7 @@ fun CreatePostSuccessScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1192,7 +1323,7 @@ fun CreatePostSuccessScreenPreview(
         Text(
             text = "${score}점",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1215,7 +1346,7 @@ fun CreatePostSuccessScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 

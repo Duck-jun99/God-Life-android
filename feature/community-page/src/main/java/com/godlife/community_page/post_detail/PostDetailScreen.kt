@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -80,13 +81,15 @@ import com.godlife.community_page.R
 import com.godlife.community_page.post_detail.post_update.post.UpdatePostScreen
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
+import com.godlife.designsystem.component.GodLifeCreateCommentBarPreview
 import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeLight
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.CommentBody
@@ -185,6 +188,7 @@ fun PostDetailScreen(
 
                                 item{
                                     Content2(
+                                        writer = it.nickname,
                                         memberLikedBoard = it.memberLikedBoard,
                                         owner = it.boardOwner,
                                         viewModel = postDetailViewModel
@@ -212,6 +216,7 @@ fun PostDetailScreen(
                         comment = writeComment,
                         onTextChanged = { postDetailViewModel.onWriteCommentChange(it) },
                         onPostClicked = { postDetailViewModel.createComment() },
+                        context = context
                     )
 
 
@@ -227,7 +232,7 @@ fun PostDetailScreen(
                     containerColor = Color.White,
                     onDismissRequest = { isShowDialog.value = !isShowDialog.value },
                     title = {
-                        Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "사용자님의 굿생 인증 게시물을 삭제하시면 굿생 점수 2점이 차감됩니다.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -237,13 +242,13 @@ fun PostDetailScreen(
                             onClick = {
                                 postDetailViewModel.deletePost()
                             },
-                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { isShowDialog.value= !isShowDialog.value },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -351,21 +356,25 @@ fun ImageBox(
 
         }
 
-        Box(
-            modifier
+        Row(
+            Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)){
-
-            Box(modifier = modifier
-                .size(width = 50.dp, height = 30.dp)
-                .background(color = CheckColor, shape = RoundedCornerShape(20.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "${imgIndex+1}/${imgCount}", style = TextStyle(Color.White, fontSize = 15.sp), textAlign = TextAlign.Center)
+                .padding(bottom = 8.dp, end = 8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                val size = if (pagerState.currentPage == iteration) 10.dp else 8.dp
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(size)
+                )
             }
-
         }
-
 
 
     }
@@ -395,7 +404,7 @@ fun ImageView(
             ){
 
                 CircularProgressIndicator(
-                    color = PurpleMain
+                    color = OrangeMain
                 )
 
             }
@@ -458,7 +467,7 @@ fun Content(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -552,6 +561,37 @@ fun Content(
 
         //Spacer(modifier.size(20.dp))
 
+        Spacer(modifier.size(5.dp))
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ){
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetailBody.writtenAt,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal, fontSize = 15.sp
+                )
+            )
+
+        }
+
+        Spacer(modifier.size(5.dp))
+
         Text(text = postDetailBody.title, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp))
 
         Spacer(modifier.size(20.dp))
@@ -580,18 +620,52 @@ fun Content(
 
         Spacer(modifier.size(20.dp))
 
-        Text(text = postDetailBody.writtenAt, style = TextStyle(color = GrayWhite, fontWeight = FontWeight.Normal, fontSize = 15.sp))
-
-        Spacer(modifier.size(20.dp))
-
-        Text(
-            text = "조회수: ${postDetailBody.views}    굿생 점수: ${postDetailBody.godScore-2}",
-            style = TextStyle(
-                color = GrayWhite,
-                fontWeight = FontWeight.Normal,
-                fontSize = 15.sp
+        Row(
+            modifier = modifier
+                .height(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
             )
-        )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${postDetailBody.views}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = "${postDetailBody.godScore-2}",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+            )
+
+        }
 
         Spacer(modifier.size(20.dp))
 
@@ -603,6 +677,7 @@ fun Content(
 @Composable
 fun Content2(
     modifier: Modifier = Modifier,
+    writer: String,
     memberLikedBoard: Boolean = true,
     owner: Boolean,
     viewModel: PostDetailViewModel
@@ -611,17 +686,44 @@ fun Content2(
 
         Column(
             modifier = modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .background(Color.White)
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 20.dp)
                 .fillMaxWidth()
-                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .background(color = OrangeLight, shape = RoundedCornerShape(16.dp))
                 .padding(10.dp)
         ) {
 
             if(!memberLikedBoard){
+                Row(){
+                    Text(
+                        text = writer,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 16.sp
+                        )
+                    )
+                    Text(
+                        text = "님의 굿생을 인정하시나요?",
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            lineHeight = 16.sp
+                        )
+                    )
+                }
                 Text(
-                    text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
-                    style = TextStyle(color = GrayWhite, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+                    text = "그렇다면, 아래 [굿생 인정!] 버튼을 눌러주세요!",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        lineHeight = 16.sp
+                    )
                 )
+
 
                 Spacer(modifier.size(20.dp))
 
@@ -630,7 +732,16 @@ fun Content2(
                         .align(Alignment.CenterHorizontally),
                     leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
                     onClick = { viewModel.agreeGodLife() },
-                    text = { Text(text = "굿생 인정!") }
+                    text = {
+                        Text(
+                            text = "굿생 인정!",
+                            style = TextStyle(
+                                color = OrangeMain,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                           }
                 )
             }
 
@@ -640,7 +751,7 @@ fun Content2(
                         .align(Alignment.CenterHorizontally),
                     imageVector = Icons.Outlined.ThumbUp,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
 
                 Text(
@@ -648,7 +759,7 @@ fun Content2(
                         .fillMaxWidth(),
                     text = "유저님께서 굿생을 인정하신 글이에요!",
                     style = TextStyle(
-                        color = GrayWhite,
+                        color = OrangeMain,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal
                     ),
@@ -748,7 +859,7 @@ fun CommentBox(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -829,7 +940,7 @@ fun DeleteSuccessScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Delete,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -837,7 +948,7 @@ fun DeleteSuccessScreen(
         Text(
             text = "게시물 삭제가 완료되었어요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -849,7 +960,7 @@ fun DeleteSuccessScreen(
             onClick = {
                 navController.popBackStack()
                       },
-            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
     }
@@ -1027,7 +1138,7 @@ fun PostDetailScreenPreview(modifier: Modifier = Modifier){
             }
 
             Box {
-                GodLifeCreateCommentBar()
+                GodLifeCreateCommentBarPreview()
             }
 
 
@@ -1084,7 +1195,7 @@ fun ContentPreview(modifier: Modifier = Modifier){
 
             Box(
                 modifier
-                    .background(PurpleMain, shape = CircleShape)
+                    .background(OrangeMain, shape = CircleShape)
                     .size(70.dp)
             )
 
@@ -1182,7 +1293,7 @@ fun Content2Preview(
                     .align(Alignment.CenterHorizontally),
                 imageVector = Icons.Outlined.ThumbUp,
                 contentDescription = "",
-                tint = PurpleMain
+                tint = OrangeMain
             )
 
             Text(
@@ -1332,7 +1443,7 @@ fun DeleteSuccessScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.Delete,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1340,7 +1451,7 @@ fun DeleteSuccessScreenPreview(
         Text(
             text = "게시물 삭제가 완료되었어요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1350,7 +1461,7 @@ fun DeleteSuccessScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
     }

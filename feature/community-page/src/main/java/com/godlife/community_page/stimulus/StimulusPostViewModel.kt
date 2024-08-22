@@ -38,6 +38,26 @@ class StimulusPostViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<StimulusPostUiState>(StimulusPostUiState.Loading)
     val uiState: StateFlow<StimulusPostUiState> = _uiState
 
+    //FAB 버튼 Expaned
+    val fabExpanded = mutableStateOf(false)
+
+    //도움말 Dialog Visible
+    val helpDialogVisible = mutableStateOf(false)
+
+    /**
+     * Event
+     */
+
+    fun setFabExpanded() {
+        fabExpanded.value = !fabExpanded.value
+    }
+
+    fun setHelpDialogVisible() {
+        helpDialogVisible.value = !helpDialogVisible.value
+    }
+
+
+
 
 
 }

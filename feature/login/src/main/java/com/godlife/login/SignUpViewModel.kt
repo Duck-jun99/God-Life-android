@@ -1,5 +1,6 @@
 package com.godlife.login
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.SignUpUseCase
 import com.godlife.network.model.SignUpQuery
+import com.skydoves.sandwich.onError
+import com.skydoves.sandwich.onException
+import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,6 +97,7 @@ class SignUpViewModel @Inject constructor(
     //닉네임에 공백 허용하지 않고 10자까지 제한
     fun checkNicknameLogic(nickname: String){
 
+        Log.e("checkNicknameLogic","checkNicknameLogic")
         _checkedNickname.value = false
 
         val containsEmptyspace = nickname.contains(" ")
@@ -160,8 +165,10 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
 
             id = localPreferenceUserUseCase.getUserId()
+
             if(::id.isInitialized){
-                var signUpQuery: SignUpQuery =
+
+                val result =
                 signUpUseCase.executeSignUp(nickname = nickname.value,
                     email = email.value,
                     age = age.value.toInt(),
@@ -169,12 +176,19 @@ class SignUpViewModel @Inject constructor(
                     providerId = id,
                     providerName = "KaKao")
 
-                localPreferenceUserUseCase.saveAccessToken(signUpQuery.accessToken)
-                localPreferenceUserUseCase.saveAccessToken(signUpQuery.refershToken)
+                result
+                    .onSuccess {
+                        localPreferenceUserUseCase.saveAccessToken(data.accessToken)
+                        localPreferenceUserUseCase.saveRefreshToken(data.refershToken)
+                    }
+                    .onError {
+
+                    }
+                    .onException {
+
+                    }
 
             }
-
-
 
         }
 

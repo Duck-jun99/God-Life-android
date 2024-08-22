@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
@@ -29,7 +28,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,7 +49,7 @@ import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -100,7 +98,7 @@ fun CreateTodoListScreen1(
             Column(
                 modifier = Modifier
                     .padding(20.dp)
-                    .weight(0.8f)
+                    .weight(0.9f)
             ) {
 
                 Text(
@@ -125,9 +123,12 @@ fun CreateTodoListScreen1(
 
 
             }
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.2f)){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.1f),
+                contentAlignment = Alignment.TopCenter
+            ){
 
                 GodLifeButton(onClick = {
                     if(selectedList.isNotEmpty()){
@@ -175,8 +176,8 @@ fun CardTodoList(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             modifier = Modifier
-                .size(100.dp, 100.dp)
-                .padding(16.dp),
+                .size(70.dp, 70.dp)
+                .padding(8.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
         ) {
 
@@ -222,8 +223,8 @@ fun SelectedCardTodoList(
                 // Use custom label for accessibility services to communicate button's action to user.
                 // Pass null for action to only override the label and not the actual action.
                 modifier = Modifier
-                    .size(100.dp, 100.dp)
-                    .padding(16.dp),
+                    .size(70.dp, 70.dp)
+                    .padding(8.dp),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 10.dp),
             ){
@@ -237,8 +238,8 @@ fun SelectedCardTodoList(
 
             }
             Box(modifier = Modifier
-                .size(100.dp, 100.dp)
-                .padding(16.dp)
+                .size(70.dp, 70.dp)
+                .padding(8.dp)
                 .background(CheckColor, shape = RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center){
                 Icon(
@@ -261,7 +262,7 @@ fun SelectedTodoList(name: String){
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = PurpleMain),
+        colors = CardDefaults.cardColors(containerColor = OrangeMain),
         // Use custom label for accessibility services to communicate button's action to user.
         // Pass null for action to only override the label and not the actual action.
         modifier = Modifier
@@ -382,7 +383,7 @@ fun SelectedTodoListPreview(){
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = PurpleMain),
+        colors = CardDefaults.cardColors(containerColor = OrangeMain),
         // Use custom label for accessibility services to communicate button's action to user.
         // Pass null for action to only override the label and not the actual action.
         modifier = Modifier

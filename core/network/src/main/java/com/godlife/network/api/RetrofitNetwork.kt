@@ -9,6 +9,7 @@ import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LogoutQuery
+import com.godlife.network.model.NotificationListQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -35,6 +36,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -47,18 +49,21 @@ interface RetrofitNetworkApi {
 
     // 아이디 존재여부 확인
     @GET("check/id")
+    @Headers("Auth: false")
     suspend fun checkUserExistence(
         @Query("memberId") id: String?,
     ): UserExistenceCheckResult
 
     // 닉네임 중복체크
     @GET("check/nickname")
+    @Headers("Auth: false")
     suspend fun checkNickname(
         @Query("nickname") nickname :String?
     ): SignUpCheckNicknameQuery
 
     // 이메일 중복체크
     @GET("check/email")
+    @Headers("Auth: false")
     suspend fun checkEmail(
         @Query("email") email :String?
     ): SignUpCheckEmailQuery
@@ -66,9 +71,10 @@ interface RetrofitNetworkApi {
 
     // 회원가입
     @POST("/signup")
+    @Headers("Auth: false")
     suspend fun signUp(
         @Body request: SignUpRequest
-    ): SignUpQuery
+    ): ApiResponse<SignUpQuery>
 
     // 로그인 시 유저 정보 받아옴
     @GET("/member")
@@ -86,6 +92,17 @@ interface RetrofitNetworkApi {
     suspend fun getUserProfile(
         @Path("memberId") memberId: String
     ): ApiResponse<UserProfileQuery>
+
+    // 수신된 알림 리스트 조회
+    @GET("/alarm")
+    suspend fun getNotificationList(
+    ): ApiResponse<NotificationListQuery>
+
+    // 알림 읽음 처리
+    @PUT("/alarm/{alarmId}")
+    suspend fun patchNotificationRead(
+        @Path("alarmId") alarmId: Int
+    ): ApiResponse<NotificationQuery>
 
     // 엑세스 토큰 갱신
     @POST("/reissue")
@@ -175,8 +192,8 @@ interface RetrofitNetworkApi {
     suspend fun searchPost(
         @Query("page") page: Int,
         @Query("keyword") keyword: String,
-        @Query("Tag") tag: String,
-        @Query("Nickname") nickname: String
+        @Query("tags") tag: String,
+        @Query("nickname") nickname: String
     ): ApiResponse<LatestPostQuery>
 
 

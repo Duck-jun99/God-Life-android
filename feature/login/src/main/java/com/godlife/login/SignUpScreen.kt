@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,15 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.godlife.designsystem.component.GodLifeSignUpTextField
 import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.PurpleMain
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.godlife.designsystem.theme.OrangeMain
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(
@@ -117,7 +113,7 @@ fun SignUpScreen1(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -153,10 +149,11 @@ fun SignUpScreen1(
 fun EditScreen1(
     signUpViewModel:SignUpViewModel
 ){
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleMain)
+            .background(OrangeMain)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -164,6 +161,9 @@ fun EditScreen1(
 
             var nickname by remember { signUpViewModel.nickname }
             var email by remember { signUpViewModel.email }
+
+            Log.e("nickname", nickname)
+            Log.e("email", email)
 
             val checkedNickname by signUpViewModel.checkedNickname.collectAsState()
 
@@ -184,18 +184,19 @@ fun EditScreen1(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            GodLifeTextField(
+            GodLifeSignUpTextField(
                 text = nickname,
                 onTextChanged = {nickname = it},
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                 ),
-                keyboardActions = KeyboardActions(onDone = {
+                actionCallBack = {
 
                     // 키보드 입력 종료 시 통신 수행
                     signUpViewModel.checkNicknameLogic(nickname)
                     Log.e("Silkjsakjld", "키보드 입력 종료")
-                })
+                },
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.size(5.dp))
@@ -214,18 +215,20 @@ fun EditScreen1(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            GodLifeTextField(
+            GodLifeSignUpTextField(
                 text = email,
                 onTextChanged = {email = it},
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                 ),
-                keyboardActions = KeyboardActions(onDone = {
+                actionCallBack = {
+
                     // 키보드 입력 종료 시 통신 수행
                     //performCommunication(nickname, email)
                     signUpViewModel.checkEmailLogic(email)
                     Log.e("Silkjsakjld", "키보드 입력 종료")
-                })
+                },
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.size(5.dp))
@@ -259,7 +262,7 @@ fun EditScreen2(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleMain)
+            .background(OrangeMain)
     ) {
         Column(
 
@@ -282,14 +285,17 @@ fun EditScreen2(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            GodLifeTextField(text = age, onTextChanged = {age = it},
+            GodLifeSignUpTextField(
+                text = age,
+                onTextChanged = {age = it},
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number).copy(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
+                actionCallBack = {
                     // 키보드 입력 종료 시 통신 수행
                     //performCommunication(nickname, email)
                     signUpViewModel.checkAgeLogic(age)
                     Log.e("Silkjsakjld", "키보드 입력 종료")
-                })
+                },
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.size(5.dp))
@@ -308,16 +314,19 @@ fun EditScreen2(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            GodLifeTextField(text = sex, onTextChanged = {sex = it},
+            GodLifeSignUpTextField(
+                text = sex,
+                onTextChanged = {sex = it},
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done // 키보드 입력 종료 액션 설정
                 ),
-                keyboardActions = KeyboardActions(onDone = {
+                actionCallBack = {
                     // 키보드 입력 종료 시 통신 수행
                     //performCommunication(nickname, email)
                     signUpViewModel.checkSexLogic(sex)
                     Log.e("Silkjsakjld", "키보드 입력 종료")
-                })
+                },
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.size(5.dp))
@@ -339,7 +348,7 @@ fun SignUpScreenPreview(){
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -371,7 +380,7 @@ fun SignUpScreen1Preview(){
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -450,7 +459,7 @@ fun SignUpScreen2Preview(){
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)

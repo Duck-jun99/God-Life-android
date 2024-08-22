@@ -29,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -46,16 +45,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.create_post.R
-import com.godlife.create_post.stimulus.CreateStimulusPostCoverRoute
 import com.godlife.create_post.stimulus.QuillInterface
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
-import com.godlife.network.BuildConfig
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.delay
@@ -158,7 +155,7 @@ fun UpdateStimulusPostContent(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -274,7 +271,7 @@ fun UpdateStimulusPostContent(
                             webViewRef.value?.let { viewModel.getHtmlFromWebView(it) }
                             completeDialogVisible.value = !completeDialogVisible.value
                         },
-                        text = { Text(text = "수정 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                        text = { Text(text = "수정 완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                     )
                 }
 
@@ -285,7 +282,7 @@ fun UpdateStimulusPostContent(
                     containerColor = Color.White,
                     onDismissRequest = { completeDialogVisible.value = !completeDialogVisible.value },
                     title = {
-                        Text(text = "수정이 완료되셨나요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "수정이 완료되셨나요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "주의사항을 확인하셨다면 '글 게시하기' 버튼을 눌러주세요.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -299,13 +296,13 @@ fun UpdateStimulusPostContent(
                                 completeDialogVisible.value = !completeDialogVisible.value
 
                             },
-                            text = { Text(text = "글 게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "글 게시하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { completeDialogVisible.value = !completeDialogVisible.value },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -316,7 +313,7 @@ fun UpdateStimulusPostContent(
                     containerColor = Color.White,
                     onDismissRequest = { completeDialogVisible.value = !completeDialogVisible.value },
                     title = {
-                        Text(text = "이전 단계로 돌아가시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "이전 단계로 돌아가시겠어요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "지금 작성하신 내용은 저장되지 않아요.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -333,13 +330,13 @@ fun UpdateStimulusPostContent(
                                 backDialogVisible.value = !backDialogVisible.value
 
                             },
-                            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "돌아가기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { backDialogVisible.value = !backDialogVisible.value },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )

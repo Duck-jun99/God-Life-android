@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,15 +37,14 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +63,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,15 +72,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
-import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.component.GodLifeTextFieldGray
-import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.profile.navigation.ProfileScreenRoute
+import com.godlife.designsystem.theme.OrangeMain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -247,8 +242,17 @@ fun ProfileEditBox(
 
     val showIntroduceChangeViewState by viewModel.showIntroduceChangeViewState.collectAsState()
 
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
-    Log.e("ProfileEditBox", "${bottomSheetScaffoldState.bottomSheetState.currentValue}")
+    //val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = SheetState(
+            initialValue = SheetValue.Expanded,
+            skipPartiallyExpanded = false,
+            density  = Density(LocalContext.current)
+        )
+    )
+
+    //Log.e("ProfileEditBox", "${bottomSheetScaffoldState.bottomSheetState.currentValue}")
 
     Box(
         modifier = modifier
@@ -473,7 +477,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "프로필 사진 변경하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "프로필 사진 변경", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -490,7 +494,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "배경 사진 변경하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "배경 사진 변경", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -508,7 +512,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "소개글 수정하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "소개글 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -523,7 +527,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "초기화하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "수정 내용 초기화", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
     }
@@ -543,7 +547,7 @@ fun EditIntroduceBox(
         containerColor = Color.White,
         onDismissRequest = { viewModel.updateShowIntroduceChangeViewState() },
         title = {
-            Text(text = "소개글 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "소개글 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             Box(
@@ -565,13 +569,13 @@ fun EditIntroduceBox(
                     viewModel.updateIntroduce(text)
                     viewModel.updateShowIntroduceChangeViewState()
                           },
-                text = { Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "작성 완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         },
         dismissButton = {
             GodLifeButtonWhite(
                 onClick = { viewModel.updateShowIntroduceChangeViewState() },
-                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         }
     )
@@ -600,7 +604,7 @@ fun ProfileEditErrorScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -608,7 +612,7 @@ fun ProfileEditErrorScreen(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -631,7 +635,7 @@ fun ProfileEditErrorScreen(
 
         GodLifeButtonWhite(
             onClick = { navController.popBackStack() },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -850,7 +854,7 @@ fun ProfileEditBoxPreview(
                 Spacer(modifier = modifier.size(10.dp))
 
                 //소개글
-                Text(text = "안녕하세요! 갓생을 꿈꾸는 유저입니다.",
+                Text(text = "안녕하세요! 굿생을 꿈꾸는 유저입니다.",
                     style = TextStyle(
                         color = GrayWhite2,
                         fontSize = 15.sp,
@@ -931,7 +935,7 @@ fun EditOptionBoxPreview(modifier: Modifier = Modifier){
                 .clickable { },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "프로필 사진 변경하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "프로필 사진 변경하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -944,7 +948,7 @@ fun EditOptionBoxPreview(modifier: Modifier = Modifier){
                 .clickable { },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "배경 사진 변경하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "배경 사진 변경하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -957,7 +961,7 @@ fun EditOptionBoxPreview(modifier: Modifier = Modifier){
                 .clickable { },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "소개글 수정하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "소개글 수정하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -970,7 +974,7 @@ fun EditOptionBoxPreview(modifier: Modifier = Modifier){
                 .clickable { },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "초기화하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "초기화하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
     }
@@ -986,7 +990,7 @@ fun EditIntroduceBoxPreview(modifier: Modifier = Modifier){
         containerColor = Color.White,
         onDismissRequest = {  },
         title = {
-            Text(text = "소개글 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "소개글 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             Box(
@@ -1006,13 +1010,13 @@ fun EditIntroduceBoxPreview(modifier: Modifier = Modifier){
             GodLifeButtonWhite(
                 onClick = {
                 },
-                text = { Text(text = "작성 완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "작성 완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         },
         dismissButton = {
             GodLifeButtonWhite(
                 onClick = {  },
-                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         }
     )
@@ -1090,7 +1094,7 @@ fun ProfileEditErrorScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1098,7 +1102,7 @@ fun ProfileEditErrorScreenPreview(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1121,7 +1125,7 @@ fun ProfileEditErrorScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 

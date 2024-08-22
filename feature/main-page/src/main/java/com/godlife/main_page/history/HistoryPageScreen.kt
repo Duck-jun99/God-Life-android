@@ -46,7 +46,7 @@ import androidx.navigation.NavController
 import com.godlife.database.model.TodoEntity
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.navigation.HistoryDetailRoute
 
 @Composable
@@ -142,7 +142,7 @@ fun HistoryPageScreen(
                         Text(
                             text = "기록 저장소란?",
                             style = TextStyle(
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )

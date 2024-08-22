@@ -2,7 +2,6 @@ package com.godlife.login
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,16 +15,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.main.MainActivity
+import com.godlife.designsystem.theme.OrangeMain
+import com.godlife.login.fake.TestUserLoginScreen
+import com.godlife.login.fake.TestUserSignUpScreen
 import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -74,7 +72,7 @@ fun LoginUi(context: Context,
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleMain)
+            .background(OrangeMain)
             .statusBarsPadding()
     ) {
         NavHost(navController = navController, startDestination = LoginScreenRoute.route,
@@ -86,6 +84,20 @@ fun LoginUi(context: Context,
 
             composable(SignUpScreenRoute.route){
                 SignUpScreen()
+            }
+
+            composable(TestUserSignUpScreenRoute.route){
+                TestUserSignUpScreen()
+            }
+
+            composable(TestUserLoginScreenRoute.route){
+                TestUserLoginScreen(
+                    context = context,
+                    loginViewModel = loginViewModel,
+                    navController = navController,
+                    mainNavigator = mainNavigator,
+                    loginActivity = loginActivity
+                )
             }
 
         }
@@ -100,6 +112,14 @@ object LoginScreenRoute{
 
 object SignUpScreenRoute{
     const val route = "SignUpScreen"
+}
+
+object TestUserSignUpScreenRoute{
+    const val route = "TestUserSignUpScreen"
+}
+
+object TestUserLoginScreenRoute{
+    const val route = "TestUserLoginScreen"
 }
 
 private lateinit var autoLoginState:AutoLoginConstant

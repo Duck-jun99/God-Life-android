@@ -35,4 +35,6 @@ dependencies {
 
     implementation(projects.feature.navigator)
 
+    implementation ("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+
 }

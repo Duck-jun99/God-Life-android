@@ -46,7 +46,7 @@ import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -137,7 +137,7 @@ fun UpdateStimulusPostCover(
                                     ){
 
                                         CircularProgressIndicator(
-                                            color = PurpleMain
+                                            color = OrangeMain
                                         )
 
                                     }
@@ -376,7 +376,7 @@ fun UpdateStimulusCoverItem(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }

@@ -6,8 +6,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godlife.database.model.TodoEntity
 import com.godlife.domain.CreatePostUseCase
 import com.godlife.domain.GetUserInfoUseCase
+import com.godlife.domain.LocalDatabaseUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.network.model.UserInfoBody
 import com.skydoves.sandwich.message
@@ -34,7 +36,8 @@ sealed class CreatePostUiState {
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val createPostUseCase: CreatePostUseCase,
-    private val getUserInfoUseCase: GetUserInfoUseCase
+    private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val localDatabaseUseCase: LocalDatabaseUseCase
 ): ViewModel(){
 
     private val _uiState = MutableStateFlow<CreatePostUiState>(CreatePostUiState.Loading)
@@ -58,7 +61,27 @@ class CreatePostViewModel @Inject constructor(
     private val _text = mutableStateOf("")
     val text: State<String> = _text
 
-    val tags = mutableListOf("tag1","tag2","tag3")
+    private val _tags = MutableStateFlow<List<String>>(emptyList())
+    val tags: StateFlow<List<String>> = _tags
+
+    private val _todayTodo = MutableStateFlow<TodoEntity?>(null)
+    val todayTodo: StateFlow<TodoEntity?> = _todayTodo
+
+    //val tags = mutableListOf("tag1","tag2","tag3")
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            //_tags.value = localDatabaseUseCase.getTodayTodoList().todoList.map{ it.name }
+            launch {
+                _todayTodo.value = localDatabaseUseCase.getTodayTodoList()
+            }.join()
+
+            launch {
+                _tags.value = todayTodo.value!!.todoList.map{ it.name }
+            }
+
+        }
+    }
 
     fun getUserInfo(){
         if(!_isGetUserInfo.value){
@@ -111,12 +134,14 @@ class CreatePostViewModel @Inject constructor(
 
                 viewModelScope.launch(Dispatchers.IO) {
 
-                    val result = createPostUseCase.executeCreatePost(title.value, text.value, tags, selectedImgUri.value)
+                    val result = createPostUseCase.executeCreatePost(title.value, text.value, tags.value, selectedImgUri.value)
 
                     result
                         .onSuccess {
-                            _uiState.value = CreatePostUiState.Success(data.message)
                             _isSending.value = true
+                            updateTodoCompleted()
+
+                            //localDatabaseUseCase.updateTodoList(todayTodo.value!!.copy(isCompleted = true))
                         }
 
                         .onError {
@@ -134,6 +159,24 @@ class CreatePostViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun onMove(from: Int, to: Int) {
+        _selectedImgUri.value = _selectedImgUri.value.toMutableList().apply {
+            add(to, removeAt(from))
+        }
+    }
+
+    private fun updateTodoCompleted(){
+        viewModelScope.launch(Dispatchers.IO) {
+            launch {
+                localDatabaseUseCase.updateTodoList(todayTodo.value!!.copy(isCompleted = true))
+            }.join()
+
+            launch {
+                _uiState.value = CreatePostUiState.Success("오늘의 투두리스트 완료")
+            }
+        }
     }
 
 

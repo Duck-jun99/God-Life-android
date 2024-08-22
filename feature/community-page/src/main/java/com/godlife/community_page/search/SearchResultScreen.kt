@@ -49,7 +49,7 @@ import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.PostDetailRoute
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.PostDetailBody
 
 @Composable
@@ -159,7 +159,7 @@ fun SearchedPostList(modifier: Modifier = Modifier, item: PostDetailBody, navCon
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = item.tier, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
             }
             Box(modifier.weight(0.2f), contentAlignment = Alignment.TopCenter){
@@ -239,7 +239,7 @@ fun SearchedPostListPreview(modifier: Modifier = Modifier){
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = "마스터", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
             }
             Box(modifier.weight(0.2f), contentAlignment = Alignment.TopCenter){

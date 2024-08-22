@@ -15,9 +15,11 @@ import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.ReissueUseCase
 import com.godlife.domain.SearchPostUseCase
+import com.godlife.model.community.LatestContentUi
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
 import com.godlife.network.model.UserProfileBody
+import com.google.android.gms.ads.AdLoader
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -77,7 +79,7 @@ class CommunityPageViewModel @Inject constructor(
     private var latestFlag = mutableIntStateOf(0)
 
     //조회된 최신 게시물, 페이징을 이용하기에 지연 초기화
-    lateinit var latestPostList: Flow<PagingData<PostDetailBody>>
+    lateinit var latestPostList: Flow<PagingData<LatestContentUi>>
 
     //주간 인기 게시물을 호출한 적이 있는지 플래그
     private var weeklyFamousFlag = mutableStateOf(false)
@@ -122,6 +124,9 @@ class CommunityPageViewModel @Inject constructor(
     private val _searchedPosts = MutableStateFlow<PagingData<PostDetailBody>>(PagingData.empty())
     val searchedPosts: StateFlow<PagingData<PostDetailBody>> = _searchedPosts
 
+    //검색 카테고리
+    var searchCategory = mutableStateOf("title")
+
     //최상단 타이틀
     var topTitle = mutableStateOf("굿생 커뮤니티")
 
@@ -140,9 +145,14 @@ class CommunityPageViewModel @Inject constructor(
         _searchText.value = text
     }
 
+    //검색 카테고리 변경
+    fun onSearchCategoryChange(category: String){
+        searchCategory.value = category
+    }
+
 
     fun getSearchedPost(
-        keyword: String,
+        keyword: String = "",
         tags: String = "",
         nickname: String = ""
     ) {
@@ -175,7 +185,7 @@ class CommunityPageViewModel @Inject constructor(
             title = "최신 게시물"
         }
         else if(route == "StimulusPostScreen"){
-            title = "갓생 자극"
+            title = "굿생 자극"
         }
         else if(route == "RankingScreen"){
             title = "명예의 전당"
@@ -191,7 +201,9 @@ class CommunityPageViewModel @Inject constructor(
     }
 
     //최신 게시물 불러오기
-    fun getLatestPost(){
+    fun getLatestPost(
+        adLoaderBuilder: AdLoader.Builder
+    ){
 
         // 최신 게시물 API를 호출한 적이 없을 때에만 실행
         if(latestFlag.value == 0){
@@ -199,7 +211,9 @@ class CommunityPageViewModel @Inject constructor(
             // Loading으로 초기화
             _uiState.value = CommunityPageUiState.Loading
 
-            latestPostList = getLatestPostUseCase.executeGetLatestPost().cachedIn(viewModelScope)
+            latestPostList = getLatestPostUseCase.executeGetLatestPost(adLoaderBuilder).cachedIn(viewModelScope)
+
+            Log.e("getLatestPost", latestPostList.toString())
 
             _uiState.value = CommunityPageUiState.Success("최신 게시물 조회 완료")
 
@@ -208,7 +222,7 @@ class CommunityPageViewModel @Inject constructor(
         }
     }
 
-    //일주일 인기 게시물 불러오기
+    //일주일 인기 게시물 불러오기 -> 성공하면 전체 인기 게시물 불러오기
     fun getWeeklyFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
@@ -223,7 +237,9 @@ class CommunityPageViewModel @Inject constructor(
                     .onSuccess {
                         _weeklyFamousPostList.value = data.body
 
-                        _uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
+                        getAllFamousPost()
+
+                        //_uiState.value = CommunityPageUiState.Success("일주일 인기 게시물 조회 완료")
 
                     }
                     .onError {
@@ -246,13 +262,13 @@ class CommunityPageViewModel @Inject constructor(
     }
 
     //전체 인기 게시물 불러오기
-    fun getAllFamousPost(){
+    private fun getAllFamousPost(){
 
         // 인기 게시물 API를 호출한 적이 없을 때에만 실행
         if(!allFamousFlag.value){
             allFamousFlag.value = true
 
-            _uiState.value = CommunityPageUiState.Loading
+            //_uiState.value = CommunityPageUiState.Loading
 
             viewModelScope.launch {
                 val result = getWeeklyFamousPostUseCase.executeGetAllFamousPost()
@@ -319,7 +335,7 @@ class CommunityPageViewModel @Inject constructor(
 
         if(!allRankingFlag.value){
             allRankingFlag.value = true
-            _rankingUiState.value = RankingPageUiState.Loading
+            //_rankingUiState.value = RankingPageUiState.Loading
 
             viewModelScope.launch {
                 val result = getRankingUseCase.executeGetAllRanking()

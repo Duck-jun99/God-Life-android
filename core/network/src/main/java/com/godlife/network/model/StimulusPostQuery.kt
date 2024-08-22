@@ -43,7 +43,7 @@ data class StimulusPostList(
     val introduction: String,
     val nickname: String,
     val godLifeScore: Int,
-    val views: Int,
+    val view: Int,
 )
 
 data class StimulusPostDetailQuery(
@@ -63,5 +63,6 @@ data class StimulusPost(
     val owner: Boolean,
     val content: String,
     val writerId: Int,
-    val createDate: String
+    val createDate: String,
+    val memberLikedBoard: Boolean
 )

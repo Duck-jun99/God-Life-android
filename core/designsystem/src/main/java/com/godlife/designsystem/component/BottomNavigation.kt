@@ -18,13 +18,18 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.navigationbar.BottomNavItem
 
 
@@ -36,23 +41,56 @@ fun TabIconView(
     selectedIcon: ImageVector,
     unselectedIcon: ImageVector,
     title: String,
-    badgeAmount: Int? = null
+    badgeAmount: Boolean? = null
 ) {
     BadgedBox(badge = { TabBarBadgeView(badgeAmount) }) {
-        Icon(
-            imageVector = if (isSelected) selectedIcon else unselectedIcon,
-            contentDescription = title
-        )
+
+        if(isSelected){
+            Icon(
+                imageVector = selectedIcon,
+                contentDescription = title,
+                modifier = Modifier
+                    .graphicsLayer(alpha = 0.99f)
+                    .drawWithCache {
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    listOf(
+                                        Color(0xFFFF44A2),
+                                        Color(0xFFFF5890),
+                                        Color(0xFFFA6B80),
+                                        Color(0xFFFF7B75),
+                                        Color(0xFFFF8161),
+                                        Color(0xFFFF884D)
+                                    )
+                                ),
+                                blendMode = BlendMode.SrcAtop
+                            )
+                        }
+                    },
+            )
+        }
+        else{
+            Icon(
+                imageVector = unselectedIcon,
+                contentDescription = title
+            )
+        }
+
     }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun TabBarBadgeView(count: Int? = null) {
-    if (count != null) {
-        Badge {
-            Text(count.toString())
+fun TabBarBadgeView(
+    badge: Boolean? = null
+) {
+    if (badge != null) {
+        if(badge){
+            Badge()
         }
+
     }
 }
 
@@ -84,13 +122,13 @@ fun BottomNavigationPreview() {
                         selectedIcon = tabBarItem.selectedIcon,
                         unselectedIcon = tabBarItem.unselectedIcon,
                         title = tabBarItem.title,
-                        badgeAmount = tabBarItem.badgeAmount
+                        //badgeAmount = tabBarItem.badgeAmount
                     )
                 },
                 label = { Text(tabBarItem.title) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PurpleMain,
-                    selectedTextColor = PurpleMain,
+                    selectedIconColor = OrangeMain,
+                    selectedTextColor = OrangeMain,
                     unselectedIconColor = GrayWhite,
                     unselectedTextColor = GrayWhite,
                     disabledIconColor = GrayWhite3,

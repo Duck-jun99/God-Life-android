@@ -10,6 +10,7 @@ import com.godlife.network.model.GodScoreQuery
 import com.godlife.network.model.ImageUploadQuery
 import com.godlife.network.model.ImageUploadStimulusQuery
 import com.godlife.network.model.LogoutQuery
+import com.godlife.network.model.NotificationListQuery
 import com.godlife.network.model.StimulusPostListQuery
 import com.godlife.network.model.NotificationQuery
 import com.godlife.network.model.NotificationRequest
@@ -42,9 +43,15 @@ interface NetworkDataSource {
                        sex: String,
                        providerId: String,
                        providerName: String
-    ): SignUpQuery
+    ): ApiResponse<SignUpQuery>
 
     suspend fun getUserInfo(): ApiResponse<UserInfoQuery>
+
+    suspend fun getNotificationList(): ApiResponse<NotificationListQuery>
+
+    suspend fun patchNotificationRead(
+        alarmId: Int
+    ): ApiResponse<NotificationQuery>
 
     suspend fun logout(): ApiResponse<LogoutQuery>
 

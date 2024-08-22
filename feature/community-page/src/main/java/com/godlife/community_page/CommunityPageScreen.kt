@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -54,11 +56,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.godlife.community_page.famous.FamousPostScreen
 import com.godlife.community_page.latest.LatestPostListPreview
 import com.godlife.community_page.latest.LatestPostScreen
@@ -67,18 +67,18 @@ import com.godlife.community_page.navigation.FamousPostRoute
 import com.godlife.community_page.navigation.LatestPostRoute
 import com.godlife.community_page.navigation.RankingRoute
 import com.godlife.community_page.navigation.SearchResultRoute
-import com.godlife.community_page.navigation.StimulusPostDetailRoute
 import com.godlife.community_page.navigation.StimulusPostRoute
-import com.godlife.community_page.post_detail.StimulusDetailScreen
 import com.godlife.community_page.ranking.RankingScreen
 import com.godlife.community_page.search.SearchResultScreen
 import com.godlife.community_page.stimulus.StimulusPostScreen
 import com.godlife.designsystem.component.GodLifeSearchBar
+import com.godlife.designsystem.component.CommunitySearchBar
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueLight
+import com.google.android.gms.ads.AdLoader
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -122,8 +122,9 @@ fun CommunityPageScreen(
     //BottomSheet가 접혀있을 때 높이
     val initBottomSheetHeight = height - 240.dp
 
-
     val searchText by viewModel.searchText.collectAsState()
+
+    val searchCategory = viewModel.searchCategory.value
 
     NavHost(navController = navController, startDestination = "CommunityPageScreen"){
         composable("CommunityPageScreen"){
@@ -183,20 +184,86 @@ fun CommunityPageScreen(
 
                     Column(
                         modifier
-                            .padding(start = 10.dp, end = 20.dp, bottom = 10.dp)
-                            .height(80.dp)) {
+                            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                            .height(80.dp)
+                    ) {
 
-                        Text(text = "다른 굿생러 분들의 게시물을 확인하세요.", style = TextStyle(color = GrayWhite2, fontSize = 15.sp))
+                        Text(text = "다른 굿생러 분들은 어떻게 살고 있을까요?", style = TextStyle(color = Color.White, fontSize = 15.sp))
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        GodLifeSearchBar(
+                        CommunitySearchBar(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally),
                             searchText = searchText,
                             containerColor = OpaqueLight,
                             onTextChanged = { viewModel.onSearchTextChange(it) },
                             onSearchClicked = {
-                                viewModel.getSearchedPost(keyword = searchText)
+
+                                when(searchCategory){
+                                    "title" -> {
+                                        viewModel.getSearchedPost(keyword = searchText)
+                                    }
+                                    "nickname" -> {
+                                        viewModel.getSearchedPost(nickname = searchText)
+                                    }
+                                    "tag" -> {
+                                        viewModel.getSearchedPost(tags = searchText)
+                                    }
+                                }
+
                                 navControllerBottomSheet.navigate(SearchResultRoute.route)
+                            },
+                            optionBoolean = true,
+                            optionMenu = {
+                                Column {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Checkbox(
+                                            checked = searchCategory == "title",
+                                            onCheckedChange = { viewModel.onSearchCategoryChange("title") }
+                                        )
+                                        Text(
+                                            text = "제목으로 검색",
+                                            style = TextStyle(
+                                                color = Color.Black,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Checkbox(
+                                            checked = searchCategory == "nickname",
+                                            onCheckedChange = { viewModel.onSearchCategoryChange("nickname") }
+                                        )
+                                        Text(
+                                            text = "작성자명으로 검색",
+                                            style = TextStyle(
+                                                color = Color.Black,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Checkbox(
+                                            checked = searchCategory == "tag",
+                                            onCheckedChange = { viewModel.onSearchCategoryChange("tag") }
+                                        )
+                                        Text(
+                                            text = "태그로 검색",
+                                            style = TextStyle(
+                                                color = Color.Black,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+                                    }
+                                }
                             }
                         )
 
@@ -357,7 +424,7 @@ fun CommunityPageView(
         composable(FamousPostRoute.route){
             viewModel.changeCurrentRoute(route = FamousPostRoute.route)
             viewModel.getWeeklyFamousPost()
-            viewModel.getAllFamousPost()
+            //viewModel.getAllFamousPost()
 
             when(uiState){
 
@@ -379,8 +446,10 @@ fun CommunityPageView(
         }
 
         composable(LatestPostRoute.route) {
+            val context = LocalContext.current
             viewModel.changeCurrentRoute(route = LatestPostRoute.route)
-            viewModel.getLatestPost()
+            /*TODO 광고 테스트 UnitID 사용중*/
+            viewModel.getLatestPost(AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110"))
 
             when(uiState){
 
@@ -550,6 +619,9 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                     Spacer(modifier = Modifier.height(15.dp))
 
                     GodLifeSearchBar(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
                         searchText = searchText,
                         containerColor = OpaqueLight,
                         onTextChanged = { it -> searchText },
@@ -612,7 +684,7 @@ fun CommunityPageScreenPreview(modifier: Modifier = Modifier){
                         horizontalAlignment = Alignment.CenterHorizontally
                     )  {
 
-                        CategoryBoxPreview(categoryName = "갓생 자극", isSelected = false)
+                        CategoryBoxPreview(categoryName = "굿생 자극", isSelected = false)
 
                     }
 

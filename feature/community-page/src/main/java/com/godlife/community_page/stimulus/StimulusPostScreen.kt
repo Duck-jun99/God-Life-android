@@ -1,6 +1,7 @@
 package com.godlife.community_page.stimulus
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -23,13 +24,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,6 +49,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,15 +68,22 @@ import com.godlife.community_page.stimulus.famous_post.FamousStimulusPostContent
 import com.godlife.community_page.stimulus.latest_post.LatestStimulusPostContent
 import com.godlife.community_page.stimulus.most_view_post.MostViewStimulusPostContent
 import com.godlife.community_page.stimulus.recommended_author.RecommendedAuthorInfoContent
-import com.godlife.community_page.stimulus.recommended_author.RecommendedAuthorInfoContentPreview
-import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorStimulusPostContent
 import com.godlife.community_page.stimulus.recommended_post.RecommendedStimulusPostContent
 import com.godlife.create_post.stimulus.CreateStimulusPostScreen
+import com.godlife.designsystem.list.AdMobListViewWhite
+import com.godlife.designsystem.list.NativeAdView
 import com.godlife.designsystem.theme.GodLifeTheme
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.StimulusPostList
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -96,9 +108,46 @@ fun StimulusPostScreen(
     val fabVisibleState = remember { mutableStateOf(true) }
 
     val itemList = listOf(
-        FABItem(icon = Icons.Rounded.Create, text = "글 작성"),
-        FABItem(icon = Icons.Rounded.Search, text = "검색"),
+        FABItem(icon = Icons.Outlined.Create, text = "글 작성"),
+        FABItem(icon = Icons.Outlined.Search, text = "검색"),
+        FABItem(icon = Icons.Outlined.Info, text = "도움말"),
     )
+
+    val context = LocalContext.current
+
+    /* TODO AdMob TEST */
+    var nativeAd by remember { mutableStateOf<NativeAd?>(null) }
+
+
+    /* TODO adunitId는 테스트용으로 이용중 */
+    val adLoader = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110")
+        .forNativeAd { ad : NativeAd ->
+            // Show the ad.
+
+            nativeAd = ad
+            /*
+            if (isDestroyed) {
+                ad.destroy()
+                return@forNativeAd
+            }
+             */
+        }
+        .withAdListener(object : AdListener() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                // Handle the failure.
+
+                Log.e("AdMob", "Ad failed to load. Error code: ${adError.code}, Message: ${adError.message}")
+            }
+        })
+        .withNativeAdOptions(
+            NativeAdOptions.Builder()
+                // Methods in the NativeAdOptions.Builder class can be
+                // used here to specify individual options settings.
+                .build()
+        )
+        .build()
+
+    adLoader.loadAd(AdRequest.Builder().build())
 
 
     GodLifeTheme {
@@ -119,8 +168,10 @@ fun StimulusPostScreen(
                             when(item.text){
                                 "글 작성" -> navController2.navigate("CreateStimulusPostScreen")
                                 "검색" -> navController2.navigate("StimulusSearchScreen")
+                                "도움말" -> viewModel.setHelpDialogVisible()
                             }
-                        }
+                        },
+                        viewModel = viewModel
                     )
                 }
 
@@ -134,11 +185,13 @@ fun StimulusPostScreen(
                     LazyColumn(
                         modifier
                             .fillMaxSize()
-                            .background(Color.White)
+                            .background(GrayWhite3)
                     ) {
 
                         item {
                             RecommendedStimulusPostContent(navController = navController)
+
+                            //Spacer(modifier = Modifier.height(10.dp))
                         }
 
 
@@ -146,8 +199,10 @@ fun StimulusPostScreen(
 
                             Text(
                                 modifier = modifier
-                                    .padding(20.dp),
-                                text = "닉네임 님, 인기 글을 읽어보세요.",
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(top = 10.dp, start = 20.dp),
+                                text = "인기 글을 읽어보세요.",
                                 style = TextStyle(
                                     color = Color.Black,
                                     fontSize = 18.sp,
@@ -159,14 +214,32 @@ fun StimulusPostScreen(
 
                         item {
                             FamousStimulusPostContent(navController = navController)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+
+                        item{
+                            /* TODO AdMob TEST */
+
+                            nativeAd?.let { it ->
+                                NativeAdView(ad = it) { adView, ad, view ->
+                                    AdMobListViewWhite(
+                                        adView = adView,
+                                        ad = ad,
+                                        view = view
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
 
                         item {
 
                             Text(
                                 modifier = modifier
-                                    .padding(20.dp),
-                                text = "최신글",
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(top = 10.dp, start = 20.dp),
+                                text = "따끈따끈, 최신글",
                                 style = TextStyle(
                                     color = Color.Black,
                                     fontSize = 18.sp,
@@ -180,13 +253,16 @@ fun StimulusPostScreen(
                             LatestStimulusPostContent(
                                 navController = navController
                             )
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
 
                         item{
                             Text(
                                 modifier = modifier
-                                    .padding(20.dp),
-                                text = "조회수가 높은 글이에요.",
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(top = 10.dp, start = 20.dp),
+                                text = "많이 본 글이에요.",
                                 style = TextStyle(
                                     color = Color.Black,
                                     fontSize = 18.sp,
@@ -199,10 +275,17 @@ fun StimulusPostScreen(
                             MostViewStimulusPostContent(
                                 navController = navController
                             )
+                            //Spacer(modifier = Modifier.height(10.dp))
                         }
 
-                        item { RecommendedAuthorInfoContent() }
+                        item {
+                            RecommendedAuthorInfoContent(
+                                navController = navController
+                            )
+                        }
 
+                        /*
+                        //RecommendedAuthorInfoContent로 이전
                         item {
 
                             Text(
@@ -224,7 +307,44 @@ fun StimulusPostScreen(
                             )
                         }
 
+                         */
 
+
+                    }
+
+                    // 도움말 다이얼로그
+                    if(viewModel.helpDialogVisible.value){
+                        AlertDialog(
+                            containerColor = Color.White,
+                            onDismissRequest = {
+                                viewModel.setHelpDialogVisible()
+                            },
+                            title = {
+
+                                Text(
+                                    text = "굿생 자극이란?",
+                                    style = TextStyle(
+                                        color = OrangeMain,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "굿생에 대해 자유롭게 글을 작성하고 읽을 수 있는 공간이에요.\n" +
+                                            "굿생러분들의 좋은 글을 통해 여러분의 굿생에 도움을 드리기 위해 제작했어요.\n" +
+                                            "또는 굿생을 살기 위한 본인의 팁, 조언 또는 경험이 있다면 자유롭게 작성해주세요.\n",
+                                    style = TextStyle(
+                                        color = Color.Black,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        lineHeight = 24.sp
+                                    )
+                                )
+                            },
+                            confirmButton = { /*TODO*/ }
+                        )
                     }
 
                 }
@@ -241,7 +361,9 @@ fun StimulusPostScreen(
 
                 composable("StimulusSearchScreen"){
                     fabVisibleState.value = false
-                    StimulusSearchScreen()
+                    StimulusSearchScreen(
+                        parentNavController = navController
+                    )
 
                 }
 
@@ -271,7 +393,7 @@ fun StimulusCoverItem(
         GlideImage(
             imageModel = { BuildConfig.SERVER_IMAGE_DOMAIN + item.thumbnailUrl },
             imageOptions = ImageOptions(
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Crop,
                 alignment = Alignment.Center
             ),
             modifier = modifier
@@ -285,7 +407,7 @@ fun StimulusCoverItem(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -328,11 +450,135 @@ fun CustomExpandableFAB(
         icon = Icons.Rounded.Menu,
         text = "    메뉴    "
     ),
-    onItemClick: (FABItem) -> Unit
+    onItemClick: (FABItem) -> Unit,
+    viewModel: StimulusPostViewModel
+) {
+
+    val buttonClicked = viewModel.fabExpanded.value
+
+    val interactionSource = MutableInteractionSource()
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.elevatedCardElevation(4.dp)
+    ) {
+
+        // parent layout
+        Column(
+            modifier = Modifier
+                .background(color = Color.White)
+        ) {
+
+//            you can also use the spring() in EnterTransition/ExitTransition provided by Material-3 library for a more smooth animation, but it increases the collapse time of the sheet/FAB
+//            example - spring(dampingRatio = 3f)
+
+            // The Expandable Sheet layout
+            AnimatedVisibility(
+                visible = buttonClicked,
+                enter = expandVertically(tween(700)) + fadeIn(),
+                exit = shrinkVertically(tween(700)) + fadeOut(
+                    animationSpec = tween(700)
+                )
+            ) {
+                // display the items
+                Column(
+                    modifier = Modifier
+                        .background(color = Color.White)
+                        .padding(vertical = 10.dp, horizontal = 10.dp)
+                ) {
+                    items.forEach { item ->
+                        Row(modifier = Modifier
+                            .padding(vertical = 10.dp)
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = {
+                                    onItemClick(item)
+                                    viewModel.setFabExpanded()
+                                    //buttonClicked = false
+                                }
+                            )) {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = "",
+                                tint = OrangeMain
+                            )
+
+                            Spacer(modifier = Modifier.width(15.dp))
+
+                            Text(
+                                text = item.text,
+                                style = TextStyle(
+                                    color = GrayWhite
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            // The FAB main button
+            Card(
+                modifier = Modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = {
+                        viewModel.setFabExpanded()
+                        //buttonClicked = !buttonClicked
+                    }
+                ),
+                colors = CardDefaults.cardColors(OrangeMain)
+            ) {
+                Row(
+                    modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
+                ) {
+                    Icon(
+                        imageVector = fabButton.icon,
+                        contentDescription = "",
+                        tint = Color.White
+                    )
+                    AnimatedVisibility(
+                        visible = buttonClicked,
+                        enter = expandVertically(animationSpec = tween(700)) + fadeIn(),
+                        exit = shrinkVertically(tween(700)) + fadeOut(tween(700))
+                    ) {
+                        Row {
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Text(
+                                text = fabButton.text,
+                                style = TextStyle(
+                                    color = Color.White
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+}
+
+@Preview(showBackground = true)
+@SuppressLint("UnrememberedMutableInteractionSource")
+@Composable
+fun CustomExpandableFABPreview(
+    modifier: Modifier = Modifier,
+    items: List<FABItem> = listOf(
+        FABItem(icon = Icons.Rounded.Create, text = "글 작성"),
+        FABItem(icon = Icons.Rounded.Search, text = "검색")
+    ),
+    fabButton: FABItem = FABItem(
+        icon = Icons.Rounded.Menu,
+        text = "메뉴"
+    ),
+    //onItemClick: (FABItem) -> Unit
 ) {
 
     var buttonClicked by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     val interactionSource = MutableInteractionSource()
@@ -343,7 +589,10 @@ fun CustomExpandableFAB(
     ) {
 
         // parent layout
-        Column {
+        Column(
+            modifier = Modifier
+                .background(color = GrayWhite3)
+        ) {
 
 //            you can also use the spring() in EnterTransition/ExitTransition provided by Material-3 library for a more smooth animation, but it increases the collapse time of the sheet/FAB
 //            example - spring(dampingRatio = 3f)
@@ -351,15 +600,16 @@ fun CustomExpandableFAB(
             // The Expandable Sheet layout
             AnimatedVisibility(
                 visible = buttonClicked,
-                enter = expandVertically(tween(1000)) + fadeIn(),
-                exit = shrinkVertically(tween(1000)) + fadeOut(
-                    animationSpec = tween(1000)
+                enter = expandVertically(tween(700)) + fadeIn(),
+                exit = shrinkVertically(tween(700)) + fadeOut(
+                    animationSpec = tween(700)
                 )
             ) {
                 // display the items
                 Column(
                     modifier = Modifier
-                        .padding(vertical = 20.dp, horizontal = 20.dp)
+                        .background(color = GrayWhite3)
+                        .padding(vertical = 10.dp, horizontal = 10.dp)
                 ) {
                     items.forEach { item ->
                         Row(modifier = Modifier
@@ -368,7 +618,7 @@ fun CustomExpandableFAB(
                                 interactionSource = interactionSource,
                                 indication = null,
                                 onClick = {
-                                    onItemClick(item)
+                                    //onItemClick(item)
                                     buttonClicked = false
                                 }
                             )) {
@@ -378,7 +628,12 @@ fun CustomExpandableFAB(
 
                             Spacer(modifier = Modifier.width(15.dp))
 
-                            Text(text = item.text)
+                            Text(
+                                text = item.text,
+                                style = TextStyle(
+                                    color = Color.Black
+                                )
+                            )
                         }
                     }
                 }
@@ -394,19 +649,24 @@ fun CustomExpandableFAB(
                     }
                 ), colors = CardDefaults.cardColors(Color.White)) {
                 Row(
-                    modifier = Modifier.padding(vertical = 20.dp, horizontal = 30.dp)
+                    modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
                 ) {
                     Icon(
-                        imageVector = fabButton.icon, contentDescription = "refresh"
+                        imageVector = fabButton.icon, contentDescription = ""
                     )
                     AnimatedVisibility(
                         visible = buttonClicked,
-                        enter = expandVertically(animationSpec = tween(1500)) + fadeIn(),
-                        exit = shrinkVertically(tween(1200)) + fadeOut(tween(1200))
+                        enter = expandVertically(animationSpec = tween(700)) + fadeIn(),
+                        exit = shrinkVertically(tween(700)) + fadeOut(tween(700))
                     ) {
                         Row {
                             Spacer(modifier = Modifier.width(20.dp))
-                            Text(text = fabButton.text)
+                            Text(
+                                text = fabButton.text,
+                                style = TextStyle(
+                                    color = Color.Black
+                                )
+                            )
                         }
                     }
                 }
@@ -474,7 +734,7 @@ fun StimulusLoadingScreen(
             .height(300.dp),
         contentAlignment = Alignment.Center
     ){
-        CircularProgressIndicator(color = PurpleMain)
+        CircularProgressIndicator(color = OrangeMain)
     }
 }
 

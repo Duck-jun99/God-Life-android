@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -55,7 +53,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +67,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.PostDetailBody
@@ -178,6 +175,7 @@ fun ProfileBox(
         Column(
             modifier = modifier.fillMaxSize()
         ) {
+
             Box(
                 modifier = modifier
                     .fillMaxWidth()
@@ -187,12 +185,15 @@ fun ProfileBox(
                 contentAlignment = Alignment.TopEnd
             ){
 
+                /*
                 //본인의 프로필이 아니면 아래 아이콘, 본인의 프로필이면 설정 아이콘
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "Menu",
                     tint = Color.White
                 )
+
+                 */
             }
 
             Column(
@@ -283,7 +284,7 @@ fun ProfileBox(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 티어",
+                        Text(text = "굿생 티어",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,
@@ -318,7 +319,7 @@ fun ProfileBox(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 점수",
+                        Text(text = "굿생 점수",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,
@@ -604,7 +605,7 @@ fun PostList(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -688,7 +689,7 @@ fun SearchStimulusPostItem(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -1016,7 +1017,7 @@ fun ProfileBoxPreview(
                 Spacer(modifier = modifier.size(10.dp))
 
                 //소개글
-                Text(text = "안녕하세요! 갓생을 꿈꾸는 유저입니다.",
+                Text(text = "안녕하세요! 굿생을 꿈꾸는 유저입니다.",
                     style = TextStyle(
                         color = GrayWhite2,
                         fontSize = 15.sp,
@@ -1039,7 +1040,7 @@ fun ProfileBoxPreview(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 티어",
+                        Text(text = "굿생 티어",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,
@@ -1074,7 +1075,7 @@ fun ProfileBoxPreview(
                             .padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "갓생 점수",
+                        Text(text = "굿생 점수",
                             style = TextStyle(
                                 color = GrayWhite2,
                                 fontSize = 18.sp,

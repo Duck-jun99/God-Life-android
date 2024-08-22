@@ -22,13 +22,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -65,15 +73,15 @@ import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.CommunityPageRoute
-import com.godlife.community_page.navigation.StimulusPostDetailRoute
-import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostCoverRoute
 import com.godlife.community_page.post_detail.post_update.stimulus.UpdateStimulusPostScreenRoute
+import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorPostItem
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeLight
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.StimulusPost
@@ -164,12 +172,16 @@ fun StimulusDetailScreen(
                                             )
                                         }
                                     }
+
+                                    Spacer(modifier.size(10.dp))
                                 }
 
                                 item{
                                     writerInfo.value?.nickname?.let { it1 ->
-                                        WriterAnotherPostPreview(
-                                            nickname = it1
+                                        WriterAnotherPost(
+                                            nickname = it1,
+                                            viewModel = viewModel,
+                                            navController = navController
                                         )
                                     }
                                 }
@@ -272,7 +284,7 @@ fun StimulusPostCover(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -389,7 +401,7 @@ fun StimulusCoverItem(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -437,71 +449,21 @@ fun PostContent(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.White)
-            .statusBarsPadding()
-            .padding(horizontal = 15.dp, vertical = 10.dp)
+            //.statusBarsPadding()
+            //.padding(horizontal = 15.dp, vertical = 10.dp)
     ){
 
-        AndroidView(
+        Card(
+            shape = RoundedCornerShape(0.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
             modifier = modifier
-                .fillMaxSize(),
-            factory = { context ->
-
-                WebView(context).apply {
-                    loadUrl("file:///android_asset/content_template.html")
-
-
-                    settings.javaScriptEnabled = true
-                    settings.loadWithOverviewMode = true
-                    settings.useWideViewPort = true
-
-                    // 웹뷰 크기에 맞게 컨텐츠 크기 조정
-                    settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
-
-
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
-                            view?.evaluateJavascript(
-                                """
-                        document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
-                        document.body.style.backgroundColor = 'transparent';
-                        document.documentElement.style.backgroundColor = 'transparent';
-                        """.trimIndent(),
-                                null
-                            )
-                        }
-
-                    }
-
-                }
-            }
-        )
-
-        Spacer(modifier.size(20.dp))
-
-        Text(
-            text = postDetail.createDate,
-            style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-        )
-
-        Spacer(modifier.size(20.dp))
-
-        Text(
-            text = "조회수: ${postDetail.view}",
-            style = TextStyle(color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Normal)
-        )
-
-        Spacer(modifier.size(20.dp))
-
-
-        Column(modifier = modifier
-            .fillMaxWidth()
-            .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
-            .padding(10.dp),
-            verticalArrangement = Arrangement.Center
-        ){
-
+                .fillMaxWidth()
+        ) {
             Row(
+                modifier = modifier
+                    .statusBarsPadding()
+                    .padding(start = 10.dp, end = 10.dp, bottom = 5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -513,7 +475,7 @@ fun PostContent(
                     ),
                     modifier = modifier
                         .clip(CircleShape)
-                        .size(70.dp),
+                        .size(50.dp),
                     loading = {
                         Box(
                             modifier = modifier
@@ -523,7 +485,7 @@ fun PostContent(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -569,9 +531,129 @@ fun PostContent(
 
         }
 
-        if(postDetail.owner){
+        Spacer(modifier.size(10.dp))
 
-            Spacer(modifier.size(20.dp))
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.schedule_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.createDate,
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+        }
+
+        Spacer(modifier.size(5.dp))
+
+        AndroidView(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp, vertical = 10.dp),
+            factory = { context ->
+
+                WebView(context).apply {
+                    loadUrl("file:///android_asset/content_template.html")
+
+
+                    settings.javaScriptEnabled = true
+                    settings.loadWithOverviewMode = true
+                    settings.useWideViewPort = true
+
+                    // 웹뷰 크기에 맞게 컨텐츠 크기 조정
+                    settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
+
+
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            // HTML 템플릿이 로드된 후 콘텐츠를 삽입합니다.
+                            view?.evaluateJavascript(
+                                """
+                        document.querySelector('.ql-editor').innerHTML = `${postDetail.content}`;
+                        document.body.style.backgroundColor = 'transparent';
+                        document.documentElement.style.backgroundColor = 'transparent';
+                        """.trimIndent(),
+                                null
+                            )
+                        }
+
+                    }
+
+                }
+            }
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        Row(
+            modifier = modifier
+                .padding(horizontal = 15.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.visibility_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.view.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+            Spacer(modifier.width(10.dp))
+
+            Icon(
+                modifier = modifier
+                    .size(20.dp),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = GrayWhite
+            )
+
+            Spacer(modifier.width(2.dp))
+
+            Text(
+                text = postDetail.godLifeScore.toString(),
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+
+        }
+
+        Spacer(modifier.size(10.dp))
+
+        if(postDetail.owner){
 
             OwnerOption(
                 navController = navController,
@@ -579,6 +661,14 @@ fun PostContent(
                 postDetail = postDetail
             )
 
+        }
+        else {
+
+            GoodScoreOption(
+                navController = navController,
+                viewModel = viewModel,
+                postDetail = postDetail
+            )
         }
 
 
@@ -591,7 +681,7 @@ fun PostContent(
             containerColor = Color.White,
             onDismissRequest = { viewModel.setDialogVisble() },
             title = {
-                Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                Text(text = "삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
             },
             text = {
                 Text(text = "게시물을 삭제하시겠어요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -602,13 +692,13 @@ fun PostContent(
                         viewModel.deletePost()
                         viewModel.setDialogVisble()
                     },
-                    text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    text = { Text(text = "삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
             },
             dismissButton = {
                 GodLifeButtonWhite(
                     onClick = { viewModel.setDialogVisble() },
-                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
             }
         )
@@ -627,7 +717,7 @@ fun OwnerOption(
 ){
     Row(modifier = modifier
         .fillMaxWidth()
-        .background(color = GrayWhite3, shape = RoundedCornerShape(18.dp))
+        .background(color = GrayWhite3)
         .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -651,7 +741,7 @@ fun OwnerOption(
                     Text(
                         text = "수정하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -678,7 +768,7 @@ fun OwnerOption(
                     Text(
                         text = "삭제하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -688,9 +778,111 @@ fun OwnerOption(
 
         }
 
+    }
+}
+
+@Composable
+fun GoodScoreOption(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: StimulusPostDetailViewModel,
+    postDetail: StimulusPost
+){
+    Column(
+        modifier = modifier
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+            .background(color = OrangeLight, shape = RoundedCornerShape(16.dp))
+            .padding(10.dp)
+    ) {
+
+        if(!postDetail.memberLikedBoard){
+            Text(
+                text = "작성자님의 게시물을 읽어보셨나요?\n굿생을 인정하신다면, 아래 버튼을 눌러주세요!",
+                style = TextStyle(color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Normal)
+            )
+
+            Spacer(modifier.size(20.dp))
+
+            GodLifeButtonWhite(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                leadingIcon = {Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "")},
+                onClick = { viewModel.agreeGodLife() },
+                text = { Text(text = "굿생 인정!") }
+            )
+        }
+
+        else{
+            Icon(
+                modifier = modifier
+                    .align(Alignment.CenterHorizontally),
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = "",
+                tint = OrangeMain
+            )
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth(),
+                text = "유저님께서 굿생을 인정하신 글이에요!",
+                style = TextStyle(
+                    color = GrayWhite,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal
+                ),
+                textAlign = TextAlign.Center
+            )
+        }
 
 
     }
+}
+
+@Composable
+fun WriterAnotherPost(
+    modifier: Modifier = Modifier,
+    nickname: String,
+    viewModel: StimulusPostDetailViewModel,
+    navController: NavController
+){
+
+    val item = viewModel.writerAnotherPost.collectAsState().value
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalAlignment = Alignment.Start
+    ){
+
+        Text(
+            text = "${nickname}님의 다른 글은 어때요?",
+            style = TextStyle(color = GrayWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        )
+
+        Spacer(modifier.size(10.dp))
+
+        HorizontalDivider()
+
+        LazyHorizontalGrid(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(500.dp),
+            rows = GridCells.Fixed(3)
+        ) {
+            items(item.size){
+                RecommendedAuthorPostItem(
+                    item = item[it],
+                    navController = navController
+                )
+            }
+        }
+
+
+
+
+    }
+
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -746,7 +938,7 @@ fun StimulusDetailScreenPreview(
 
                 item { PostContentPreview(height = height) }
 
-                item { WriterAnotherPostPreview() }
+                //item { WriterAnotherPost() }
 
             }
         }
@@ -999,33 +1191,6 @@ fun PostContentPreview(
 }
 
 
-@Preview
-@Composable
-fun WriterAnotherPostPreview(
-    modifier: Modifier = Modifier,
-    nickname: String = "작성자"
-){
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalAlignment = Alignment.Start
-    ){
-
-        Text(
-            text = "${nickname}님의 다른 글도 읽어보세요.",
-            style = TextStyle(color = GrayWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        )
-
-        Spacer(modifier.size(10.dp))
-
-        HorizontalDivider()
-
-
-    }
-
-}
-
 @Preview(showBackground = true)
 @Composable
 fun OwnerOptionPreview(
@@ -1053,7 +1218,7 @@ fun OwnerOptionPreview(
                     Text(
                         text = "수정하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -1078,7 +1243,7 @@ fun OwnerOptionPreview(
                     Text(
                         text = "삭제하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )

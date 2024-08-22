@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,20 +24,20 @@ fun GodLifeTimeInput(
         modifier = Modifier.padding(top = 10.dp),
         colors = TimePickerDefaults.colors(
             timeSelectorSelectedContainerColor = Color.White,
-            timeSelectorSelectedContentColor = PurpleMain,
+            timeSelectorSelectedContentColor = OrangeMain,
             timeSelectorUnselectedContainerColor = Color.White,
             timeSelectorUnselectedContentColor = GrayWhite,
 
-            periodSelectorBorderColor = PurpleMain,
-            periodSelectorSelectedContainerColor = PurpleMain,
+            periodSelectorBorderColor = OrangeMain,
+            periodSelectorSelectedContainerColor = OrangeMain,
             periodSelectorSelectedContentColor = Color.White,
             periodSelectorUnselectedContainerColor = Color.White,
             periodSelectorUnselectedContentColor = GrayWhite,
 
-            containerColor = PurpleMain,
-            selectorColor = PurpleMain,
-            clockDialColor = PurpleMain,
-            clockDialSelectedContentColor = PurpleMain,
+            containerColor = OrangeMain,
+            selectorColor = OrangeMain,
+            clockDialColor = OrangeMain,
+            clockDialSelectedContentColor = OrangeMain,
             clockDialUnselectedContentColor = Color.White,
 
             )
@@ -60,20 +60,20 @@ fun CustomTimeInputPreview(){
         modifier = Modifier.padding(top = 10.dp),
         colors = TimePickerDefaults.colors(
             timeSelectorSelectedContainerColor = Color.White,
-            timeSelectorSelectedContentColor = PurpleMain,
+            timeSelectorSelectedContentColor = OrangeMain,
             timeSelectorUnselectedContainerColor = Color.White,
             timeSelectorUnselectedContentColor = GrayWhite,
 
-            periodSelectorBorderColor = PurpleMain,
-            periodSelectorSelectedContainerColor = PurpleMain,
+            periodSelectorBorderColor = OrangeMain,
+            periodSelectorSelectedContainerColor = OrangeMain,
             periodSelectorSelectedContentColor = Color.White,
             periodSelectorUnselectedContainerColor = Color.White,
             periodSelectorUnselectedContentColor = GrayWhite,
 
-            containerColor = PurpleMain,
-            selectorColor = PurpleMain,
-            clockDialColor = PurpleMain,
-            clockDialSelectedContentColor = PurpleMain,
+            containerColor = OrangeMain,
+            selectorColor = OrangeMain,
+            clockDialColor = OrangeMain,
+            clockDialSelectedContentColor = OrangeMain,
             clockDialUnselectedContentColor = Color.White,
 
 

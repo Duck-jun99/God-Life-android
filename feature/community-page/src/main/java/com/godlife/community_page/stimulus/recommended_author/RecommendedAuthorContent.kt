@@ -31,12 +31,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.stimulus.RecommendUserItem
 import com.godlife.community_page.stimulus.StimulusPostItem
+import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorStimulusPostContent
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.RecommendPostBody
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -44,6 +46,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun RecommendedAuthorInfoContent(
     modifier: Modifier = Modifier,
+    navController: NavController,
     viewModel: RecommendedAuthorViewModel = hiltViewModel()
 ){
 
@@ -77,7 +80,7 @@ fun RecommendedAuthorInfoContent(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -99,6 +102,25 @@ fun RecommendedAuthorInfoContent(
         }
 
     }
+
+    //Spacer(modifier.height(10.dp))
+
+    Text(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(top = 10.dp, start = 20.dp),
+        text = "${user.value?.nickname}님의 게시물",
+        style = TextStyle(
+            color = Color.Black,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+    )
+
+    RecommendedAuthorStimulusPostContent(
+        navController = navController
+    )
 
 }
 
@@ -161,7 +183,7 @@ fun RecommendUserProfile(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }

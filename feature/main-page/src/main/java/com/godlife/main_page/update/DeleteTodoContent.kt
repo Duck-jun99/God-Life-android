@@ -11,7 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.MainPageViewModel
 
 @Composable
@@ -29,7 +29,7 @@ fun DeleteTodoContent(
             viewModel.setCleared()
                            },
         title = {
-            Text(text = "오늘 투두 삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "오늘 투두 삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             Text(text = "오늘의 투두를 삭제할까요?", style = TextStyle(color = GrayWhite, fontSize = 16.sp, fontWeight = FontWeight.Normal))
@@ -41,7 +41,7 @@ fun DeleteTodoContent(
                               todoId, mainPageViewModel, onUpdateComplete
                           )
                 },
-                text = { Text(text = "삭제", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+                text = { Text(text = "삭제", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
         },
 
         dismissButton = {

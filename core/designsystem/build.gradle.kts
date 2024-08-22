@@ -12,6 +12,7 @@ dependencies {
 
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.google.ads)
     implementation(project(":core:model"))
     implementation(project(":core:network"))
 }

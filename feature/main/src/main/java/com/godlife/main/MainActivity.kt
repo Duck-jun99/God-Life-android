@@ -1,14 +1,23 @@
 package com.godlife.main
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
@@ -28,14 +37,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -61,13 +78,15 @@ import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.history.HistoryDetailScreen
 import com.godlife.main_page.history.HistoryPageScreen
 import com.godlife.main_page.navigation.HistoryDetailRoute
 import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.navigation.MainPageRoute
+import com.godlife.main_page.navigation.NotificationListRoute
+import com.godlife.main_page.notification.NotificationListScreen
 import com.godlife.model.navigationbar.BottomNavItem
 import com.godlife.navigator.CreatePostNavigator
 import com.godlife.navigator.CreatetodolistNavigator
@@ -80,6 +99,7 @@ import com.godlife.service.MyFirebaseMessagingService
 import com.godlife.setting_page.SettingPageScreen
 import com.godlife.setting_page.navigation.SettingPageRoute
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -138,10 +158,77 @@ class MainActivity : ComponentActivity() {
          */
 
         setContent {
-            MainUiTheme(this, createNavigator, loginNavigator, createPostNavigator)
+            MainUiTheme(
+                this,
+                createNavigator,
+                loginNavigator,
+                createPostNavigator,
+                intent
+            )
+        }
+
+    }
+
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        setContent {
+            MainUiTheme(
+                this,
+                createNavigator,
+                loginNavigator,
+                createPostNavigator,
+                intent
+            )
         }
     }
 }
+
+private fun handleNotificationIntent(
+    intent: Intent?,
+    navController: NavController
+) {
+    intent?.let {
+
+        if (it.getStringExtra("navigation") == "normal"
+            || it.getStringExtra("navigation") == "comment") {
+            val postId = it.getStringExtra("postId")
+            if (postId != null) {
+                //navController.navigate("${PostDetailRoute.route}/$postId")
+                // 기존 백 스택을 클리어하고 메인 화면을 시작점으로 설정
+                navController.navigate(MainPageRoute.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+
+                // 그 다음 PostDetail 화면으로 이동
+                navController.navigate("${PostDetailRoute.route}/$postId")
+            }
+        }
+        else if (it.getStringExtra("navigation") == "stimulus") {
+            val postId = it.getStringExtra("postId")
+            if (postId != null) {
+                //navController.navigate("${PostDetailRoute.route}/$postId")
+                // 기존 백 스택을 클리어하고 메인 화면을 시작점으로 설정
+                navController.navigate(MainPageRoute.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+
+                // 그 다음 PostDetail 화면으로 이동
+                navController.navigate("${StimulusPostDetailRoute.route}/$postId")
+            }
+        }
+    }
+}
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -149,7 +236,8 @@ fun MainUiTheme(
     mainActivity: MainActivity,
     createNavigator: CreatetodolistNavigator,
     loginNavigator: LoginNavigator,
-    createPostNavigator: CreatePostNavigator
+    createPostNavigator: CreatePostNavigator,
+    intent: Intent?
 ){
     GodLifeTheme {
 
@@ -158,7 +246,7 @@ fun MainUiTheme(
 
 
         val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
-        val communityTab = BottomNavItem(title = "Good Life", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+        val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
         val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
 
@@ -170,7 +258,6 @@ fun MainUiTheme(
         val currentRoute = remember { mutableStateOf(MainPageRoute.route)}
 
         val bottomBarVisibleState = remember { mutableStateOf(true) }
-
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -236,6 +323,15 @@ fun MainUiTheme(
                             bottomBarVisibleState.value = false
                         }
 
+                    }
+
+                    //알림 리스트 화면
+                    composable(NotificationListRoute.route){
+                        NotificationListScreen(
+                            navController = navController
+                        )
+                        currentRoute.value = NotificationListRoute.route
+                        bottomBarVisibleState.value = false
                     }
 
                     //프로필 화면
@@ -329,6 +425,14 @@ fun MainUiTheme(
 
 
                 }
+
+                LaunchedEffect(Unit) {
+                    handleNotificationIntent(
+                        intent = intent,
+                        navController = navController
+                    )
+                }
+
             }
         }
     }
@@ -347,7 +451,19 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
         modifier = Modifier.shadow(7.dp)
     ) {
         bottomNavItems.forEach { bottomNavItem ->
+
             NavigationBarItem(
+                modifier = Modifier.drawWithContent {
+                    drawContent()
+                    if (currentRoute == bottomNavItem.route) {
+                        drawLine(
+                            color = OrangeMain,
+                            start = Offset(0f, 0f),
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 5.dp.toPx()
+                        )
+                    }
+                },
                 selected = currentRoute == bottomNavItem.route,
                 onClick = {
                     navController.navigate(bottomNavItem.route){
@@ -362,17 +478,17 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                         selectedIcon = bottomNavItem.selectedIcon,
                         unselectedIcon = bottomNavItem.unselectedIcon,
                         title = bottomNavItem.title,
-                        badgeAmount = bottomNavItem.badgeAmount
+                        //badgeAmount = bottomNavItem.badgeAmount
                     )
                 },
                 label = {
                     if(currentRoute == bottomNavItem.route){
-                        Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold)) }
+                        Text(bottomNavItem.title, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold)) }
                     else null
                         },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PurpleMain,
-                    selectedTextColor = PurpleMain,
+                    selectedIconColor = OrangeMain,
+                    selectedTextColor = OrangeMain,
                     unselectedIconColor = GrayWhite,
                     unselectedTextColor = GrayWhite,
                     disabledIconColor = GrayWhite3,
@@ -383,4 +499,89 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
     }
 }
 
+@Preview
+@Composable
+fun MyBottomNavigationPreview() {
+    val mainTab = BottomNavItem(title = "Main", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home, route = MainPageRoute.route)
+    val communityTab = BottomNavItem(title = "Community", selectedIcon = Icons.AutoMirrored.Filled.List, unselectedIcon = Icons.AutoMirrored.Outlined.List, route = CommunityPageRoute.route)
+    val settingTab = BottomNavItem(title = "Setting", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings, route = SettingPageRoute.route)
 
+    val bottomNavItems = listOf(mainTab, communityTab, settingTab)
+
+    var currentRoute by remember { mutableStateOf("Main") }
+    var indicatorOffset by remember { mutableStateOf(0f) }
+
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+    val cScope = rememberCoroutineScope()
+
+    // 그라데이션 컬러 리스트
+    val gradientColors = listOf(
+        Color(0xFFFF44A2),
+        Color(0xFFFF5890),
+        Color(0xFFFA6B80),
+        Color(0xFFFF7B75),
+        Color(0xFFFF8161),
+        Color(0xFFFF884D)
+    )
+
+
+    NavigationBar(
+        containerColor = Color.White,
+        contentColor = contentColorFor(backgroundColor = Color.White),
+        modifier = Modifier.shadow(7.dp)
+    ) {
+        val itemWidth = configuration.screenWidthDp / bottomNavItems.size
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // 애니메이션이 적용된 인디케이터
+            Box(
+                Modifier
+                    .offset(x = with(density) { indicatorOffset.toDp() })
+                    .width(itemWidth.dp)
+                    .height(3.dp)
+                    .background(OrangeMain)
+            )
+
+            Row {
+                bottomNavItems.forEachIndexed { index, bottomNavItem ->
+                    NavigationBarItem(
+                        selected = currentRoute == bottomNavItem.route,
+                        onClick = {
+                            currentRoute = bottomNavItem.route
+                            // 애니메이션 적용
+                            cScope.launch {
+                                animate(
+                                    initialValue = indicatorOffset,
+                                    targetValue = index.toFloat() * (itemWidth.toFloat())
+                                ) { value, _ ->
+                                    indicatorOffset = value
+                                }
+                            }
+                        },
+                        icon = {
+                            TabIconView(
+                                isSelected = currentRoute == bottomNavItem.route,
+                                selectedIcon = bottomNavItem.selectedIcon,
+                                unselectedIcon = bottomNavItem.unselectedIcon,
+                                title = bottomNavItem.title,
+                            )
+                        },
+                        label = {
+                            if(currentRoute == bottomNavItem.route){
+                                Text(bottomNavItem.title, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold))
+                            }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.Unspecified,
+                            selectedTextColor = OrangeMain,
+                            unselectedIconColor = GrayWhite,
+                            unselectedTextColor = GrayWhite,
+                            indicatorColor = Color.Transparent // 기본 인디케이터를 숨김.
+                        ),
+                    )
+                }
+            }
+        }
+    }
+}

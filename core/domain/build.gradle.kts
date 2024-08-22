@@ -8,6 +8,6 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.model)
-
+    implementation(libs.google.ads)
     implementation(libs.androidx.junit.ktx)
 }

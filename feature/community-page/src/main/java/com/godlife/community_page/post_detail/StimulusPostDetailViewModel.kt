@@ -13,7 +13,9 @@ import com.godlife.domain.GetUserProfileUseCase
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.PlusGodScoreUseCase
 import com.godlife.domain.ReissueUseCase
+import com.godlife.domain.SearchPostUseCase
 import com.godlife.network.model.StimulusPost
+import com.godlife.network.model.StimulusPostList
 import com.godlife.network.model.UserProfileBody
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -42,9 +44,11 @@ enum class UiType{
 class StimulusPostDetailViewModel @Inject constructor(
     private val getPostDetailUseCase: GetPostDetailUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val deleteStimulusPostUseCase: DeleteStimulusPostUseCase
+    private val deleteStimulusPostUseCase: DeleteStimulusPostUseCase,
+    private val plusGodScoreUseCase: PlusGodScoreUseCase,
+    private val getSearchPostUseCase: SearchPostUseCase,
 
-): ViewModel() {
+    ): ViewModel() {
 
     /**
      * State 관련
@@ -70,6 +74,10 @@ class StimulusPostDetailViewModel @Inject constructor(
     private val _writerInfo = MutableStateFlow<UserProfileBody?>(null)
     val writerInfo: StateFlow<UserProfileBody?> = _writerInfo
 
+    //작성자 게시물
+    private val _writerAnotherPost = MutableStateFlow<List<StimulusPostList>>(emptyList())
+    val writerAnotherPost: StateFlow<List<StimulusPostList>> = _writerAnotherPost
+
     //삭제 Dialog 보여줄 플래그
     val isDialogVisble = MutableStateFlow(false)
 
@@ -78,6 +86,9 @@ class StimulusPostDetailViewModel @Inject constructor(
 
     //작성자 정보 받아왔는지 플래그
     private val isGetWriterInfo = MutableStateFlow(false)
+
+    //작성자 게시물 받아왔는지 플래그
+    private val isGetSearchPost = MutableStateFlow(false)
 
     //삭제 완료 플래그
     private val isDeleted = MutableStateFlow(false)
@@ -146,7 +157,8 @@ class StimulusPostDetailViewModel @Inject constructor(
                 result
                     .onSuccess {
                         _writerInfo.value = data.body
-                        _uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
+                        getWriterAnotherPost()
+                        //_uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
                     }
                     .onError {
                         _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
@@ -159,7 +171,71 @@ class StimulusPostDetailViewModel @Inject constructor(
 
     }
 
-    //삭제 버튼 Dialog flag 변경 함수
+    private fun getWriterAnotherPost(){
+        if(!isGetSearchPost.value){
+            isGetSearchPost.value = true
+
+            viewModelScope.launch {
+                getSearchPostUseCase.executeSearchStimulusPost(
+                    title = "",
+                    nickname = writerInfo.value!!.nickname,
+                    introduction = ""
+                )
+                    .onSuccess {
+                        _writerAnotherPost.value = data.body
+                        _uiState.value = StimulusPostDetailUiState.Success(UiType.LOAD_POST)
+                    }
+                    .onError {
+                        _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
+                    }
+                    .onException {
+                        _uiState.value = StimulusPostDetailUiState.Error(this.message())
+                    }
+            }
+        }
+    }
+
+    //굿생 인정 버튼 클릭
+    fun agreeGodLife(){
+
+        val postId = postId.value.toInt()
+
+        viewModelScope.launch {
+
+            val result = plusGodScoreUseCase.executePlusGodScore(postId)
+
+            result
+                .onSuccess {
+                    //굿생 인정이 성공했다는 메시지를 받으면 게시물 정보 다시 불러오기
+                    isGetPostDetail.value = false
+                    getPostDetail()
+                }
+                .onError {
+                    Log.e("onError", this.message())
+
+                    // UI State Error로 변경
+
+                    if(this.response.code() == 400){
+                        _uiState.value = StimulusPostDetailUiState.Error("재로그인이 필요합니다.")
+                    }
+                    else if(this.response.code() == 409){
+                        _uiState.value = StimulusPostDetailUiState.Error("이미 굿생인정한 게시물입니다.")
+                    }
+                    _uiState.value = StimulusPostDetailUiState.Error("${this.response.code()} Error")
+                }
+                .onException {
+
+                    Log.e("onException", "${this.message}")
+
+                    // UI State Error로 변경
+                    _uiState.value = StimulusPostDetailUiState.Error(this.message())
+                }
+
+        }
+
+    }
+
+    //삭제 버튼 Dialog flag 변경 함수 (작성자인 경우)
     fun setDialogVisble(){
         isDialogVisble.value = !isDialogVisble.value
     }
