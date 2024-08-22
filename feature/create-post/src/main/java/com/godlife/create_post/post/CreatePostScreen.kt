@@ -306,7 +306,19 @@ fun CreatePostScreen(
                             Spacer(modifier = Modifier.size(20.dp))
 
                             AddButton(
-                                onClick = { launcher.launch("image/*") }
+                                onClick = {
+                                    if(selectedImgList!!.size < 5){
+                                        launcher.launch("image/*")
+                                    }
+                                    else{
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "이미지는 최대 5장까지 올릴 수 있어요.",
+                                                Toast.LENGTH_SHORT).show()
+                                    }
+
+                                }
                             )
                         }
                     }
