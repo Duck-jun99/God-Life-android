@@ -239,7 +239,7 @@ fun TagItemView(
             contentAlignment = Alignment.Center
         ) {
             Text(text = "#${tagItem}",
-                style = TextStyle(color = Color.Black),
+                style = TextStyle(color = GrayWhite),
                 textAlign = TextAlign.Center,
             )
         }
@@ -438,7 +438,7 @@ fun TagItemPreview(
             contentAlignment = Alignment.Center
         ) {
             Text(text = "#${text}",
-                style = TextStyle(color = Color.Black),
+                style = TextStyle(color = GrayWhite),
                 textAlign = TextAlign.Center,
             )
         }
