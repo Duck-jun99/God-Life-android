@@ -30,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -75,11 +76,13 @@ fun AdMobListViewWhite(
     modifier: Modifier = Modifier,
     ad: NativeAd,
     view: View,
-    adView: NativeAdView
+    adView: NativeAdView,
+    outerHorizontalPadding: Dp = 10.dp,
+    outerVerticalPadding: Dp = 5.dp,
 ){
     Column(
         modifier
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .padding(horizontal = outerHorizontalPadding, vertical = outerVerticalPadding)
             .fillMaxWidth()
             .heightIn(max = 500.dp)
             .background(Color.White, shape = RoundedCornerShape(15.dp))

@@ -231,23 +231,6 @@ fun MainPageScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ){
 
-                            //Text(text = "${userInfo.nickname}님 환영해요!", style = GodLifeTypography.titleMedium)
-
-                            /*
-                            Text(text = "Good Life",
-                                style = TextStyle(
-                                    color = Color.Black,
-                                    fontFamily = FontFamily.Default,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 22.sp,
-                                    lineHeight = 28.sp,
-                                    letterSpacing = 0.sp
-                                )
-                            )
-
-                             */
-
-
                             Image(
                                 modifier = modifier
                                     .size(height = 70.dp, width = 100.dp),
@@ -469,7 +452,9 @@ fun MainPageScreen(
                                     AdMobListViewWhite(
                                         adView = adView,
                                         ad = ad,
-                                        view = view
+                                        view = view,
+                                        outerHorizontalPadding = 0.dp,
+                                        outerVerticalPadding = 10.dp
                                     )
                                 }
                             }
@@ -691,7 +676,7 @@ fun MainTodoListBox(
                     Column {
 
                         DropdownMenuItem(
-                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = OrangeMain)) },
+                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = GrayWhite)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "EDIT_TODOLIST")
@@ -703,7 +688,13 @@ fun MainTodoListBox(
                         )
 
                         DropdownMenuItem(
-                            text = { Text(text = "알림 시간 수정", style = TextStyle(color = OrangeMain)) },
+                            text = {
+                                Text(
+                                    text = "알림 시간 수정",
+                                    style = TextStyle(
+                                        color = GrayWhite)
+                                )
+                                   },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "EDIT_NOTIFICATION_TIME")
@@ -715,7 +706,7 @@ fun MainTodoListBox(
                         )
 
                         DropdownMenuItem(
-                            text = { Text(text = "삭제하기", style = TextStyle(color = OrangeMain)) },
+                            text = { Text(text = "삭제하기", style = TextStyle(color = GrayWhite)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "DELETE")
