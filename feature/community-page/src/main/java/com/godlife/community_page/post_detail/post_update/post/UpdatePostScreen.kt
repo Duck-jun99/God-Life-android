@@ -68,6 +68,7 @@ import com.godlife.create_post.post.TagItemPreview
 import com.godlife.create_post.post.convertResizeImage
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextFieldGray
+import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
@@ -263,11 +264,9 @@ fun UpdatePostScreen(
 
                     item{
                         FlowRow {
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
-                            TagItemPreview()
+                            viewModel.tags.collectAsState().value.forEach {
+                                TagItemView(it)
+                            }
                         }
                     }
 
@@ -330,7 +329,7 @@ fun UpdatePostScreen(
                                             reorderableState = state,
                                             key = item.hashCode()
                                         ) { isDragging ->
-                                            val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                                            //val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                                             SelectImage(
                                                 index = imgList.indexOf(item),
                                                 imageUri = item,

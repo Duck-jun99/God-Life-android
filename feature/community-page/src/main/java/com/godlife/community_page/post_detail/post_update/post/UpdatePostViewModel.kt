@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -62,13 +63,16 @@ class UpdatePostViewModel @Inject constructor(
     private val _text = mutableStateOf("")
     val text: State<String> = _text
 
-    val tags = mutableListOf("tag1","tag2","tag3")
+    private val _tags = MutableStateFlow<List<String>>(emptyList())
+    val tags: StateFlow<List<String>> = _tags
 
     fun init(postDetail: PostDetailBody, context: Context) {
         if (!_isInit.value) {
             _oldPost.value = postDetail
             _title.value = postDetail.title
             _text.value = postDetail.body
+            _tags.value = postDetail.tags
+
 
             viewModelScope.launch {
 
@@ -112,7 +116,7 @@ class UpdatePostViewModel @Inject constructor(
                     postId = oldPost.value!!.board_id.toString(),
                     title = title.value,
                     content = text.value,
-                    tags = tags,
+                    tags = tags.value,
                     categoryType = null,
                     imagePath = selectedImgUri.value
                 )

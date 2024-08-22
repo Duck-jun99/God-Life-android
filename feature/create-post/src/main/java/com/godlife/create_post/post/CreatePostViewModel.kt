@@ -161,6 +161,12 @@ class CreatePostViewModel @Inject constructor(
 
     }
 
+    fun onMove(from: Int, to: Int) {
+        _selectedImgUri.value = _selectedImgUri.value.toMutableList().apply {
+            add(to, removeAt(from))
+        }
+    }
+
     private fun updateTodoCompleted(){
         viewModelScope.launch(Dispatchers.IO) {
             launch {

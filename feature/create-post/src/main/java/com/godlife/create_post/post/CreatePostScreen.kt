@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -94,6 +96,10 @@ import com.godlife.model.community.TagItem
 import com.godlife.navigator.MainNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -315,6 +321,46 @@ fun CreatePostScreen(
                     }
 
                     item{
+                        val state = rememberReorderableLazyListState(onMove = { from, to ->
+                            viewModel.onMove(from.index, to.index)
+                        })
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .detectReorderAfterLongPress(state)
+                        ) {
+
+                            LazyRow(
+                                state = state.listState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .reorderable(state)
+                            ) {
+                                selectedImgList?.let { imgList ->
+                                    items(
+                                        items = imgList,
+                                        key = { it.hashCode() } // URI나 복잡한 객체의 경우 고유한 식별자를 사용
+                                    ) { item ->
+                                        ReorderableItem(
+                                            reorderableState = state,
+                                            key = item.hashCode()
+                                        ) { isDragging ->
+                                            //val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                                            SelectImage(
+                                                index = imgList.indexOf(item),
+                                                imageUri = item,
+                                                context = LocalContext.current,
+                                                viewModel = viewModel,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        /*
+
                         LazyRow {
                             selectedImgList?.let {
                                 itemsIndexed(it){ index, item ->
@@ -324,6 +370,8 @@ fun CreatePostScreen(
                             }
 
                         }
+
+                         */
                     }
 
                     item{ Spacer(modifier.padding(10.dp)) }
