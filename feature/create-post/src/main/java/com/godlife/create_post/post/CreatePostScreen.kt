@@ -75,6 +75,8 @@ import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.godlife.designsystem.component.GodLifeButton
+import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.list.TagItemView
@@ -331,6 +333,47 @@ fun CreatePostScreen(
                             .fillMaxWidth()
                             .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically){
+
+                        GodLifeButtonWhite(
+                            modifier = modifier
+                                .weight(0.5f)
+                                .padding(horizontal = 10.dp),
+                            onClick = {
+                                navController.navigate("CreatePostPreviewScreen") {
+                                    launchSingleTop = true
+                                }
+                                      },
+                            text = {
+                                Text(
+                                    text = "미리 보기",
+                                    color = OrangeMain,
+                                    style = TextStyle(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        )
+
+                        GodLifeButton(
+                            modifier = modifier
+                                .weight(0.5f)
+                                .padding(horizontal = 10.dp),
+                            onClick = {
+                                if (title == "" || text == "") Toast
+                                    .makeText(
+                                        context,
+                                        "제목과 내용을 모두 입력해주세요.",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                                else isDialogVisble = !isDialogVisble
+                                      },
+                            text = {
+                                Text(
+                                    text = "작성 완료",
+                                    style = TextStyle(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        )
+                        /*
                         Box(
                             Modifier
                                 .weight(0.5f)
@@ -394,6 +437,8 @@ fun CreatePostScreen(
                                 )
                             }
                         }
+
+                         */
                     } }
 
                 }
@@ -876,6 +921,33 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                         .fillMaxWidth()
                         .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically){
+                    GodLifeButtonWhite(
+                        modifier = modifier
+                            .weight(0.5f)
+                            .padding(horizontal = 10.dp),
+                        onClick = { /*TODO*/ },
+                        text = {
+                            Text(
+                                text = "미리 보기",
+                                color = OrangeMain,
+                                style = TextStyle(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    )
+
+                    GodLifeButton(
+                        modifier = modifier
+                            .weight(0.5f)
+                            .padding(horizontal = 10.dp),
+                        onClick = { /*TODO*/ },
+                        text = {
+                            Text(
+                                text = "작성 완료",
+                                style = TextStyle(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    )
+                    /*
                     Box(
                         Modifier
                             .weight(0.5f)
@@ -924,6 +996,8 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                             )
                         }
                     }
+
+                     */
                 } }
             }
         }
