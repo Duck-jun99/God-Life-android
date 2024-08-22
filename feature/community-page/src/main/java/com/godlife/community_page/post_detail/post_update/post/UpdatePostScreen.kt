@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -71,6 +72,7 @@ import com.godlife.community_page.post_detail.PostDetailViewModel
 import com.godlife.create_post.post.AddButton
 import com.godlife.create_post.post.TagItemPreview
 import com.godlife.create_post.post.convertResizeImage
+import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextFieldGray
 import com.godlife.designsystem.list.TagItemView
@@ -366,40 +368,32 @@ fun UpdatePostScreen(
                         Modifier
                             .fillMaxWidth()
                             .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically){
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ){
 
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterVertically)){
-
-                            Card(
-                                modifier = Modifier
-                                    .padding(12.dp)
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (title == "" || text == "") Toast
-                                            .makeText(
-                                                context,
-                                                "제목과 내용을 모두 입력해주세요.",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
-                                        else isDialogVisble = !isDialogVisble
-                                    },
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = CardDefaults.cardElevation(7.dp),
-                                colors = CardDefaults.cardColors(OrangeMain)
-                            ) {
+                        GodLifeButton(
+                            modifier = modifier
+                                .padding(horizontal = 10.dp),
+                            onClick = {
+                                if (title == "" || text == "") Toast
+                                    .makeText(
+                                        context,
+                                        "제목과 내용을 모두 입력해주세요.",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                                else isDialogVisble = !isDialogVisble
+                                      },
+                            text = {
                                 Text(
                                     text = "작성 완료",
-                                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                                    modifier = Modifier
-                                        .padding(20.dp)
-                                        .align(Alignment.CenterHorizontally)
+                                    style = TextStyle(fontWeight = FontWeight.Bold)
                                 )
                             }
-                        }
+                        )
+
+
                     } }
 
                 }
