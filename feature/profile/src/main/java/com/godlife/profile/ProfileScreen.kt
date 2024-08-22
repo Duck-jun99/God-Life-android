@@ -175,6 +175,7 @@ fun ProfileBox(
         Column(
             modifier = modifier.fillMaxSize()
         ) {
+
             Box(
                 modifier = modifier
                     .fillMaxWidth()
@@ -184,12 +185,15 @@ fun ProfileBox(
                 contentAlignment = Alignment.TopEnd
             ){
 
+                /*
                 //본인의 프로필이 아니면 아래 아이콘, 본인의 프로필이면 설정 아이콘
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "Menu",
                     tint = Color.White
                 )
+
+                 */
             }
 
             Column(

@@ -37,6 +37,8 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -61,6 +63,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -239,8 +242,17 @@ fun ProfileEditBox(
 
     val showIntroduceChangeViewState by viewModel.showIntroduceChangeViewState.collectAsState()
 
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
-    Log.e("ProfileEditBox", "${bottomSheetScaffoldState.bottomSheetState.currentValue}")
+    //val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = SheetState(
+            initialValue = SheetValue.Expanded,
+            skipPartiallyExpanded = false,
+            density  = Density(LocalContext.current)
+        )
+    )
+
+    //Log.e("ProfileEditBox", "${bottomSheetScaffoldState.bottomSheetState.currentValue}")
 
     Box(
         modifier = modifier
@@ -465,7 +477,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "프로필 사진 변경하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "프로필 사진 변경", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -482,7 +494,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "배경 사진 변경하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "배경 사진 변경", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -500,7 +512,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "소개글 수정하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "소개글 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
         Spacer(modifier.size(20.dp))
@@ -515,7 +527,7 @@ fun EditOptionBox(
                 },
             contentAlignment = Alignment.CenterStart
         ){
-            Text(text = "초기화하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "수정 내용 초기화", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         }
 
     }
