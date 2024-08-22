@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Create
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -74,7 +73,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OpaqueLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import kotlinx.coroutines.delay
 
 
@@ -292,7 +291,7 @@ fun GodLifeCreateCommentBar(
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .background(color = PurpleMain)
+                .background(color = OrangeMain)
                 .clickable {
                     if (comment.isNotBlank()) onPostClicked() else Toast
                         .makeText(context, "댓글을 입력해주세요.", Toast.LENGTH_SHORT)
@@ -567,7 +566,7 @@ fun GodLifeCreateCommentBarPreview(
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .background(color = PurpleMain)
+                .background(color = OrangeMain)
                 .clickable { onPostClicked() },
             contentAlignment = Alignment.Center
         ) {
@@ -597,7 +596,7 @@ fun TextFiledPreview(){
             ) {
             var text = "Hi"
 
-            Box(modifier = Modifier.background(PurpleMain)){
+            Box(modifier = Modifier.background(OrangeMain)){
 
                 GodLifeTextField(text = text, onTextChanged = { it -> text })
             }

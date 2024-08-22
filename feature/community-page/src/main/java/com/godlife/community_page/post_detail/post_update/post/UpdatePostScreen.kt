@@ -73,7 +73,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.model.community.TagItem
@@ -383,7 +383,7 @@ fun UpdatePostScreen(
                                     },
                                 shape = RoundedCornerShape(8.dp),
                                 elevation = CardDefaults.cardElevation(7.dp),
-                                colors = CardDefaults.cardColors(PurpleMain)
+                                colors = CardDefaults.cardColors(OrangeMain)
                             ) {
                                 Text(
                                     text = "작성 완료",
@@ -406,7 +406,7 @@ fun UpdatePostScreen(
                     containerColor = Color.White,
                     onDismissRequest = { isDialogVisble = !isDialogVisble },
                     title = {
-                        Text(text = "게시물을 수정할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "게시물을 수정할까요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "수정이 완료되었으면 '게시하기' 버튼을 눌러주세요."
@@ -421,13 +421,13 @@ fun UpdatePostScreen(
                                 isDialogVisble = !isDialogVisble
 
                             },
-                            text = { Text(text = "게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "게시하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { isDialogVisble = !isDialogVisble },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -479,7 +479,7 @@ fun TagItem(tagItem: TagItem, modifier: Modifier = Modifier){
         Box(
             modifier
                 .size(70.dp, 30.dp)
-                .background(color = PurpleMain, shape = RoundedCornerShape(7.dp))
+                .background(color = OrangeMain, shape = RoundedCornerShape(7.dp))
                 .padding(2.dp)
             ,
             contentAlignment = Alignment.Center

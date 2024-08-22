@@ -21,7 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.login.fake.TestUserLoginScreen
 import com.godlife.login.fake.TestUserSignUpScreen
 import com.godlife.navigator.MainNavigator
@@ -72,7 +72,7 @@ fun LoginUi(context: Context,
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleMain)
+            .background(OrangeMain)
             .statusBarsPadding()
     ) {
         NavHost(navController = navController, startDestination = LoginScreenRoute.route,

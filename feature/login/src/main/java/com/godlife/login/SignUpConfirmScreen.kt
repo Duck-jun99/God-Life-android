@@ -1,9 +1,7 @@
 package com.godlife.login
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,10 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 
 @Composable
 fun SignUpConfirmScreen(
@@ -35,7 +32,7 @@ fun SignUpConfirmScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -134,7 +131,7 @@ fun SignUpConfirmScreen(
                         .fillMaxWidth(0.5f),
 
                     text = { Text(text = "굿생 시작",
-                        color = PurpleMain,
+                        color = OrangeMain,
                         style = TextStyle(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
@@ -153,7 +150,7 @@ fun SignUpConfirmScreenPreview(){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -250,7 +247,7 @@ fun SignUpConfirmScreenPreview(){
                         .align(Alignment.CenterHorizontally)
                         .fillMaxWidth(0.5f),
                     text = {Text(text = "굿생 시작",
-                        color = PurpleMain,
+                        color = OrangeMain,
                         style = TextStyle(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold

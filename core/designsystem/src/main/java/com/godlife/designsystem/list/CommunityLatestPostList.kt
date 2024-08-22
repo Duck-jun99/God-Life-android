@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.community.LatestPostItem
 
 @Composable
@@ -106,7 +106,7 @@ fun CommunityLatestPostList(modifier: Modifier = Modifier,
                 //게시물 대표 사진 보여질 곳
                 Box(
                     modifier
-                        .background(PurpleMain)
+                        .background(OrangeMain)
                         .weight(0.4f)
                         .fillMaxSize()
                 ){
@@ -187,7 +187,7 @@ fun CommunityLatestPostListPreview(modifier: Modifier = Modifier){
                 //게시물 대표 사진 보여질 곳
                 Box(
                     modifier
-                        .background(PurpleMain)
+                        .background(OrangeMain)
                         .weight(0.4f)
                         .height(350.dp)
                         .fillMaxWidth()){

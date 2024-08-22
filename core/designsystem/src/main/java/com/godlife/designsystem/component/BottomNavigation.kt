@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.navigationbar.BottomNavItem
 
 
@@ -127,8 +127,8 @@ fun BottomNavigationPreview() {
                 },
                 label = { Text(tabBarItem.title) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PurpleMain,
-                    selectedTextColor = PurpleMain,
+                    selectedIconColor = OrangeMain,
+                    selectedTextColor = OrangeMain,
                     unselectedIconColor = GrayWhite,
                     unselectedTextColor = GrayWhite,
                     disabledIconColor = GrayWhite3,

@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.login.SignUpViewModel
+import com.godlife.designsystem.theme.OrangeMain
 
 @Composable
 fun TestSignUpConfirmScreen(
@@ -32,7 +31,7 @@ fun TestSignUpConfirmScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -142,7 +141,7 @@ fun TestSignUpConfirmScreen(
                         .fillMaxWidth(0.5f),
 
                     text = { Text(text = "굿생 시작",
-                        color = PurpleMain,
+                        color = OrangeMain,
                         style = TextStyle(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold

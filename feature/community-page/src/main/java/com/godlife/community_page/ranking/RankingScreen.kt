@@ -42,17 +42,14 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.lerp
 import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.CommunityPageViewModel
@@ -64,14 +61,12 @@ import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.PostDetailBody
 import com.godlife.network.model.RankingBody
 import com.godlife.network.model.UserProfileBody
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
-import kotlin.math.absoluteValue
-import kotlin.math.max
 
 @Composable
 fun RankingScreen(
@@ -251,7 +246,7 @@ fun WeeklyRankingListItem(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -298,7 +293,7 @@ fun WeeklyRankingListItem(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -405,7 +400,7 @@ fun TotalRankingListItem1(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -483,7 +478,7 @@ fun TotalRankingListItem1(
                                 ){
 
                                     CircularProgressIndicator(
-                                        color = PurpleMain
+                                        color = OrangeMain
                                     )
 
                                 }
@@ -582,9 +577,9 @@ fun TotalRankingListItem2(
                 modifier = modifier,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = PurpleMain)
+                Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = OrangeMain)
                 Spacer(modifier.size(10.dp))
-                Text(text = "굿생 점수", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
+                Text(text = "굿생 점수", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
             Spacer(modifier.size(10.dp))
 
@@ -605,9 +600,9 @@ fun TotalRankingListItem2(
                 modifier = modifier,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = PurpleMain)
+                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = OrangeMain)
                 Spacer(modifier.size(10.dp))
-                Text(text = "굿생 인증", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
+                Text(text = "굿생 인증", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
             Spacer(modifier.size(10.dp))
 
@@ -654,7 +649,7 @@ fun RankingUserPostListItem(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -1009,9 +1004,9 @@ fun TotalRankingListItem2Preview(
                 modifier = modifier,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = PurpleMain)
+                Icon(imageVector = Icons.Outlined.ThumbUp, contentDescription = "", tint = OrangeMain)
                 Spacer(modifier.size(10.dp))
-                Text(text = "굿생 점수", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
+                Text(text = "굿생 점수", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
             Spacer(modifier.size(10.dp))
 
@@ -1032,9 +1027,9 @@ fun TotalRankingListItem2Preview(
                 modifier = modifier,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = PurpleMain)
+                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = OrangeMain)
                 Spacer(modifier.size(10.dp))
-                Text(text = "굿생 인증", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
+                Text(text = "굿생 인증", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
             Spacer(modifier.size(10.dp))
 

@@ -8,17 +8,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.OrangeLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 
 
 @Composable
@@ -34,7 +32,7 @@ fun GodLifeButton(
         modifier = modifier,
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            containerColor = PurpleMain,
+            containerColor = OrangeMain,
             contentColor = Color.White
         ),
         contentPadding = contentPadding,
@@ -83,7 +81,7 @@ fun GodLifeButtonWhiteWrap(
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White,
-            contentColor = PurpleMain
+            contentColor = OrangeMain
         ),
         contentPadding = contentPadding,
         content = content,
@@ -106,7 +104,7 @@ fun GodLifeButtonOrangeWrap(
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = OrangeLight,
-            contentColor = PurpleMain
+            contentColor = OrangeMain
         ),
         contentPadding = contentPadding,
         content = content,

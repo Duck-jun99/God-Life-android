@@ -13,10 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeTimeInput
-import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.todo.NotificationTimeData
 import java.time.LocalDateTime
 
@@ -58,40 +58,73 @@ fun CreateTodoListScreen2(
 
     Log.e("selectedList",selectedList.toString())
 
-    GodLifeTheme {
-
-
+    Column(
+        modifier = Modifier
+            .padding(5.dp)
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
         Column(
             modifier = Modifier
-                .padding(5.dp)
-                .fillMaxSize()
-                .background(Color.White)
+                .padding(20.dp)
+                .weight(0.9f)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .weight(0.8f)
-            ) {
 
-                Text(
-                    text = "알림을 설정하시면\n잊지 않게 알림을 보내드릴게요.",
-                    style = GodLifeTypography.titleMedium
+            Text(
+                text = "알림을 설정하시면\n잊지 않게 알림을 보내드릴게요.",
+                style = GodLifeTypography.titleMedium
+            )
+
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            Row(modifier = Modifier.padding(5.dp)){
+
+                Icon(
+                    imageVector = Icons.Outlined.Notifications,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    tint = GrayWhite
                 )
 
+                Text(text = "알림 설정",
+                    style = TextStyle(
+                        color = OrangeMain,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            }
 
-                Spacer(modifier = Modifier.height(100.dp))
+            Box(modifier = Modifier.fillMaxWidth()){
+                Switch(
+                    checked = notificationSwitchState,
+                    onCheckedChange = { createViewModel.updateNotificationSwitchState() },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = OrangeMain,
+                        uncheckedTrackColor = Color.LightGray
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            if(notificationSwitchState){
 
                 Row(modifier = Modifier.padding(5.dp)){
 
                     Icon(
                         imageVector = Icons.Outlined.Notifications,
                         contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterVertically)
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        tint = GrayWhite
                     )
 
-                    Text(text = "알림 설정",
+                    Text(text = "알림 시간",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         ),
@@ -100,66 +133,40 @@ fun CreateTodoListScreen2(
                 }
 
                 Box(modifier = Modifier.fillMaxWidth()){
-                    Switch(
-                        checked = notificationSwitchState, onCheckedChange = { createViewModel.updateNotificationSwitchState() }
-                    )
+                    NotificationTimeInput(modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.Center),
+                        createViewModel)
                 }
-
-                Spacer(modifier = Modifier.height(100.dp))
-
-                if(notificationSwitchState){
-
-                    Row(modifier = Modifier.padding(5.dp)){
-
-                        Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = null,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-
-                        Text(text = "알림 시간",
-                            style = TextStyle(
-                                color = PurpleMain,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            ),
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    }
-
-                    Box(modifier = Modifier.fillMaxWidth()){
-                        NotificationTimeInput(modifier = Modifier
-                            .padding(10.dp)
-                            .align(Alignment.Center),
-                            createViewModel)
-                    }
-
-                }
-
-
-
-                Spacer(modifier = Modifier.height(100.dp))
 
             }
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.2f)){
 
-                GodLifeButton(onClick = {
-                    navController.navigate(CreateTodoListScreen3Route.route)
-                },
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth(0.5f)
-                ) {
-                    Text(text = "완료",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.1f),
+            contentAlignment = Alignment.TopCenter
+        ){
+
+            GodLifeButton(onClick = {
+                navController.navigate(CreateTodoListScreen3Route.route)
+            },
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth(0.5f)
+            ) {
+                Text(text = "완료",
+                    color = Color.White,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                }
+                )
             }
         }
     }
@@ -198,101 +205,105 @@ fun NotificationTimeInput(
 @Preview(showBackground = true)
 @Composable
 fun CreateTodoListScreen2Preview(){
-    GodLifeTheme {
-
-
+    Column(
+        modifier = Modifier
+            .padding(5.dp)
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
         Column(
             modifier = Modifier
-                .padding(5.dp)
-                .fillMaxSize()
-                .background(Color.White)
+                .padding(20.dp)
+                .weight(0.8f)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .weight(0.8f)
-            ) {
 
-                Text(
-                    text = "알림을 설정하시면\n잊지 않게 알림을 보내드릴게요.",
-                    style = GodLifeTypography.titleMedium
+            Text(
+                text = "알림을 설정하시면\n잊지 않게 알림을 보내드릴게요.",
+                style = GodLifeTypography.titleMedium
+            )
+
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            Row(modifier = Modifier.padding(5.dp)){
+
+                Icon(
+                    imageVector = Icons.Outlined.Notifications,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    tint = GrayWhite
                 )
 
-
-                Spacer(modifier = Modifier.height(100.dp))
-
-                Row(modifier = Modifier.padding(5.dp)){
-
-                    Icon(
-                        imageVector = Icons.Outlined.Notifications,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-
-                    Text(
-                        text = "알림 설정",
-                        style = TextStyle(
-                            color = PurpleMain,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        ),
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-                }
-
-                val switchState = remember { mutableStateOf(false) }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ){
-                    Switch(
-                        checked = switchState.value, onCheckedChange = {switchState.value = !switchState.value}
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(100.dp))
-
-                Row(modifier = Modifier.padding(5.dp)){
-
-                    Icon(
-                        imageVector = Icons.Outlined.Notifications,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-
-                    Text(text = "알림 시간",
-                        style = TextStyle(
-                            color = PurpleMain,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        ),
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-                }
-
-                NotificationTimeInputPreview()
-
-                Spacer(modifier = Modifier.height(100.dp))
-
+                Text(
+                    text = "알림 설정",
+                    style = TextStyle(
+                        color = OrangeMain,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
             }
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.2f)){
 
-                GodLifeButton(onClick = {},
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth(0.5f)
-                ) {
-                    Text(text = "완료",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+            val switchState = remember { mutableStateOf(false) }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ){
+                Switch(
+                    checked = switchState.value,
+                    onCheckedChange = {switchState.value = !switchState.value},
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = OrangeMain,
+                        uncheckedTrackColor = Color.LightGray
                     )
-                }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            Row(modifier = Modifier.padding(5.dp)){
+
+                Icon(
+                    imageVector = Icons.Outlined.Notifications,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    tint = GrayWhite
+                )
+
+                Text(text = "알림 시간",
+                    style = TextStyle(
+                        color = OrangeMain,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            }
+
+            NotificationTimeInputPreview()
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+        }
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f)){
+
+            GodLifeButton(onClick = {},
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth(0.5f)
+            ) {
+                Text(text = "완료",
+                    color = Color.White,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
             }
         }
     }

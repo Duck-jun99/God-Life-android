@@ -33,7 +33,7 @@ import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.MainPageViewModel
 
 @Composable
@@ -52,7 +52,7 @@ fun EditTodoListContent(
             viewModel.setCleared()
         },
         title = {
-            Text(text = "투두 리스트 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "투두 리스트 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             LazyVerticalGrid(
@@ -80,7 +80,7 @@ fun EditTodoListContent(
                     //mainPageViewModel.setUpdateAlertDialogFlag()
                     //onUpdateComplete()
                 },
-                text = { Text(text = "완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+                text = { Text(text = "완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
         },
 
         dismissButton = {
@@ -161,7 +161,7 @@ fun EditTodoListPreview(
         containerColor = GrayWhite3,
         onDismissRequest = { /*TODO*/ },
         title = {
-            Text(text = "투두 리스트 수정", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = "투두 리스트 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             LazyVerticalGrid(
@@ -178,7 +178,7 @@ fun EditTodoListPreview(
         confirmButton = {
             GodLifeButtonWhite(
                 onClick = { /*TODO*/ },
-                text = { Text(text = "완료", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
+                text = { Text(text = "완료", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) })
         },
 
         dismissButton = {

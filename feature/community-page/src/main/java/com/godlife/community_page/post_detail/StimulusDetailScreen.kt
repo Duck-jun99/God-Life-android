@@ -81,7 +81,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.StimulusPost
@@ -284,7 +284,7 @@ fun StimulusPostCover(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -401,7 +401,7 @@ fun StimulusCoverItem(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -485,7 +485,7 @@ fun PostContent(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -681,7 +681,7 @@ fun PostContent(
             containerColor = Color.White,
             onDismissRequest = { viewModel.setDialogVisble() },
             title = {
-                Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                Text(text = "삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
             },
             text = {
                 Text(text = "게시물을 삭제하시겠어요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -692,13 +692,13 @@ fun PostContent(
                         viewModel.deletePost()
                         viewModel.setDialogVisble()
                     },
-                    text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    text = { Text(text = "삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
             },
             dismissButton = {
                 GodLifeButtonWhite(
                     onClick = { viewModel.setDialogVisble() },
-                    text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                    text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                 )
             }
         )
@@ -741,7 +741,7 @@ fun OwnerOption(
                     Text(
                         text = "수정하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -768,7 +768,7 @@ fun OwnerOption(
                     Text(
                         text = "삭제하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -819,7 +819,7 @@ fun GoodScoreOption(
                     .align(Alignment.CenterHorizontally),
                 imageVector = Icons.Outlined.ThumbUp,
                 contentDescription = "",
-                tint = PurpleMain
+                tint = OrangeMain
             )
 
             Text(
@@ -1218,7 +1218,7 @@ fun OwnerOptionPreview(
                     Text(
                         text = "수정하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -1243,7 +1243,7 @@ fun OwnerOptionPreview(
                     Text(
                         text = "삭제하기",
                         style = TextStyle(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         )

@@ -47,7 +47,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -63,7 +62,7 @@ import com.godlife.create_post.R
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.BuildConfig
 
 @Composable
@@ -359,7 +358,7 @@ fun ContentPreview(modifier: Modifier = Modifier){
 
             Box(
                 modifier
-                    .background(PurpleMain, shape = CircleShape)
+                    .background(OrangeMain, shape = CircleShape)
                     .size(70.dp))
 
             Spacer(modifier.size(10.dp))
@@ -431,7 +430,7 @@ fun RowButton2(navController: NavController){
             ) {
                 Text(
                     text = "수정하기",
-                    color = PurpleMain,
+                    color = OrangeMain,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     modifier = Modifier
                         .padding(20.dp)

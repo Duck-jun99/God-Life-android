@@ -88,7 +88,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.navigation.HistoryPageRoute
 import com.godlife.main_page.navigation.NotificationListRoute
 import com.godlife.main_page.update.UpdateAlertDialog
@@ -544,7 +544,7 @@ fun TodoAlertDialog(
         containerColor = Color.White,
         onDismissRequest = { viewModel.setTodoAlertDialogFlag() },
         title = {
-            Text(text = selectedTodo.name, style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+            Text(text = selectedTodo.name, style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
             Text(text = "해당 목표를 달성하셨나요?", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -560,13 +560,13 @@ fun TodoAlertDialog(
                     viewModel.setTodoAlertDialogFlag()
 
                 },
-                text = { Text(text = "달성하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "달성하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         },
         dismissButton = {
             GodLifeButtonWhite(
                 onClick = { viewModel.setTodoAlertDialogFlag() },
-                text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
             )
         }
     )
@@ -691,38 +691,38 @@ fun MainTodoListBox(
                     Column {
 
                         DropdownMenuItem(
-                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = PurpleMain)) },
+                            text = { Text(text = "투두리스트 수정", style = TextStyle(color = OrangeMain)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "EDIT_TODOLIST")
                             },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = PurpleMain)
+                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "수정하기", tint = OrangeMain)
                             },
                             colors = MenuDefaults.itemColors(Color.White)
                         )
 
                         DropdownMenuItem(
-                            text = { Text(text = "알림 시간 수정", style = TextStyle(color = PurpleMain)) },
+                            text = { Text(text = "알림 시간 수정", style = TextStyle(color = OrangeMain)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "EDIT_NOTIFICATION_TIME")
                             },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = PurpleMain)
+                                Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "수정하기", tint = OrangeMain)
                             },
                             colors = MenuDefaults.itemColors(Color.White)
                         )
 
                         DropdownMenuItem(
-                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain)) },
+                            text = { Text(text = "삭제하기", style = TextStyle(color = OrangeMain)) },
                             onClick = {
                                 viewModel.setDropDownVisble()
                                 viewModel.setUpdateAlertDialogFlag(category = "DELETE")
 
                             },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = PurpleMain)
+                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "삭제하기", tint = OrangeMain)
                             },
                             colors = MenuDefaults.itemColors(Color.White)
                         )
@@ -974,14 +974,14 @@ fun NoCompletedTodayList(
                 .padding(10.dp)
         ) {
             Text(text = todo.name,
-                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
+                style = TextStyle(fontSize = 20.sp, color = OrangeMain)
             )
 
             HorizontalDivider(
                 modifier = Modifier
                     .padding(vertical = 10.dp),
                 thickness = 2.dp,
-                color = PurpleMain
+                color = OrangeMain
             )
 
             GodLifeButton(
@@ -1050,7 +1050,7 @@ fun CompleteTodayBox(
         Icon(
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription ="",
-            tint = PurpleMain,
+            tint = OrangeMain,
             modifier = modifier
                 .size(25.dp)
                 .graphicsLayer(alpha = 0.99f)
@@ -1106,7 +1106,7 @@ fun CompleteTodayBox(
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
             },
             text = {
@@ -1188,7 +1188,7 @@ fun MainTodoListBoxPreview(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "진행상황", style = TextStyle(color = GrayWhite, fontSize = 15.sp), textAlign = TextAlign.Center)
-            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = PurpleMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+            Text(text = "$completedTodoListSize / $todayTodoListSize", style = TextStyle(color = OrangeMain, fontSize = 25.sp, fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
         }
 
 
@@ -1211,7 +1211,7 @@ fun MainTodoListBoxPreview(
             drawArc(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xff63C6C4), PurpleMain
+                        Color(0xff63C6C4), OrangeMain
                     ),
                     start = Offset.Zero,
                     end = Offset.Infinite,
@@ -1241,7 +1241,7 @@ fun MainTodoListBoxPreview(
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
             }
         }
@@ -1313,7 +1313,7 @@ fun MainNoTodoListBoxPreview(
                     drawArc(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                Color(0xff63C6C4), PurpleMain
+                                Color(0xff63C6C4), OrangeMain
                             ),
                             start = Offset.Zero,
                             end = Offset.Infinite,
@@ -1375,7 +1375,7 @@ fun CompleteTodayBoxPreview(
         Icon(
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription ="",
-            tint = PurpleMain,
+            tint = OrangeMain,
             modifier = modifier
                 .size(25.dp)
                 .graphicsLayer(alpha = 0.99f)
@@ -1429,7 +1429,7 @@ fun CompleteTodayBoxPreview(
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
             },
             text = {
@@ -1452,7 +1452,7 @@ fun CompletedTodoListBoxPreview() {
     Column(
         modifier = Modifier
             .background(
-                brush = Brush.verticalGradient(listOf(PurpleSecond, PurpleMain)),
+                brush = Brush.verticalGradient(listOf(PurpleSecond, OrangeMain)),
                 shape = RoundedCornerShape(30.dp),
                 alpha = 0.8f
             )
@@ -1518,11 +1518,11 @@ fun NoCompletedTodayListPreview(){
                 .padding(10.dp)
         ) {
             Text(text = "아침 식사",
-                style = TextStyle(fontSize = 20.sp, color = PurpleMain)
+                style = TextStyle(fontSize = 20.sp, color = OrangeMain)
             )
 
             Divider(
-                color = PurpleMain,
+                color = OrangeMain,
                 thickness = 2.dp,
                 modifier = Modifier
                     .padding(vertical = 10.dp)

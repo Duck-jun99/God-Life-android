@@ -45,7 +45,7 @@ import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -129,7 +129,7 @@ fun MostViewStimulusPostItem(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }

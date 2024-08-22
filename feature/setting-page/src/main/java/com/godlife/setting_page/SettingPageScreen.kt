@@ -2,12 +2,9 @@ package com.godlife.setting_page
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,16 +36,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -62,19 +56,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.navigator.LoginNavigator
 import com.godlife.network.model.UserInfoBody
 import com.godlife.profile.navigation.ProfileEditScreenRoute
-import com.godlife.profile.navigation.ProfileScreenRoute
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -252,7 +241,7 @@ fun ProfileCard(
             Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = "마스터", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
                 HorizontalDivider(modifier.padding(top = 10.dp, bottom = 10.dp))
 
@@ -288,7 +277,7 @@ fun ProfileButton(
                 Icon(
                     imageVector = imageVector,
                     contentDescription = null,
-                    tint = PurpleMain,
+                    tint = OrangeMain,
                     modifier = Modifier.size(40.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -505,7 +494,7 @@ fun ProfileCardPreview(
             Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = "마스터", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
                 HorizontalDivider(modifier.padding(top = 10.dp, bottom = 10.dp))
 
@@ -543,13 +532,13 @@ fun ProfileButtonPreview(
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = null,
-                    tint = PurpleMain,
+                    tint = OrangeMain,
                     modifier = Modifier.size(30.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = text,
-                    color = PurpleMain,
+                    color = OrangeMain,
                     style = TextStyle(fontSize = 20.sp)
                 )
             }

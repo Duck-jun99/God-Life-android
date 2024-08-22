@@ -1,6 +1,5 @@
 package com.godlife.designsystem.list
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,8 +41,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OrangeLight
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.model.community.TagItem
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.BuildConfig
 import com.godlife.network.model.PostDetailBody
 import com.skydoves.landscapist.ImageOptions
@@ -96,7 +94,7 @@ fun CommunityFamousPostList(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -146,7 +144,7 @@ fun CommunityFamousPostList(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -293,7 +291,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -343,7 +341,7 @@ fun CommunityFamousPostListPreview(modifier: Modifier = Modifier){
                             ){
 
                                 CircularProgressIndicator(
-                                    color = PurpleMain
+                                    color = OrangeMain
                                 )
 
                             }

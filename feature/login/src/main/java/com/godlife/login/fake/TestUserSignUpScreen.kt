@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,12 +36,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.godlife.designsystem.component.GodLifeSignUpTextField
-import com.godlife.designsystem.component.GodLifeTextField
 import com.godlife.designsystem.theme.GodLifeTheme
-import com.godlife.designsystem.theme.PurpleMain
-import com.godlife.login.EditScreen1
-import com.godlife.login.SignUpConfirmScreen
-import com.godlife.login.SignUpViewModel
+import com.godlife.designsystem.theme.OrangeMain
 import kotlinx.coroutines.delay
 
 @Composable
@@ -116,7 +111,7 @@ fun FakeSignUpScreen1(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PurpleMain)
+                .background(OrangeMain)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -165,7 +160,7 @@ fun TestEditScreen1(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleMain)
+            .background(OrangeMain)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -295,7 +290,7 @@ fun TestEditScreen2(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleMain)
+            .background(OrangeMain)
     ) {
         Column(
 

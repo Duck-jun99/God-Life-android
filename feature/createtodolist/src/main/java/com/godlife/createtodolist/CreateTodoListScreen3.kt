@@ -147,7 +147,7 @@ fun DoneLodingUI(
             Column(
                 modifier = Modifier
                     .padding(20.dp)
-                    .weight(0.8f)
+                    .weight(0.9f)
             ) {
 
                 Text(
@@ -160,7 +160,9 @@ fun DoneLodingUI(
             }
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.2f)){
+                .weight(0.1f),
+                contentAlignment = Alignment.TopCenter
+            ){
 
                 GodLifeButton(onClick = {
                     moveMainActivity(mainNavigator, createTodoListActivity)

@@ -1,7 +1,5 @@
 package com.godlife.community_page.search.stimulus
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,14 +19,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,21 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.stimulus.StimulusPostItem
@@ -61,7 +51,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
 import com.godlife.designsystem.theme.OrangeLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.network.model.StimulusPostList
 import com.skydoves.landscapist.ImageOptions
@@ -106,7 +96,7 @@ fun StimulusSearchScreen(
                         viewModel.checkCategory("post")
                     },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = PurpleMain
+                        checkedColor = OrangeMain
                     )
                 )
                 Text(
@@ -124,7 +114,7 @@ fun StimulusSearchScreen(
                         viewModel.checkCategory("writer")
                     },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = PurpleMain
+                        checkedColor = OrangeMain
                     )
                 )
                 Text(
@@ -174,7 +164,7 @@ fun StimulusSearchScreen(
                             Text(
                                 text = "\"${searchText.value}\"에 대해 ${searchResult.size}개의 게시물을 찾았어요.",
                                 style = TextStyle(
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     fontSize = 14.sp
                                 )
                             )
@@ -203,7 +193,7 @@ fun StimulusSearchScreen(
                             Text(
                                 text = "검색 결과가 없습니다.",
                                 style = TextStyle(
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     fontSize = 16.sp
                                 )
                             )
@@ -277,7 +267,7 @@ fun SearchStimulusPostItem(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }

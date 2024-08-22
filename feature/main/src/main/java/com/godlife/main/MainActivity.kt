@@ -10,7 +10,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.animate
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,10 +24,7 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -47,13 +43,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -84,7 +78,7 @@ import com.godlife.designsystem.component.TabIconView
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.main_page.MainPageScreen
 import com.godlife.main_page.history.HistoryDetailScreen
 import com.godlife.main_page.history.HistoryPageScreen
@@ -463,7 +457,7 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                     drawContent()
                     if (currentRoute == bottomNavItem.route) {
                         drawLine(
-                            color = PurpleMain,
+                            color = OrangeMain,
                             start = Offset(0f, 0f),
                             end = Offset(size.width, 0f),
                             strokeWidth = 5.dp.toPx()
@@ -489,12 +483,12 @@ fun MyBottomNavigation(bottomNavItems: List<BottomNavItem>, navController: NavCo
                 },
                 label = {
                     if(currentRoute == bottomNavItem.route){
-                        Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold)) }
+                        Text(bottomNavItem.title, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold)) }
                     else null
                         },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PurpleMain,
-                    selectedTextColor = PurpleMain,
+                    selectedIconColor = OrangeMain,
+                    selectedTextColor = OrangeMain,
                     unselectedIconColor = GrayWhite,
                     unselectedTextColor = GrayWhite,
                     disabledIconColor = GrayWhite3,
@@ -546,7 +540,7 @@ fun MyBottomNavigationPreview() {
                     .offset(x = with(density) { indicatorOffset.toDp() })
                     .width(itemWidth.dp)
                     .height(3.dp)
-                    .background(PurpleMain)
+                    .background(OrangeMain)
             )
 
             Row {
@@ -575,12 +569,12 @@ fun MyBottomNavigationPreview() {
                         },
                         label = {
                             if(currentRoute == bottomNavItem.route){
-                                Text(bottomNavItem.title, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold))
+                                Text(bottomNavItem.title, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold))
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.Unspecified,
-                            selectedTextColor = PurpleMain,
+                            selectedTextColor = OrangeMain,
                             unselectedIconColor = GrayWhite,
                             unselectedTextColor = GrayWhite,
                             indicatorColor = Color.Transparent // 기본 인디케이터를 숨김.

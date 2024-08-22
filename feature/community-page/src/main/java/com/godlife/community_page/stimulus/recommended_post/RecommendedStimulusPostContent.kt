@@ -1,8 +1,5 @@
 package com.godlife.community_page.stimulus.recommended_post
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +23,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,10 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -52,9 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.navigation.StimulusPostDetailRoute
@@ -64,7 +55,7 @@ import com.godlife.community_page.stimulus.StimulusLoadingScreen
 import com.godlife.community_page.stimulus.StimulusPostItem
 import com.godlife.community_page.stimulus.StimulusPostUiState
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.NonCancellable
@@ -172,7 +163,7 @@ fun RecommendedStimulusPostContent(
                                     ){
 
                                         CircularProgressIndicator(
-                                            color = PurpleMain
+                                            color = OrangeMain
                                         )
 
                                     }

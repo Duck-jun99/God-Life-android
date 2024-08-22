@@ -76,7 +76,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.StimulusPostList
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
@@ -324,7 +324,7 @@ fun StimulusPostScreen(
                                 Text(
                                     text = "굿생 자극이란?",
                                     style = TextStyle(
-                                        color = PurpleMain,
+                                        color = OrangeMain,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -407,7 +407,7 @@ fun StimulusCoverItem(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -501,7 +501,7 @@ fun CustomExpandableFAB(
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = "",
-                                tint = PurpleMain
+                                tint = OrangeMain
                             )
 
                             Spacer(modifier = Modifier.width(15.dp))
@@ -527,7 +527,7 @@ fun CustomExpandableFAB(
                         //buttonClicked = !buttonClicked
                     }
                 ),
-                colors = CardDefaults.cardColors(PurpleMain)
+                colors = CardDefaults.cardColors(OrangeMain)
             ) {
                 Row(
                     modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
@@ -734,7 +734,7 @@ fun StimulusLoadingScreen(
             .height(300.dp),
         contentAlignment = Alignment.Center
     ){
-        CircularProgressIndicator(color = PurpleMain)
+        CircularProgressIndicator(color = OrangeMain)
     }
 }
 

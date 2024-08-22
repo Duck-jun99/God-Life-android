@@ -38,7 +38,7 @@ import com.godlife.community_page.stimulus.RecommendUserItem
 import com.godlife.community_page.stimulus.StimulusPostItem
 import com.godlife.community_page.stimulus.recommended_author_post.RecommendedAuthorStimulusPostContent
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.model.RecommendPostBody
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -80,7 +80,7 @@ fun RecommendedAuthorInfoContent(
                 ){
 
                     CircularProgressIndicator(
-                        color = PurpleMain
+                        color = OrangeMain
                     )
 
                 }
@@ -183,7 +183,7 @@ fun RecommendUserProfile(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }

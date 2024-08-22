@@ -84,10 +84,9 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.model.community.TagItem
 import com.godlife.navigator.MainNavigator
-import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -353,7 +352,7 @@ fun CreatePostScreen(
                             ) {
                                 Text(
                                     text = "미리 보기",
-                                    color = PurpleMain,
+                                    color = OrangeMain,
                                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                                     modifier = Modifier
                                         .padding(20.dp)
@@ -384,7 +383,7 @@ fun CreatePostScreen(
                                     },
                                 shape = RoundedCornerShape(8.dp),
                                 elevation = CardDefaults.cardElevation(7.dp),
-                                colors = CardDefaults.cardColors(PurpleMain)
+                                colors = CardDefaults.cardColors(OrangeMain)
                             ) {
                                 Text(
                                     text = "작성 완료",
@@ -407,7 +406,7 @@ fun CreatePostScreen(
                     containerColor = Color.White,
                     onDismissRequest = { isDialogVisble = !isDialogVisble },
                     title = {
-                        Text(text = "게시물을 게시할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "게시물을 게시할까요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "아래의 내용을 꼭 확인해주세요!\n\n" +
@@ -428,13 +427,13 @@ fun CreatePostScreen(
                                 isDialogVisble = !isDialogVisble
 
                             },
-                            text = { Text(text = "게시하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "게시하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { isDialogVisble = !isDialogVisble },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -485,7 +484,7 @@ fun TagItem(tagItem: TagItem, modifier: Modifier = Modifier){
         Box(
             modifier
                 .size(70.dp, 30.dp)
-                .background(color = PurpleMain, shape = RoundedCornerShape(7.dp))
+                .background(color = OrangeMain, shape = RoundedCornerShape(7.dp))
                 .padding(2.dp)
             ,
             contentAlignment = Alignment.Center
@@ -596,7 +595,7 @@ fun CreatePostSuccessScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -604,7 +603,7 @@ fun CreatePostSuccessScreen(
         Text(
             text = "${score}점",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -627,7 +626,7 @@ fun CreatePostSuccessScreen(
 
         GodLifeButtonWhite(
             onClick = { mainNavigator.navigateFrom(activity = createPostActivity, withFinish = true) },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -656,7 +655,7 @@ fun CreatePostErrorScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -664,7 +663,7 @@ fun CreatePostErrorScreen(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -687,7 +686,7 @@ fun CreatePostErrorScreen(
 
         GodLifeButtonWhite(
             onClick = { mainNavigator.navigateFrom(activity = createPostActivity, withFinish = true) },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -893,7 +892,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                         ) {
                             Text(
                                 text = "미리 보기",
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                                 modifier = Modifier
                                     .padding(20.dp)
@@ -914,7 +913,7 @@ fun CreatePostScreenPreview(modifier: Modifier = Modifier){
                                 .fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
                             elevation = CardDefaults.cardElevation(7.dp),
-                            colors = CardDefaults.cardColors(PurpleMain)
+                            colors = CardDefaults.cardColors(OrangeMain)
                         ) {
                             Text(
                                 text = "작성 완료",
@@ -958,11 +957,11 @@ fun AddButton(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Outlined.Add, // Choose an appropriate icon
                 contentDescription = "Add icon",
-                tint = PurpleMain,
+                tint = OrangeMain,
                 modifier = Modifier.size(24.dp)
             )
         },
-        text = {Text("추가하기", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold))}
+        text = {Text("추가하기", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold))}
     )
 }
 
@@ -975,11 +974,11 @@ fun AddButtonPreview() {
             Icon(
                 imageVector = Icons.Outlined.Add, // Choose an appropriate icon
                 contentDescription = "Add icon",
-                tint = PurpleMain,
+                tint = OrangeMain,
                 modifier = Modifier.size(24.dp)
             )
         },
-        text = {Text("추가하기", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold))}
+        text = {Text("추가하기", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold))}
     )
 }
 
@@ -997,7 +996,7 @@ fun SelectImagePreview(){
         }
         Box(modifier = Modifier
             .size(50.dp)
-            .background(PurpleMain, shape = CircleShape)
+            .background(OrangeMain, shape = CircleShape)
         ){
             Text(text = "1", style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) ,modifier = Modifier.align(Alignment.Center))
         }
@@ -1028,7 +1027,7 @@ fun RowButton(){
             ) {
                 Text(
                     text = "미리 보기",
-                    color = PurpleMain,
+                    color = OrangeMain,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     modifier = Modifier
                         .padding(20.dp)
@@ -1049,7 +1048,7 @@ fun RowButton(){
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(7.dp),
-                colors = CardDefaults.cardColors(PurpleMain)
+                colors = CardDefaults.cardColors(OrangeMain)
             ) {
                 Text(
                     text = "작성 완료",
@@ -1117,7 +1116,7 @@ fun CreatePostErrorScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1125,7 +1124,7 @@ fun CreatePostErrorScreenPreview(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1148,7 +1147,7 @@ fun CreatePostErrorScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 
@@ -1190,7 +1189,7 @@ fun CreatePostSuccessScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.ThumbUp,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1198,7 +1197,7 @@ fun CreatePostSuccessScreenPreview(
         Text(
             text = "${score}점",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1221,7 +1220,7 @@ fun CreatePostSuccessScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "메인으로 돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
 

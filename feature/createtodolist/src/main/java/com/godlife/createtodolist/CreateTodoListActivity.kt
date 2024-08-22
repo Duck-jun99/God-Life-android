@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,7 @@ import com.godlife.designsystem.component.GodLifeButton
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.navigator.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -65,7 +66,7 @@ class CreateTodoListActivity :ComponentActivity() {
                     containerColor = Color.White,
                     onDismissRequest = { showExitDialog = false },
                     title = {
-                        Text(text = "투두 리스트 제작을 종료할까요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "투두 리스트 제작을 종료할까요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "아직 오늘의 투두 리스트가 완성되지 않았어요.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -73,13 +74,13 @@ class CreateTodoListActivity :ComponentActivity() {
                     confirmButton = {
                         GodLifeButtonWhite(
                             onClick = { mainNavigator.navigateFrom(this, withFinish = true) },
-                            text = { Text(text = "종료하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "종료하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { showExitDialog = false },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -105,7 +106,10 @@ fun CreateTodoList(
 
 
     Column(
-        modifier = Modifier.fillMaxWidth().statusBarsPadding()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .statusBarsPadding()
     ) {
 
         NavHost(navController = navController, startDestination = CreateTodoListScreen1Route.route,

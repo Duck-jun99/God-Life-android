@@ -79,7 +79,6 @@ import androidx.navigation.NavController
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.R
 import com.godlife.community_page.post_detail.post_update.post.UpdatePostScreen
-import com.godlife.designsystem.component.GodLifeButtonOrange
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeCreateCommentBar
 import com.godlife.designsystem.component.GodLifeCreateCommentBarPreview
@@ -90,7 +89,7 @@ import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OrangeLight
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.network.model.CommentBody
@@ -233,7 +232,7 @@ fun PostDetailScreen(
                     containerColor = Color.White,
                     onDismissRequest = { isShowDialog.value = !isShowDialog.value },
                     title = {
-                        Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                        Text(text = "해당 게시물을 삭제하시겠어요?", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     },
                     text = {
                         Text(text = "사용자님의 굿생 인증 게시물을 삭제하시면 굿생 점수 2점이 차감됩니다.", style = TextStyle(color = GrayWhite, fontSize = 15.sp, fontWeight = FontWeight.Normal))
@@ -243,13 +242,13 @@ fun PostDetailScreen(
                             onClick = {
                                 postDetailViewModel.deletePost()
                             },
-                            text = { Text(text = "삭제하기", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "삭제하기", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     },
                     dismissButton = {
                         GodLifeButtonWhite(
                             onClick = { isShowDialog.value= !isShowDialog.value },
-                            text = { Text(text = "취소", style = TextStyle(color = PurpleMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
+                            text = { Text(text = "취소", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)) }
                         )
                     }
                 )
@@ -405,7 +404,7 @@ fun ImageView(
             ){
 
                 CircularProgressIndicator(
-                    color = PurpleMain
+                    color = OrangeMain
                 )
 
             }
@@ -468,7 +467,7 @@ fun Content(
                     ){
 
                         CircularProgressIndicator(
-                            color = PurpleMain
+                            color = OrangeMain
                         )
 
                     }
@@ -737,7 +736,7 @@ fun Content2(
                         Text(
                             text = "굿생 인정!",
                             style = TextStyle(
-                                color = PurpleMain,
+                                color = OrangeMain,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -752,7 +751,7 @@ fun Content2(
                         .align(Alignment.CenterHorizontally),
                     imageVector = Icons.Outlined.ThumbUp,
                     contentDescription = "",
-                    tint = PurpleMain
+                    tint = OrangeMain
                 )
 
                 Text(
@@ -760,7 +759,7 @@ fun Content2(
                         .fillMaxWidth(),
                     text = "유저님께서 굿생을 인정하신 글이에요!",
                     style = TextStyle(
-                        color = PurpleMain,
+                        color = OrangeMain,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal
                     ),
@@ -860,7 +859,7 @@ fun CommentBox(
                         ){
 
                             CircularProgressIndicator(
-                                color = PurpleMain
+                                color = OrangeMain
                             )
 
                         }
@@ -941,7 +940,7 @@ fun DeleteSuccessScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Delete,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -949,7 +948,7 @@ fun DeleteSuccessScreen(
         Text(
             text = "게시물 삭제가 완료되었어요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -961,7 +960,7 @@ fun DeleteSuccessScreen(
             onClick = {
                 navController.popBackStack()
                       },
-            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
     }
@@ -1196,7 +1195,7 @@ fun ContentPreview(modifier: Modifier = Modifier){
 
             Box(
                 modifier
-                    .background(PurpleMain, shape = CircleShape)
+                    .background(OrangeMain, shape = CircleShape)
                     .size(70.dp)
             )
 
@@ -1294,7 +1293,7 @@ fun Content2Preview(
                     .align(Alignment.CenterHorizontally),
                 imageVector = Icons.Outlined.ThumbUp,
                 contentDescription = "",
-                tint = PurpleMain
+                tint = OrangeMain
             )
 
             Text(
@@ -1444,7 +1443,7 @@ fun DeleteSuccessScreenPreview(
                 .size(40.dp),
             imageVector = Icons.Outlined.Delete,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -1452,7 +1451,7 @@ fun DeleteSuccessScreenPreview(
         Text(
             text = "게시물 삭제가 완료되었어요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -1462,7 +1461,7 @@ fun DeleteSuccessScreenPreview(
 
         GodLifeButtonWhite(
             onClick = { /*TODO*/ },
-            text = { Text(text = "돌아가기", style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+            text = { Text(text = "돌아가기", style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
         )
 
     }

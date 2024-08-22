@@ -1,14 +1,7 @@
 package com.godlife.community_page.latest
 
-import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,49 +16,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ThumbUp
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.godlife.community_page.BuildConfig
 import com.godlife.community_page.CommunityPageViewModel
 import com.godlife.community_page.R
@@ -77,7 +50,7 @@ import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.designsystem.view.GodLifeErrorScreen
 import com.godlife.designsystem.view.GodLifeLoadingScreen
 import com.godlife.model.community.LatestContentUi
@@ -92,13 +65,8 @@ fun LatestPostScreen(
     viewModel: CommunityPageViewModel
 ){
 
-    //val viewModel = hiltViewModel<LatestPostViewModel>()
-
-    //val postList = viewModel.getLatestPost().collectAsLazyPagingItems()
     val postList = viewModel.latestPostList.collectAsLazyPagingItems()
     Log.e("LatestPostScreen", "postList.loadState: ${postList.loadState}")
-
-
 
     GodLifeTheme {
 
@@ -246,7 +214,7 @@ fun LatestPostListView(
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                //Text(text = item.tier, style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                //Text(text = item.tier, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
             }
             Text(
                 modifier = modifier
@@ -505,7 +473,7 @@ fun LatestPostListPreview(modifier: Modifier = Modifier){
                 Spacer(modifier.size(10.dp))
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = PurpleMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = "마스터", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
             }
             Box(modifier.weight(0.2f), contentAlignment = Alignment.TopCenter){
@@ -524,7 +492,7 @@ fun LatestPostListPreview(modifier: Modifier = Modifier){
         //게시물 대표 사진 보여질 곳
         Box(
             modifier
-                .background(PurpleMain)
+                .background(OrangeMain)
                 .height(500.dp)
                 .fillMaxWidth()){
 

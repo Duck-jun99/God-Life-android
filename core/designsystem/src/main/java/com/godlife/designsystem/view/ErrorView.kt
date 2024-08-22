@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.godlife.designsystem.component.GodLifeButtonWhite
-import com.godlife.designsystem.theme.PurpleMain
+import com.godlife.designsystem.theme.OrangeMain
 
 @Preview
 @Composable
@@ -47,7 +47,7 @@ fun GodLifeErrorScreen(
                 .size(40.dp),
             imageVector = Icons.Outlined.Warning,
             contentDescription = "",
-            tint = PurpleMain
+            tint = OrangeMain
         )
 
         Spacer(modifier.size(10.dp))
@@ -55,7 +55,7 @@ fun GodLifeErrorScreen(
         Text(
             text = "오류가 발생했어요.\n잠시 후 다시 시도해주세요.",
             style = TextStyle(
-                color = PurpleMain,
+                color = OrangeMain,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             ),
@@ -86,7 +86,7 @@ fun GodLifeErrorScreen(
 
             GodLifeButtonWhite(
                 onClick = buttonEvent,
-                text = { Text(text = buttonText, style = TextStyle(color = PurpleMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
+                text = { Text(text = buttonText, style = TextStyle(color = OrangeMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)) }
             )
 
         }
