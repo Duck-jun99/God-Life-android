@@ -1089,7 +1089,7 @@ fun CompleteTodayBox(
 
         Spacer(modifier.size(10.dp))
 
-        GodLifeButtonWhite(
+        GodLifeButtonOrange(
             onClick = {
                 moveCreatePostActivity(createPostNavigator, mainActivity)
                       },
@@ -1108,7 +1108,8 @@ fun CompleteTodayBox(
                         fontWeight = FontWeight.Bold
                     )
                 )
-            }
+            },
+            showElevation = false
         )
 
     }

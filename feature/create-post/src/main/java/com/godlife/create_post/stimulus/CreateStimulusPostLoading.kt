@@ -145,11 +145,9 @@ fun CreateStimulusPostLoading(
                             )
                         )
 
-
-
                         Spacer(modifier.size(5.dp))
 
-                        HorizontalDivider()
+                        HorizontalDivider(modifier.width(200.dp))
 
                         Spacer(modifier.size(5.dp))
 
