@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +48,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,11 +61,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.create_post.R
+import com.godlife.designsystem.list.TagItemView
 import com.godlife.designsystem.theme.CheckColor
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
+import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.network.BuildConfig
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun CreatePostPreviewScreen(
@@ -119,40 +126,50 @@ fun Content(
     navController: NavController,
     modifier: Modifier = Modifier){
     val userInfo by viewModel.userInfo.collectAsState()
-    val bitmap: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 
     Column(
         modifier
             .fillMaxWidth()
-            .padding(20.dp)) {
+            .padding(horizontal = 20.dp)) {
         Row(
             modifier
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(70.dp),
             verticalAlignment = Alignment.CenterVertically){
 
-            Glide.with(LocalContext.current)
-                .asBitmap()
-                .load(if(userInfo?.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo?.profileImage else R.drawable.category3)
-                .error(R.drawable.category3)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        bitmap.value = resource
+            //프로필 이미지 부분
+            GlideImage(
+                imageModel = { if(userInfo?.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo?.profileImage else R.drawable.category3 },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = modifier
+                    .clip(CircleShape)
+                    .size(50.dp),
+                loading = {
+                    Box(
+                        modifier = modifier
+                            .background(GrayWhite3)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        CircularProgressIndicator(
+                            color = OrangeMain
+                        )
+
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-
-            bitmap.value?.asImageBitmap()?.let { fetchedBitmap ->
-                Image(
-                    bitmap = fetchedBitmap,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = modifier
-                        .clip(CircleShape)
-                        .size(50.dp)
-                )
-            }
+                },
+                failure = {
+                    Image(
+                        painter = painterResource(id = R.drawable.category3),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            )
 
             Spacer(modifier.size(10.dp))
 
@@ -174,11 +191,9 @@ fun Content(
         Spacer(modifier.size(20.dp))
 
         FlowRow{
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
-            TagItemPreview()
+            viewModel.tags.collectAsState().value.forEach {
+                TagItemView(tagItem = it)
+            }
         }
 
         Spacer(modifier.size(20.dp))
@@ -187,7 +202,7 @@ fun Content(
 
         //Spacer(modifier.size(20.dp))
 
-        RowButton2(navController)
+        //RowButton2(navController)
 
     }
 }
@@ -402,6 +417,7 @@ fun ContentPreview(modifier: Modifier = Modifier){
     }
 }
 
+/*
 @Composable
 fun RowButton2(navController: NavController){
     Row(
@@ -442,6 +458,8 @@ fun RowButton2(navController: NavController){
 
     }
 }
+
+ */
 
 @Preview(showBackground = true)
 @Composable
