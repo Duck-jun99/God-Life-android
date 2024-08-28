@@ -149,16 +149,33 @@ fun HistoryPageScreen(
                         )
                 },
                 text = {
-                    Text(
-                        text = "지금까지 사용자님께서 설정하신 투두 리스트를 볼 수 있는 공간이에요.\n" +
-                                "그동안 굿생을 살기 위해 어떤 노력을 하셨는지 확인해보세요.",
-                        style = TextStyle(
-                            color = Color.Black,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
-                            lineHeight = 24.sp
+                    Column {
+
+                        Text(
+                            text = "지금까지 사용자님께서 설정하신 투두 리스트를 볼 수 있는 공간이에요.\n" +
+                                    "그동안 굿생을 살기 위해 어떤 노력을 하셨는지 확인해보세요.",
+                            style = TextStyle(
+                                color = Color.Black,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                lineHeight = 24.sp
+                            )
                         )
-                    )
+
+                        Spacer(modifier.height(10.dp))
+
+                        Text(
+                            text = "앱 데이터를 삭제하면 모든 기록이 사라집니다.",
+                            style = TextStyle(
+                                color = OrangeMain,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 20.sp
+                            )
+                        )
+
+                    }
+
                 },
                 confirmButton = { /*TODO*/ }
             )
@@ -182,7 +199,7 @@ fun HistoryTodoItem(
             .height(200.dp)
             .background(color = Color.White, shape = RoundedCornerShape(16.dp))
             .clickable {
-                navController.navigate("${HistoryDetailRoute.route}/${todo.id}"){
+                navController.navigate("${HistoryDetailRoute.route}/${todo.id}") {
                     launchSingleTop = true
                 }
             }
