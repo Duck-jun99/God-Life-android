@@ -22,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -137,7 +136,7 @@ fun NoReadNotificationItem(
         ){
 
             Image(
-                painter = painterResource(R.drawable.goodlife_inside_logo),
+                painter = painterResource(R.drawable.goodlife_logo),
                 contentDescription = "",
                 modifier = modifier
                     .fillMaxSize()
@@ -206,7 +205,7 @@ fun ReadNotificationItem(
         ){
 
             Image(
-                painter = painterResource(R.drawable.goodlife_inside_logo),
+                painter = painterResource(R.drawable.goodlife_logo),
                 contentDescription = "",
                 modifier = modifier
                     .fillMaxSize()

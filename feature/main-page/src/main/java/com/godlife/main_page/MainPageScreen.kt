@@ -234,8 +234,8 @@ fun MainPageScreen(
                             Image(
                                 modifier = modifier
                                     .size(height = 70.dp, width = 100.dp),
-                                painter = painterResource(id = R.drawable.goodlife_inside_logo),
-                                contentDescription = "",
+                                painter = painterResource(id = R.drawable.goodlife_logo),
+                                contentDescription = ""
                             )
 
 
@@ -250,7 +250,7 @@ fun MainPageScreen(
                                 GlideImage(
                                     imageModel = { if(userInfo.profileImage != "") BuildConfig.SERVER_IMAGE_DOMAIN + userInfo.profileImage else R.drawable.ic_person },
                                     imageOptions = ImageOptions(
-                                        contentScale = ContentScale.FillWidth,
+                                        contentScale = ContentScale.Crop,
                                         alignment = Alignment.Center
                                     ),
                                     modifier = modifier
@@ -1638,7 +1638,7 @@ fun TabBarPreview(modifier: Modifier = Modifier){
         Image(
             modifier = modifier
                 .size(height = 70.dp, width = 100.dp),
-            painter = painterResource(id = R.drawable.goodlife_inside_logo),
+            painter = painterResource(id = R.drawable.goodlife_logo),
             contentDescription = "",
         )
     }
