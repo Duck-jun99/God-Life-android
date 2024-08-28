@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.godlife.domain.LocalPreferenceUserUseCase
 import com.godlife.domain.SignUpUseCase
 import com.godlife.network.model.SignUpQuery
+import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onSuccess
@@ -18,6 +19,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class SignUpUiState {
+
+    //초기화
+    object Init: SignUpUiState()
+
+    //회원가입 진행중(서버와 통신)
+    object Loading : SignUpUiState()
+
+    //회원가입 성공(서버와 통신 후)
+    data class Success(val data: String) : SignUpUiState()
+
+    //회원가입 실패, 또는 다른 에러 발생
+    data class Error(val message: String) : SignUpUiState()
+}
+
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
@@ -25,12 +41,25 @@ class SignUpViewModel @Inject constructor(
 ) : ViewModel() {
 
     //입력된 닉네임, 이메일, 나이, 성별
-    val nickname = mutableStateOf("")
-    val email = mutableStateOf("")
-    val age = mutableStateOf("")
-    val sex = mutableStateOf("")
+    private val _nickname = MutableStateFlow("")
+    val nickname: StateFlow<String> = _nickname
 
-    lateinit var id: String
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
+
+    private val _age = MutableStateFlow("")
+    val age: StateFlow<String> = _age
+
+    private val _sex = MutableStateFlow("")
+    val sex: StateFlow<String> = _sex
+
+    //카카오 로그인 UserId
+    private val _id = MutableStateFlow("")
+    val id: StateFlow<String> = _id
+
+    //Ui State
+    private val _uiState = MutableStateFlow<SignUpUiState>(SignUpUiState.Init)
+    val uiState: StateFlow<SignUpUiState> = _uiState
 
 
     // 닉네임, 이메일, 나이, 성별 로직을 통과하는지에 대한 여부
@@ -66,6 +95,29 @@ class SignUpViewModel @Inject constructor(
 
     private val _checkedServerEmail = MutableStateFlow(false)
     val checkedServerEmail: StateFlow<Boolean> = _checkedServerEmail
+
+    //회원가입 플래그
+    private var isSignUp = mutableStateOf(false)
+
+    init{
+        _id.value = localPreferenceUserUseCase.getUserId()
+    }
+
+    fun setNickname(nickname: String) {
+        _nickname.value = nickname
+    }
+
+    fun setEmail(email: String) {
+        _email.value = email
+    }
+
+    fun setAge(age: String) {
+        _age.value = age
+    }
+
+    fun setSex(sex: String) {
+        _sex.value = sex
+    }
 
     suspend fun checkServerNickname(nickname: String) {
         _checkedServerNickname.value = signUpUseCase.executeCheckNickname(nickname)!!.check
@@ -141,11 +193,14 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun checkAgeLogic(age: String){
+    fun checkAgeLogic(age: String) {
         _checkedAge.value = false
-        if(age!=null){
+        if (age.isNotEmpty() && age.all { it.isDigit() }) {
             _checkedAge.value = true
             _checkedAgeMessage.value = "입력이 확인되었어요."
+        } else {
+            _checkedAge.value = false
+            _checkedAgeMessage.value = "나이는 숫자만 입력해주세요."
         }
     }
 
@@ -162,35 +217,57 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun signUp(){
-        viewModelScope.launch {
+        if(!isSignUp.value){
+            isSignUp.value = true
 
-            id = localPreferenceUserUseCase.getUserId()
+            viewModelScope.launch {
 
-            if(::id.isInitialized){
+                _uiState.value = SignUpUiState.Loading
 
-                val result =
-                signUpUseCase.executeSignUp(nickname = nickname.value,
-                    email = email.value,
-                    age = age.value.toInt(),
-                    sex = sex.value,
-                    providerId = id,
-                    providerName = "KaKao")
+                //id = localPreferenceUserUseCase.getUserId()
 
-                result
-                    .onSuccess {
-                        localPreferenceUserUseCase.saveAccessToken(data.accessToken)
-                        localPreferenceUserUseCase.saveRefreshToken(data.refershToken)
-                    }
-                    .onError {
+                if(id.value!=""){
 
-                    }
-                    .onException {
+                    val result =
+                        signUpUseCase.executeSignUp(
+                            nickname = nickname.value,
+                            email = email.value,
+                            age = age.value.toInt(),
+                            sex = sex.value,
+                            providerId = id.value,
+                            providerName = "KaKao"
+                        )
 
-                    }
+                    result
+                        .onSuccess {
+
+                            localPreferenceUserUseCase.saveAccessToken(accessToken = data.body.accessToken)
+                            localPreferenceUserUseCase.saveRefreshToken(refreshToken = data.body.refreshToken)
+
+                            _uiState.value = SignUpUiState.Success("회원가입 성공")
+
+                        }
+                        .onError {
+                            _uiState.value = SignUpUiState.Error("${this.response.code()} Error")
+                            Log.e("signUp", this.response.message())
+                        }
+                        .onException {
+                            _uiState.value = SignUpUiState.Error(this.message())
+                            Log.e("signUp", this.message())
+
+                        }
+
+                }
+
+                else{
+                    _uiState.value = SignUpUiState.Error("카카오 인증 오류")
+                    Log.e("signUp","id값이 비어져 있음.")
+                }
 
             }
 
         }
+
 
 
     }

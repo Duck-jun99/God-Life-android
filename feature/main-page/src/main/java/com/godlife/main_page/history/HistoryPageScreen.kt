@@ -201,30 +201,46 @@ fun HistoryTodoItem(
                 val size: Size = drawContext.size
                 val sizeArc = size / 1.5F
 
-                drawArc(
-                    brush = Brush.linearGradient(
-                        colors =
-                        listOf(
-                            Color(0xFFFF44A2),  // 밝은 핫핑크
-                            Color(0xFFFF5890),  // 연한 핑크
-                            Color(0xFFFA6B80),  // 연한 코럴 핑크
-                            Color(0xFFFF7B75),  // 연한 살몬
-                            Color(0xFFFF8161),  // 밝은 코럴
-                            Color(0xFFFF884D),  // 연한 오렌지
+                if(todo.isCompleted){
+                    drawArc(
+                        brush = Brush.linearGradient(
+                            colors =
+                            listOf(
+                                Color(0xFFFF44A2),  // 밝은 핫핑크
+                                Color(0xFFFF5890),  // 연한 핑크
+                                Color(0xFFFA6B80),  // 연한 코럴 핑크
+                                Color(0xFFFF7B75),  // 연한 살몬
+                                Color(0xFFFF8161),  // 밝은 코럴
+                                Color(0xFFFF884D),  // 연한 오렌지
+                            )
+                            ,
+                            start = Offset.Zero,
+                            end = Offset.Infinite,
                         ),
-                        start = Offset.Zero,
-                        end = Offset.Infinite,
-                    ),
-                    startAngle = 100f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                    topLeft = Offset(
-                        (size.width - sizeArc.width) / 2f,
-                        (size.height - sizeArc.height) / 2f
-                    ),
-                    size = sizeArc,
-                    style = Stroke(width = 15f, cap = StrokeCap.Round)
-                )
+                        startAngle = 100f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset(
+                            (size.width - sizeArc.width) / 2f,
+                            (size.height - sizeArc.height) / 2f
+                        ),
+                        size = sizeArc,
+                        style = Stroke(width = 15f, cap = StrokeCap.Round)
+                    )
+                }
+                else{
+                    drawArc(
+                        color = Color(0xFFE1E2E9),
+                        startAngle = 100f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                        size = sizeArc,
+                        style = Stroke(width = 15f, cap = StrokeCap.Round)
+                    )
+                }
+
+
             }
 
             Text(
