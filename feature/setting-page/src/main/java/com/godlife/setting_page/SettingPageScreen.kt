@@ -59,6 +59,7 @@ import androidx.navigation.NavController
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.navigator.LoginNavigator
@@ -233,7 +234,7 @@ fun ProfileCard(
                     .size(50.dp, 50.dp)
                     .clip(CircleShape)
                     .fillMaxSize()
-                    .background(color = GrayWhite)
+                    .background(color = GrayWhite2)
             )
 
             Spacer(modifier.size(10.dp))
