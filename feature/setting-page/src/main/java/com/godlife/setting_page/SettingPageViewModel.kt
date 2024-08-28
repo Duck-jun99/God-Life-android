@@ -44,6 +44,10 @@ class SettingPageViewModel @Inject constructor(
     private val _userInfo = MutableStateFlow<UserInfoBody>(UserInfoBody("", 0, "", 0, "", "", "", 0, ""))
     val userInfo: StateFlow<UserInfoBody> = _userInfo
 
+    //굿생 티어
+    private val _tier = MutableStateFlow<String>("로딩중")
+    val tier: StateFlow<String> = _tier
+
     private val _logoutResult = MutableStateFlow<Boolean?>(null)
     val logoutResult: StateFlow<Boolean?> = _logoutResult
 
@@ -66,6 +70,9 @@ class SettingPageViewModel @Inject constructor(
                 .onSuccess {
 
                     _userInfo.value = data.body
+
+                    setTier()
+
                     _uiState.value = SettingPageUiState.Success("success")
 
                 }
@@ -119,6 +126,42 @@ class SettingPageViewModel @Inject constructor(
                     true
                 }
                 _logoutResult.value = result
+            }
+        }
+    }
+
+    private fun setTier(){
+        viewModelScope.launch(Dispatchers.Default) {
+            when(userInfo.value.godLifeScore){
+
+                in 0..29 -> {
+                    _tier.value = "새싹"
+                }
+
+                in 30..99 -> {
+                    _tier.value = "브론즈"
+                }
+
+                in 100..199 -> {
+                    _tier.value = "실버"
+                }
+
+                in 200..499 -> {
+                    _tier.value = "골드"
+                }
+
+                in 500..699 -> {
+                    _tier.value = "다이아"
+                }
+
+                in 700..999 -> {
+                    _tier.value = "마스터"
+                }
+
+                in 1000..Int.MAX_VALUE -> {
+                    _tier.value = "굿생왕"
+                }
+
             }
         }
     }

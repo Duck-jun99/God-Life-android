@@ -139,7 +139,12 @@ fun SettingPageScreen(
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
 
-                item { ProfileCard(userInfo = userInfo) }
+                item {
+                    ProfileCard(
+                        userInfo = userInfo,
+                        viewModel = viewModel
+                    )
+                }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -206,7 +211,8 @@ private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Acti
 @Composable
 fun ProfileCard(
     modifier: Modifier = Modifier,
-    userInfo: UserInfoBody
+    userInfo: UserInfoBody,
+    viewModel: SettingPageViewModel
 ) {
 
     Log.e("ProfileCard", userInfo.nickname)
@@ -242,7 +248,7 @@ fun ProfileCard(
             Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = viewModel.tier.collectAsState().value, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
                 HorizontalDivider(modifier.padding(top = 10.dp, bottom = 10.dp))
 
@@ -354,7 +360,9 @@ fun SelectMenu1(
                 modifier
                     .weight(0.3f)
                     .clickable {
-                               Toast.makeText(context, "준비중입니다.", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(context, "준비중입니다.", Toast.LENGTH_SHORT)
+                            .show()
                     },
                 contentAlignment = Alignment.Center){
 

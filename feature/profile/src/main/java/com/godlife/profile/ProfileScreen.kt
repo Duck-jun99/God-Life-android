@@ -303,7 +303,7 @@ fun ProfileBox(
                         Spacer(modifier.size(10.dp))
 
                         //티어 보일 공간
-                        Text(text = "마스터",
+                        Text(text = viewModel.tier.collectAsState().value,
                             style = TextStyle(
                                 color = Color.White,
                                 fontSize = 20.sp,
@@ -656,7 +656,7 @@ fun SearchStimulusPostItem(
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(15.dp))
             .clickable {
-                navController.navigate("StimulusDetailScreen/${item.boardId}"){
+                navController.navigate("StimulusDetailScreen/${item.boardId}") {
                     launchSingleTop = true
                 }
             }
