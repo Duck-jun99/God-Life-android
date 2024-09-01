@@ -231,7 +231,7 @@ class ProfileViewModel @Inject constructor(
                 }
 
                 in 1000..Int.MAX_VALUE -> {
-                    _tier.value = "굿생왕"
+                    _tier.value = "레전드"
                 }
 
             }

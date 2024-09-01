@@ -10,3 +10,7 @@ fun NavController.navigateSettingPage() {
 object SettingPageRoute {
     const val route = "Setting-Page"
 }
+
+object ScoreDetailPageRoute {
+    const val route = "Score-Detail-Page"
+}

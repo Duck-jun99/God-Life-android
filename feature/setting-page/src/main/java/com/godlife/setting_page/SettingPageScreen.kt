@@ -65,6 +65,7 @@ import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.navigator.LoginNavigator
 import com.godlife.network.model.UserInfoBody
 import com.godlife.profile.navigation.ProfileEditScreenRoute
+import com.godlife.setting_page.navigation.ScoreDetailPageRoute
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -79,9 +80,7 @@ fun SettingPageScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
-    LaunchedEffect(key1 = true) {
 
-    }
 
     val logoutResult by viewModel.logoutResult.collectAsState()
     val userInfo by viewModel.userInfo.collectAsState()
@@ -148,7 +147,12 @@ fun SettingPageScreen(
 
                 item{ Spacer(modifier.size(12.dp)) }
 
-                item { SelectMenu1(navController = navController) }
+                item {
+                    SelectMenu1(
+                        userInfo = userInfo,
+                        navController = navController
+                    )
+                }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -303,7 +307,9 @@ fun ProfileButton(
 @Composable
 fun SelectMenu1(
     modifier: Modifier = Modifier,
-    navController: NavController){
+    navController: NavController,
+    userInfo: UserInfoBody
+){
 
     val context = LocalContext.current
 
@@ -339,7 +345,7 @@ fun SelectMenu1(
             Box(
                 modifier
                     .weight(0.3f)
-                    .clickable { /* TODO */ },
+                    .clickable { navController.navigate("${ScoreDetailPageRoute.route}/${userInfo.nickname}/${userInfo.godLifeScore}") },
                 contentAlignment = Alignment.Center){
 
                 Column {
