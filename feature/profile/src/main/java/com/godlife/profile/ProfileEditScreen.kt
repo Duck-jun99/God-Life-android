@@ -248,7 +248,8 @@ fun ProfileEditBox(
         bottomSheetState = SheetState(
             initialValue = SheetValue.Expanded,
             skipPartiallyExpanded = false,
-            density  = Density(LocalContext.current)
+            density  = Density(LocalContext.current),
+            skipHiddenState = true
         )
     )
 
