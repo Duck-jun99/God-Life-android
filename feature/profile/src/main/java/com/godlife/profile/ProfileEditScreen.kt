@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -73,6 +74,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.godlife.designsystem.component.GodLifeButtonWhite
 import com.godlife.designsystem.component.GodLifeTextFieldGray
+import com.godlife.designsystem.theme.GrayWhite
 import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OpaqueDark
@@ -248,7 +250,8 @@ fun ProfileEditBox(
         bottomSheetState = SheetState(
             initialValue = SheetValue.Expanded,
             skipPartiallyExpanded = false,
-            density  = Density(LocalContext.current)
+            density  = Density(LocalContext.current),
+            skipHiddenState = true
         )
     )
 
@@ -541,7 +544,7 @@ fun EditIntroduceBox(
 ){
     val introduce by viewModel.introduce.collectAsState()
 
-    var text by remember { mutableStateOf(introduce) }
+    var text by remember { mutableStateOf(introduce.take(25)) }
 
     AlertDialog(
         containerColor = Color.White,
@@ -550,15 +553,36 @@ fun EditIntroduceBox(
             Text(text = "소개글 수정", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Bold))
         },
         text = {
-            Box(
-                modifier
-                    .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+            Column(
+                modifier = modifier
                     .padding(5.dp)
             ){
-                GodLifeTextFieldGray(
-                    text = text,
-                    hint = "소개글을 입력해주세요.",
-                    onTextChanged = { text = it }
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .background(color = GrayWhite3, shape = RoundedCornerShape(16.dp))
+                        .padding(horizontal = 5.dp, vertical = 3.dp)
+                ){
+
+                    GodLifeTextFieldGray(
+                        text = text,
+                        hint = "소개글을 입력해주세요.",
+                        onTextChanged = { text = it.take(25) },
+                        singleLine = true
+                    )
+
+                }
+
+
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    text = "${text.length}/25",
+                    style = TextStyle(
+                        color = GrayWhite,
+                        fontSize = 12.sp
+                    ),
+                    textAlign = TextAlign.End
                 )
             }
 

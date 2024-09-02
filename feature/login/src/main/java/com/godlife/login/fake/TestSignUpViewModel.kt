@@ -176,8 +176,8 @@ class TestSignUpViewModel @Inject constructor(
 
             result
                 .onSuccess {
-                    localPreferenceUserUseCase.saveAccessToken(data.accessToken)
-                    localPreferenceUserUseCase.saveRefreshToken(data.refershToken)
+                    localPreferenceUserUseCase.saveAccessToken(data.body.accessToken)
+                    localPreferenceUserUseCase.saveRefreshToken(data.body.refreshToken)
                 }
                 .onError {
 

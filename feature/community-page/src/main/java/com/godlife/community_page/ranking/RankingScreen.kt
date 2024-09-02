@@ -602,7 +602,7 @@ fun TotalRankingListItem2(
             ){
                 Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = OrangeMain)
                 Spacer(modifier.size(10.dp))
-                Text(text = "굿생 인증", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
+                Text(text = "게시물 수", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
             Spacer(modifier.size(10.dp))
 
@@ -1029,7 +1029,7 @@ fun TotalRankingListItem2Preview(
             ){
                 Icon(imageVector = Icons.Outlined.Edit, contentDescription = "", tint = OrangeMain)
                 Spacer(modifier.size(10.dp))
-                Text(text = "굿생 인증", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
+                Text(text = "게시물 수", style = TextStyle(color = OrangeMain, fontSize = 18.sp, fontWeight = FontWeight.Normal))
             }
             Spacer(modifier.size(10.dp))
 

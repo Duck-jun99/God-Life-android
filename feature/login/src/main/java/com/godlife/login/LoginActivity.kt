@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.login.fake.TestUserLoginScreen
 import com.godlife.login.fake.TestUserSignUpScreen
 import com.godlife.navigator.MainNavigator
@@ -72,18 +72,24 @@ fun LoginUi(context: Context,
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(OrangeMain)
+            .background(Color.White)
             .statusBarsPadding()
     ) {
-        NavHost(navController = navController, startDestination = LoginScreenRoute.route,
-            modifier = Modifier.fillMaxHeight()) {
+        NavHost(
+            navController = navController,
+            startDestination = LoginScreenRoute.route,
+            modifier = Modifier.fillMaxHeight()
+        ) {
 
             composable(LoginScreenRoute.route){
                 LoginScreen(context, navController, mainNavigator, loginActivity)
             }
 
             composable(SignUpScreenRoute.route){
-                SignUpScreen()
+                SignUpScreen(
+                    mainNavigator = mainNavigator,
+                    loginActivity = loginActivity
+                )
             }
 
             composable(TestUserSignUpScreenRoute.route){

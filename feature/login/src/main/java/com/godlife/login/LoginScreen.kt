@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
@@ -38,7 +40,8 @@ fun LoginScreen(
     navController: NavController,
     mainNavigator:MainNavigator,
     loginActivity: LoginActivity,
-    loginViewModel: LoginViewModel = hiltViewModel()){
+    loginViewModel: LoginViewModel = hiltViewModel()
+){
 
     val kakaoLoginManager: KakaoLoginManager = KakaoLoginManager(LocalContext.current, loginViewModel, navController, mainNavigator, loginActivity)
 
@@ -47,16 +50,16 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(30.dp))
+            //Spacer(modifier = Modifier.height(30.dp))
 
-            Text("God Life\nGood Life", style = TextStyle(
-                color = Color.White,
-                fontSize = 35.sp,
-                fontStyle = FontStyle.Italic
-            ))
+            Image(
+                painter = painterResource(id = R.drawable.goodlife_inside_logo2) ,
+                contentDescription = "Good Life Logo"
+            )
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -95,22 +98,29 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview(){
     GodLifeTheme(
-        modifier = Modifier.background(OrangeMain)
+        modifier = Modifier.background(Color.White)
     ) {
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(30.dp))
+            //Spacer(modifier = Modifier.height(30.dp))
 
+            /*
             Text("God Life\nGood Life", style = TextStyle(
                 color = Color.White,
                 fontSize = 35.sp,
                 fontStyle = FontStyle.Italic
             ))
+             */
+            Image(
+                painter = painterResource(id = R.drawable.goodlife_inside_logo2) ,
+                contentDescription = "Good Life Logo"
+            )
 
             Spacer(modifier = Modifier.height(30.dp))
 

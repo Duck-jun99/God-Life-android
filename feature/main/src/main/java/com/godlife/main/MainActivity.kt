@@ -97,7 +97,9 @@ import com.godlife.profile.navigation.ProfileEditScreenRoute
 import com.godlife.profile.navigation.ProfileScreenRoute
 import com.godlife.service.MyFirebaseMessagingService
 import com.godlife.setting_page.SettingPageScreen
+import com.godlife.setting_page.navigation.ScoreDetailPageRoute
 import com.godlife.setting_page.navigation.SettingPageRoute
+import com.godlife.setting_page.score.ScoreDetailScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -356,6 +358,27 @@ fun MainUiTheme(
                         currentRoute.value = ProfileEditScreenRoute.route
                         bottomBarVisibleState.value = false
                     }
+
+                    //굿생 점수 상세 화면
+                    composable("${ScoreDetailPageRoute.route}/{nickname}/{score}", arguments =
+                    listOf(
+                        navArgument("nickname"){type = NavType.StringType},
+                        navArgument("score"){type = NavType.IntType}
+                    )
+                    ){
+                        val nickname = it.arguments?.getString("nickname")
+                        val score = it.arguments?.getInt("score")
+                        if(nickname != null && score != null){
+                            ScoreDetailScreen(
+                                nickname = nickname,
+                                score = score,
+                            )
+                            currentRoute.value = ScoreDetailPageRoute.route
+                            bottomBarVisibleState.value = false
+                        }
+                        //ScoreDetailScreen()
+                    }
+
 
                     //게시물 상세 화면
                     composable("${PostDetailRoute.route}/{postId}", arguments = listOf(navArgument("postId"){type = NavType.StringType})){

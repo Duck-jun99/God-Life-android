@@ -149,16 +149,33 @@ fun HistoryPageScreen(
                         )
                 },
                 text = {
-                    Text(
-                        text = "지금까지 사용자님께서 설정하신 투두 리스트를 볼 수 있는 공간이에요.\n" +
-                                "그동안 굿생을 살기 위해 어떤 노력을 하셨는지 확인해보세요.",
-                        style = TextStyle(
-                            color = Color.Black,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
-                            lineHeight = 24.sp
+                    Column {
+
+                        Text(
+                            text = "지금까지 사용자님께서 설정하신 투두 리스트를 볼 수 있는 공간이에요.\n" +
+                                    "그동안 굿생을 살기 위해 어떤 노력을 하셨는지 확인해보세요.",
+                            style = TextStyle(
+                                color = Color.Black,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                lineHeight = 24.sp
+                            )
                         )
-                    )
+
+                        Spacer(modifier.height(10.dp))
+
+                        Text(
+                            text = "앱 데이터를 삭제하면 모든 기록이 사라집니다.",
+                            style = TextStyle(
+                                color = OrangeMain,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 20.sp
+                            )
+                        )
+
+                    }
+
                 },
                 confirmButton = { /*TODO*/ }
             )
@@ -182,7 +199,7 @@ fun HistoryTodoItem(
             .height(200.dp)
             .background(color = Color.White, shape = RoundedCornerShape(16.dp))
             .clickable {
-                navController.navigate("${HistoryDetailRoute.route}/${todo.id}"){
+                navController.navigate("${HistoryDetailRoute.route}/${todo.id}") {
                     launchSingleTop = true
                 }
             }
@@ -201,30 +218,46 @@ fun HistoryTodoItem(
                 val size: Size = drawContext.size
                 val sizeArc = size / 1.5F
 
-                drawArc(
-                    brush = Brush.linearGradient(
-                        colors =
-                        listOf(
-                            Color(0xFFFF44A2),  // 밝은 핫핑크
-                            Color(0xFFFF5890),  // 연한 핑크
-                            Color(0xFFFA6B80),  // 연한 코럴 핑크
-                            Color(0xFFFF7B75),  // 연한 살몬
-                            Color(0xFFFF8161),  // 밝은 코럴
-                            Color(0xFFFF884D),  // 연한 오렌지
+                if(todo.isCompleted){
+                    drawArc(
+                        brush = Brush.linearGradient(
+                            colors =
+                            listOf(
+                                Color(0xFFFF44A2),  // 밝은 핫핑크
+                                Color(0xFFFF5890),  // 연한 핑크
+                                Color(0xFFFA6B80),  // 연한 코럴 핑크
+                                Color(0xFFFF7B75),  // 연한 살몬
+                                Color(0xFFFF8161),  // 밝은 코럴
+                                Color(0xFFFF884D),  // 연한 오렌지
+                            )
+                            ,
+                            start = Offset.Zero,
+                            end = Offset.Infinite,
                         ),
-                        start = Offset.Zero,
-                        end = Offset.Infinite,
-                    ),
-                    startAngle = 100f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                    topLeft = Offset(
-                        (size.width - sizeArc.width) / 2f,
-                        (size.height - sizeArc.height) / 2f
-                    ),
-                    size = sizeArc,
-                    style = Stroke(width = 15f, cap = StrokeCap.Round)
-                )
+                        startAngle = 100f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset(
+                            (size.width - sizeArc.width) / 2f,
+                            (size.height - sizeArc.height) / 2f
+                        ),
+                        size = sizeArc,
+                        style = Stroke(width = 15f, cap = StrokeCap.Round)
+                    )
+                }
+                else{
+                    drawArc(
+                        color = Color(0xFFE1E2E9),
+                        startAngle = 100f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
+                        size = sizeArc,
+                        style = Stroke(width = 15f, cap = StrokeCap.Round)
+                    )
+                }
+
+
             }
 
             Text(

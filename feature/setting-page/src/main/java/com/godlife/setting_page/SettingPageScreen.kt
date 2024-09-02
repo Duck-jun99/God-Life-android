@@ -59,11 +59,13 @@ import androidx.navigation.NavController
 import com.godlife.designsystem.theme.GodLifeTheme
 import com.godlife.designsystem.theme.GodLifeTypography
 import com.godlife.designsystem.theme.GrayWhite
+import com.godlife.designsystem.theme.GrayWhite2
 import com.godlife.designsystem.theme.GrayWhite3
 import com.godlife.designsystem.theme.OrangeMain
 import com.godlife.navigator.LoginNavigator
 import com.godlife.network.model.UserInfoBody
 import com.godlife.profile.navigation.ProfileEditScreenRoute
+import com.godlife.setting_page.navigation.ScoreDetailPageRoute
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -78,9 +80,7 @@ fun SettingPageScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
     SnackbarHost(hostState = snackBarHostState)
-    LaunchedEffect(key1 = true) {
 
-    }
 
     val logoutResult by viewModel.logoutResult.collectAsState()
     val userInfo by viewModel.userInfo.collectAsState()
@@ -138,11 +138,21 @@ fun SettingPageScreen(
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
 
-                item { ProfileCard(userInfo = userInfo) }
+                item {
+                    ProfileCard(
+                        userInfo = userInfo,
+                        viewModel = viewModel
+                    )
+                }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
-                item { SelectMenu1(navController = navController) }
+                item {
+                    SelectMenu1(
+                        userInfo = userInfo,
+                        navController = navController
+                    )
+                }
 
                 item{ Spacer(modifier.size(12.dp)) }
 
@@ -205,7 +215,8 @@ private fun moveLoginActivity(loginNavigator: LoginNavigator, mainActivity: Acti
 @Composable
 fun ProfileCard(
     modifier: Modifier = Modifier,
-    userInfo: UserInfoBody
+    userInfo: UserInfoBody,
+    viewModel: SettingPageViewModel
 ) {
 
     Log.e("ProfileCard", userInfo.nickname)
@@ -233,7 +244,7 @@ fun ProfileCard(
                     .size(50.dp, 50.dp)
                     .clip(CircleShape)
                     .fillMaxSize()
-                    .background(color = GrayWhite)
+                    .background(color = GrayWhite2)
             )
 
             Spacer(modifier.size(10.dp))
@@ -241,7 +252,7 @@ fun ProfileCard(
             Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
 
                 //티어 보여줄 부분
-                Text(text = "마스터", style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+                Text(text = viewModel.tier.collectAsState().value, style = TextStyle(color = OrangeMain, fontWeight = FontWeight.Bold, fontSize = 15.sp))
 
                 HorizontalDivider(modifier.padding(top = 10.dp, bottom = 10.dp))
 
@@ -296,7 +307,9 @@ fun ProfileButton(
 @Composable
 fun SelectMenu1(
     modifier: Modifier = Modifier,
-    navController: NavController){
+    navController: NavController,
+    userInfo: UserInfoBody
+){
 
     val context = LocalContext.current
 
@@ -332,7 +345,7 @@ fun SelectMenu1(
             Box(
                 modifier
                     .weight(0.3f)
-                    .clickable { /* TODO */ },
+                    .clickable { navController.navigate("${ScoreDetailPageRoute.route}/${userInfo.nickname}/${userInfo.godLifeScore}") },
                 contentAlignment = Alignment.Center){
 
                 Column {
@@ -353,7 +366,9 @@ fun SelectMenu1(
                 modifier
                     .weight(0.3f)
                     .clickable {
-                               Toast.makeText(context, "준비중입니다.", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(context, "준비중입니다.", Toast.LENGTH_SHORT)
+                            .show()
                     },
                 contentAlignment = Alignment.Center){
 

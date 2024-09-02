@@ -162,7 +162,7 @@ class ProfileEditViewModel @Inject constructor(
 
     //소개글 수정 버튼 이벤트
     fun updateIntroduce(introduce: String){
-        _introduce.value = introduce
+        _introduce.value = introduce.take(25)
         if(!workList.value.contains(Work.INTRODUCE)){
             _workList.value.add(Work.INTRODUCE)
         }

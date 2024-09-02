@@ -30,8 +30,14 @@ data class SignUpCheckEmailQuery(
 )
 
 data class SignUpQuery(
+    val status: String,
+    val body: BodySignUp,
+    val message: String
+)
+
+data class BodySignUp(
     val accessToken: String,
-    val refershToken: String,
+    val refreshToken: String,
 )
 
 data class BodyQuery(
