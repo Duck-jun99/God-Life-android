@@ -115,7 +115,7 @@ fun ScoreDetailScreen(
                     Row(
                         modifier = modifier
                             .fillMaxWidth()
-                            .height(400.dp)
+                            .height(300.dp)
                     ){
                         Box(
                             modifier = modifier
@@ -259,7 +259,7 @@ fun ScoreDetailScreen(
                     }
 
 
-                    Spacer(modifier.height(20.dp))
+                    //Spacer(modifier.height(20.dp))
 
                     AnimatedVisibility(
                         visible = text1Visble.value,
@@ -312,8 +312,6 @@ fun ScoreDetailScreen(
                         }
 
                     }
-
-
 
                     Spacer(modifier.height(20.dp))
 
@@ -667,11 +665,11 @@ fun ScoreDetailScreenPreview(
     modifier: Modifier = Modifier
 ){
     val animatedValue = remember { Animatable(0f) }
-    val graphVisble = remember { mutableStateOf(false) }
-    val text1Visble = remember { mutableStateOf(false) }
-    val tierVisble = remember { mutableStateOf(false) }
-    val text2Visble = remember { mutableStateOf(false) }
-    val text3Visble = remember { mutableStateOf(false) }
+    val graphVisble = remember { mutableStateOf(true) }
+    val text1Visble = remember { mutableStateOf(true) }
+    val tierVisble = remember { mutableStateOf(true) }
+    val text2Visble = remember { mutableStateOf(true) }
+    val text3Visble = remember { mutableStateOf(true) }
 
     // 특정 값으로 색을 채우는 Animation
     LaunchedEffect(Unit) {
@@ -715,7 +713,7 @@ fun ScoreDetailScreenPreview(
                     Row(
                         modifier = modifier
                             .fillMaxWidth()
-                            .height(400.dp)
+                            .height(300.dp)
                     ){
                         Box(
                             modifier = modifier
@@ -852,7 +850,7 @@ fun ScoreDetailScreenPreview(
                     }
 
 
-                    Spacer(modifier.height(20.dp))
+                    //Spacer(modifier.height(20.dp))
 
                     AnimatedVisibility(
                         visible = text1Visble.value,
